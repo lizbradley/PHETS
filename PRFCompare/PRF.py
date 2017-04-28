@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from PersistentHomology.BuildComplex import build_filtration
+from DCE.DCETools import embed
 
 
 def get_filtration(in_filename, params, start=0):
@@ -270,7 +271,7 @@ def mean_PRF_dist_plots(
 		funcs_1 = []
 		worm_1 = np.loadtxt(filename_1)
 		print 'len pre crop:', len(worm_1)
-		# worm_1 = worm_1[crop_samp[0]:crop_samp[1]]
+		worm_1 = worm_1[crop_samp[0]:crop_samp[1]]
 		print 'post crop:', len(worm_1)
 		start_pts = np.floor(np.linspace(0, len(worm_1), num_windows, endpoint=False)).astype(int)
 		for i, pt in enumerate(start_pts[:-1]):
@@ -354,6 +355,147 @@ def mean_PRF_dist_plots(
 		plt.close(fig)
 
 	plot_dists(dists1_vs_1, dists2_vs_1, 'ref mean: ' + mean_from)
+
+
+
+def mean_PRF_dist_plots_NEW(
+		filename_1, filename_2,
+		out_filename,
+		filt_params,
+		crop=(2, 2.3), 			# sec
+		window_size=.05,		# sec
+		num_windows=10,
+		mean_samp_num=5,
+		wav_samp_rate = 44100, 	# hz
+		rebuild_filt=True,
+		mean_from='left',
+		tau=50		# samps
+		):
+
+	filt_params.update(
+		{
+			'worm_length' : np.floor(window_size * wav_samp_rate).astype(int)
+		}
+	)
+
+	print 'worm_length:', filt_params['worm_length']
+
+	crop_samp = np.floor(np.array(crop) * wav_samp_rate).astype(int)
+	window_size_samp = int(np.array(window_size) * wav_samp_rate)
+	# window_step_samp = int(window_step * wav_samp_rate)
+
+
+	print 'building funcs_1'
+	funcs_1 = []
+	sig_1_full = np.loadtxt(filename_1)
+	print 'len pre crop:', len(sig_1_full)
+	sig_1 = sig_1_full[crop_samp[0]:crop_samp[1]]
+	print 'post crop:', len(sig_1)
+	start_pts = np.floor(np.linspace(0, len(sig_1), num_windows, endpoint=False)).astype(int)
+	for i, pt in enumerate(start_pts[:-1]):
+		print '\n============================================='
+		print filename_1.split('/')[-1], i, pt
+		print '=============================================\n'
+		window = sig_1[pt:pt + window_size_samp]
+		np.savetxt('PRFCompare/temp_data/temp_sig1.txt', window)
+		embed('PRFCompare/temp_data/temp_sig1.txt', 'PRFCompare/temp_data/temp_worm1.txt',
+			  'none', tau, 2, 4410 )
+		func = get_rank_func('PRFCompare/temp_data/temp_worm1.txt', filt_params)
+		funcs_1.append(func)
+
+
+	print 'building funcs_2'
+	funcs_2 = []
+	sig_2_full = np.loadtxt(filename_2)
+	print 'len pre crop:', len(sig_2_full)
+	sig_2 = sig_2_full[crop_samp[0]:crop_samp[1]]
+	print 'post crop:', len(sig_2)
+	start_pts = np.floor(np.linspace(0, len(sig_2), num_windows, endpoint=False)).astype(int)
+	for i, pt in enumerate(start_pts[:-1]):
+		print '\n============================================='
+		print filename_2.split('/')[-1], i, pt
+		print '=============================================\n'
+		window = sig_2[pt:pt + window_size_samp]
+		np.savetxt('PRFCompare/temp_data/temp_sig2.txt', window,)
+		embed('PRFCompare/temp_data/temp_sig2.txt', 'PRFCompare/temp_data/temp_worm2.txt',
+			  'none', tau, 2, 4410)
+		func = get_rank_func('PRFCompare/temp_data/temp_worm2.txt', filt_params)
+		funcs_2.append(func)
+
+
+		np.save('PRFCompare/temp_data/funcs_1.npy', funcs_1)
+		np.save('PRFCompare/temp_data/funcs_2.npy', funcs_2)
+
+
+	funcs_1 = np.load('PRFCompare/temp_data/funcs_1.npy')
+	funcs_2 = np.load('PRFCompare/temp_data/funcs_2.npy')
+
+	mean_1_samps = funcs_1[::num_windows//mean_samp_num]
+	mean_2_samps = funcs_2[::num_windows//mean_samp_num]
+
+	funcs_1_avg = np.mean(mean_1_samps, axis=0)
+	funcs_2_avg = np.mean(mean_2_samps, axis=0)
+
+	funcs_avg = funcs_1_avg if mean_from == 'left' else funcs_2_avg
+
+	# box_area = (funcs_1_avg[3] / len(funcs_1_avg[2])) ** 2
+	box_area = 1
+
+	diffs1_vs_1 = np.array([np.subtract(func[2], funcs_1_avg[2]) for func in funcs_1])
+	dists1_vs_1 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs1_vs_1])
+
+	diffs2_vs_1 = np.array([np.subtract(func[2], funcs_1_avg[2]) for func in funcs_2])
+	dists2_vs_1 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_1])
+
+
+	diffs1_vs_2 = np.array([np.subtract(func[2], funcs_2_avg[2]) for func in funcs_1])
+	dists1_vs_2 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs1_vs_2])
+
+	diffs2_vs_2 = np.array([np.subtract(func[2], funcs_2_avg[2]) for func in funcs_2])
+	dists2_vs_2 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_2])
+
+	# x = np.concatenate([start_pts[:-1], start_pts[:-1] + start_pts[-2]])
+
+	from DCE.DCEPlotter import plot_waveform
+	def plot_dists(dists1, dists2, title, out_filename):
+		fig = plt.figure(figsize=(10, 5))
+		ax1 = fig.add_subplot(221)
+		ax1.plot(dists1)
+		ax1.grid()
+		ax1.set_ylim(bottom=0)
+
+		ax2 = fig.add_subplot(222, sharey=ax1)
+		ax2.plot(dists2)
+		ax2.grid()
+		plt.setp(ax2.get_yticklabels(), visible=False)
+
+		ax1.set_title (filename_1.split('/')[-1])
+		ax2.set_title (filename_2.split('/')[-1])
+
+		ax3 = fig.add_subplot(223)
+		# ax3.plot(sig_1)
+		plot_waveform(ax3, sig_1_full, crop)
+
+		ax4 = fig.add_subplot(224, sharey=ax3)
+		# ax4.plot(sig_2)
+		plot_waveform(ax4, sig_2_full, crop)
+
+
+		fig.suptitle(title)
+
+		plt.savefig(out_filename)
+
+
+		plt.close(fig)
+
+	base_filename = out_filename.split('.')[0]
+
+
+	plot_dists(dists1_vs_1, dists2_vs_1, 'ref mean: left', base_filename + '__ref_left.png')
+	plot_dists(dists1_vs_2, dists2_vs_2, 'ref mean: right', base_filename + '__ref_right.png' )
+
+
+
 
 def see(filename, filt_params):
 
