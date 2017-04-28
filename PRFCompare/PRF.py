@@ -489,10 +489,11 @@ def mean_PRF_dist_plots_NEW(
 		plt.close(fig)
 
 	base_filename = out_filename.split('.')[0]
+	ext = out_filename.split('.')[1]
 
 
-	plot_dists(dists1_vs_1, dists2_vs_1, 'ref mean: left', base_filename + '__ref_left.png')
-	plot_dists(dists1_vs_2, dists2_vs_2, 'ref mean: right', base_filename + '__ref_right.png' )
+	plot_dists(dists1_vs_1, dists2_vs_1, 'ref mean: left', base_filename + '__ref_left.' + ext)
+	plot_dists(dists1_vs_2, dists2_vs_2, 'ref mean: right', base_filename + '__ref_right.' + ext)
 
 
 

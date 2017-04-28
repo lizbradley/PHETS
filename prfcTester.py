@@ -75,7 +75,27 @@ if test == 3:
 	mean_PRF_dist_plots_NEW(
 		'datasets/time_series/viol_data/36-viol.txt',
 		'datasets/time_series/piano_data/C134C/36-C134C.txt',
-		'output/PRFCompare/dist_test_left_NEW.png',
+		'output/PRFCompare/viol_vs_C134C.png',
 		params,
-		mean_from='left'
 	)
+
+if test == 4:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate' : 50,
+			'worm_length' : 5000,
+			'max_filtration_param': -10,
+			'num_divisions' : 50
+		}
+	)
+
+
+	mean_PRF_dist_plots_NEW(
+		'datasets/time_series/34-C134C.txt',
+		'datasets/time_series/34-C135B.txt',
+		'output/PRFCompare/C135B_vs_C134C.png',
+		params,
+	)
+
