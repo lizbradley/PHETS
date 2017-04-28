@@ -240,125 +240,8 @@ def PRF_dist_plots(dir, base_filename,out_filename, i_ref, i_arr, filt_params, r
 	plot_dists(i_ref, i_arr, dists, out_filename)
 
 
+
 def mean_PRF_dist_plots(
-		filename_1, filename_2,
-		out_filename,
-		filt_params,
-		crop=(.1, .4), 			# sec
-		window_size=.05,		# sec
-		num_windows=10,
-		mean_samp_num=5,
-		wav_samp_rate = 44100, 	# hz
-		rebuild_filt=True,
-		mean_from='left'
-		):
-
-	filt_params.update(
-		{
-			'worm_length' : np.floor(window_size * wav_samp_rate).astype(int)
-		}
-	)
-
-	print 'worm_length:', filt_params['worm_length']
-
-	crop_samp = np.floor(np.array(crop) * wav_samp_rate).astype(int)
-	window_size_samp = int(np.array(window_size) * wav_samp_rate)
-	# window_step_samp = int(window_step * wav_samp_rate)
-
-
-	if rebuild_filt:
-		print 'building funcs_1'
-		funcs_1 = []
-		worm_1 = np.loadtxt(filename_1)
-		print 'len pre crop:', len(worm_1)
-		worm_1 = worm_1[crop_samp[0]:crop_samp[1]]
-		print 'post crop:', len(worm_1)
-		start_pts = np.floor(np.linspace(0, len(worm_1), num_windows, endpoint=False)).astype(int)
-		for i, pt in enumerate(start_pts[:-1]):
-			print '\n============================================='
-			print filename_1.split('/')[-1], i, pt
-			print '=============================================\n'
-			window = worm_1[pt:pt + window_size_samp]
-			np.savetxt('PRFCompare/temp_data/temp_worm1.txt', window)
-			func = get_rank_func('PRFCompare/temp_data/temp_worm1.txt', filt_params)
-			funcs_1.append(func)
-
-
-		print 'building funcs_2'
-		funcs_2 = []
-		worm_2 = np.loadtxt(filename_2)
-		print 'len pre crop:', len(worm_2)
-		worm_2 = worm_2[crop_samp[0]:crop_samp[1]]
-		print 'post crop:', len(worm_2)
-		start_pts = np.floor(np.linspace(0, len(worm_2), num_windows, endpoint=False)).astype(int)
-		for i, pt in enumerate(start_pts[:-1]):
-			print '\n============================================='
-			print filename_2.split('/')[-1], i, pt
-			print '=============================================\n'
-			window = worm_2[pt:pt + window_size_samp]
-			np.savetxt('PRFCompare/temp_data/temp_worm2.txt', window,)
-			func = get_rank_func('PRFCompare/temp_data/temp_worm2.txt', filt_params)
-			funcs_2.append(func)
-
-
-		np.save('PRFCompare/temp_data/funcs_1.npy', funcs_1)
-		np.save('PRFCompare/temp_data/funcs_2.npy', funcs_2)
-
-
-	funcs_1 = np.load('PRFCompare/temp_data/funcs_1.npy')
-	funcs_2 = np.load('PRFCompare/temp_data/funcs_2.npy')
-
-	mean_1_samps = funcs_1[::num_windows//mean_samp_num]
-	mean_2_samps = funcs_2[::num_windows//mean_samp_num]
-
-	funcs_1_avg = np.mean(mean_1_samps, axis=0)
-	funcs_2_avg = np.mean(mean_2_samps, axis=0)
-
-	funcs_avg = funcs_1_avg if mean_from == 'left' else funcs_2_avg
-
-	# box_area = (funcs_1_avg[3] / len(funcs_1_avg[2])) ** 2
-	box_area = 1
-
-	diffs1_vs_1 = np.array([np.subtract(func[2], funcs_avg[2]) for func in funcs_1])
-	dists1_vs_1 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs1_vs_1])
-
-	diffs2_vs_1 = np.array([np.subtract(func[2], funcs_avg[2]) for func in funcs_2])
-	dists2_vs_1 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_1])
-
-
-
-	# x = np.concatenate([start_pts[:-1], start_pts[:-1] + start_pts[-2]])
-
-	def plot_dists(dists1, dists2, title):
-		fig = plt.figure(figsize=(10, 5))
-		ax1 = fig.add_subplot(121)
-		ax1.plot(dists1)
-		# ax.set_xlabel('start point (samples)')
-		# ax.set_ylabel('$distance \quad ({\epsilon}^2 \; \# \; holes)$')
-		# ax.xaxis.set_ticks(i_arr[::2])
-		ax1.grid()
-		ax1.set_ylim(bottom=0)
-
-		ax2 = fig.add_subplot(122, sharey=ax1)
-		ax2.plot(dists2)
-		ax2.grid()
-		plt.setp(ax2.get_yticklabels(), visible=False)
-
-		ax1.set_title (filename_1.split('/')[-1])
-		ax2.set_title (filename_2.split('/')[-1])
-
-		fig.suptitle(title)
-
-		plt.savefig(out_filename)
-
-
-		plt.close(fig)
-
-	plot_dists(dists1_vs_1, dists2_vs_1, 'ref mean: ' + mean_from)
-
-
-
-def mean_PRF_dist_plots_NEW(
 		filename_1, filename_2,
 		out_filename,
 		filt_params,
@@ -368,7 +251,6 @@ def mean_PRF_dist_plots_NEW(
 		mean_samp_num=5,
 		wav_samp_rate = 44100, 	# hz
 		rebuild_filt=True,
-		mean_from='left',
 		tau=50		# samps
 		):
 
@@ -436,7 +318,6 @@ def mean_PRF_dist_plots_NEW(
 	funcs_1_avg = np.mean(mean_1_samps, axis=0)
 	funcs_2_avg = np.mean(mean_2_samps, axis=0)
 
-	funcs_avg = funcs_1_avg if mean_from == 'left' else funcs_2_avg
 
 	# box_area = (funcs_1_avg[3] / len(funcs_1_avg[2])) ** 2
 	box_area = 1

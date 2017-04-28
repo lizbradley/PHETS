@@ -3,7 +3,7 @@ import numpy as np
 
 from PersistentHomology.TestingFunctions import parameter_set
 from PRFCompare.PRF import PRF_dist_plots, mean_PRF_dist_plots
-from PRFCompare.PRF import mean_PRF_dist_plots_NEW
+from PRFCompare.PRF import mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
@@ -41,61 +41,18 @@ if test == 2:
 		}
 	)
 
-
-	mean_PRF_dist_plots_NEW(
-		'datasets/embedded/test_cases/viol/36-viol.txt',
-		'datasets/embedded/test_cases/C134C/36-C134C.txt',
-		'output/PRFCompare/dist_test_left_NEW.png',
-		params,
-		mean_from='left'
-	)
-
 	mean_PRF_dist_plots(
-		'datasets/embedded/test_cases/viol/36-viol.txt',
-		'datasets/embedded/test_cases/C134C/36-C134C.txt',
-		'output/PRFCompare/dist_test_right.png',
+		'datasets/time_series/34-C134C.txt',		# input (left)
+		'datasets/time_series/34-C135B.txt',		# input (right)
+		'output/PRFCompare/C135B_vs_C134C.png',		# out filename
 		params,
-		mean_from='right'
+		crop=(2, 2.3),			# seconds
+		window_size=.05,		# seconds
+		num_windows=10,			# evenly spaced
+		mean_samp_num=5,		# number of windows to use for mean
+		tau=50  				# samples (44100 Hz)
+
+		# TODO: auto tau, auto crop, save filt movies and PDs, add PRF contour plot, normalize volume
 	)
 
-
-if test == 3:
-	params = parameter_set
-	# params = standard_parameter_set
-	params.update(
-		{
-			'ds_rate' : 50,
-			'worm_length' : 5000,
-			'max_filtration_param': -10,
-			'num_divisions' : 50
-		}
-	)
-
-
-	mean_PRF_dist_plots_NEW(
-		'datasets/time_series/viol_data/36-viol.txt',
-		'datasets/time_series/piano_data/C134C/36-C134C.txt',
-		'output/PRFCompare/viol_vs_C134C.png',
-		params,
-	)
-
-if test == 4:
-	params = parameter_set
-	# params = standard_parameter_set
-	params.update(
-		{
-			'ds_rate' : 50,
-			'worm_length' : 5000,
-			'max_filtration_param': -10,
-			'num_divisions' : 50
-		}
-	)
-
-
-	mean_PRF_dist_plots_NEW(
-		'datasets/time_series/34-C134C.txt',
-		'datasets/time_series/34-C135B.txt',
-		'output/PRFCompare/C135B_vs_C134C.png',
-		params,
-	)
 
