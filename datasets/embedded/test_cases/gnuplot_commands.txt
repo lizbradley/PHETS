@@ -1,0 +1,37 @@
+set term pngcairo
+set output sprintf('Annulus1_np20r1L5dp1_worm1_image_0.png')
+set style arrow 1 nohead
+set size ratio -1
+set xrange [-0.986361:1.000000]
+set yrange [-0.996584:0.969400]
+set zrange [-1.000000:1.000000]
+set label at 1.000000,0.000000 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at 0.789141,0.614213 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at 0.245485,0.969400 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at -0.401695,0.915773 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at -0.879474,0.475947 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at -0.986361,-0.164595 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at -0.677282,-0.735724 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at -0.082579,-0.996584 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at 0.546948,-0.837166 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at 0.945817,-0.324699 point pt 7 ps 1.000000 lt rgb "#FF00FF"
+set label at 1.000000,0.000000 point pt 7 ps 0.100000
+set label at 0.945817,0.324699 point pt 7 ps 0.100000
+set label at 0.789141,0.614213 point pt 7 ps 0.100000
+set label at 0.546948,0.837166 point pt 7 ps 0.100000
+set label at 0.245485,0.969400 point pt 7 ps 0.100000
+set label at -0.082579,0.996584 point pt 7 ps 0.100000
+set label at -0.401695,0.915773 point pt 7 ps 0.100000
+set label at -0.677282,0.735724 point pt 7 ps 0.100000
+set label at -0.879474,0.475947 point pt 7 ps 0.100000
+set label at -0.986361,0.164595 point pt 7 ps 0.100000
+set label at -0.986361,-0.164595 point pt 7 ps 0.100000
+set label at -0.879474,-0.475947 point pt 7 ps 0.100000
+set label at -0.677282,-0.735724 point pt 7 ps 0.100000
+set label at -0.401695,-0.915773 point pt 7 ps 0.100000
+set label at -0.082579,-0.996584 point pt 7 ps 0.100000
+set label at 0.245485,-0.969400 point pt 7 ps 0.100000
+set label at 0.546948,-0.837166 point pt 7 ps 0.100000
+set label at 0.789141,-0.614213 point pt 7 ps 0.100000
+set label at 0.945817,-0.324699 point pt 7 ps 0.100000
+set label at 1.000000,-0.000000 point pt 7 ps 0.100000

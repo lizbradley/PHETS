@@ -1,0 +1,1 @@
+/usr/local/bin/gcc-5 -fopenmp -lpopt -o find_landmarks find_landmarks.c

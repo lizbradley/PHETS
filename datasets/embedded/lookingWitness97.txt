@@ -1,0 +1,15 @@
+Looking at witness 97: 
+
+268 - Mess With:
+
+At threshold value 0.322671, witness 97 has 1 associated landmarks: [10] 
+At threshold value 0.645341, witness 97 has 2 associated landmarks: [24, 16]
+
+
+
+
+
+
+At threshold value 3.226707, witness 97 has 2 associated landmarks: [3, 25] 
+
+Now: [10, 24, 16, 4, 17, 23, 31, 5, 9, 0, 11, 3, 25] vs [10, 24, 16, 4, 17, 23, 31, 5, 9, 0, 11, 3, 25]
