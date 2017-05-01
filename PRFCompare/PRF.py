@@ -141,8 +141,6 @@ def get_homology(filt_list):
 	filt_array = np.asarray(filt_array)
 	build_perseus_in_file(filt_array)
 
-	print "HII: ", os.getcwd()
-
 	print 'calling perseus...'
 	os.chdir('perseus')
 
@@ -245,7 +243,7 @@ def persistence_diagram(filename):
 
 from scipy.signal import butter, lfilter, freqz
 
-def get_crop_0(sig, length):
+def auto_crop(sig, length):
 
 	sig_abs = np.abs(sig)
 
@@ -269,34 +267,43 @@ def get_crop_0(sig, length):
 	fs = 44100
 	cutoff = 1
 
-	# Get the filter coefficients so we can check its frequency response.
-	b, a = butter_lowpass(cutoff, fs, order)
-
-	# Plot the frequency response.
-	w, h = freqz(b, a)
-	plt.subplot(2, 1, 1)
-	plt.plot(0.5 * fs * w / np.pi, np.abs(h), 'b')
-	plt.axvline(cutoff, color='k')
-	plt.xlim(0, 0.01 * fs)
-	plt.title("Lowpass Filter Frequency Response")
-	plt.xlabel('Frequency [Hz]')
-	plt.grid()
-
-	y = butter_lowpass_filter(sig_abs, cutoff, fs, order)
+	envelope = butter_lowpass_filter(sig_abs, cutoff, fs, order)
 
 	n = len(sig)
 	T = n/fs
 	t = np.linspace(0, T, n, endpoint=False)
 
-	plt.subplot(2, 1, 2)
-	plt.plot(t, sig, 'b-', label='data', color='lightblue')
-	plt.plot(t, y, 'g-', linewidth=1, label='filtered data', color='red')
-	plt.xlabel('Time [sec]')
-	plt.grid()
-	plt.legend()
 
-	plt.subplots_adjust(hspace=0.35)
-	plt.show()
+
+	max_arg = np.argmax(envelope)
+	max = envelope[max_arg]
+
+
+	st_arg = 0
+	for i in xrange(max_arg, len(envelope)):
+		if envelope[i] < .1 * max:
+			st_arg = i
+			break
+	print 'crop start:', t[st_arg]
+	crop = (int(st_arg), int(st_arg + length * 44100))
+
+	# fig = plt.figure()
+	# ax = fig.add_subplot(111)
+	# ax.plot(t, sig, label='data', color='lightblue')
+	# ax.plot(t, envelope, linewidth=1, label='filtered data', color='red')
+	# ax.set_xlabel('Time [sec]')
+	# ax.grid()
+	# ax.legend()
+	#
+	# ax.plot(t[max_arg], envelope[max_arg], color='k', marker='.')
+	# print t[max_arg], envelope[max_arg]
+	#
+	# ax.plot(t[st_arg], envelope[st_arg], color='k', marker='.')
+	#
+	# plt.show()
+
+	return crop
+
 
 
 
@@ -305,7 +312,8 @@ def mean_PRF_dist_plots(
 		filename_1, filename_2,
 		out_filename,
 		filt_params,
-		crop=(2, 2.3), 			# sec
+		crop_1='auto', 		# sec or 'auto'
+		crop_2='auto',
 		crop_auto_len=.3, 		# sec
 		window_size=.05,		# sec
 		num_windows=10,
@@ -348,13 +356,9 @@ def mean_PRF_dist_plots(
 		else:
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
-	filt_params.update(
-		{
-			'worm_length' : np.floor(window_size * wav_samp_rate).astype(int)
-		}
-	)
+	filt_params.update({'worm_length' : np.floor(window_size * wav_samp_rate).astype(int)})
 
-	print 'worm_length:', filt_params['worm_length']
+	# print 'worm_length:', filt_params['worm_length']
 
 	window_size_samp = int(np.array(window_size) * wav_samp_rate)
 	# window_step_samp = int(window_step * wav_samp_rate)
@@ -363,16 +367,11 @@ def mean_PRF_dist_plots(
 	sig_1_full = np.loadtxt(filename_1)
 	if normalize_volume: sig_1_full = sig_1_full / np.max(sig_1_full)
 
-	print 'len pre crop:', len(sig_1_full)
-	if crop == 'auto 0':
-		get_crop_0(sig_1_full, crop_auto_len)
+	if crop_1 == 'auto':
+		crop_1_samp = auto_crop(sig_1_full, crop_auto_len)
 	else:
-		crop_samp = np.floor(np.array(crop) * wav_samp_rate).astype(int)
-
-	sig_1 = sig_1_full[crop_samp[0]:crop_samp[1]]
-
-	print 'post crop:', len(sig_1)
-
+		crop_1_samp = np.floor(np.array(crop_1) * wav_samp_rate).astype(int)
+	sig_1 = sig_1_full[crop_1_samp[0]:crop_1_samp[1]]
 
 
 	start_pts = np.floor(np.linspace(0, len(sig_1), num_windows, endpoint=False)).astype(int)
@@ -398,9 +397,13 @@ def mean_PRF_dist_plots(
 	sig_2_full = np.loadtxt(filename_2)
 	if normalize_volume: sig_2_full = sig_2_full / np.max(sig_2_full)
 
-	print 'len pre crop:', len(sig_2_full)
-	sig_2 = sig_2_full[crop_samp[0]:crop_samp[1]]
-	print 'post crop:', len(sig_2)
+	if crop_2 == 'auto':
+		crop_2_samp = auto_crop(sig_2_full, crop_auto_len)
+	else:
+		crop_2_samp = np.floor(np.array(crop_2) * wav_samp_rate).astype(int)
+
+	sig_2 = sig_2_full[crop_2_samp[0]:crop_2_samp[1]]
+
 
 	start_pts = np.floor(np.linspace(0, len(sig_2), num_windows, endpoint=False)).astype(int)
 	for i, pt in enumerate(start_pts[:-1]):
@@ -469,10 +472,12 @@ def mean_PRF_dist_plots(
 
 		ax3 = fig.add_subplot(223)
 		# ax3.plot(sig_1)
+		crop = np.asarray(crop_1_samp) / 44100
 		plot_waveform(ax3, sig_1_full, crop)
 
 		ax4 = fig.add_subplot(224, sharey=ax3)
 		# ax4.plot(sig_2)
+		crop = np.asarray(crop_2_samp) / 44100
 		plot_waveform(ax4, sig_2_full, crop)
 
 
