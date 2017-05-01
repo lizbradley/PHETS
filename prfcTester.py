@@ -7,7 +7,7 @@ from PRFCompare.PRF import mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 3
+test = 2
 
 if test == 1:
 	params = parameter_set
@@ -37,7 +37,7 @@ if test == 2:
 			'ds_rate' : 50,
 			'worm_length' : 5000,
 			'max_filtration_param': -10,
-			'num_divisions' : 50
+			'num_divisions' : 30
 		}
 	)
 
@@ -50,7 +50,8 @@ if test == 2:
 		window_size=.05,		# seconds
 		num_windows=10,			# evenly spaced
 		mean_samp_num=5,		# number of windows to use for mean
-		tau=50  				# samples (44100 Hz)
+		tau=50,  				# samples (44100 Hz)
+		PD_movie_int=3			# interval to build filt movies and PDs
 
 		# TODO: auto tau, auto crop, save filt movies and PDs, add PRF contour plot, normalize volume
 	)

@@ -82,7 +82,7 @@ def add_title(subplot, title_block_info):
     title_table.auto_set_font_size(False)
     title_table.auto_set_font_size(8)
 
-def add_persistence_plot(subplot, num_div):
+def add_persistence_plot(subplot):
     print 'plotting persistence diagram...'
     birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True)
 
@@ -159,9 +159,7 @@ def make_figure(title_block_info, out_file_name):
     title_block = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3)
     pers_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 
-    num_divisions = len(filt_array)
-
-    add_persistence_plot(pers_plot, num_divisions)
+    add_persistence_plot(pers_plot)
     add_title(title_block, title_block_info)
     pyplot.savefig(out_file_name)
     pyplot.clf()

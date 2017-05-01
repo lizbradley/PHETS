@@ -20,15 +20,15 @@ def get_filtration(in_filename, params, start=0):
 	# lines = open(in_filename).readlines()
 	print "building filtration..."
 	in_filename = os.getcwd() + '/' + in_filename
-	os.chdir('PersistentHomology')
+	os.chdir('PersistentHomology/')
 	filtration = build_filtration(in_filename, params)
-	os.chdir('..')
-	os.chdir('PRFCompare')
-	# witness_coords = filtration[1][1]
-	# landmark_coords = filtration[1][0]
-	complexes = sorted(list(filtration[0]))
-	# np.save('temp_data/complexes.npy', complexes)
 
+	witness_coords = filtration[1][1]
+	landmark_coords = filtration[1][0]
+	complexes = sorted(list(filtration[0]))
+	np.save('temp_data/complexes.npy', complexes)
+	np.save('temp_data/witness_coords.npy', witness_coords)
+	np.save('temp_data/landmark_coords.npy', landmark_coords)
 	return complexes
 
 
@@ -84,7 +84,8 @@ def get_interval_data():
 
 
 def get_homology(filt_list):
-	""" calls perseus """
+
+	""" calls perseus, creating perseus_out_*.tdt """
 
 	# if filt_list == 'read':
 	# 	filt_list = np.load('temp_data/complexes.npy')
@@ -140,6 +141,7 @@ def get_homology(filt_list):
 	filt_array = np.asarray(filt_array)
 	build_perseus_in_file(filt_array)
 
+	print "HII: ", os.getcwd()
 
 	print 'calling perseus...'
 	os.chdir('perseus')
@@ -156,16 +158,6 @@ def get_homology(filt_list):
 	os.chdir('..')
 	os.chdir('..')
 
-
-def get_volume(intervals):
-
-	x, y, z, max_lim = intervals
-	# min_lim = .1 * max_lim
-	min_lim = 0
-	step = .05
-
-	vol, err = integrate.dblquad(f, min_lim, max_lim, lambda x: x, lambda x: max_lim)
-	return vol, err
 
 
 def build_rank_func(data):
@@ -239,7 +231,16 @@ def PRF_dist_plots(dir, base_filename,out_filename, i_ref, i_arr, filt_params, r
 	dists = np.array([np.abs(np.nansum(diff)) * box_area  for diff in diffs])
 	plot_dists(i_ref, i_arr, dists, out_filename)
 
+from PersistentHomology.PersistencePlotter import add_persistence_plot
+from PersistentHomology.FiltrationPlotter import make_movie
 
+
+def persistence_diagram(filename):
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	add_persistence_plot(ax)
+	plt.savefig(filename)
+	plt.close(fig)
 
 def mean_PRF_dist_plots(
 		filename_1, filename_2,
@@ -251,8 +252,40 @@ def mean_PRF_dist_plots(
 		mean_samp_num=5,
 		wav_samp_rate = 44100, 	# hz
 		rebuild_filt=True,
-		tau=50		# samps
+		tau=50,		# samps
+		PD_movie_int = 5
 		):
+
+	def make_movie_and_PD(filename):
+
+		base_name = filename.split('/')[-1].split('.')[0]
+		comp_name = 'compare_{:s}_{:d}_'.format(base_name, i)
+		PD_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'PD.png'
+		movie_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'movie.mp4'
+
+		persistence_diagram(PD_filename)
+
+		color_scheme = 'none'
+		camera_angle = (135, 55)
+		alpha = 1
+		dpi = 150
+		max_frames = None
+		hide_1simplexes = False
+		save_frames = False
+		framerate = 1
+
+		title_block_info = [filename, 'worm {:d} of {:d}'.format(i, num_windows), filt_params, color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
+		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
+
+	path = 'output/PRFCompare/PDs_and_movies/'
+	old_files = os.listdir(path)
+	if old_files:
+		ans = raw_input('Clear old files in ' + path + ' ? (y/n) \n')
+		if ans == 'y':
+			for f in old_files:
+				os.remove(path + f)
+		else:
+			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
 	filt_params.update(
 		{
@@ -266,8 +299,6 @@ def mean_PRF_dist_plots(
 	window_size_samp = int(np.array(window_size) * wav_samp_rate)
 	# window_step_samp = int(window_step * wav_samp_rate)
 
-
-	print 'building funcs_1'
 	funcs_1 = []
 	sig_1_full = np.loadtxt(filename_1)
 	print 'len pre crop:', len(sig_1_full)
@@ -285,8 +316,10 @@ def mean_PRF_dist_plots(
 		func = get_rank_func('PRFCompare/temp_data/temp_worm1.txt', filt_params)
 		funcs_1.append(func)
 
+		if i % PD_movie_int == 0:
+			make_movie_and_PD(filename_1)
 
-	print 'building funcs_2'
+
 	funcs_2 = []
 	sig_2_full = np.loadtxt(filename_2)
 	print 'len pre crop:', len(sig_2_full)
@@ -304,9 +337,11 @@ def mean_PRF_dist_plots(
 		func = get_rank_func('PRFCompare/temp_data/temp_worm2.txt', filt_params)
 		funcs_2.append(func)
 
+		if i % PD_movie_int == 0:
+			make_movie_and_PD(filename_2)
 
-		np.save('PRFCompare/temp_data/funcs_1.npy', funcs_1)
-		np.save('PRFCompare/temp_data/funcs_2.npy', funcs_2)
+
+
 
 
 	funcs_1 = np.load('PRFCompare/temp_data/funcs_1.npy')
