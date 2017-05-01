@@ -253,7 +253,8 @@ def mean_PRF_dist_plots(
 		wav_samp_rate = 44100, 	# hz
 		rebuild_filt=True,
 		tau=50,		# samps
-		PD_movie_int = 5
+		PD_movie_int = 5,
+		normalize_volume=True
 		):
 
 	def make_movie_and_PD(filename):
@@ -279,7 +280,7 @@ def mean_PRF_dist_plots(
 
 	path = 'output/PRFCompare/PDs_and_movies/'
 	old_files = os.listdir(path)
-	if old_files:
+	if old_files and PD_movie_int:
 		ans = raw_input('Clear old files in ' + path + ' ? (y/n) \n')
 		if ans == 'y':
 			for f in old_files:
@@ -301,6 +302,7 @@ def mean_PRF_dist_plots(
 
 	funcs_1 = []
 	sig_1_full = np.loadtxt(filename_1)
+	sig_1_full = sig_1_full / np.max(sig_1_full)
 	print 'len pre crop:', len(sig_1_full)
 	sig_1 = sig_1_full[crop_samp[0]:crop_samp[1]]
 	print 'post crop:', len(sig_1)
@@ -309,19 +311,24 @@ def mean_PRF_dist_plots(
 		print '\n============================================='
 		print filename_1.split('/')[-1], i, pt
 		print '=============================================\n'
-		window = sig_1[pt:pt + window_size_samp]
+		window = np.asarray(sig_1[pt:pt + window_size_samp])
+		# if normalize_volume: window = window / np.max(window)
 		np.savetxt('PRFCompare/temp_data/temp_sig1.txt', window)
 		embed('PRFCompare/temp_data/temp_sig1.txt', 'PRFCompare/temp_data/temp_worm1.txt',
 			  'none', tau, 2, 4410 )
 		func = get_rank_func('PRFCompare/temp_data/temp_worm1.txt', filt_params)
 		funcs_1.append(func)
 
-		if i % PD_movie_int == 0:
-			make_movie_and_PD(filename_1)
+		if PD_movie_int:
+			if i % PD_movie_int == 0:
+				make_movie_and_PD(filename_1)
+
 
 
 	funcs_2 = []
 	sig_2_full = np.loadtxt(filename_2)
+	sig_2_full = sig_2_full / np.max(sig_2_full)
+
 	print 'len pre crop:', len(sig_2_full)
 	sig_2 = sig_2_full[crop_samp[0]:crop_samp[1]]
 	print 'post crop:', len(sig_2)
@@ -330,15 +337,17 @@ def mean_PRF_dist_plots(
 		print '\n============================================='
 		print filename_2.split('/')[-1], i, pt
 		print '=============================================\n'
-		window = sig_2[pt:pt + window_size_samp]
+		window = np.asarray(sig_2[pt:pt + window_size_samp])
+		# if normalize_volume: window = window /
 		np.savetxt('PRFCompare/temp_data/temp_sig2.txt', window,)
 		embed('PRFCompare/temp_data/temp_sig2.txt', 'PRFCompare/temp_data/temp_worm2.txt',
 			  'none', tau, 2, 4410)
 		func = get_rank_func('PRFCompare/temp_data/temp_worm2.txt', filt_params)
 		funcs_2.append(func)
 
-		if i % PD_movie_int == 0:
-			make_movie_and_PD(filename_2)
+		if PD_movie_int:
+			if i % PD_movie_int == 0:
+				make_movie_and_PD(filename_2)
 
 
 
