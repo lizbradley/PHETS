@@ -242,16 +242,75 @@ def persistence_diagram(filename):
 	plt.savefig(filename)
 	plt.close(fig)
 
+
+from scipy.signal import butter, lfilter, freqz
+
+def get_crop_0(sig, length):
+
+	sig_abs = np.abs(sig)
+
+	# http://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
+
+	def butter_lowpass(cutoff, fs, order=5):
+		nyq = 0.5 * fs
+		normal_cutoff = cutoff / nyq
+		b, a = butter(order, normal_cutoff, btype='low', analog=False)
+		return b, a
+
+	def butter_lowpass_filter(data, cutoff, fs, order=5):
+		b, a = butter_lowpass(cutoff, fs, order=order)
+		y = lfilter(b, a, data)
+		return y
+
+
+
+	# Filter requirements.
+	order = 1
+	fs = 44100
+	cutoff = 1
+
+	# Get the filter coefficients so we can check its frequency response.
+	b, a = butter_lowpass(cutoff, fs, order)
+
+	# Plot the frequency response.
+	w, h = freqz(b, a)
+	plt.subplot(2, 1, 1)
+	plt.plot(0.5 * fs * w / np.pi, np.abs(h), 'b')
+	plt.axvline(cutoff, color='k')
+	plt.xlim(0, 0.01 * fs)
+	plt.title("Lowpass Filter Frequency Response")
+	plt.xlabel('Frequency [Hz]')
+	plt.grid()
+
+	y = butter_lowpass_filter(sig_abs, cutoff, fs, order)
+
+	n = len(sig)
+	T = n/fs
+	t = np.linspace(0, T, n, endpoint=False)
+
+	plt.subplot(2, 1, 2)
+	plt.plot(t, sig, 'b-', label='data', color='lightblue')
+	plt.plot(t, y, 'g-', linewidth=1, label='filtered data', color='red')
+	plt.xlabel('Time [sec]')
+	plt.grid()
+	plt.legend()
+
+	plt.subplots_adjust(hspace=0.35)
+	plt.show()
+
+
+
+
 def mean_PRF_dist_plots(
 		filename_1, filename_2,
 		out_filename,
 		filt_params,
 		crop=(2, 2.3), 			# sec
+		crop_auto_len=.3, 		# sec
 		window_size=.05,		# sec
 		num_windows=10,
 		mean_samp_num=5,
 		wav_samp_rate = 44100, 	# hz
-		rebuild_filt=True,
 		tau=50,		# samps
 		PD_movie_int = 5,
 		normalize_volume=True
@@ -297,16 +356,25 @@ def mean_PRF_dist_plots(
 
 	print 'worm_length:', filt_params['worm_length']
 
-	crop_samp = np.floor(np.array(crop) * wav_samp_rate).astype(int)
 	window_size_samp = int(np.array(window_size) * wav_samp_rate)
 	# window_step_samp = int(window_step * wav_samp_rate)
 
 	funcs_1 = []
 	sig_1_full = np.loadtxt(filename_1)
-	sig_1_full = sig_1_full / np.max(sig_1_full)
+	if normalize_volume: sig_1_full = sig_1_full / np.max(sig_1_full)
+
 	print 'len pre crop:', len(sig_1_full)
+	if crop == 'auto 0':
+		get_crop_0(sig_1_full, crop_auto_len)
+	else:
+		crop_samp = np.floor(np.array(crop) * wav_samp_rate).astype(int)
+
 	sig_1 = sig_1_full[crop_samp[0]:crop_samp[1]]
+
 	print 'post crop:', len(sig_1)
+
+
+
 	start_pts = np.floor(np.linspace(0, len(sig_1), num_windows, endpoint=False)).astype(int)
 	for i, pt in enumerate(start_pts[:-1]):
 		print '\n============================================='
@@ -328,11 +396,12 @@ def mean_PRF_dist_plots(
 
 	funcs_2 = []
 	sig_2_full = np.loadtxt(filename_2)
-	sig_2_full = sig_2_full / np.max(sig_2_full)
+	if normalize_volume: sig_2_full = sig_2_full / np.max(sig_2_full)
 
 	print 'len pre crop:', len(sig_2_full)
 	sig_2 = sig_2_full[crop_samp[0]:crop_samp[1]]
 	print 'post crop:', len(sig_2)
+
 	start_pts = np.floor(np.linspace(0, len(sig_2), num_windows, endpoint=False)).astype(int)
 	for i, pt in enumerate(start_pts[:-1]):
 		print '\n============================================='
