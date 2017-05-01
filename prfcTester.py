@@ -51,7 +51,7 @@ if test == 2:
 		num_windows=10,			# evenly spaced
 		mean_samp_num=5,		# number of windows to use for mean
 		tau=50,  				# samples (44100 Hz)
-		PD_movie_int=0			# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=3			# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 		# TODO: auto tau, auto crop, add PRF contour plot, normalize volume
 	)

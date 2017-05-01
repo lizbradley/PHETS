@@ -284,7 +284,8 @@ def mean_PRF_dist_plots(
 		ans = raw_input('Clear old files in ' + path + ' ? (y/n) \n')
 		if ans == 'y':
 			for f in old_files:
-				os.remove(path + f)
+				if f != '.gitkeep':
+					os.remove(path + f)
 		else:
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
