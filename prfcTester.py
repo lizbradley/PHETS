@@ -34,10 +34,10 @@ if test == 2:
 	# params = standard_parameter_set
 	params.update(
 		{
-			'ds_rate' : 50,
-			'worm_length' : 5000,
+			'ds_rate': 50,
+			'worm_length': 5000,
 			'max_filtration_param': -10,
-			'num_divisions' : 30
+			'num_divisions': 30
 		}
 	)
 
