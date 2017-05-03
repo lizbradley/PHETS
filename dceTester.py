@@ -6,11 +6,14 @@ from DCE.DCEPlotter import make_window_frame
 from DCE.DCEMovies_helper import frames_to_movie
 from DCE.DCEMovies import vary_tau, slide_window, compare_vary_tau, compare_multi
 
+# slide_window, vary_tau, compare_vary_tau: tau is in samples not seconds
+# compare_multi: tau is in seconds; has all options for tau and crop *****
 
 
 
-test = 9
-# test = int(sys.argv[1])
+
+#test = 9
+test = int(sys.argv[1])
 
 print 'running test %d...' % test
 
@@ -105,7 +108,30 @@ if test == 9:
 	frames_to_movie('output/DCE/viol_test_7_tau.25T.mp4', framerate=1)
 
 
+if test == 10:
+	
+	dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'  # numerical index goes in front of base
+	dir2, base2 = "datasets/time_series/C135B", '-C135B.txt'
+	
+	compare_multi(
+		dir1, base1,
+		dir2, base2,
 
+		i_lims=(40, 41), 		 # specify note range
+
+		embed_crop_1='auto',	 # seconds or 'auto'
+		embed_crop_2='auto',	 # seconds or 'auto'
+		crop_auto_len=.05,  	 	 # seconds for when embed_crop = 'auto'
+
+		tau='auto detect',  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_T=math.pi, 		 	 # for auto tau. tau = period * tau_T
+
+		save_worms=True,		 # to output/DCE/saved_worms
+		save_movie=True			 # False for faster worm creation
+		
+			)
+
+	frames_to_movie('output/DCE/C134vC135.mp4', framerate=1)
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
