@@ -7,7 +7,6 @@ from DCE.DCEMovies_helper import frames_to_movie
 from DCE.DCEMovies import vary_tau, slide_window, compare_vary_tau, compare_multi
 
 
-# TODO: embed() wrapper
 
 
 test = 9
@@ -30,7 +29,7 @@ if test == 1:
 		vary_tau(
 			'datasets/time_series/%s/%s-%s.txt' % (piano, str(note), piano),
 			tau_lims=(1, 100),
-			tau_inc=5,
+			tau_inc=5,			# samples
 			embed_crop=(.5*i, .5*(i+1)),  	# aka window position, in seconds
 			ds_rate=20
 		)             		# downsample rate (takes every third sample)
@@ -46,7 +45,7 @@ if test == 2:
 			'datasets/time_series/%s/%s-%s.txt' % (piano, str(note), piano),
 			window_size=.05*(i+1),    # seconds
 			ds_rate=1,
-			tau=10,
+			tau=10,				# samples
 			step_size=1)      # how much to move window each frame
 		frames_to_movie('output/DCE/slide_window_scale_tau_%s_%s.mp4' % (str(note), piano), framerate=1)
 
@@ -59,7 +58,7 @@ if test == 3:
 			'datasets/time_series/C135B/%s-C135B.txt' % str(note),
 			'datasets/time_series/C134C/%s-C134C.txt' % str(note),
 			tau_lims=(1, 40),
-			tau_inc=2,
+			tau_inc=2,			#
 			embed_crop=(.5, .7),
 			ds_rate=5
 		)
@@ -78,7 +77,7 @@ if test == 8:
 
 if test == 9:
 	dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'
-	dir2, base2 = "datasets/time_series/viol", '-viol.txt'
+	dir2, base2 = 'datasets/time_series/viol', '-viol.txt'
 
 	compare_multi(
 		dir1, base1,
@@ -90,18 +89,16 @@ if test == 9:
 		embed_crop_2=(2, 2.3),	 # seconds or 'auto'
 		crop_auto_len=.3,  	 	 # seconds for when embed_crop = 'auto'
 
-		tau='auto detect',  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau='auto detect',  	 # seconds 'auto detect' or 'auto ideal'. NOTE: 'auto detect' is considerably slower that 'auto ideal'
 		tau_T=math.pi, 		 	 # for auto tau. tau = period * tau_T
 
 		save_worms=True,		 # to output/DCE/saved_worms
-		save_movie=True			 # False for faster worm creation
+		save_movie=True,			 # False for faster worm creation
+
+		ds_rate=1
 
 
-		# As of now tau cannot be specified for file1
-		# and file 2 seperately. Let me know if this functionality is needed.
-		# NOTE: for the tuning discrepencies we've been encountering (~ 5 Hz), it turns out that
-		# the adjustment to tau is typically less than 1 sample, so 'auto detect' gives the same
-		# results as 'auto ideal', but is much slower.
+		# As of now tau cannot be specified for file1 and file 2 seperately. Let me know if this functionality is needed.
 
 	)
 

@@ -5,11 +5,23 @@ from PersistentHomology.TestingFunctions import parameter_set
 from PRFCompare.PRF import PRF_dist_plots, mean_PRF_dist_plots
 from PRFCompare.PRF import mean_PRF_dist_plots
 
-# TODO: auto tau, add PRF contour plot, weighting functions
+# TODO: prfc auto tau
+# TODO: debug prfc auto crop
+# TODO: dce normalize volumes
+# TODO: dce tau (sec) in old movie funcs
+# TODO: finish auto_embed
 
 
-test = int(sys.argv[1])
-# test = 3
+# TODO: add PRF contour plot
+# TODO: prfc weighting functions
+# TODO: clarinet data
+# TODO: GI Complex
+# TODO: make dce take tau (sec), update all calling functions
+
+
+
+# test = int(sys.argv[1])
+test = 3
 
 if test == 1:
 	params = parameter_set
@@ -81,13 +93,15 @@ if test == 3:
 		'datasets/time_series/C135B/49-C135B.txt',  # input (right)
 		'output/PRFCompare/C134C_vs_C135B_new.png',  # out filename
 		params,
-		crop_1=(2, 2.3),		# seconds or 'auto'
-		crop_2=(2, 2.3),		# seconds or 'auto'
+		crop_1='auto',		# seconds or 'auto'
+		crop_2='auto',		# seconds or 'auto'
 		crop_auto_len=.3,		# seconds. length of windows when crop is 'auto'
 		window_size=.05, 		# seconds
 		num_windows=10, 		# evenly spaced
 		mean_samp_num=10,  		# number of windows to use for mean
-		tau=.001134,  			# seconds
+		tau='auto ideal',  		# seconds
+		tau_T=np.pi,			# tau_T = tau / period
+		note_index=49,			# required for auto tau
 		PD_movie_int=0,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)

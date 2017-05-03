@@ -5,6 +5,8 @@ import scipy.fftpack
 from scipy.io import wavfile
 import matplotlib.pyplot as pyplot
 import math
+from scipy.signal import butter, lfilter, freqz
+
 
 WAV_SAMPLE_RATE = 44100
 
@@ -16,11 +18,10 @@ def wav_to_txt(wav_file_name, output_file_name, crop=(0, 1)):
 	np.savetxt(output_file_name, sig)
 
 
-
 def embed(
 		input_file_name, output_file_name,
-		embed_crop,
-		tau,
+		embed_crop,		# sec
+		tau,			# samples
 		m,
 		ds_rate=1,
 		channel=0
@@ -54,7 +55,99 @@ def embed(
 	input_file.close()
 	output_file.close()
 
-from PRFCompare.PRF import auto_crop
+
+def auto_crop(sig, length):
+	""" 
+	finds max of volume envelope: (xmax, ymax)
+	get first point (x, y) on envelope where y < .1 * ymax and x > xmax """
+
+	# lowpass from http://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
+	def butter_lowpass(cutoff, fs, order=5):
+		nyq = 0.5 * fs
+		normal_cutoff = cutoff / nyq
+		b, a = butter(order, normal_cutoff, btype='low', analog=False)
+		return b, a
+
+	def butter_lowpass_filter(data, cutoff, fs, order=5):
+		b, a = butter_lowpass(cutoff, fs, order=order)
+		y = lfilter(b, a, data)
+		return y
+
+	sig_abs = np.abs(sig)
+	order, fs, cutoff = 1, WAV_SAMPLE_RATE, 1		# filter params
+	envelope = butter_lowpass_filter(sig_abs, cutoff, fs, order)
+
+	n = len(sig)
+	T = n/fs
+	t = np.linspace(0, T, n, endpoint=False)
+
+	max_arg = np.argmax(envelope)
+	max = envelope[max_arg]
+
+	st_arg = 0
+	for i in xrange(max_arg, len(envelope)):
+		if envelope[i] < .1 * max:
+			st_arg = i
+			break
+	print 'crop start:', t[st_arg]
+	crop = (int(st_arg), int(st_arg + length * WAV_SAMPLE_RATE))
+
+	# fig = plt.figure()
+	# ax = fig.add_subplot(111)
+	# ax.plot(t, sig, label='data', color='lightblue')
+	# ax.plot(t, envelope, linewidth=1, label='filtered data', color='red')
+	# ax.set_xlabel('Time [sec]')
+	# ax.grid()
+	# ax.legend()
+	#
+	# ax.plot(t[max_arg], envelope[max_arg], color='k', marker='.')
+	# print t[max_arg], envelope[max_arg]
+	#
+	# ax.plot(t[st_arg], envelope[st_arg], color='k', marker='.')
+	#
+	# plt.show()
+
+	return crop
+
+
+def auto_tau(tau_cmd, filename, note_index, tau_T, crop):
+	""" 
+		helper for mean_PRF_dist_plots(). would be nice to use in DCEMovies.compare_multi() as well
+		returns tau in samples
+	"""
+	if isinstance(tau_cmd, basestring):
+		if not note_index:
+			print "ERROR: 'note_index' required for"
+
+		fname_index = int(filename.split('/')[-1].split('-')[0])
+		if fname_index != note_index:
+			r = input("WARNING: 'note_index' does not seem to match fname_index. 'note_index' is required for auto tau functionality. Continue? (y/n)")
+			if r == 'n':
+				sys.exit()
+		ideal_freq = math.pow(2, (40 - float(note_index)) / 12) * 440  # Hz, descending index
+
+	if not isinstance(tau_cmd, basestring):
+		tau = tau_cmd * WAV_SAMPLE_RATE
+	
+	elif tau_cmd == 'auto detect':
+		f = get_fund_freq(filename, ideal_freq, crop)
+		T = 1. / f
+		tau_sec = tau_T * T
+		tau = tau_sec * WAV_SAMPLE_RATE
+
+	elif tau_cmd == 'auto ideal':
+		f = ideal_freq
+		T = 1./f
+		tau_sec = tau_T * T
+		tau = tau_sec * WAV_SAMPLE_RATE
+			
+	else:
+		print 'ERROR: tau_cmd not recognized.'
+		sys.exit()
+	
+	return tau
+
+
 
 
 def auto_embed(
@@ -90,9 +183,7 @@ def auto_embed(
 			print 'ERROR: tau not recognized.'
 			sys.exit()
 
-	DCETools.embed(filename1, 'DCE/temp_data/embedded_coords_comp1.txt', crop_1, tau_1, m, ds_rate=ds_rate)
-
-
+	embed(filename, 'DCE/temp_data/embedded_coords_comp1.txt', crop_1, tau_1, m, ds_rate=ds_rate)
 
 
 

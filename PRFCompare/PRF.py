@@ -8,7 +8,6 @@ import itertools
 import numpy as np
 from os import system, chdir
 
-from scipy.signal import butter, lfilter, freqz
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -18,6 +17,8 @@ from DCE.DCETools import embed
 from DCE.DCEPlotter import plot_waveform
 from PersistentHomology.PersistencePlotter import add_persistence_plot
 from PersistentHomology.FiltrationPlotter import make_movie
+
+from DCE.DCETools import auto_crop
 
 WAV_SAMPLE_RATE = 44100
 
@@ -192,58 +193,6 @@ def persistence_diagram(filename):
 	plt.close(fig)
 
 
-def auto_crop(sig, length):
-	""" 
-	finds max of volume envelope: (xmax, ymax)
-	get first point (x, y) on envelope where y < .1 * ymax and x > xmax """
-
-	# lowpass from http://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
-	def butter_lowpass(cutoff, fs, order=5):
-		nyq = 0.5 * fs
-		normal_cutoff = cutoff / nyq
-		b, a = butter(order, normal_cutoff, btype='low', analog=False)
-		return b, a
-
-	def butter_lowpass_filter(data, cutoff, fs, order=5):
-		b, a = butter_lowpass(cutoff, fs, order=order)
-		y = lfilter(b, a, data)
-		return y
-
-	sig_abs = np.abs(sig)
-	order, fs, cutoff = 1, WAV_SAMPLE_RATE, 1		# filter params
-	envelope = butter_lowpass_filter(sig_abs, cutoff, fs, order)
-
-	n = len(sig)
-	T = n/fs
-	t = np.linspace(0, T, n, endpoint=False)
-
-	max_arg = np.argmax(envelope)
-	max = envelope[max_arg]
-
-	st_arg = 0
-	for i in xrange(max_arg, len(envelope)):
-		if envelope[i] < .1 * max:
-			st_arg = i
-			break
-	print 'crop start:', t[st_arg]
-	crop = (int(st_arg), int(st_arg + length * WAV_SAMPLE_RATE))
-
-	# fig = plt.figure()
-	# ax = fig.add_subplot(111)
-	# ax.plot(t, sig, label='data', color='lightblue')
-	# ax.plot(t, envelope, linewidth=1, label='filtered data', color='red')
-	# ax.set_xlabel('Time [sec]')
-	# ax.grid()
-	# ax.legend()
-	#
-	# ax.plot(t[max_arg], envelope[max_arg], color='k', marker='.')
-	# print t[max_arg], envelope[max_arg]
-	#
-	# ax.plot(t[st_arg], envelope[st_arg], color='k', marker='.')
-	#
-	# plt.show()
-
-	return crop
 
 
 def PRF_dist_plots(dir, base_filename, fname_format,
@@ -322,6 +271,7 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 	dists_plot(i_ref, i_arr, dists, out_filename)
 
 
+from DCE.DCETools import auto_tau
 
 def mean_PRF_dist_plots(
 		filename_1, filename_2,
@@ -334,6 +284,8 @@ def mean_PRF_dist_plots(
 		num_windows=10,						# per file
 		mean_samp_num=5,					# per file
 		tau=.001,							# sec
+		tau_T=np.pi,
+		note_index=None,					#
 		PD_movie_int = 5,				
 		normalize_volume=True
 		):
@@ -376,16 +328,18 @@ def mean_PRF_dist_plots(
 	def get_funcs(filename, crop):
 		funcs = []
 		sig_full = np.loadtxt(filename)
+
 		if normalize_volume: sig_full = sig_full / np.max(sig_full)
 
-		if crop == 'auto':
-			crop_samp = auto_crop(sig_full, crop_auto_len)
-		else:
-			crop_samp = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		if crop == 'auto': crop_samp = auto_crop(sig_full, crop_auto_len)
+		else: crop_samp = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
 
 		sig = sig_full[crop_samp[0]:crop_samp[1]]
 
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
+
+		tau_samps = auto_tau(tau, filename, note_index, tau_T, crop)
+
 		for i, pt in enumerate(start_pts[:-1]):
 
 			print '\n============================================='
@@ -395,7 +349,7 @@ def mean_PRF_dist_plots(
 			window = np.asarray(sig[pt:pt + window_size_samp])
 			np.savetxt('PRFCompare/temp_data/temp_sig.txt', window)
 			embed('PRFCompare/temp_data/temp_sig.txt', 'PRFCompare/temp_data/temp_worm.txt',
-				  'none', int(tau * WAV_SAMPLE_RATE), 2, WAV_SAMPLE_RATE)
+				  'none', int(tau_samps), 2, WAV_SAMPLE_RATE)
 
 			func = get_rank_func('PRFCompare/temp_data/temp_worm.txt', filt_params)
 			funcs.append(func[2])	# select grid_vals (third element)

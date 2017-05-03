@@ -231,7 +231,7 @@ def plot_titlebox(subplot, info):
 
 
 def compare_multi_frame_new(out_file_name, wave_file_name1, wave_file_name2, frame_num, crop_1, crop_2, info, dpi):
-    fig = pyplot.figure(figsize=(11, 5), tight_layout=True, dpi=dpi)
+    fig = pyplot.figure(figsize=(11, 6), tight_layout=True, dpi=dpi)
     titlebox = pyplot.subplot2grid((5, 11), (0, 0), rowspan=5, colspan=3)
     dce1 = pyplot.subplot2grid((5, 11), (0, 3), rowspan=4, colspan=4)
     dce2 = pyplot.subplot2grid((5, 11), (0, 7), rowspan=4, colspan=4)
