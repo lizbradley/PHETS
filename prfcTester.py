@@ -77,17 +77,17 @@ if test == 3:
 	)
 
 	mean_PRF_dist_plots(
-		'datasets/time_series/C134C/49-C134C.txt',  # input (left)
-		'datasets/time_series/C135B/49-C135B.txt',  # input (right)
-		'output/PRFCompare/C134C_vs_C135B_new.png',  # out filename
+		'datasets/time_series/C134C/40-C134C.txt',  # input (left)
+		'datasets/time_series/C135B/40-C135B.txt',  # input (right)
+		'output/PRFCompare/40_C134C_vs_C135B.png',  # out filename
 		params,
-		crop_1=(2, 2.3),		# seconds or 'auto'
-		crop_2=(2, 2.3),		# seconds or 'auto'
-		crop_auto_len=.3,		# seconds. length of windows when crop is 'auto'
+		crop_1= (1,3),		# seconds or 'auto'
+		crop_2=(1,3),		# seconds or 'auto'
+		crop_auto_len=2,		# seconds. length of windows when crop is 'auto'
 		window_size=.05, 		# seconds
-		num_windows=10, 		# evenly spaced
-		mean_samp_num=10,  		# number of windows to use for mean
+		num_windows=15, 		# evenly spaced
+		mean_samp_num=5,  		# number of windows to use for mean
 		tau=.001134,  			# seconds
-		PD_movie_int=0,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=3,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)

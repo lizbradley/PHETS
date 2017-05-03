@@ -1,12 +1,12 @@
 import sys
 import numpy as np
-from PersistentHomology.TestingFunctions import build_and_save_filtration, make_filtration_movie,make_persistence_diagram
+from PersistentHomology.TestingFunctions import build_and_save_filtration, make_filtration_movie, make_persistence_diagram
 from PersistentHomology.FiltrationPlotter import make_frame3D
 from PersistentHomology.TestingFunctions import parameter_set
 
 
-test = 1
-# test = int(sys.argv[1])
+# test = 1
+test = int(sys.argv[1])
 
 
 
@@ -340,6 +340,39 @@ if test == 12:
 			"output/PersistentHomology/%s-viol_persistence_diagram.png" % str(i),
 			build_filt_params
 		)
+
+if test == 13:
+	in_data_file_name = "output/DCE/saved_worms/double/a/40-C134C.txt"
+	build_filt_params = parameter_set
+	build_filt_params.update(
+		{
+			'ds_rate' : 20,
+			'worm_length' : 2000,
+			'max_filtration_param': -10,
+			'num_divisions': 30,
+			'use_cliques': True
+
+		})
+
+	start_pt = 0   # skip first half of in data file (primitive sliding window)
+	build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) # comment out to reuse filtration
+
+	make_filtration_movie(
+		in_data_file_name,              # used to check if saved filtration is up to date, and in titlebox
+		"output/PersistentHomology/40-C134C.mp4",      		# output filename
+		build_filt_params,              # passed to BuildComplex.build_filtration()
+
+		# the following are optional plotting parameters and may be omitted
+		# see documentation at line 76 of TestingFunctions.py.
+		color_scheme='highlight new',
+		framerate=1,
+	)
+
+	make_persistence_diagram(
+		in_data_file_name,
+		"output/PersistentHomology/40-C134C.png",
+		build_filt_params
+	)
 
 
 
