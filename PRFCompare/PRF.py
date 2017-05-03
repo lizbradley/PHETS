@@ -40,7 +40,7 @@ def get_filtration(in_filename, params, start=0):
 def get_interval_data():
 	""" formats perseus output """
 	# NOTE: should be merged back into PersistencePlotter
-	birth_t, death_t = np.loadtxt('PRFCompare/perseus/perseus_out_1.txt', unpack=True, ndmin=1)
+	birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True, ndmin=1)
 
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
 	lim = np.max(epsilons)
@@ -398,22 +398,22 @@ def mean_PRF_dist_plots(
 				  'none', int(tau * WAV_SAMPLE_RATE), 2, WAV_SAMPLE_RATE)
 
 			func = get_rank_func('PRFCompare/temp_data/temp_worm.txt', filt_params)
-			funcs.append(func)
+			funcs.append(func[2])
 
 			if PD_movie_int:
 				if i % PD_movie_int == 0:
 					pass
 					make_movie_and_PD(filename, i)
 
-		return crop_samp, sig_full, np.asarray(funcs)
+		return crop_samp, sig_full, funcs
 
 	def dists_plot(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
-		fig = plt.figure(figsize=(12, 8), tight_layout=True)
+		fig = plt.figure(figsize=(14, 6), tight_layout=True)
 
 		ax1 = fig.add_subplot(321)
 		ax1.plot(d_1_vs_1)
 		ax1.grid()
-		ax1.set_ylim(bottom=-5)
+		ax1.set_ylim(bottom=0)
 		plt.setp(ax1.get_xticklabels(), visible=False)
 		plt.setp(ax1.get_xticklines(), visible=False)
 
@@ -439,6 +439,8 @@ def mean_PRF_dist_plots(
 
 		ax1.set_title (filename_1.split('/')[-1])
 		ax2.set_title (filename_2.split('/')[-1])
+		ax1.set_ylabel('ref: left', rotation=0, size='large', labelpad=50)
+		ax3.set_ylabel('ref: right', rotation=0, size='large', labelpad=50)
 
 		ax5 = fig.add_subplot(325)
 		crop = np.asarray(crop_1_samp) / WAV_SAMPLE_RATE
@@ -474,7 +476,6 @@ def mean_PRF_dist_plots(
 	funcs_1_avg = np.mean(mean_1_samps, axis=0)
 	funcs_2_avg = np.mean(mean_2_samps, axis=0)
 
-	# box_area = (funcs_1_avg[3] / len(funcs_1_avg[2])) ** 2
 	box_area = 1
 
 	diffs1_vs_1 = np.array([np.subtract(func[2], funcs_1_avg[2]) for func in funcs_1])
@@ -488,6 +489,8 @@ def mean_PRF_dist_plots(
 
 	diffs2_vs_2 = np.array([np.subtract(func[2], funcs_2_avg[2]) for func in funcs_2])
 	dists2_vs_2 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_2])
+
+
 
 	dists_plot(dists1_vs_1, dists2_vs_1, dists1_vs_2, dists2_vs_2, out_filename)
 

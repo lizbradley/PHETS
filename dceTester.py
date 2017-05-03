@@ -121,7 +121,8 @@ if test == 9:
 
 		i_lims=(36, 64), 	 # specify note range
 
-		embed_crop=(1, 2),	 # seconds or 'auto'
+		embed_crop_1=(1, 2),	 # seconds or 'auto'
+		embed_crop_2=(1, 2),	 # seconds or 'auto'
 		crop_auto_len=(.3),  # for when embed_crop = 'auto'
 
 
