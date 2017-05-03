@@ -78,8 +78,8 @@ if test == 3:
 		'datasets/time_series/C135B/49-C135B.txt',  # input (right)
 		'output/PRFCompare/C134C_vs_C135B_new.png',  # out filename
 		params,
-		crop_1='auto',		# seconds or 'auto'
-		crop_2=(4, 4.3),	# seconds or 'auto'
+		crop_1=(2, 2.3),	# seconds or 'auto'
+		crop_2=(2, 2.3),	# seconds or 'auto'
 		crop_auto_len=.3,	# seconds. length of windows when crop is 'auto'
 		window_size=.05, 	# seconds
 		num_windows=10, 	# evenly spaced
@@ -87,5 +87,5 @@ if test == 3:
 		tau=.001134,  		# seconds
 		PD_movie_int=0,  	# interval to build filt movies and PDs. 0 means no PDs or movies.
 
-		# TODO: auto tau, auto crop, add PRF contour plot, normalize volume
+		# TODO: auto tau, add PRF contour plot, weighting function
 	)

@@ -318,7 +318,7 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 	funcs = np.asarray(funcs)
 	box_area = (ref_func[3] / len(ref_func[2])) ** 2
 	diffs = np.array([np.subtract(func[2], ref_func[2]) for func in funcs])
-	dists = np.array([np.abs(np.nansum(diff)) * box_area  for diff in diffs])
+	dists = np.array([np.nansum(np.abs(diff)) * box_area  for diff in diffs])
 	dists_plot(i_ref, i_arr, dists, out_filename)
 
 
@@ -398,7 +398,7 @@ def mean_PRF_dist_plots(
 				  'none', int(tau * WAV_SAMPLE_RATE), 2, WAV_SAMPLE_RATE)
 
 			func = get_rank_func('PRFCompare/temp_data/temp_worm.txt', filt_params)
-			funcs.append(func[2])
+			funcs.append(func[2])	# select grid_vals (third element)
 
 			if PD_movie_int:
 				if i % PD_movie_int == 0:
@@ -478,17 +478,17 @@ def mean_PRF_dist_plots(
 
 	box_area = 1
 
-	diffs1_vs_1 = np.array([np.subtract(func[2], funcs_1_avg[2]) for func in funcs_1])
-	dists1_vs_1 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs1_vs_1])
+	diffs1_vs_1 = np.array([np.subtract(func, funcs_1_avg) for func in funcs_1])
+	dists1_vs_1 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs1_vs_1])
 
-	diffs2_vs_1 = np.array([np.subtract(func[2], funcs_1_avg[2]) for func in funcs_2])
-	dists2_vs_1 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_1])
+	diffs2_vs_1 = np.array([np.subtract(func, funcs_1_avg) for func in funcs_2])
+	dists2_vs_1 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs2_vs_1])
 
-	diffs1_vs_2 = np.array([np.subtract(func[2], funcs_2_avg[2]) for func in funcs_1])
-	dists1_vs_2 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs1_vs_2])
+	diffs1_vs_2 = np.array([np.subtract(func, funcs_2_avg) for func in funcs_1])
+	dists1_vs_2 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs1_vs_2])
 
-	diffs2_vs_2 = np.array([np.subtract(func[2], funcs_2_avg[2]) for func in funcs_2])
-	dists2_vs_2 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_2])
+	diffs2_vs_2 = np.array([np.subtract(func, funcs_2_avg) for func in funcs_2])
+	dists2_vs_2 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs2_vs_2])
 
 
 
