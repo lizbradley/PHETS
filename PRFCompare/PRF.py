@@ -2,19 +2,24 @@ from __future__ import division
 import time
 import subprocess
 import os
+import sys
+from sys import platform
 import itertools
 import numpy as np
 from os import system, chdir
 
-from sys import platform
+from scipy.signal import butter, lfilter, freqz
 
-from scipy import integrate
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from PersistentHomology.BuildComplex import build_filtration
 from DCE.DCETools import embed
+from DCE.DCEPlotter import plot_waveform
+from PersistentHomology.PersistencePlotter import add_persistence_plot
+from PersistentHomology.FiltrationPlotter import make_movie
 
+WAV_SAMPLE_RATE = 44100
 
 def get_filtration(in_filename, params, start=0):
 	# lines = open(in_filename).readlines()
@@ -34,6 +39,7 @@ def get_filtration(in_filename, params, start=0):
 
 def get_interval_data():
 	""" formats perseus output """
+	# NOTE: should be merged back into PersistencePlotter
 	birth_t, death_t = np.loadtxt('PRFCompare/perseus/perseus_out_1.txt', unpack=True, ndmin=1)
 
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
@@ -48,7 +54,6 @@ def get_interval_data():
 			birth_e.append(epsilons[int(times[0])])
 			death_e.append(epsilons[int(times[1])])
 
-
 	immortal_holes = []
 	for i, death_time in np.ndenumerate(death_t):    # place immortal holes at [birth time, time lim]
 		if death_time == -1:
@@ -59,24 +64,17 @@ def get_interval_data():
 		birth_e.extend(immortal_holes[:,0])
 		death_e.extend(immortal_holes[:,1])
 
-
-
 	try:
 		count = np.zeros(len(birth_t))
-	except TypeError:
+	except TypeError:	# only one interval point
 		count = [0]
 	for i, pt in enumerate(zip(birth_e, death_e)):
 		for scanner_pt in zip(birth_e, death_e):
 			if pt == scanner_pt:
 				count[i] += 1
 
-
-
-	points = np.asarray([birth_e,
-						 death_e,
-						 count]).T
+	points = np.asarray([birth_e, death_e, count]).T
 	points = np.vstack({tuple(row) for row in points})  # toss duplicates
-
 
 	x, y, z = points[:,0], points[:,1], points[:,2]
 
@@ -84,11 +82,7 @@ def get_interval_data():
 
 
 def get_homology(filt_list):
-
 	""" calls perseus, creating perseus_out_*.tdt """
-
-	# if filt_list == 'read':
-	# 	filt_list = np.load('temp_data/complexes.npy')
 
 	def group_by_birth_time(complex_ID_list):
 		"""Reformats 1D list of SimplexBirth objects into 2D array of
@@ -157,7 +151,6 @@ def get_homology(filt_list):
 	os.chdir('..')
 
 
-
 def build_rank_func(data):
 	""" helper for get_rank_func()"""
 	x, y, z, max_lim = data
@@ -187,50 +180,8 @@ def get_rank_func(filename, filt_params):
 	filt = get_filtration(filename, filt_params)
 	get_homology(filt)
 	intervals = get_interval_data()
-	return build_rank_func(intervals)
-
-
-def plot_dists(i_ref, i_arr, dists, out_filename):
-	fig = plt.figure(figsize=(10, 5))
-	ax = fig.add_subplot(111)
-	ax.plot(i_arr, dists)
-	ax.set_xlabel('$tau \quad (samples)$')
-	ax.set_ylabel('$distance \quad ({\epsilon}^2 \; \# \; holes)$')
-	ax.xaxis.set_ticks(i_arr[::2])
-	ax.grid()
-	ax.set_ylim(bottom=0)
-	ax.set_title('reference tau: ' + str(i_ref))
-	plt.savefig(out_filename)
-	plt.close(fig)
-
-
-def PRF_dist_plots(dir, base_filename,out_filename, i_ref, i_arr, filt_params, rebuild_filt=True):
-	if rebuild_filt:
-		# filename = '{}/{}{}'.format(dir, i_ref, base_filename)
-		filename = '{}/{}{}.txt'.format(dir, base_filename, i_ref)
-		ref_func = get_rank_func(filename, filt_params)
-		funcs = []
-		for i in i_arr:
-			# filename = '{}/{}{}'.format(dir, i, base_filename)
-			filename = '{}/{}{}.txt'.format(dir, base_filename, i)
-			print '\n============================================='
-			print filename
-			print '=============================================\n'
-			func = get_rank_func(filename, filt_params)
-			funcs.append(func)
-		funcs = np.array(funcs)
-		np.save('PRFCompare/temp_data/PRFs.npy', funcs)
-		np.save('PRFCompare/temp_data/PRF_ref.npy', ref_func)
-
-	funcs = np.load('PRFCompare/temp_data/PRFs.npy')
-	ref_func = np.load('PRFCompare/temp_data/PRF_ref.npy')
-	box_area = (ref_func[3] / len(ref_func[2])) ** 2
-	diffs = np.array([np.subtract(func[2], ref_func[2]) for func in funcs])
-	dists = np.array([np.abs(np.nansum(diff)) * box_area  for diff in diffs])
-	plot_dists(i_ref, i_arr, dists, out_filename)
-
-from PersistentHomology.PersistencePlotter import add_persistence_plot
-from PersistentHomology.FiltrationPlotter import make_movie
+	f = build_rank_func(intervals)
+	return f
 
 
 def persistence_diagram(filename):
@@ -241,14 +192,13 @@ def persistence_diagram(filename):
 	plt.close(fig)
 
 
-from scipy.signal import butter, lfilter, freqz
 
 def auto_crop(sig, length):
+	""" 
+	finds max of volume envelope: (xmax, ymax)
+	get first point (x, y) on envelope where y < .1 * ymax and x > xmax """
 
-	sig_abs = np.abs(sig)
-
-	# http://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
-
+	# lowpass from http://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
 	def butter_lowpass(cutoff, fs, order=5):
 		nyq = 0.5 * fs
 		normal_cutoff = cutoff / nyq
@@ -260,24 +210,16 @@ def auto_crop(sig, length):
 		y = lfilter(b, a, data)
 		return y
 
-
-
-	# Filter requirements.
-	order = 1
-	fs = 44100
-	cutoff = 1
-
+	sig_abs = np.abs(sig)
+	order, fs, cutoff = 1, WAV_SAMPLE_RATE, 1		# filter params
 	envelope = butter_lowpass_filter(sig_abs, cutoff, fs, order)
 
 	n = len(sig)
 	T = n/fs
 	t = np.linspace(0, T, n, endpoint=False)
 
-
-
 	max_arg = np.argmax(envelope)
 	max = envelope[max_arg]
-
 
 	st_arg = 0
 	for i in xrange(max_arg, len(envelope)):
@@ -285,7 +227,7 @@ def auto_crop(sig, length):
 			st_arg = i
 			break
 	print 'crop start:', t[st_arg]
-	crop = (int(st_arg), int(st_arg + length * 44100))
+	crop = (int(st_arg), int(st_arg + length * WAV_SAMPLE_RATE))
 
 	# fig = plt.figure()
 	# ax = fig.add_subplot(111)
@@ -305,29 +247,148 @@ def auto_crop(sig, length):
 	return crop
 
 
+def PRF_dist_plots(dir, base_filename, fname_format,
+				   out_filename,
+				   i_ref, i_arr,
+				   filt_params,
+				   PD_movie_int=5):
+
+	""" plots distance from reference rank function over a range of embedded input files"""
+
+	def dists_plot(i_ref, i_arr, dists, out_filename):
+		fig = plt.figure(figsize=(10, 5))
+		ax = fig.add_subplot(111)
+		ax.plot(i_arr, dists)
+		ax.set_xlabel('$tau \quad (samples)$')
+		ax.set_ylabel('$distance \quad ({\epsilon}^2 \; \# \; holes)$')
+		ax.xaxis.set_ticks(i_arr[::2])
+		ax.grid()
+		ax.set_ylim(bottom=0)
+		ax.set_title('reference tau: ' + str(i_ref))
+		plt.savefig(out_filename)
+		plt.close(fig)
+
+	def get_filename(i):
+		if fname_format == 'i base':
+			filename = '{}/{}{}'.format(dir, i, base_filename)
+		elif fname_format == 'base i':
+			filename = '{}/{}{}.txt'.format(dir, base_filename, i)
+		else:
+			sys.exit()
+			print "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
+			filename = None
+		return filename
+
+	def make_movie_and_PD(filename, i, ref=False):
+		base_name = filename.split('/')[-1].split('.')[0]
+		comp_name = 'ref_compare_{}_{}_'.format(base_name, i)
+		if ref: comp_name += 'REFERENCE'
+		PD_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'PD.png'
+		movie_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'movie.mp4'
+
+		color_scheme = 'none'
+		camera_angle = (135, 55)
+		alpha = 1
+		dpi = 150
+		max_frames = None
+		hide_1simplexes = False
+		save_frames = False
+		framerate = 1
+		title_block_info = [filename, '', filt_params, color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
+
+		persistence_diagram(PD_filename)
+		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
+
+	filename = get_filename(i_ref)
+	make_movie_and_PD(filename, i_ref, ref=True)
+	ref_func = get_rank_func(filename, filt_params)
+	
+	funcs = []
+	for i in i_arr:
+		filename = get_filename(i)
+		print '\n=================================================='
+		print filename
+		print '==================================================\n'
+		func = get_rank_func(filename, filt_params)
+		funcs.append(func)
+
+		if PD_movie_int:
+			if i % PD_movie_int == 0:
+				make_movie_and_PD(filename, i)
+
+	funcs = np.asarray(funcs)
+	box_area = (ref_func[3] / len(ref_func[2])) ** 2
+	diffs = np.array([np.subtract(func[2], ref_func[2]) for func in funcs])
+	dists = np.array([np.abs(np.nansum(diff)) * box_area  for diff in diffs])
+	dists_plot(i_ref, i_arr, dists, out_filename)
 
 
+def get_funcs(filename, crop, normalize_volume, crop_auto_len, num_windows, window_size_samp, filt_params, tau, PD_movie_int):
+	funcs = []
+	sig_full = np.loadtxt(filename)
+	if normalize_volume: sig_full = sig_full / np.max(sig_full)
+
+	if crop == 'auto': crop_samp = auto_crop(sig_full, crop_auto_len)
+	else: crop_samp = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+
+	sig = sig_full[crop_samp[0]:crop_samp[1]]
+
+	start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
+	for i, pt in enumerate(start_pts[:-1]):
+
+		print '\n============================================='
+		print filename.split('/')[-1], 'worm #', i
+		print '=============================================\n'
+
+		window = np.asarray(sig[pt:pt + window_size_samp])
+		np.savetxt('PRFCompare/temp_data/temp_sig.txt', window)
+		embed('PRFCompare/temp_data/temp_sig.txt', 'PRFCompare/temp_data/temp_worm.txt',
+			  'none', int(tau * WAV_SAMPLE_RATE), 2, WAV_SAMPLE_RATE)
+
+		func = get_rank_func('PRFCompare/temp_data/temp_worm.txt', filt_params)
+		funcs.append(func)
+
+		if PD_movie_int:
+			if i % PD_movie_int == 0:
+				pass
+				# make_movie_and_PD(filename, i)
+
+	return crop_samp, sig_full, np.asarray(funcs)
 
 def mean_PRF_dist_plots(
 		filename_1, filename_2,
 		out_filename,
 		filt_params,
-		crop_1='auto', 		# sec or 'auto'
+		crop_1='auto', 						# sec or 'auto'
 		crop_2='auto',
-		crop_auto_len=.3, 		# sec
-		window_size=.05,		# sec
-		num_windows=10,
-		mean_samp_num=5,
-		wav_samp_rate = 44100, 	# hz
-		tau=50,		# samps
-		PD_movie_int = 5,
+		crop_auto_len=.3, 					# sec
+		window_size=.05,					# sec
+		num_windows=10,						# per file
+		mean_samp_num=5,					# per file
+		tau=.001,							# sec
+		PD_movie_int = 5,				
 		normalize_volume=True
 		):
 
-	def make_movie_and_PD(filename):
+	window_size_samp = int(window_size * WAV_SAMPLE_RATE)
+
+	def clear_old_files():
+		path = 'output/PRFCompare/PDs_and_movies/'
+		old_files = os.listdir(path)
+		if old_files and PD_movie_int:
+			ans = raw_input('Clear old files in ' + path + ' ? (y/n) \n')
+			if ans == 'y':
+				for f in old_files:
+					if f != '.gitkeep':
+						os.remove(path + f)
+			else:
+				print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
+
+	def make_movie_and_PD(filename, i, ref=False):
 
 		base_name = filename.split('/')[-1].split('.')[0]
-		comp_name = 'compare_{:s}_{:d}_'.format(base_name, i)
+		comp_name = 'mean_compare_{:s}_{:d}_'.format(base_name, i)
+		if ref: comp_name += 'MEAN'
 		PD_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'PD.png'
 		movie_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'movie.mp4'
 
@@ -345,96 +406,71 @@ def mean_PRF_dist_plots(
 		title_block_info = [filename, 'worm {:d} of {:d}'.format(i, num_windows), filt_params, color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
 		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
 
-	path = 'output/PRFCompare/PDs_and_movies/'
-	old_files = os.listdir(path)
-	if old_files and PD_movie_int:
-		ans = raw_input('Clear old files in ' + path + ' ? (y/n) \n')
-		if ans == 'y':
-			for f in old_files:
-				if f != '.gitkeep':
-					os.remove(path + f)
-		else:
-			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
+	def dists_plot(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
+		fig = plt.figure(figsize=(12, 8), tight_layout=True)
 
-	filt_params.update({'worm_length' : np.floor(window_size * wav_samp_rate).astype(int)})
+		ax1 = fig.add_subplot(321)
+		ax1.plot(d_1_vs_1)
+		ax1.grid()
+		ax1.set_ylim(bottom=-5)
+		plt.setp(ax1.get_xticklabels(), visible=False)
+		plt.setp(ax1.get_xticklines(), visible=False)
 
-	# print 'worm_length:', filt_params['worm_length']
-
-	window_size_samp = int(np.array(window_size) * wav_samp_rate)
-	# window_step_samp = int(window_step * wav_samp_rate)
-
-	funcs_1 = []
-	sig_1_full = np.loadtxt(filename_1)
-	if normalize_volume: sig_1_full = sig_1_full / np.max(sig_1_full)
-
-	if crop_1 == 'auto':
-		crop_1_samp = auto_crop(sig_1_full, crop_auto_len)
-	else:
-		crop_1_samp = np.floor(np.array(crop_1) * wav_samp_rate).astype(int)
-	sig_1 = sig_1_full[crop_1_samp[0]:crop_1_samp[1]]
+		ax2 = fig.add_subplot(322, sharey=ax1)
+		ax2.plot(d_2_vs_1)
+		ax2.grid()
+		plt.setp(ax2.get_yticklabels(), visible=False)
+		plt.setp(ax2.get_yticklines(), visible=False)
+		plt.setp(ax2.get_xticklabels(), visible=False)
+		plt.setp(ax2.get_xticklines(), visible=False)
 
 
-	start_pts = np.floor(np.linspace(0, len(sig_1), num_windows, endpoint=False)).astype(int)
-	for i, pt in enumerate(start_pts[:-1]):
-		print '\n============================================='
-		print filename_1.split('/')[-1], i, pt
-		print '=============================================\n'
-		window = np.asarray(sig_1[pt:pt + window_size_samp])
-		# if normalize_volume: window = window / np.max(window)
-		np.savetxt('PRFCompare/temp_data/temp_sig1.txt', window)
-		embed('PRFCompare/temp_data/temp_sig1.txt', 'PRFCompare/temp_data/temp_worm1.txt',
-			  'none', tau, 2, 4410 )
-		func = get_rank_func('PRFCompare/temp_data/temp_worm1.txt', filt_params)
-		funcs_1.append(func)
+		ax3 = fig.add_subplot(323, sharey=ax1)
+		ax3.plot(d_1_vs_2)
+		ax3.grid()
 
-		if PD_movie_int:
-			if i % PD_movie_int == 0:
-				make_movie_and_PD(filename_1)
+		ax4 = fig.add_subplot(324, sharey=ax1)
+		ax4.plot(d_2_vs_2)
+		ax4.grid()
+		plt.setp(ax4.get_yticklabels(), visible=False)
+		plt.setp(ax4.get_yticklines(), visible=False)
 
 
+		ax1.set_title (filename_1.split('/')[-1])
+		ax2.set_title (filename_2.split('/')[-1])
 
-	funcs_2 = []
-	sig_2_full = np.loadtxt(filename_2)
-	if normalize_volume: sig_2_full = sig_2_full / np.max(sig_2_full)
+		ax5 = fig.add_subplot(325)
+		crop = np.asarray(crop_1_samp) / WAV_SAMPLE_RATE
+		plot_waveform(ax5, sig_1_full, crop)
 
-	if crop_2 == 'auto':
-		crop_2_samp = auto_crop(sig_2_full, crop_auto_len)
-	else:
-		crop_2_samp = np.floor(np.array(crop_2) * wav_samp_rate).astype(int)
+		ax6 = fig.add_subplot(326, sharey=ax5)
+		crop = np.asarray(crop_2_samp) / WAV_SAMPLE_RATE
+		plot_waveform(ax6, sig_2_full, crop)
+		plt.setp(ax6.get_yticklabels(), visible=False)
+		plt.setp(ax6.get_yticklines(), visible=False)
 
-	sig_2 = sig_2_full[crop_2_samp[0]:crop_2_samp[1]]
+
+		plt.savefig(out_filename)
 
 
-	start_pts = np.floor(np.linspace(0, len(sig_2), num_windows, endpoint=False)).astype(int)
-	for i, pt in enumerate(start_pts[:-1]):
-		print '\n============================================='
-		print filename_2.split('/')[-1], i, pt
-		print '=============================================\n'
-		window = np.asarray(sig_2[pt:pt + window_size_samp])
-		# if normalize_volume: window = window /
-		np.savetxt('PRFCompare/temp_data/temp_sig2.txt', window,)
-		embed('PRFCompare/temp_data/temp_sig2.txt', 'PRFCompare/temp_data/temp_worm2.txt',
-			  'none', tau, 2, 4410)
-		func = get_rank_func('PRFCompare/temp_data/temp_worm2.txt', filt_params)
-		funcs_2.append(func)
-
-		if PD_movie_int:
-			if i % PD_movie_int == 0:
-				make_movie_and_PD(filename_2)
+		plt.close(fig)
 
 
 
+	# ======================= SETUP	============================
+	clear_old_files()
+	filt_params.update({'worm_length' : np.floor(window_size * WAV_SAMPLE_RATE).astype(int)})
+	print 'using worm_length:', filt_params['worm_length']
+	# ===========================================================
 
-
-	funcs_1 = np.load('PRFCompare/temp_data/funcs_1.npy')
-	funcs_2 = np.load('PRFCompare/temp_data/funcs_2.npy')
+	crop_1_samp, sig_1_full, funcs_1 = get_funcs(filename_1, crop_1, normalize_volume, crop_auto_len, num_windows, window_size_samp, filt_params, tau, PD_movie_int)
+	crop_2_samp, sig_2_full, funcs_2 = get_funcs(filename_2, crop_2, normalize_volume, crop_auto_len, num_windows, window_size_samp, filt_params, tau, PD_movie_int)
 
 	mean_1_samps = funcs_1[::num_windows//mean_samp_num]
 	mean_2_samps = funcs_2[::num_windows//mean_samp_num]
 
 	funcs_1_avg = np.mean(mean_1_samps, axis=0)
 	funcs_2_avg = np.mean(mean_2_samps, axis=0)
-
 
 	# box_area = (funcs_1_avg[3] / len(funcs_1_avg[2])) ** 2
 	box_area = 1
@@ -445,55 +481,13 @@ def mean_PRF_dist_plots(
 	diffs2_vs_1 = np.array([np.subtract(func[2], funcs_1_avg[2]) for func in funcs_2])
 	dists2_vs_1 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_1])
 
-
 	diffs1_vs_2 = np.array([np.subtract(func[2], funcs_2_avg[2]) for func in funcs_1])
 	dists1_vs_2 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs1_vs_2])
 
 	diffs2_vs_2 = np.array([np.subtract(func[2], funcs_2_avg[2]) for func in funcs_2])
 	dists2_vs_2 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_2])
 
-	# x = np.concatenate([start_pts[:-1], start_pts[:-1] + start_pts[-2]])
-
-	from DCE.DCEPlotter import plot_waveform
-	def plot_dists(dists1, dists2, title, out_filename):
-		fig = plt.figure(figsize=(10, 5))
-		ax1 = fig.add_subplot(221)
-		ax1.plot(dists1)
-		ax1.grid()
-		ax1.set_ylim(bottom=0)
-
-		ax2 = fig.add_subplot(222, sharey=ax1)
-		ax2.plot(dists2)
-		ax2.grid()
-		plt.setp(ax2.get_yticklabels(), visible=False)
-
-		ax1.set_title (filename_1.split('/')[-1])
-		ax2.set_title (filename_2.split('/')[-1])
-
-		ax3 = fig.add_subplot(223)
-		# ax3.plot(sig_1)
-		crop = np.asarray(crop_1_samp) / 44100
-		plot_waveform(ax3, sig_1_full, crop)
-
-		ax4 = fig.add_subplot(224, sharey=ax3)
-		# ax4.plot(sig_2)
-		crop = np.asarray(crop_2_samp) / 44100
-		plot_waveform(ax4, sig_2_full, crop)
-
-
-		fig.suptitle(title)
-
-		plt.savefig(out_filename)
-
-
-		plt.close(fig)
-
-	base_filename = out_filename.split('.')[0]
-	ext = out_filename.split('.')[1]
-
-
-	plot_dists(dists1_vs_1, dists2_vs_1, 'ref mean: left', base_filename + '__ref_left.' + ext)
-	plot_dists(dists1_vs_2, dists2_vs_2, 'ref mean: right', base_filename + '__ref_right.' + ext)
+	dists_plot(dists1_vs_1, dists2_vs_1, dists1_vs_2, dists2_vs_2, out_filename)
 
 
 

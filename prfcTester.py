@@ -5,7 +5,6 @@ from PersistentHomology.TestingFunctions import parameter_set
 from PRFCompare.PRF import PRF_dist_plots, mean_PRF_dist_plots
 from PRFCompare.PRF import mean_PRF_dist_plots
 
-# TESTING COMMENT INSERTION
 
 # test = int(sys.argv[1])
 test = 3
@@ -25,9 +24,12 @@ if test == 1:
 	i_arr = np.arange(20, 40, 2)
 	dir = 'datasets/embedded/test_cases'
 	base_filename = 'L63_x_m2_tau'
+	filename_format = 'base i'				# 'i base' or 'base i'
+
 	out_filename = 'output/PRFCompare/distances1.png'
 
-	PRF_dist_plots(dir, base_filename, out_filename, i_ref, i_arr, params)
+	PRF_dist_plots(dir, base_filename, filename_format, out_filename, i_ref, i_arr, params,
+				   PD_movie_int=0)
 
 
 if test == 2:
@@ -43,8 +45,8 @@ if test == 2:
 	)
 
 	mean_PRF_dist_plots(
-		'datasets/time_series/C134C/34-C134C.txt',		# input (left)
-		'datasets/time_series/C135B/34-C135B.txt',		# input (right)
+		'datasets/time_series/C134C/49-C134C.txt',		# input (left)
+		'datasets/time_series/C135B/49-C135B.txt',		# input (right)
 		'output/PRFCompare/C135B_vs_C134C.png',		# out filename
 		params,
 		crop_1=(2, 2.3),		# seconds
@@ -52,8 +54,8 @@ if test == 2:
 		window_size=.05,		# seconds
 		num_windows=10,			# evenly spaced
 		mean_samp_num=5,		# number of windows to use for mean
-		tau=50,  				# samples (44100 Hz)
-		PD_movie_int=3,			# interval to build filt movies and PDs. 0 means no PDs or movies.
+		tau=.0011,  			# seconds
+		PD_movie_int=7,			# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 		# TODO: auto tau, auto crop, add PRF contour plot, normalize volume
 	)
@@ -73,15 +75,15 @@ if test == 3:
 	mean_PRF_dist_plots(
 		'datasets/time_series/C134C/49-C134C.txt',  # input (left)
 		'datasets/time_series/C135B/49-C135B.txt',  # input (right)
-		'output/PRFCompare/C134C_vs_C135B.png',  # out filename
+		'output/PRFCompare/C134C_vs_C135B_25.png',  # out filename
 		params,
-		crop_1='auto',
-		crop_2='auto',
-		crop_auto_len=.3,	# seconds
+		crop_1=(4, 4.3),
+		crop_2=(4, 4.3),
+		crop_auto_len=.3,	# seconds. length of windows when crop is 'auto'
 		window_size=.05, 	# seconds
-		num_windows=10, 	# evenly spaced
-		mean_samp_num=5,  	# number of windows to use for mean
-		tau=50,  			# samples (44100 Hz)
+		num_windows=15, 	# evenly spaced
+		mean_samp_num=15,  	# number of windows to use for mean
+		tau=.001134,  		# samples (44100 Hz)
 		PD_movie_int=0,  	# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 		# TODO: auto tau, auto crop, add PRF contour plot, normalize volume

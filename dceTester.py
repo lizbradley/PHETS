@@ -24,7 +24,7 @@ if test == 1:
         print 'Hello'
         note = i + 10
         piano = 'C134C'
-        vary_tau('datasets/time_series/piano_data/%s/%s-%s.txt' % (piano, str(note), piano),
+        vary_tau('datasets/time_series/%s/%s-%s.txt' % (piano, str(note), piano),
                  tau_lims=(1, 100),
                  tau_inc=5,
                  embed_crop=(.5*i, .5*(i+1)),  # aka window position, in seconds
@@ -37,7 +37,7 @@ if test == 2:
     for i in xrange(7):
         note = i*10+10
         piano = 'C134C'
-        slide_window('datasets/time_series/piano_data/%s/%s-%s.txt' % (piano, str(note), piano),
+        slide_window('datasets/time_series/%s/%s-%s.txt' % (piano, str(note), piano),
                      window_size=.05*(i+1),    # seconds
                      ds_rate=1,
                      tau= 10,
@@ -49,8 +49,8 @@ if test == 3:
     for i in xrange(7):
         note = (i+1)*10
         print 'note is %s ' % str(note)
-        compare_vary_tau('datasets/time_series/piano_data/C135B/%s-C135B.txt' % str(note),
-                         'datasets/time_series/piano_data/C134C/%s-C134C.txt' % str(note),
+        compare_vary_tau('datasets/time_series/C135B/%s-C135B.txt' % str(note),
+                         'datasets/time_series/C134C/%s-C134C.txt' % str(note),
                          tau_lims=(1,40),
                          tau_inc=2,
                          embed_crop=(.5,.7),
@@ -60,8 +60,8 @@ if test == 3:
 
 
 if test == 4:
-    dir1 = "datasets/time_series/piano_data/C134C"
-    dir2 = "datasets/time_series/piano_data/C135B"
+    dir1 = "datasets/time_series/C134C"
+    dir2 = "datasets/time_series/C135B"
     tau = 10
     compare_multi(dir1, '-C134C.txt',
                   dir2, '-C135B.txt',
@@ -71,8 +71,8 @@ if test == 4:
 
 
 if test == 5:
-    dir1 = "datasets/time_series/piano_data/C134C"
-    dir2 = "datasets/time_series/piano_data/C135B"
+    dir1 = "datasets/time_series/C134C"
+    dir2 = "datasets/time_series/C135B"
     tau_T = 1/math.pi
     compare_multi_auto_tau(dir1, '-C134C.txt',
                            dir2, '-C135B.txt',
@@ -85,7 +85,7 @@ if test == 5:
 
 
 if test == 7:
-    dir1, base1 = 'datasets/time_series/piano_data/C134C', '-C134C.txt'
+    dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'
     dir2, base2 = "datasets/time_series/viol_data", '-viol.txt'
 
     window = (1, 1.5)
@@ -104,14 +104,14 @@ if test == 7:
 
 if test == 8:
     # still trying to figure out exactly how the units should work here
-    plot_power_spectrum('datasets/time_series/piano_data/C134C/34-C134C.txt',
+    plot_power_spectrum('datasets/time_series/C134C/34-C134C.txt',
                         'output/DCE/power_spectrum_34-C134C.png',
                         crop=(1, 2),    # window for analysis (seconds)
                         )
 
 
 if test == 9:
-    dir1, base1 = 'datasets/time_series/piano_data/C134C', '-C134C.txt'
+    dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'
     dir2, base2 = "datasets/time_series/viol_data", '-viol.txt'
 
     window = (1, 1.5)
