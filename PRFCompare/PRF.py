@@ -192,7 +192,6 @@ def persistence_diagram(filename):
 	plt.close(fig)
 
 
-
 def auto_crop(sig, length):
 	""" 
 	finds max of volume envelope: (xmax, ymax)
@@ -324,8 +323,6 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 
 
 
-
-
 def mean_PRF_dist_plots(
 		filename_1, filename_2,
 		out_filename,
@@ -341,7 +338,6 @@ def mean_PRF_dist_plots(
 		normalize_volume=True
 		):
 
-	window_size_samp = int(window_size * WAV_SAMPLE_RATE)
 
 	def clear_old_files():
 		path = 'output/PRFCompare/PDs_and_movies/'
@@ -465,6 +461,8 @@ def mean_PRF_dist_plots(
 	clear_old_files()
 	filt_params.update({'worm_length' : np.floor(window_size * WAV_SAMPLE_RATE).astype(int)})
 	print 'using worm_length:', filt_params['worm_length']
+	window_size_samp = int(window_size * WAV_SAMPLE_RATE)
+
 	# ===========================================================
 
 	crop_1_samp, sig_1_full, funcs_1 = get_funcs(filename_1, crop_1)
@@ -492,8 +490,6 @@ def mean_PRF_dist_plots(
 	dists2_vs_2 = np.array([np.abs(np.nansum(diff)) * box_area for diff in diffs2_vs_2])
 
 	dists_plot(dists1_vs_1, dists2_vs_1, dists1_vs_2, dists2_vs_2, out_filename)
-
-
 
 
 def see(filename, filt_params):
