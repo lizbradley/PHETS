@@ -25,20 +25,20 @@ def prep_save_worms_double():
 		sys.exit()
 
 
-def save_worms_double(filename1, filename2, i, tau1, tau2, embed_crop):
+def save_worms_double(filename1, filename2, i, tau1, tau2, crop_1, crop_2):
 
 	out_filename1 = 'output/DCE/saved_worms/double/a/' + filename1.split('/')[-1]
 	out_filename2 = 'output/DCE/saved_worms/double/b/' + filename2.split('/')[-1]
 
-	shutil.copyfile('temp_data/embedded_coords_comp1.txt', out_filename1)
-	shutil.copyfile('temp_data/embedded_coords_comp2.txt', out_filename2)
+	shutil.copyfile('DCE/temp_data/embedded_coords_comp1.txt', out_filename1)
+	shutil.copyfile('DCE/temp_data/embedded_coords_comp2.txt', out_filename2)
 
 	info_file_1 = open('output/DCE/saved_worms/double/a/WORM_INFO.txt', 'a')
-	info_file_1.write('{:d}: tau = {} (samples), embed_crop = [{:.5f}, {:.5f}] (seconds) \n'.format(i, tau1, embed_crop[0], embed_crop[1]))
+	info_file_1.write('{:d}: tau = {} (samples), embed_crop = [{:.5f}, {:.5f}] (seconds) \n'.format(i, tau1, crop_1[0], crop_1[1]))
 	info_file_1.close()
 
 	info_file_1 = open('output/DCE/saved_worms/double/b/WORM_INFO.txt', 'a')
-	info_file_1.write('{:d}: tau = {} (samples), embed_crop = [{:.5f}, {:.5f}] (seconds) \n'.format(i, tau2, embed_crop[0], embed_crop[1]))
+	info_file_1.write('{:d}: tau = {} (samples), embed_crop = [{:.5f}, {:.5f}] (seconds) \n'.format(i, tau2, crop_2[0], crop_2[1]))
 	info_file_1.close()
 
 

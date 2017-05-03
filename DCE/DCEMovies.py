@@ -56,11 +56,11 @@ def vary_tau(txt_wave_file,
 
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
-		DCETools.embed(txt_wave_file, 'temp_data/embedded_coords.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(txt_wave_file, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
 
 		if save_worms: save_worms_single('{:d}-{}'.format(i, txt_wave_file), i, tau, embed_crop)
 
-		if save_movie: DCEPlotter.make_window_frame('temp_data/embedded_coords.txt', txt_wave_file, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
+		if save_movie: DCEPlotter.make_window_frame('DCE/temp_data/embedded_coords.txt', txt_wave_file, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
 
 
 def compare_vary_tau(txt_wave_file1,
@@ -81,8 +81,8 @@ def compare_vary_tau(txt_wave_file1,
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
 
-		DCETools.embed(txt_wave_file1, 'temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
-		DCETools.embed(txt_wave_file2, 'temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(txt_wave_file1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(txt_wave_file2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
 
 		if save_worms: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop)
 
@@ -112,8 +112,8 @@ def compare_multi(
 		filename1 = dir1 + "/%02d" % i + dir1_base
 		filename2 = dir2 + "/%02d" % i + dir2_base
 
-		DCETools.embed(filename1, 'temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
-		DCETools.embed(filename2, 'temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(filename1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(filename2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
 
 		if save_worms: save_worms_double(filename1, filename2, i, tau, tau, embed_crop)
 
@@ -153,8 +153,8 @@ def compare_multi_auto_tau(
 			tau_1 = info['tau_1']
 			tau_2 = info['tau_2']
 
-			DCETools.embed(filename1, 'temp_data/embedded_coords_comp1.txt', embed_crop, tau_1, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
-			DCETools.embed(filename2, 'temp_data/embedded_coords_comp2.txt', embed_crop, tau_2, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+			DCETools.embed(filename1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, tau_1, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+			DCETools.embed(filename2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, tau_2, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
 
 			if save_worms: save_worms_double(filename1, filename2, i, tau_1, tau_2, embed_crop)
 
@@ -162,8 +162,8 @@ def compare_multi_auto_tau(
 			info = get_info_ideal(tau_T, embed_crop, i, ds_rate, WAV_SAMPLE_RATE, filename1, filename2)
 			tau = info['tau']
 
-			DCETools.embed(filename1, 'temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
-			DCETools.embed(filename2, 'temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+			DCETools.embed(filename1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+			DCETools.embed(filename2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
 
 			if save_worms: save_worms_double(filename1, filename2, i, tau, tau, embed_crop)
 
@@ -182,7 +182,7 @@ def compare_multi_auto(
 
 		embed_crop_1=(1, 2),    # seconds or 'auto'
 		embed_crop_2=(1, 2),
-		crop_auto_len=(.3),		# for when embed_crop = 'auto'
+		crop_auto_len=.3,		# for when embed_crop = 'auto'
 
 		tau='auto ideal',       # seconds 'auto detect' or 'auto ideal'
 		tau_T=1/np.pi,          # tau_sec = period * tau_T
@@ -208,7 +208,7 @@ def compare_multi_auto(
 
 		if isinstance(embed_crop_1, basestring):
 			if embed_crop_1 == 'auto':
-				crop_1 = auto_crop(np.loadtxt(filename1))
+				crop_1 = auto_crop(np.loadtxt(filename1), crop_auto_len)
 			else:
 				print 'ERROR: embed_crop_1 not recognized.'
 				crop_1 = None
@@ -216,7 +216,7 @@ def compare_multi_auto(
 
 		if isinstance(embed_crop_2, basestring):
 			if embed_crop_2 == 'auto':
-				crop_2 = auto_crop(np.loadtxt(filename1))
+				crop_2 = auto_crop(np.loadtxt(filename1), crop_auto_len)
 			else:
 				print 'ERROR: embed_crop_2 not recognized.'
 				crop_2 = None
@@ -225,7 +225,8 @@ def compare_multi_auto(
 
 		if not isinstance(tau, basestring):
 			info = get_info_manual(tau, crop_1, crop_2, i, ds_rate, WAV_SAMPLE_RATE, filename1, filename2)
-			tau_1 = tau_2 = info['tau']
+			tau_1 = info['tau_1']
+			tau_2 = info['tau_2']
 
 		elif tau == 'auto detect':
 			info = get_info_real(tau_T, crop_1, crop_2, i, ds_rate, WAV_SAMPLE_RATE, filename1, filename2)
@@ -234,17 +235,17 @@ def compare_multi_auto(
 
 		elif tau == 'auto ideal':
 			info = get_info_ideal(tau_T, crop_1, crop_2, i, ds_rate, WAV_SAMPLE_RATE, filename1, filename2)
-			tau_1 = tau_2 = info['tau']
+			tau_1, tau_2 = info['tau_1'], info['tau_2']
 
 		else:
 			print 'ERROR: tau not recognized.'
 			sys.exit()
 
-		DCETools.embed(filename1, 'temp_data/embedded_coords_comp1.txt', embed_crop, tau_1, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
-		DCETools.embed(filename2, 'temp_data/embedded_coords_comp2.txt', embed_crop, tau_2, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(filename1, 'DCE/temp_data/embedded_coords_comp1.txt', crop_1, tau_1, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(filename2, 'DCE/temp_data/embedded_coords_comp2.txt', crop_2, tau_2, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
 
-		if save_worms: save_worms_double(filename1, filename2, i, tau_1, tau_2, embed_crop)
+		if save_worms: save_worms_double(filename1, filename2, i, tau_1, tau_2, crop_1, crop_2)
 
-		if save_movie: DCEPlotter.compare_multi_frame_new('DCE/frames/frame%03d.png' % frame_idx, filename1, filename2, i, embed_crop, info, dpi)
+		if save_movie: DCEPlotter.compare_multi_frame_new('DCE/frames/frame%03d.png' % frame_idx, filename1, filename2, i, crop_1, crop_2, info, dpi)
 
 

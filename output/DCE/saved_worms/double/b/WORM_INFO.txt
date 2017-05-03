@@ -1,7 +1,1 @@
-0: tau = 1 (samples), embed_crop = [0.50000, 0.70000] (seconds) 
-1: tau = 3 (samples), embed_crop = [0.50000, 0.70000] (seconds) 
-2: tau = 5 (samples), embed_crop = [0.50000, 0.70000] (seconds) 
-3: tau = 7 (samples), embed_crop = [0.50000, 0.70000] (seconds) 
-4: tau = 9 (samples), embed_crop = [0.50000, 0.70000] (seconds) 
-5: tau = 11 (samples), embed_crop = [0.50000, 0.70000] (seconds) 
-6: tau = 13 (samples), embed_crop = [0.50000, 0.70000] (seconds) 
+36: tau = 50 (samples), embed_crop = [111207.00000, 124437.00000] (seconds) 

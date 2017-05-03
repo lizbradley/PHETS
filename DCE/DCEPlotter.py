@@ -112,8 +112,8 @@ def compare_vary_tau_frame(out_file_name, wave_file_name1, wave_file_name2, fram
     subplot4 = pyplot.subplot2grid((5, 2), (4, 1), sharey=subplot3)
     pyplot.setp(subplot4.get_yticklabels(), visible=False)
 
-    plot_dce(subplot1, 'temp_data/embedded_coords_comp1.txt')
-    plot_dce(subplot2, 'temp_data/embedded_coords_comp2.txt')
+    plot_dce(subplot1, 'DCE/temp_data/embedded_coords_comp1.txt')
+    plot_dce(subplot2, 'DCE/temp_data/embedded_coords_comp2.txt')
 
     wave_data1, wave_data2 = np.loadtxt(wave_file_name1), np.loadtxt(wave_file_name2)
     plot_waveform(subplot3, wave_data1, embed_crop)
@@ -135,8 +135,8 @@ def compare_multi_frame(out_file_name, wave_file_name1, wave_file_name2, frame_n
     subplot4 = pyplot.subplot2grid((5, 2), (4, 1), sharey=subplot3)
     pyplot.setp(subplot4.get_yticklabels(), visible=False)
 
-    plot_dce(subplot1, 'temp_data/embedded_coords_comp1.txt')
-    plot_dce(subplot2, 'temp_data/embedded_coords_comp2.txt')
+    plot_dce(subplot1, 'DCE/temp_data/embedded_coords_comp1.txt')
+    plot_dce(subplot2, 'DCE/temp_data/embedded_coords_comp2.txt')
 
     wave_data1, wave_data2 = np.loadtxt(wave_file_name1), np.loadtxt(wave_file_name2)
     plot_waveform(subplot3, wave_data1, embed_crop)
@@ -230,7 +230,7 @@ def plot_titlebox(subplot, info):
 
 
 
-def compare_multi_frame_new(out_file_name, wave_file_name1, wave_file_name2, frame_num, embed_crop, info, dpi):
+def compare_multi_frame_new(out_file_name, wave_file_name1, wave_file_name2, frame_num, crop_1, crop_2, info, dpi):
     fig = pyplot.figure(figsize=(11, 5), tight_layout=True, dpi=dpi)
     titlebox = pyplot.subplot2grid((5, 11), (0, 0), rowspan=5, colspan=3)
     dce1 = pyplot.subplot2grid((5, 11), (0, 3), rowspan=4, colspan=4)
@@ -241,12 +241,12 @@ def compare_multi_frame_new(out_file_name, wave_file_name1, wave_file_name2, fra
 
     plot_titlebox(titlebox, info)
 
-    plot_dce(dce1, 'temp_data/embedded_coords_comp1.txt')
-    plot_dce(dce2, 'temp_data/embedded_coords_comp2.txt')
+    plot_dce(dce1, 'DCE/temp_data/embedded_coords_comp1.txt')
+    plot_dce(dce2, 'DCE/temp_data/embedded_coords_comp2.txt')
 
     wave_data1, wave_data2 = np.loadtxt(wave_file_name1), np.loadtxt(wave_file_name2)
-    plot_waveform(wave1, wave_data1, embed_crop)
-    plot_waveform(wave2, wave_data2, embed_crop)
+    plot_waveform(wave1, wave_data1, crop_1)
+    plot_waveform(wave2, wave_data2, crop_2)
 
     dce1.set_title(wave_file_name1.split('/')[-1])
     dce2.set_title(wave_file_name2.split('/')[-1])
