@@ -273,9 +273,8 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 		elif fname_format == 'base i':
 			filename = '{}/{}{}.txt'.format(dir, base_filename, i)
 		else:
-			sys.exit()
 			print "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
-			filename = None
+			sys.exit()
 		return filename
 
 	def make_movie_and_PD(filename, i, ref=False):
@@ -309,16 +308,17 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 		print filename
 		print '==================================================\n'
 		func = get_rank_func(filename, filt_params)
-		funcs.append(func)
+		funcs.append(func[2])
 
 		if PD_movie_int:
 			if i % PD_movie_int == 0:
 				make_movie_and_PD(filename, i)
 
 	funcs = np.asarray(funcs)
-	box_area = (ref_func[3] / len(ref_func[2])) ** 2
-	diffs = np.array([np.subtract(func[2], ref_func[2]) for func in funcs])
-	dists = np.array([np.nansum(np.abs(diff)) * box_area  for diff in diffs])
+	# box_area = (ref_func[3] / len(ref_func[2])) ** 2
+	box_area = 1
+	diffs = np.array([np.subtract(func, ref_func) for func in funcs])
+	dists = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs])
 	dists_plot(i_ref, i_arr, dists, out_filename)
 
 
