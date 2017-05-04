@@ -203,9 +203,9 @@ def auto_embed(
 
 def rename_files():
 	os.chdir('..')
-	os.chdir('datasets/time_series/ivy162_piano/middle_c')
+	os.chdir('datasets/time_series/ivy162_piano/a440')
 	raw_input(os.getcwd())
-	[os.rename(f, f.replace('Close', '')) for f in os.listdir('.') if f.endswith('.wav') or f.endswith('.txt')]
+	[os.rename(f, f.replace('49', '40')) for f in os.listdir('.') if f.endswith('.wav') or f.endswith('.txt')]
 
 
 def rename_files_shift_index():
@@ -326,7 +326,7 @@ def batch_flac_to_wav(dir):
 
 
 if __name__ == '__main__':
-	# rename_files()
+	rename_files()
 	# rename_files_shift_index()
 	# batch_wav_to_txt('C:\Users\PROGRAMMING\Documents\CU_research\piano_data\C134C')
 	# batch_wav_to_txt('input/viol_data')
@@ -335,6 +335,6 @@ if __name__ == '__main__':
 	# os.chdir('..')
 	print os.getcwd()
 
-	dir = '../datasets/time_series/clarinet/sustained/high_quality'
+	# dir = '../datasets/time_series/clarinet/sustained/high_quality'
 	# batch_flac_to_wav(dir)
-	batch_wav_to_txt(dir)
+	# batch_wav_to_txt(dir)
