@@ -203,11 +203,12 @@ def auto_embed(
 
 def rename_files():
 	os.chdir('..')
-	os.chdir('datasets/time_series/clarinet/short')
+	os.chdir('datasets/time_series/ivy162_piano/middle_c')
 	raw_input(os.getcwd())
-	[os.rename(f, f.replace('clarinet', '-clarinet')) for f in os.listdir('.') if f.endswith('.wav') or f.endswith('.txt')]
+	[os.rename(f, f.replace('Close', '')) for f in os.listdir('.') if f.endswith('.wav') or f.endswith('.txt')]
 
-def rename_files_shift_index(i_out=lambda i: ):
+
+def rename_files_shift_index():
 	os.chdir('input/')
 	for f in os.listdir('.'):
 		i_in = int(f.split('-')[0])
@@ -313,12 +314,27 @@ def plot_power_spectrum(sig, out_file, crop=(1,2)):
 	pyplot.savefig(out_file)
 	pyplot.close(fig)
 
+def batch_flac_to_wav(dir):
+	import soundfile as sf
+	os.chdir(dir)
+	for f in os.listdir('.'):
+		if f.endswith('.flac'):
+			out_file = f.split('.')[0] + '.wav'
+			data, samplerate = sf.read(f)
+			sf.write(out_file, data, samplerate)
+			os.remove(f)
+
 
 if __name__ == '__main__':
-	print os.getcwd()
-	rename_files()
+	# rename_files()
 	# rename_files_shift_index()
 	# batch_wav_to_txt('C:\Users\PROGRAMMING\Documents\CU_research\piano_data\C134C')
 	# batch_wav_to_txt('input/viol_data')
 	# get_fund_freq('input/viol_data/01-viol.txt', window=(1, 2))
 	# get_fund_freq('input/piano_data/C134C/24-C134C.txt', window=(1, 2))
+	# os.chdir('..')
+	print os.getcwd()
+
+	dir = '../datasets/time_series/clarinet/sustained/high_quality'
+	# batch_flac_to_wav(dir)
+	batch_wav_to_txt(dir)
