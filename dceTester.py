@@ -31,8 +31,8 @@ if test == 1:
 		piano = 'C134C'
 		vary_tau(
 			'datasets/time_series/%s/%s-%s.txt' % (piano, str(note), piano),
-			tau_lims=(1, 100),
-			tau_inc=5,			# samples
+			tau_lims=(.001, .005),
+			tau_inc=.001,			# seconds
 			embed_crop=(.5*i, .5*(i+1)),  	# aka window position, in seconds
 			ds_rate=20
 		)             		# downsample rate (takes every third sample)
@@ -48,7 +48,7 @@ if test == 2:
 			'datasets/time_series/%s/%s-%s.txt' % (piano, str(note), piano),
 			window_size=.05*(i+1),    # seconds
 			ds_rate=1,
-			tau=10,				# samples
+			tau=.001,					# seconds
 			step_size=1)      # how much to move window each frame
 		frames_to_movie('output/DCE/slide_window_scale_tau_%s_%s.mp4' % (str(note), piano), framerate=1)
 
@@ -60,8 +60,8 @@ if test == 3:
 		compare_vary_tau(
 			'datasets/time_series/C135B/%s-C135B.txt' % str(note),
 			'datasets/time_series/C134C/%s-C134C.txt' % str(note),
-			tau_lims=(1, 40),
-			tau_inc=2,			#
+			tau_lims=(.001, .005),
+			tau_inc=.001, 	# seconds
 			embed_crop=(.5, .7),
 			ds_rate=5
 		)
@@ -147,9 +147,11 @@ if test == 11:
 		embed_crop_2='auto',  # seconds or 'auto'
 		crop_auto_len=.05,  # seconds for when embed_crop = 'auto'
 
-		tau='auto detect',
+		tau='auto ideal',
 		# seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_T=math.pi,  # for auto tau. tau = period * tau_T
+
+		normalize_volume=True,
 
 		save_worms=False,  # to output/DCE/saved_worms
 		save_movie=True  # False for faster worm creation
@@ -162,10 +164,10 @@ print("time elapsed: %d seconds" % (time.time() - start_time))
 
 # PARAMETER TEST CASES 5/3/17 #
 #################################################################
-#  tau: auto ideal		crop: explicit	  #  PASSED             #
-#  tau: auto ideal		crop: auto        #  PASSED             #
-#  tau: auto detect		crop: explicit    #  PASSED             #
-#  tau: auto detect		crop: auto        #  PASSED             #
-#  tau: explicit		crop: explicit    #  PASSED             #
-#  tau: explicit		crop: auto        #  PASSED             #
+#  tau: auto ideal		crop: explicit	  #             #
+#  tau: auto ideal		crop: auto        #             #
+#  tau: auto detect		crop: explicit    #             #
+#  tau: auto detect		crop: auto        #             #
+#  tau: explicit		crop: explicit    #             #
+#  tau: explicit		crop: auto        #             #
 #################################################################

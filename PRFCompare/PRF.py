@@ -247,8 +247,8 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
 
 	filename = get_filename(i_ref)
-	make_movie_and_PD(filename, i_ref, ref=True)
-	ref_func = get_rank_func(filename, filt_params)
+	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
+	ref_func = get_rank_func(filename, filt_params)[2]
 	
 	funcs = []
 	for i in i_arr:
@@ -331,8 +331,10 @@ def mean_PRF_dist_plots(
 
 		if normalize_volume: sig_full = sig_full / np.max(sig_full)
 
-		if crop == 'auto': crop_samp = auto_crop(sig_full, crop_auto_len)
-		else: crop_samp = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		if crop == 'auto':
+			crop_samp = auto_crop(sig_full, crop_auto_len)
+		else:
+			crop_samp = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
 
 		sig = sig_full[crop_samp[0]:crop_samp[1]]
 
@@ -349,7 +351,7 @@ def mean_PRF_dist_plots(
 			window = np.asarray(sig[pt:pt + window_size_samp])
 			np.savetxt('PRFCompare/temp_data/temp_sig.txt', window)
 			embed('PRFCompare/temp_data/temp_sig.txt', 'PRFCompare/temp_data/temp_worm.txt',
-				  'none', int(tau_samps), 2, WAV_SAMPLE_RATE)
+				  'none', int(tau_samps), 2)
 
 			func = get_rank_func('PRFCompare/temp_data/temp_worm.txt', filt_params)
 			funcs.append(func[2])	# select grid_vals (third element)
@@ -447,6 +449,8 @@ def mean_PRF_dist_plots(
 
 
 	dists_plot(dists1_vs_1, dists2_vs_1, dists1_vs_2, dists2_vs_2, out_filename)
+
+
 
 
 def see(filename, filt_params):

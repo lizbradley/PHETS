@@ -157,7 +157,8 @@ def auto_tau(tau_cmd, filename, note_index, tau_T, crop):
 	else:
 		print 'ERROR: tau_cmd not recognized.'
 		sys.exit()
-	
+
+	print 'using tau:', tau
 	return tau
 
 
@@ -201,17 +202,18 @@ def auto_embed(
 
 
 def rename_files():
-	os.chdir('input/viol_data')
-	[os.rename(f, f.replace('-consolidated', '')) for f in os.listdir('.') if f.endswith('.wav') or f.endswith('.txt')]
+	os.chdir('..')
+	os.chdir('datasets/time_series/clarinet/short')
+	raw_input(os.getcwd())
+	[os.rename(f, f.replace('clarinet', '-clarinet')) for f in os.listdir('.') if f.endswith('.wav') or f.endswith('.txt')]
 
-def rename_files_shift_index():
-	os.chdir('input/viol_data')
+def rename_files_shift_index(i_out=lambda i: ):
+	os.chdir('input/')
 	for f in os.listdir('.'):
 		i_in = int(f.split('-')[0])
-		if i_in > 57:
-			base = f.split('-')[1]
-			i_out = i_in + 1
-			os.rename(f, "temp{:02d}-{}".format(i_out, base))
+		base = f.split('-')[1]
+		i_out = i_in + 1
+		os.rename(f, "temp{:02d}-{}".format(i_out, base))
 
 	for f in os.listdir('.'):
 		if 'temp' in f:
@@ -314,6 +316,7 @@ def plot_power_spectrum(sig, out_file, crop=(1,2)):
 
 if __name__ == '__main__':
 	print os.getcwd()
+	rename_files()
 	# rename_files_shift_index()
 	# batch_wav_to_txt('C:\Users\PROGRAMMING\Documents\CU_research\piano_data\C134C')
 	# batch_wav_to_txt('input/viol_data')

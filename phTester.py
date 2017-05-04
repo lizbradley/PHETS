@@ -5,8 +5,8 @@ from PersistentHomology.FiltrationPlotter import make_frame3D
 from PersistentHomology.TestingFunctions import parameter_set
 
 
-# test = 1
-test = int(sys.argv[1])
+test = 1
+# test = int(sys.argv[1])
 
 
 
@@ -183,6 +183,7 @@ if test == 7:
 			})
 
 		build_and_save_filtration(in_data_file_name, build_filt_params)
+
 		print 'Making PD %s' % str(i + 2)
 		make_persistence_diagram(
 			in_data_file_name,

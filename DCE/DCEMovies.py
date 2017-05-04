@@ -31,7 +31,7 @@ def slide_window(txt_wave_file,
 		print 'frame %i of %i' % (i, num_frames)
 
 		embed_crop = [start, start + window_size]
-		DCETools.embed(txt_wave_file, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, 2, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(txt_wave_file, 'DCE/temp_data/embedded_coords.txt', embed_crop, int(tau * WAV_SAMPLE_RATE), 2, ds_rate=ds_rate)
 
 		if save_worms: save_worms_single('{:d}-{}'.format(i, txt_wave_file), i,  tau, embed_crop)
 
@@ -56,9 +56,9 @@ def vary_tau(txt_wave_file,
 
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
-		DCETools.embed(txt_wave_file, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(txt_wave_file, 'DCE/temp_data/embedded_coords.txt', embed_crop, int(tau * WAV_SAMPLE_RATE), m,  ds_rate=ds_rate)
 
-		if save_worms: save_worms_single('{:d}-{}'.format(i, txt_wave_file), i, tau, embed_crop)
+		if save_worms: save_worms_single('{:d}-{}'.format(i, txt_wave_file), i, int(tau * WAV_SAMPLE_RATE), embed_crop)
 
 		if save_movie: DCEPlotter.make_window_frame('DCE/temp_data/embedded_coords.txt', txt_wave_file, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
 
@@ -81,10 +81,10 @@ def compare_vary_tau(txt_wave_file1,
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
 
-		DCETools.embed(txt_wave_file1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
-		DCETools.embed(txt_wave_file2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, WAV_SAMPLE_RATE, ds_rate=ds_rate)
+		DCETools.embed(txt_wave_file1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, int(tau * WAV_SAMPLE_RATE), m, ds_rate=ds_rate)
+		DCETools.embed(txt_wave_file2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, int(tau * WAV_SAMPLE_RATE), m, ds_rate=ds_rate)
 
-		if save_worms: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop)
+		if save_worms: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop, embed_crop)
 
 		if save_movie: DCEPlotter.compare_vary_tau_frame('DCE/frames/frame%03d.png' % i, txt_wave_file1, txt_wave_file2, i, tau, embed_crop)
 
