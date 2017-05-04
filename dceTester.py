@@ -12,8 +12,8 @@ from DCE.DCEMovies import vary_tau, slide_window, compare_vary_tau, compare_mult
 
 
 
-#test = 9
-test = int(sys.argv[1])
+test = 11
+# test = int(sys.argv[1])
 
 print 'running test %d...' % test
 
@@ -129,10 +129,34 @@ if test == 10:
 		save_worms=True,		 # to output/DCE/saved_worms
 		save_movie=True			 # False for faster worm creation
 		
-			)
+	)
 
 	frames_to_movie('output/DCE/C134vC135.mp4', framerate=1)
 
+if test == 11:
+	dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'  # numerical index goes in front of base
+	dir2, base2 = "datasets/time_series/C135B", '-C135B.txt'
+
+	compare_multi(
+		dir1, base1,
+		dir2, base2,
+
+		i_lims=(40, 50),  # specify note range
+
+		embed_crop_1='auto',  # seconds or 'auto'
+		embed_crop_2='auto',  # seconds or 'auto'
+		crop_auto_len=.05,  # seconds for when embed_crop = 'auto'
+
+		tau='auto detect',
+		# seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_T=math.pi,  # for auto tau. tau = period * tau_T
+
+		save_worms=False,  # to output/DCE/saved_worms
+		save_movie=True  # False for faster worm creation
+
+	)
+
+	frames_to_movie('output/DCE/C134vC135.mp4', framerate=1)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 

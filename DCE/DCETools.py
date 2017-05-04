@@ -27,32 +27,45 @@ def embed(
 		channel=0
 	):
 
-	# print 'embedding...'
-	input_file = open(input_file_name, "r")
+
+	if isinstance(input_file_name, basestring):
+		input_file = open(input_file_name, "r")
+		lines = input_file.read().split("\n")
+		input_file.close()
+
+		# apply bounds #########################################
+		worm_length_sec = len(lines) / WAV_SAMPLE_RATE
+		if isinstance(embed_crop, basestring):
+			if embed_crop == 'none': embed_crop_norm = [0, 1]
+		else:
+			embed_crop_norm = [float(t) / worm_length_sec for t in embed_crop]
+		bounds = len(lines) * np.array(embed_crop_norm)
+		lines = lines[int(bounds[0]): int(bounds[1]): ds_rate]
+		########################################################
+
+		series = []
+		for line in lines:
+			if line != "":
+				channels = [x for x in line.split(" ") if x != ""]
+				series.append(float(channels[channel]))
+
+		end = len(lines) - (tau * (m - 1)) - 1
+
+
+	else:
+		series = input_file_name			# accept array instead of filename
+		embed_crop_samp = np.array(embed_crop) * WAV_SAMPLE_RATE
+		series = series[int(embed_crop_samp[0]):int(embed_crop_samp[1])]
+		end = len(series) - (tau * (m - 1)) - 1
+
 	output_file = open(output_file_name, "w")
 	output_file.truncate(0)
-	lines = input_file.read().split("\n")
 
-	worm_length_sec = len(lines) / WAV_SAMPLE_RATE
-	if isinstance(embed_crop, basestring):
-		if embed_crop == 'none': embed_crop_norm = [0, 1]
-	else: embed_crop_norm = [float(t) / worm_length_sec for t in embed_crop]
-
-	bounds = len(lines) * np.array(embed_crop_norm)
-	lines = lines[int(bounds[0]): int(bounds[1]) : ds_rate]
-
-	series = []
-	for line in lines:
-		if line != "":
-			channels = [x for x in line.split(" ") if x != ""]
-			series.append(float(channels[channel]))
-	end = len(lines) - (tau*(m - 1)) - 1
 	for i in xrange(end):
 		for j in xrange(m):
 			output_file.write("%f " % series[i + (j*tau)])
 		if i < end:
 			output_file.write("\n")
-	input_file.close()
 	output_file.close()
 
 

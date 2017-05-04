@@ -5,9 +5,9 @@ from PersistentHomology.TestingFunctions import parameter_set
 from PRFCompare.PRF import PRF_dist_plots, mean_PRF_dist_plots
 from PRFCompare.PRF import mean_PRF_dist_plots
 
+# TODO: dce normalize volumes
 # TODO: prfc auto tau
 # TODO: debug prfc auto crop
-# TODO: dce normalize volumes
 # TODO: dce tau (sec) in old movie funcs
 # TODO: finish auto_embed
 
@@ -21,7 +21,7 @@ from PRFCompare.PRF import mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 3
+test = 4
 
 if test == 1:
 	params = parameter_set
@@ -76,38 +76,9 @@ if test == 2:
 
 	)
 
+
+
 if test == 3:
-	params = parameter_set
-	# params = standard_parameter_set
-	params.update(
-		{
-			'ds_rate': 50,
-			'worm_length': 5000,
-			'max_filtration_param': -10,
-			'num_divisions': 30
-		}
-	)
-
-	mean_PRF_dist_plots(
-		'datasets/time_series/C134C/40-C134C.txt',  # input (left)
-		'datasets/time_series/C135B/40-C135B.txt',  # input (right)
-		'output/PRFCompare/40_C134C_vs_C135B.png',  # out filename
-		params,
-		crop_1='auto',		# seconds or 'auto'
-		crop_2='auto',		# seconds or 'auto'
-		crop_auto_len=.3,		# seconds. length of windows when crop is 'auto'
-		window_size=.05, 		# seconds
-		num_windows=10, 		# evenly spaced
-		mean_samp_num=10,  		# number of windows to use for mean
-		tau='auto ideal',  		# seconds
-		tau_T=np.pi,			# tau_T = tau / period
-		note_index=49,			# required for auto tau
-		PD_movie_int=0,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
-
-
-	)
-
-if test == 4:
 	params = parameter_set
 	# params = standard_parameter_set
 	params.update(
@@ -132,4 +103,36 @@ if test == 4:
 		mean_samp_num = 5,  # number of windows to use for mean
 		tau = .001134,  # seconds
 		PD_movie_int = 3,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+	)
+
+
+if test == 4:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param': -10,
+			'num_divisions': 30
+		}
+	)
+
+	mean_PRF_dist_plots(
+		'datasets/time_series/C134C/40-C134C.txt',  # input (left)
+		'datasets/time_series/C135B/40-C135B.txt',  # input (right)
+		'output/PRFCompare/40_C134C_vs_C135B.png',  # out filename
+		params,
+		crop_1=(1, 2),			# seconds or 'auto'
+		crop_2=(1, 2),			# seconds or 'auto'
+		crop_auto_len=.3,		# seconds. length of windows when crop is 'auto'
+		window_size=.05, 		# seconds
+		num_windows=10, 		# evenly spaced
+		mean_samp_num=10,  		# number of windows to use for mean
+		tau=.0012,		  		# seconds
+		tau_T=np.pi,			# tau_T = tau / period
+		note_index=40,			# required for auto tau
+		PD_movie_int=0,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+
 	)

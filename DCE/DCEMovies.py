@@ -106,6 +106,7 @@ def compare_multi(
 		tau_T=1/np.pi,          # tau_sec = period * tau_T
 		save_worms=True,
 		save_movie=True,
+		normalize_volume=True,
 		ds_rate=1, dpi=200, m=2
 	):
 	"""makes frames for comparison movie: proportional tau, constant, vary in files"""
@@ -121,6 +122,14 @@ def compare_multi(
 		print 'frame', frame_idx
 		filename1 = dir1 + "/%02d" % i + dir1_base
 		filename2 = dir2 + "/%02d" % i + dir2_base
+
+		# normalize volumes #
+		sig_1 = np.loadtxt(filename1)
+		sig_2 = np.loadtxt(filename2)
+		if normalize_volume: sig_1 = sig_1 / np.max(sig_1)
+		if normalize_volume: sig_2 = sig_2 / np.max(sig_2)
+
+
 
 		if isinstance(embed_crop_1, basestring):
 			if embed_crop_1 == 'auto':
@@ -157,8 +166,8 @@ def compare_multi(
 			print 'ERROR: tau not recognized.'
 			sys.exit()
 
-		DCETools.embed(filename1, 'DCE/temp_data/embedded_coords_comp1.txt', crop_1, tau_1, m, ds_rate=ds_rate)
-		DCETools.embed(filename2, 'DCE/temp_data/embedded_coords_comp2.txt', crop_2, tau_2, m, ds_rate=ds_rate)
+		DCETools.embed(sig_1, 'DCE/temp_data/embedded_coords_comp1.txt', crop_1, tau_1, m, ds_rate=ds_rate)
+		DCETools.embed(sig_2, 'DCE/temp_data/embedded_coords_comp2.txt', crop_2, tau_2, m, ds_rate=ds_rate)
 
 		if save_worms: save_worms_double(filename1, filename2, i, tau_1, tau_2, crop_1, crop_2)
 
