@@ -82,7 +82,7 @@ def add_title(subplot, title_block_info):
 	title_table.auto_set_font_size(False)
 	title_table.auto_set_font_size(8)
 
-def add_persistence_plot(subplot):
+def add_persistence_plot(subplot, fig):
 	print 'plotting persistence diagram...'
 	birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True)
 
@@ -104,28 +104,28 @@ def add_persistence_plot(subplot):
 
 	subplot.plot([0, lim], [0, lim], color='k') # diagonal line
 
-	birth_e = []
-	death_e = []
-
-	for times in zip(birth_t, death_t):
-		if times[1] != - 1:
-			birth_e.append(epsilons[int(times[0])])
-			death_e.append(epsilons[int(times[1])])
-
-
+	# plot immortal holes #
 	immortal_holes = [epsilons[int(birth_t[i])] for i, death_time in enumerate(death_t) if death_time == -1]
 	count = np.zeros(len(immortal_holes))
 	for i, pt in enumerate(immortal_holes):
 		for scanner_pt in immortal_holes:
 			if pt == scanner_pt:
 				count[i] += 1
-	for b_e in immortal_holes:
-		# subplot.plot((bt, bt), (bt, lim), '--', color='k', lw=1, zorder=0)    # immortal holes
-		print 'immortal hole count:', count
-		subplot.plot(b_e, lim *.99, '^', color='C0', markersize=count * 5)
+
+	t_ms_scale = 50
+
+	x, y = immortal_holes, [lim for i in immortal_holes]
+	subplot.scatter(x, y, marker='^', s=(count * t_ms_scale), c='C0', clip_on=False)
+	# end plot immortal holes#
 
 
 
+	# plot doomed holes #
+	birth_e, death_e = [], []
+	for times in zip(birth_t, death_t):
+		if times[1] != - 1:
+			birth_e.append(epsilons[int(times[0])])
+			death_e.append(epsilons[int(times[1])])
 
 	count = np.zeros(len(birth_t))
 	for i, pt in enumerate(zip(birth_t, death_t)):
@@ -133,7 +133,32 @@ def add_persistence_plot(subplot):
 			if pt == scanner_pt:
 				count[i] += 1
 
-	subplot.scatter(birth_e, death_e, s=(count * 5), zorder=1)   # doomed holes
+	p_ms_scale = 30
+	subplot.scatter(birth_e, death_e, s=(count * p_ms_scale), clip_on=False)
+	# end plot doomed holes #
+
+	# add legend #
+	mark_t_1 = subplot.scatter([], [], marker='^', s=t_ms_scale, c='C0')
+	mark_t_3 = subplot.scatter([], [], marker='^', s=t_ms_scale * 3, c='C0')
+	mark_t_5 = subplot.scatter([], [], marker='^', s=t_ms_scale * 5, c='C0')
+
+	mark_p_1 = subplot.scatter([], [], s=p_ms_scale, c='C0')
+	mark_p_3 = subplot.scatter([], [], s=p_ms_scale * 3, c='C0')
+	mark_p_5 = subplot.scatter([], [], s=p_ms_scale * 5, c='C0')
+
+	marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
+	labels = ('', '', '', '1', '3', '5')
+
+	subplot.legend(
+		marks, labels, loc='lower right', ncol=2, markerscale=1,
+		borderpad=1,
+		labelspacing=1,
+		framealpha=1,
+		columnspacing=0,
+		borderaxespad=3,
+		edgecolor='k'
+	)
+	# end add legend #
 
 
 
@@ -165,7 +190,7 @@ def make_figure(title_block_info, out_file_name):
 	title_block = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3)
 	pers_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 
-	add_persistence_plot(pers_plot)
+	add_persistence_plot(pers_plot, fig)
 	add_title(title_block, title_block_info)
 	pyplot.savefig(out_file_name)
 	pyplot.clf()
