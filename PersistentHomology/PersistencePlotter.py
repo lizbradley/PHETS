@@ -91,7 +91,7 @@ def add_persistence_plot(subplot):
     lim = np.max(epsilons)
 
     subplot.set_aspect('equal')
-    subplot.grid(which=u'both', zorder=0)
+    subplot.grid(which=u'major', zorder=0)
     subplot.minorticks_on()
 
 

@@ -24,7 +24,7 @@ if test == 1:
 
 		})
 
-	start_pt = 0   # skip first half of in data file (primitive sliding window)
+	start_pt = 0   # fraction to skip of in data file (primitive sliding window)
 	build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) # comment out to reuse filtration
 
 	make_filtration_movie(
@@ -34,7 +34,7 @@ if test == 1:
 
 		# the following are optional plotting parameters and may be omitted
 		# see documentation at line 76 of TestingFunctions.py.
-		color_scheme='highlight new',
+		color_scheme='none',
 		framerate=1,
 	)
 
