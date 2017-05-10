@@ -12,7 +12,7 @@ from DCE.DCEMovies import vary_tau, slide_window, compare_vary_tau, compare_mult
 
 
 
-test = 11
+test = 0
 # test = int(sys.argv[1])
 
 print 'running test %d...' % test
@@ -20,8 +20,7 @@ print 'running test %d...' % test
 start_time = time.time()
 
 if test == 0:
-	batch_wav_to_txt('input\piano_data\C134C')
-	batch_wav_to_txt('input\piano_data\C135B')
+	batch_wav_to_txt('datasets/time_series/piano_revisit/C134C/scale')
 
 
 if test == 1:
