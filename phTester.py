@@ -5,7 +5,7 @@ from PersistentHomology.FiltrationPlotter import make_frame3D
 from PersistentHomology.TestingFunctions import parameter_set
 
 
-test = 1
+test = 13
 # test = int(sys.argv[1])
 
 
@@ -343,13 +343,14 @@ if test == 12:
 		)
 
 if test == 13:
-	in_data_file_name = "output/DCE/saved_worms/double/a/40-C134C.txt"
+	in_data_file_name = "output/DCE/saved_worms/double/b/49-C135B.txt"
 	build_filt_params = parameter_set
 	build_filt_params.update(
 		{
-			'ds_rate' : 20,
+			'ds_rate' : 50,
 			'worm_length' : 2000,
-			'max_filtration_param': -10,
+			'min_filtration_param': .001,
+			'max_filtration_param': .01,
 			'num_divisions': 30,
 			'use_cliques': True
 
@@ -360,18 +361,18 @@ if test == 13:
 
 	make_filtration_movie(
 		in_data_file_name,              # used to check if saved filtration is up to date, and in titlebox
-		"output/PersistentHomology/40-C134C.mp4",      		# output filename
+		"output/PersistentHomology/49-C135B.mp4",      		# output filename
 		build_filt_params,              # passed to BuildComplex.build_filtration()
 
 		# the following are optional plotting parameters and may be omitted
 		# see documentation at line 76 of TestingFunctions.py.
-		color_scheme='highlight new',
+		color_scheme=('birth time gradient', 1),
 		framerate=1,
 	)
 
 	make_persistence_diagram(
 		in_data_file_name,
-		"output/PersistentHomology/40-C134C.png",
+		"output/PersistentHomology/49-C135B.png",
 		build_filt_params
 	)
 

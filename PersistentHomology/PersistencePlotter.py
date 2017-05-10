@@ -88,21 +88,23 @@ def add_persistence_plot(subplot, fig):
 
 	print os.getcwd()
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
-	lim = np.max(epsilons)
+	max_lim = np.max(epsilons)
+	min_lim = np.min(epsilons)
+
 
 	subplot.set_aspect('equal')
 	subplot.grid(which=u'major', zorder=0)
 	subplot.minorticks_on()
 
 
-	subplot.set_xlim(0, lim)
-	subplot.set_ylim(0, lim)
+	subplot.set_xlim(min_lim, max_lim)
+	subplot.set_ylim(min_lim, max_lim)
 
 	subplot.set_xlabel('birth time')
 	subplot.set_ylabel('death time')
 
 
-	subplot.plot([0, lim], [0, lim], color='k') # diagonal line
+	subplot.plot([min_lim, max_lim], [min_lim, max_lim], color='k') # diagonal line
 
 	# plot immortal holes #
 	immortal_holes = [epsilons[int(birth_t[i])] for i, death_time in enumerate(death_t) if death_time == -1]
@@ -114,7 +116,7 @@ def add_persistence_plot(subplot, fig):
 
 	t_ms_scale = 50
 
-	x, y = immortal_holes, [lim for i in immortal_holes]
+	x, y = immortal_holes, [max_lim for i in immortal_holes]
 	subplot.scatter(x, y, marker='^', s=(count * t_ms_scale), c='C0', clip_on=False)
 	# end plot immortal holes#
 
@@ -136,6 +138,8 @@ def add_persistence_plot(subplot, fig):
 	p_ms_scale = 30
 	subplot.scatter(birth_e, death_e, s=(count * p_ms_scale), clip_on=False)
 	# end plot doomed holes #
+
+
 
 	# add legend #
 	mark_t_1 = subplot.scatter([], [], marker='^', s=t_ms_scale, c='C0')
@@ -164,8 +168,14 @@ def add_persistence_plot(subplot, fig):
 
 def make_figure(title_block_info, out_file_name):
 	filt_list = np.load('PersistentHomology/temp_data/complexes.npy')
+
+	# filt_array = group_by_birth_time(filt_list)
+	# expand_to_2simplexes(filt_array)
+	# filt_array = np.asarray(filt_array)
+	#
 	filt_array = group_by_birth_time(filt_list)
 	expand_to_2simplexes(filt_array)
+
 	filt_array = np.asarray(filt_array)
 
 

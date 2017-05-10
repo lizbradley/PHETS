@@ -19,8 +19,8 @@ build_filt_params.update(
 
 	})
 
-# start_pt = 0  # fraction to skip of in data file (primitive sliding window)
-# build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt)  # comment out to reuse filtration
+start_pt = 0  # fraction to skip of in data file (primitive sliding window)
+build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt)  # comment out to reuse filtration
 #
 # make_filtration_movie(
 # 	in_data_file_name,              # used to check if saved filtration is up to date, and in titlebox

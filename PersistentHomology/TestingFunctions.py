@@ -51,6 +51,7 @@ def build_and_save_filtration(in_file_name, params, start=0):
 	filtration = BuildComplex.build_filtration('temp_data/worm_data.txt', params)
 	witness_coords = filtration[1][1]
 	landmark_coords = filtration[1][0]
+
 	complexes = sorted(list(filtration[0]))
 
 	print "saving filtration..."

@@ -687,7 +687,9 @@ def build_filtration(input_file_name, parameter_set):
     print("Filtration has been successfully built!\n")
     return (filtration, extra_data + (max_filtration_param,))
 
-class SimplexBirth: # An object that contains a set of landmarks that define a simplex, and a birth time measured in integer units. IMPORTANT: two SimplexBirths are considered equal iff they have the same landmark set, regardless of birth time.
+class SimplexBirth:
+    # An object that contains a set of landmarks that define a simplex, and a birth time measured in integer units.
+    # IMPORTANT: two SimplexBirths are considered equal iff they have the same landmark set, regardless of birth time.
 
     include_birth_time = False
 

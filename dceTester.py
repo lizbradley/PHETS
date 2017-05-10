@@ -141,7 +141,7 @@ if test == 11:
 		dir1, base1,
 		dir2, base2,
 
-		i_lims=(40, 50),  # specify note range
+		i_lims=(45, 55),  # specify note range
 
 		embed_crop_1='auto',  # seconds or 'auto'
 		embed_crop_2='auto',  # seconds or 'auto'
@@ -153,7 +153,7 @@ if test == 11:
 
 		normalize_volume=True,
 
-		save_worms=False,  # to output/DCE/saved_worms
+		save_worms=True,  # to output/DCE/saved_worms
 		save_movie=True  # False for faster worm creation
 
 	)

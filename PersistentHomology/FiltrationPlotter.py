@@ -70,12 +70,13 @@ def unpack_complex_data_2D(complex_list, landmark_coords_data):
 					new_row.append(child)
 			row[:] = new_row
 
-	ID_array = group_by_birth_time(complex_list)
-	expand_to_2simplexes(ID_array)
-	IDs_to_coords(ID_array)
-	flatten_rows(ID_array)
-	coords_array = ID_array
-	return coords_array
+	filt_array = group_by_birth_time(complex_list)
+	expand_to_2simplexes(filt_array)
+
+	IDs_to_coords(filt_array)
+	flatten_rows(filt_array)
+
+	return filt_array
 
 def unpack_complex_data_3D(complex_list):
 
@@ -143,18 +144,29 @@ def remove_old_frames():
 		if f.endswith(".png"):
 			os.remove(dir + f)
 
-def get_simplex_color(scheme, birth_time, current_birth_time, max_birth_time):
+def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_time):
 	"""helper for plot_complex()"""
 	if scheme == 'none':
-		color = (.4, .6, .8)
+		facecolor = 'C0'
+		edgecolor = 'black'
+
 	elif scheme == 'highlight new':
-		color = (1, 0, 0) if birth_time == current_birth_time - 1 else (0, 0, 1)
-	elif scheme == 'birth_time gradient':
-		prog = birth_time / float(max_birth_time)
-		color = (0, prog, 1 - prog)
+		if past_birth_time == present_birth_time:
+			facecolor = 'red'
+			edgecolor = 'firebrick'
+		else:
+			facecolor = 'C0'
+			edgecolor = 'black'
+
+	elif hasattr(scheme, '__len__') and scheme[0] == 'birth time gradient':
+		cycles = scheme[1]
+		prog = divmod(((past_birth_time / float(max_birth_time)) * cycles), 1)[1] # modulo 1
+		facecolor = (1, prog, 1 - prog)
+		edgecolor = (.5, prog, 1 - prog)
+
 	else:
 		print 'error:', scheme, 'is not a valid color scheme'
-	return color
+	return facecolor, edgecolor
 
 
 def add_title(subplot, title_block_info, i):
@@ -205,7 +217,7 @@ def update_time_table(time_plot, i):
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
 	e = epsilons[i]
 	time_table = time_plot.table(
-		cellText= [['$\epsilon$', '{:.3f}'.format(e)]],
+		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
 		bbox=[.25, .8, .5, .05],    # x0, y0, width, height
 		colWidths=[.5, 1],
 		cellLoc = 'center',
@@ -301,7 +313,7 @@ def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angl
 		pyplot.savefig('frames/image%03d.png' % i)
 
 
-def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug):
+def make_frames_2D_old(filt_data, title_block_info, color_scheme, alpha, frame_debug):
 	def plot_witnesses(subplot, attractor_data):
 		attractor_data = np.array(attractor_data)
 		x = attractor_data[:, 0]
@@ -318,7 +330,7 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 		"""plots all complexes for full filtration"""
 		patches = []
 		for simplexes_coords in complex_data:
-			simplexes = collections.PolyCollection(simplexes_coords, edgecolors='black', facecolors='lightblue', lw=.5, alpha=alpha, animated=True, antialiased=True)
+			simplexes = collections.PolyCollection(simplexes_coords, edgecolors='black', facecolors='lightblue', lw=1, alpha=alpha, animated=True, antialiased=True)
 			simplexes.set_visible(False)
 			patches.append(subplot.add_collection(simplexes))
 		return patches
@@ -378,6 +390,68 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 		return ret_list
 
 	return init, animate
+
+def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug):
+	def plot_witnesses(subplot, attractor_data):
+		attractor_data = np.array(attractor_data)
+		x = attractor_data[:, 0]
+		y = attractor_data[:, 1]
+		return subplot.scatter(x, y, color='black', marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'), facecolor='black', s=.1)
+
+	def plot_landmarks(subplot, landmark_data):
+		landmark_data = np.array(landmark_data)
+		x = landmark_data[:, 0]
+		y = landmark_data[:, 1]
+		return subplot.scatter(x, y, color='b', s=10)
+
+	def plot_complex(subplot, i):
+		"""plots all complexes for full filtration"""
+		patches = []
+		for j, simplexes_coords in enumerate(complex_data[:i + 1]):
+
+			f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
+			simplexes = collections.PolyCollection(simplexes_coords, edgecolors=e_color, facecolors=f_color, lw=1, alpha=alpha, animated=True, antialiased=True, zorder=0)
+			patches.append(subplot.add_collection(simplexes))
+		return patches
+
+
+
+
+	filt_data[2] = unpack_complex_data_2D(filt_data[2], filt_data[1])
+
+	title_block = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3, colspan=1)
+	add_title(title_block, title_block_info, 0)
+
+	filt_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
+	filt_plot.set_aspect('equal')
+
+	witness_data = filt_data[0]
+	landmark_data = filt_data[1]
+	complex_data = filt_data[2]
+
+	def init():
+		print 'initializing...'
+		# title = add_title(title_block, title_block_info, 0)
+		witnesses = plot_witnesses(filt_plot, witness_data)
+		landmarks = plot_landmarks(filt_plot, landmark_data)
+		ret_list = [witnesses, landmarks]
+		# ret_list.extend(complexes)
+		# ret_list.extend(title)
+		return ret_list
+
+	def animate(i):
+		print 'frame', i
+		ret_comp = plot_complex(filt_plot, i)
+		ret_title = update_time_table(title_block, i)
+		ret_list = list(ret_comp)
+		ret_list.extend(ret_title)
+		if frame_debug:
+			pyplot.savefig('frames/image%03d.png' % i)    # for debugging
+
+		return ret_list
+
+	return init, animate
+
 
 
 def make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, frame_debug):
