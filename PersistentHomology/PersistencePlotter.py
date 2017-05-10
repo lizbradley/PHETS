@@ -89,8 +89,8 @@ def add_persistence_plot(subplot, fig):
 	print os.getcwd()
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
 	max_lim = np.max(epsilons)
-	min_lim = np.min(epsilons)
-
+	# min_lim = np.min(epsilons)
+	min_lim = 0
 
 	subplot.set_aspect('equal')
 	subplot.grid(which=u'major', zorder=0)
@@ -107,7 +107,7 @@ def add_persistence_plot(subplot, fig):
 	subplot.plot([min_lim, max_lim], [min_lim, max_lim], color='k') # diagonal line
 
 	# plot immortal holes #
-	immortal_holes = [epsilons[int(birth_t[i])] for i, death_time in enumerate(death_t) if death_time == -1]
+	immortal_holes = [epsilons[int(birth_t[i]) - 1] for i, death_time in enumerate(death_t) if death_time == -1]
 	count = np.zeros(len(immortal_holes))
 	for i, pt in enumerate(immortal_holes):
 		for scanner_pt in immortal_holes:
@@ -126,8 +126,8 @@ def add_persistence_plot(subplot, fig):
 	birth_e, death_e = [], []
 	for times in zip(birth_t, death_t):
 		if times[1] != - 1:
-			birth_e.append(epsilons[int(times[0])])
-			death_e.append(epsilons[int(times[1])])
+			birth_e.append(epsilons[int(times[0] - 1)])
+			death_e.append(epsilons[int(times[1] - 1)])
 
 	count = np.zeros(len(birth_t))
 	for i, pt in enumerate(zip(birth_t, death_t)):

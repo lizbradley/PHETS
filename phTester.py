@@ -350,7 +350,7 @@ if test == 13:
 			'ds_rate' : 50,
 			'worm_length' : 2000,
 			'min_filtration_param': .001,
-			'max_filtration_param': .01,
+			'max_filtration_param': .005,
 			'num_divisions': 30,
 			'use_cliques': True
 
@@ -360,13 +360,12 @@ if test == 13:
 	build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) # comment out to reuse filtration
 
 	make_filtration_movie(
-		in_data_file_name,              # used to check if saved filtration is up to date, and in titlebox
+		in_data_file_name,             						# used to check if saved filtration is up to date, and in titlebox
 		"output/PersistentHomology/49-C135B.mp4",      		# output filename
-		build_filt_params,              # passed to BuildComplex.build_filtration()
+		build_filt_params,              					# passed to BuildComplex.build_filtration()
 
-		# the following are optional plotting parameters and may be omitted
-		# see documentation at line 76 of TestingFunctions.py.
-		color_scheme=('birth time gradient', 1),
+		color_scheme='none',		# 'none' or 'highlight new' or ('birth time gradient', cycles), where cycles is number
+									# of cycles through color gradient. (ie use larger cycles for faster color changes.)
 		framerate=1,
 	)
 

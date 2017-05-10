@@ -19,16 +19,18 @@ def unpack_complex_data_2D(complex_list, landmark_coords_data):
 		"""Reformats 1D list of SimplexBirth objects into 2D array of
 		landmark_set lists, where 2nd index is  birth time (? see below)"""
 
-
 		complex_ID_array = []	# list of complex_at_t lists
 		complex_at_t = []	# list of simplices with same birth_time
 		i = 0
 		time = 0
+		# complex_ID_list = complex_ID_list[:5]	# debugging
 		list_length = len(complex_ID_list)
 		while i < list_length:
 			birth_time = complex_ID_list[i].birth_time
 			if birth_time == time:
 				complex_at_t.append(complex_ID_list[i].landmark_set)
+				if i == list_length - 1:
+					complex_ID_array.append(complex_at_t)
 				i += 1
 			else:
 				complex_ID_array.append(complex_at_t)
@@ -220,7 +222,7 @@ def update_time_table(time_plot, i):
 		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
 		bbox=[.25, .8, .5, .05],    # x0, y0, width, height
 		colWidths=[.5, 1],
-		cellLoc = 'center',
+		cellLoc='center',
 
 		animated=True,
 	)
@@ -298,8 +300,6 @@ def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angl
 
 		mlab.close()
 
-
-	filt_data[2] = unpack_complex_data_3D(filt_data[2])
 
 	title_plot = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3, colspan=1)
 	add_title(title_plot, title_block_info, 0)
@@ -402,7 +402,7 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 		landmark_data = np.array(landmark_data)
 		x = landmark_data[:, 0]
 		y = landmark_data[:, 1]
-		return subplot.scatter(x, y, color='b', s=10)
+		return subplot.scatter(x, y, color='lime', s=10)
 
 	def plot_complex(subplot, i):
 		"""plots all complexes for full filtration"""
@@ -414,10 +414,6 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 			patches.append(subplot.add_collection(simplexes))
 		return patches
 
-
-
-
-	filt_data[2] = unpack_complex_data_2D(filt_data[2], filt_data[1])
 
 	title_block = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3, colspan=1)
 	add_title(title_block, title_block_info, 0)
@@ -445,8 +441,8 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 		ret_title = update_time_table(title_block, i)
 		ret_list = list(ret_comp)
 		ret_list.extend(ret_title)
-		if frame_debug:
-			pyplot.savefig('frames/image%03d.png' % i)    # for debugging
+
+		if frame_debug: pyplot.savefig('frames/image%03d.png' % i)
 
 		return ret_list
 
@@ -457,14 +453,19 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 def make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, frame_debug):
 
 	remove_old_frames()
+
 	ambient_dim, filt_data = load_data()
+
 	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
 
 	if ambient_dim == 2:
-		init, animate = make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug=frame_debug)
-		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=len(filt_data[2]) - 1, blit=True, repeat=False)
 
-		# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is muuuch faster than saving to png.
+		pre_unpack = filt_data[2]
+		filt_data[2] = unpack_complex_data_2D(filt_data[2], filt_data[1])
+		init, animate = make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug=frame_debug)
+		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=len(filt_data[2]), blit=True, repeat=False)
+
+		# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
 		# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
 		# As a workaround, ani.save(fps=10) is used and then ffmpeg is called to reduce the speed of the video by a 10x
 
@@ -484,6 +485,7 @@ def make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framer
 		sys.exit()
 		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."
 		print "Response times may be impossibly long, especially for large 'max_filtration_param'."
+		filt_data[2] = unpack_complex_data_3D(filt_data[2])
 		make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angle, hide_1simplexes)
 		TestingFunctions.frames_to_movie(out_file_name, framerate)
 	else:
