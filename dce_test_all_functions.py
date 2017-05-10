@@ -3,6 +3,8 @@ from DCE.Movies import compare_multi
 from DCE.MovieTools import frames_to_movie
 
 
+
+
 dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'  # numerical index goes in front of base
 dir2, base2 = "datasets/time_series/C135B", '-C135B.txt'
 

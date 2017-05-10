@@ -1,10 +1,11 @@
 import sys
 import time
 import math
-from DCE.DCETools import wav_to_txt, batch_wav_to_txt, plot_power_spectrum
-from DCE.DCEPlotter import make_window_frame
-from DCE.DCEMovies_helper import frames_to_movie
-from DCE.DCEMovies import vary_tau, slide_window, compare_vary_tau, compare_multi
+from DCE.Utilities import wav_to_txt, batch_wav_to_txt
+from DCE.Tools import plot_power_spectrum
+from DCE.Plotter import make_window_frame
+from DCE.MovieTools import frames_to_movie
+from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
 
 # slide_window, vary_tau, compare_vary_tau: tau is in samples not seconds
 # compare_multi: tau is in seconds; has all options for tau and crop *****
@@ -12,8 +13,8 @@ from DCE.DCEMovies import vary_tau, slide_window, compare_vary_tau, compare_mult
 
 
 
-test = 0
-# test = int(sys.argv[1])
+# test = 11
+test = int(sys.argv[1])
 
 print 'running test %d...' % test
 
