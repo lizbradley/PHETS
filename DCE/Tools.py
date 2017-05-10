@@ -160,7 +160,7 @@ def plot_power_spectrum(sig, out_file, crop=(1,2)):
 	subplots[0].plot(FFT_x[1:len(FFT_x)/2], spec, c='k', lw=.1)
 	subplots[0].set_xlabel('frequency (Hz)')
 
-	plot_waveform(subplots[1], sig, embed_crop=crop)
+	plot_waveform(subplots[1], sig, crop=crop)
 
 
 	plt.savefig(out_file)

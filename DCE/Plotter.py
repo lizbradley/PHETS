@@ -4,71 +4,71 @@ import matplotlib.pyplot as pyplot
 from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
 from matplotlib.ticker import FormatStrFormatter
 
+WAV_SAMPLE_RATE = 44100.
 
 # noinspection PyTypeChecker
-def plot_dce(subplot, in_file_name):
+def plot_dce(ax, in_file_name):
 	# print 'plotting dce...'
 	dce_data = np.loadtxt(in_file_name)
 	x = dce_data[:,0]
 	y = dce_data[:,1]
-	subplot.scatter(x, y, color='black', s=.1)
+	ax.scatter(x, y, color='black', s=.1)
 	# subplot.set_aspect('equal')
-	subplot.set(adjustable='box-forced', aspect='equal')
-	subplot.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-	subplot.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	ax.set(adjustable='box-forced', aspect='equal')
 
-	xlims = subplot.get_xlim()
-	subplot.set_xticks([0, xlims[1]])
+	# x0,x1 = ax.get_xlim()
+	# y0,y1 = ax.get_ylim()
+	# ax.set_aspect(abs(x1-x0)/abs(y1-y0))
 
-	ylims = subplot.get_ylim()
-	subplot.set_yticks([0, ylims[1]])
+	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
+	# xlims = ax.get_xlim()
+	# ax.set_xticks([0, xlims[1]])
 	#
-	# max_label = AnchoredText('%.3f' %ylims[1],
-	#                          prop=dict(size=8), frameon=True,
-	#                          loc=2)
-	# min_label = AnchoredText('%.3f' %ylims[0],
-	#                          prop=dict(size=8), frameon=True,
-	#                          loc=3)
-	# # at.patch.set_boxstyle("round,pad=0.,rounding_size=0.2")
-	# subplot.add_artist(max_label)
-	# subplot.add_artist(min_label)
+	# ylims = ax.get_ylim()
+	# ax.set_yticks([0, ylims[1]])
 
 
-# noinspection PyTypeChecker
-def plot_waveform(subplot, waveform_data, embed_crop):
-	# print 'plotting waveform...'
+
+def plot_waveform(subplot, waveform_data, crop):
 	y = waveform_data
-	x = np.linspace(0, len(y)/44100., len(y))
-
+	x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
 
 	subplot.plot(x, y, color='k', zorder=0, lw= .5)
 	subplot.axis('tight')
-	if math.fabs(embed_crop[0] - embed_crop[1]) < .01:   # how to un-hardcode?
-		subplot.axvline(embed_crop[0], color='r', alpha=0.7, zorder=1)
-	subplot.axvspan(embed_crop[0], embed_crop[1], facecolor='r', alpha=0.5, zorder=1)
-
+	if math.fabs(crop[0] - crop[1]) < .01:   # how to un-hardcode?
+		subplot.axvline(crop[0], color='r', alpha=0.7, zorder=1)
+	subplot.axvspan(crop[0], crop[1], facecolor='r', alpha=0.5, zorder=1)
 
 	subplot.set_xlabel('time (s)')
 
 	subplot.set_ylim(-1.1, 1.1)
 	subplot.set_yticks([-1, 0, 1])
-	# subplot.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-	# ylims = subplot.get_ylim()
-	# subplot.set_yticks([ylims[0], 0, ylims[1]])
 
-	# ymax_norm = subplot.get_ylim()[1]
-	# ymax = 20 * math.log(ymax_norm, 10) # convert normalized -> dB
-	# subplot.set_yticks(subplot.get_ylim())  # no ticks
-	# max_label = AnchoredText('%.3f' % ymax,
-	#                          prop={'size': 8},
-	#                          frameon=True,
-	#                          loc=2)
-	# subplot.add_artist(max_label)
-	# subplot.add_artist(min_label)
+
+def plot_waveform_zoom(ax, full_sig, crop):
+	crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+	y = full_sig[crop[0]:crop[1]]
+	x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
+
+	# x0,x1 = ax.get_xlim()
+	# y0,y1 = ax.get_ylim()
+	# ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+
+	ax.plot(x, y, color='k', zorder=0, lw= .5)
+
+	ax.axis('tight')
+
+	ax.set_xlabel('time (s)')
+
+	# subplot.set_ylim(-1.1, 1.1)
+	# subplot.set_yticks([-1, 0, 1])
+
 
 
 def plot_title(subplot, in_file_name, tau):
+	""" for slide window movies """
 	subplot.axis('off')
 	subplot.set_xlim([0,1])
 	subplot.set_ylim([0,1])
@@ -81,12 +81,7 @@ def plot_title(subplot, in_file_name, tau):
 				 bbox=dict(facecolor='none')
 				 )
 
-	# subplot.text(0, .1, in_file_name,
-	#              horizontalalignment='left',
-	#              verticalalignment='bottom',
-	#              size=8,
-	#              bbox=dict(facecolor='none')
-	#              )
+
 
 
 def make_window_frame(coords_file_name, wave_file_name, out_file_name, embed_crop, tau, frame_num):
@@ -129,147 +124,79 @@ def compare_vary_tau_frame(out_file_name, wave_file_name1, wave_file_name2, fram
 	pyplot.close(fig)
 
 
-def compare_multi_frame(out_file_name, wave_file_name1, wave_file_name2, frame_num, tau, embed_crop):
-	fig = pyplot.figure(figsize=(12, 9), tight_layout=True)
-	subplot1 = pyplot.subplot2grid((5, 2), (0, 0), rowspan=4)
-	subplot2 = pyplot.subplot2grid((5, 2), (0, 1), rowspan=4)
-	subplot3 = pyplot.subplot2grid((5, 2), (4, 0))
-	subplot4 = pyplot.subplot2grid((5, 2), (4, 1), sharey=subplot3)
-	pyplot.setp(subplot4.get_yticklabels(), visible=False)
 
-	plot_dce(subplot1, 'DCE/temp_data/embedded_coords_comp1.txt')
-	plot_dce(subplot2, 'DCE/temp_data/embedded_coords_comp2.txt')
+def plot_titlebox(subplots, table_arr):
+	[ax.axis('off') for ax in subplots]
 
-	wave_data1, wave_data2 = np.loadtxt(wave_file_name1), np.loadtxt(wave_file_name2)
-	plot_waveform(subplot3, wave_data1, embed_crop)
-	plot_waveform(subplot4, wave_data2, embed_crop)
+	param_title, ideal_f_title, comp_title_1, comp_title_2 = subplots
 
-	subplot1.set_title(wave_file_name1.split('/')[-1])
-	subplot2.set_title(wave_file_name2.split('/')[-1])
-	fig.suptitle('$tau =  %d$' % tau, bbox={'pad': 5}, fontsize=14)
-
-	pyplot.savefig(out_file_name)
-	pyplot.close(fig)
-
-
-def plot_titlebox_old(subplot, info):
-
-	# subplot.axis('tight')
-	subplot.axis('off')
-	# subplot.xaxis.set_ticks([])
-	# subplot.yaxis.set_ticks([])
-	subplot.set_xlim([0, 1])
-	subplot.set_ylim([0, 1])
-
-	info_main = info['title_main']
-	info1 = info['title_1']
-	info2 = info['title_2']
-
-	col_widths = [1, .75]
-	col_heights = .05
-	spacing_h = .05
-	header_h = .1
-
-	h2 = col_heights * (len(info2)-1)
-	h1 = col_heights * (len(info1) - 1)
-	h_main = col_heights * len(info_main)
-
-	pos2 = 0
-	pos1 = pos2 + h2 + header_h + spacing_h
-	pos_main = pos1 + h1 + header_h + spacing_h
-
-	tables = []
-
-	table_main = subplot.table(
-		cellText=info_main,
-		colWidths=col_widths,
-		bbox=[0, pos_main, 1, h_main],  # x0, y0, width, height
-	)
-
-
-	header_1 = subplot.table(   # higher
-		cellText=[[info1[0].split('/')[-1]]],
-		bbox=[0, pos1 + h1, 1, header_h],
-		cellLoc='center'
-	)
-
-	try:
-		table_1 = subplot.table(    # higher
-			cellText=info1[1:],
-			colWidths=col_widths,
-			bbox=[0, pos1, 1, h1],
-		)
-		tables.append(table_1)
-		pass
-	except IndexError:
-		pass
-
-
-	header_2 = subplot.table(   # lower
-		cellText=[[info2[0].split('/')[-1]]],
-		bbox=[0, h2, 1, header_h],
-		cellLoc='center'
-
-	)
-	try:
-		table_2 = subplot.table(    # lower
-			cellText=info2[1:],
-			colWidths=col_widths,
-			bbox=[0, pos2, 1, h2],
-		)
-		tables.append(table_2)
-		pass
-	except IndexError:
-		pass
-
-	for table in [header_1, header_2]:
-		table.auto_set_font_size(False)
-		table.set_fontsize(10)
-
-	for table in tables:
-		table.auto_set_font_size(False)
-		table.set_fontsize(8)
-
-def plot_titlebox(subplot, table_arr):
-	subplot.axis('off')
-	params_table = subplot.table(
+	params_table = param_title.table(
 		cellText=table_arr[0],
 		# colWidths=col_widths,
-		bbox=[0, .6, 1, .5],  # x0, y0, width, height
+		bbox=[0, 0, 1, 1],  # x0, y0, width, height
 	)
 
-	title_1_arr, title_2_arr, table_1_arr, table_2_arr = table_arr[1]
+	f_ideal, title_1_arr, title_2_arr, table_1_arr, table_2_arr = table_arr[1]
 
-	title_1 = subplot.table(
+	ideal_table = ideal_f_title.table(
+		cellText = f_ideal,
+		bbox=[0, 0, 1, 1],
+	)
+
+
+	title_1 = comp_title_1.table(
 		cellText=title_1_arr,
-		# colWidths=col_widths,
-		bbox=[0, .5, 1, .05],  # x0, y0, width, height
+		cellLoc='center',
+		bbox=[0, .8, 1, .2],  # x0, y0, width, height
 	)
-
-	table_1 = subplot.table(
+	table_1 = comp_title_1.table(
 		cellText=table_1_arr,
-		bbox=[0, .3, 1, .2],
+		bbox=[0, 0, 1, .8],	# x0, y0, width, height
+	)
+
+
+	title_2 = comp_title_2.table(
+		cellText=title_2_arr,
+		cellLoc='center',
+		bbox=[0, .8, 1, .2]	# x0, y0, width, height
+	)
+	table_2 = comp_title_2.table(
+		cellText=table_2_arr,
+		bbox=[0, 0, 1, .8]		# x0, y0, width, height
 	)
 
 
 
+def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables):
+	fig = pyplot.figure(figsize=(12, 9), tight_layout=True, dpi=dpi)
 
-def compare_multi_frame_new(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables):
-	fig = pyplot.figure(figsize=(12, 5), tight_layout=True, dpi=dpi)
-	titlebox = pyplot.subplot2grid((5, 11), (0, 0), rowspan=5, colspan=3)
-	ax1 = pyplot.subplot2grid((5, 11), (0, 3), rowspan=4, colspan=4)
-	ax2 = pyplot.subplot2grid((5, 11), (0, 7), rowspan=4, colspan=4)
-	ax3 = pyplot.subplot2grid((5, 11), (4, 3), colspan=4)
-	ax4 = pyplot.subplot2grid((5, 11), (4, 7), colspan=4, sharey=ax3)
-	pyplot.setp(ax4.get_yticklabels(), visible=False)
+	param_title = pyplot.subplot2grid((9, 12), (0, 0), rowspan=3, colspan=3)
+	ideal_f_title = pyplot.subplot2grid((9, 12), (3, 0), rowspan=1, colspan=3)
+	comp_title_1 = pyplot.subplot2grid((9, 12), (4, 0), rowspan=2, colspan=3)
+	comp_title_2 = pyplot.subplot2grid((9, 12), (6, 0), rowspan=2, colspan=3)
 
-	plot_titlebox(titlebox, title_tables)
+	title_plots = [param_title, ideal_f_title, comp_title_1, comp_title_2]
+
+
+	ax1 = pyplot.subplot2grid((9, 12), (0, 3), rowspan=4, colspan=4)
+	ax2 = pyplot.subplot2grid((9, 12), (0, 7), rowspan=4, colspan=4)
+
+	ax3 = pyplot.subplot2grid((9, 12), (4, 3), colspan=4)
+	ax4 = pyplot.subplot2grid((9, 12), (4, 7), colspan=4, sharey=ax3)
+
+	ax5 = pyplot.subplot2grid((9, 12), (5, 3), colspan=4, rowspan=4)
+	ax6 = pyplot.subplot2grid((9, 12), (5, 7), colspan=4, rowspan=4, sharey=ax5)
+
+	plot_titlebox(title_plots, title_tables)
 
 	plot_dce(ax1, 'DCE/temp_data/embedded_coords_comp1.txt')
 	plot_dce(ax2, 'DCE/temp_data/embedded_coords_comp2.txt')
 
 	plot_waveform(ax3, sig1, crop_1)
 	plot_waveform(ax4, sig2, crop_2)
+
+	plot_waveform_zoom(ax5, sig1, crop_1)
+	plot_waveform_zoom(ax6, sig2, crop_2)
 
 	ax1.set_title(filename_1.split('/')[-1])
 	ax2.set_title(filename_2.split('/')[-1])

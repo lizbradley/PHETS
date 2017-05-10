@@ -97,11 +97,24 @@ def compare_vary_tau(
 
 
 def get_params_table(args_dict):
-	params_table = []
-	for key, value in args_dict.items():
-		if key not in ('dir1', 'dir1_base', 'dir2', 'dir2_base', 'dpi'):
-			params_table.append([key, value])
+	params_table = [
+		['i_lims', args_dict['i_lims']],
+		['embed_crop_1', args_dict['embed_crop_1']],
+		['embed_crop_2', args_dict['embed_crop_2']],
+		['crop_auto_len', args_dict['crop_auto_len']],
+		['tau_1', args_dict['tau_1']],
+		['tau_2', args_dict['tau_2']],
+		['tau_T', args_dict['tau_T']],
+		['normalize_volume', args_dict['normalize_volume']],
+		['save_worms', args_dict['save_worms']],
+		['save_movie', args_dict['save_movie']],
+	]
+	# for key, value in args_dict.items():
+	# 	if key not in ('dir1', 'dir1_base', 'dir2', 'dir2_base', 'dpi'):
+	# 		params_table.append([key, value])
 	return params_table
+
+
 
 def get_comp_tables(*args):
 	ideal_table = [['f ideal (Hz)', args[0]]]
@@ -109,10 +122,22 @@ def get_comp_tables(*args):
 	title_1 = [[args[1].split('/')[-1]]]
 	title_2 = [[args[2].split('/')[-1]]]
 
-	table_1 = [['f detect (Hz)', args[3]],
-			   ['tau', args[5]]]
-	table_2 = [['f detect (Hz)', args[4]],
-			   ['tau', args[6]]]
+
+	f_detect_1 = '{:.5f}'.format(args[3]) if isinstance(args[3], float) else args[3]
+	f_detect_2 = '{:.5f}'.format(args[4]) if isinstance(args[4], float) else args[4]
+
+
+
+	table_1 = [['f detect (Hz)', f_detect_1],
+			   ['tau (sec)', '{:.5f}'.format(args[5])],
+			   ['tau (samp)', int(args[5] * WAV_SAMPLE_RATE)],
+			   ['crop (sec)', '({:.3f}, {:.3f})'.format(args[7][0], args[7][1])]]
+
+	table_2 = [['f detect (Hz)', f_detect_2],
+			   ['tau (sec)', '{:.5f}'.format(args[6])],
+			   ['tau (samp)', int(args[6] * WAV_SAMPLE_RATE)],
+			   ['crop (sec)', '({:.3f}, {:.3f})'.format(args[8][0], args[8][1])]]
+
 	return [ideal_table, title_1, title_2, table_1, table_2]
 
 
@@ -146,8 +171,7 @@ def compare_multi(
 
 	params_table = get_params_table(locals())
 
-
-
+	tau_1_cmd, tau_2_cmd = tau_1, tau_2
 
 	if save_worms: prep_save_worms_double()
 
@@ -173,17 +197,17 @@ def compare_multi(
 		crop_1 = auto_crop(embed_crop_1, sig_1, crop_auto_len)
 		crop_2 = auto_crop(embed_crop_2, sig_2, crop_auto_len)
 
-		f_ideal, f_disp_1, tau_1_ = auto_tau(tau_1, sig_1, i, tau_T, crop_1, filename_1)
-		f_ideal, f_disp_2, tau_2_ = auto_tau(tau_2, sig_2, i, tau_T, crop_2, filename_2)
+		f_ideal, f_disp_1, tau_1 = auto_tau(tau_1_cmd, sig_1, i, tau_T, crop_1, filename_1)
+		f_ideal, f_disp_2, tau_2 = auto_tau(tau_2_cmd, sig_2, i, tau_T, crop_2, filename_2)
 
-		computed_tables = get_comp_tables(f_ideal, filename_1, filename_2, f_disp_1, f_disp_2, tau_1, tau_2)
+		computed_tables = get_comp_tables(f_ideal, filename_1, filename_2, f_disp_1, f_disp_2, tau_1, tau_2, crop_1, crop_2)
 
-		DCE.embed(sig_1, 'DCE/temp_data/embedded_coords_comp1.txt', crop_1, tau_1_, m, ds_rate=ds_rate)
-		DCE.embed(sig_2, 'DCE/temp_data/embedded_coords_comp2.txt', crop_2, tau_2_, m, ds_rate=ds_rate)
+		DCE.embed(sig_1, 'DCE/temp_data/embedded_coords_comp1.txt', crop_1, tau_1, m, ds_rate=ds_rate)
+		DCE.embed(sig_2, 'DCE/temp_data/embedded_coords_comp2.txt', crop_2, tau_2, m, ds_rate=ds_rate)
 
-		if save_worms: save_worms_double(filename_1, filename_2, i, tau_1_, tau_2_, crop_1, crop_2)
+		if save_worms: save_worms_double(filename_1, filename_2, i, tau_1, tau_2, crop_1, crop_2)
 
 		title_tables = [params_table, computed_tables]
-		if save_movie: Plotter.compare_multi_frame_new(frame_idx, sig_1, sig_2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables)
+		if save_movie: Plotter.compare_multi_frame(frame_idx, sig_1, sig_2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables)
 
 

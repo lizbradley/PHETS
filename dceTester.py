@@ -146,7 +146,8 @@ if test == 11:
 		embed_crop_2='auto',  # seconds or 'auto'
 		crop_auto_len=.05,  # seconds for when embed_crop = 'auto'
 
-		tau='auto ideal',
+		tau_1='auto ideal',
+		tau_2='auto ideal',
 		# seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_T=math.pi,  # for auto tau. tau = period * tau_T
 
