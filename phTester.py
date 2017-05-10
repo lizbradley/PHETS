@@ -4,9 +4,13 @@ from PersistentHomology.TestingFunctions import build_and_save_filtration, make_
 from PersistentHomology.FiltrationPlotter import make_frame3D
 from PersistentHomology.TestingFunctions import parameter_set
 
+import time
 
-test = 13
-# test = int(sys.argv[1])
+start = time.time()
+
+
+#test = 13
+test = int(sys.argv[1])
 
 
 
@@ -376,5 +380,5 @@ if test == 13:
 	)
 
 
-
+print 'Runtime : %s ', % str(time.time() - start)
 print 'test %d complete.' % test
