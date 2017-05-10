@@ -19,11 +19,10 @@ def unpack_complex_data_2D(complex_list, landmark_coords_data):
 		"""Reformats 1D list of SimplexBirth objects into 2D array of
 		landmark_set lists, where 2nd index is  birth time (? see below)"""
 
-		complex_ID_array = []	# list of complex_at_t lists
-		complex_at_t = []	# list of simplices with same birth_time
+		complex_ID_array = []		# list of complex_at_t lists
+		complex_at_t = []			# list of simplices with same birth_time
 		i = 0
 		time = 0
-		# complex_ID_list = complex_ID_list[:5]	# debugging
 		list_length = len(complex_ID_list)
 		while i < list_length:
 			birth_time = complex_ID_list[i].birth_time

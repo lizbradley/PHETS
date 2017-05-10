@@ -350,7 +350,7 @@ if test == 13:
 			'ds_rate' : 50,
 			'worm_length' : 2000,
 			'min_filtration_param': .001,
-			'max_filtration_param': .005,
+			'max_filtration_param': .01,
 			'num_divisions': 30,
 			'use_cliques': True
 

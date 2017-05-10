@@ -23,6 +23,8 @@ def group_by_birth_time(complex_ID_list):
 		birth_time = complex_ID_list[i].birth_time
 		if birth_time == time:
 			complex_at_t.append(complex_ID_list[i].landmark_set)
+			if i == list_length - 1:		# edge case
+				complex_ID_array.append(complex_at_t)
 			i += 1
 		else:
 			complex_ID_array.append(complex_at_t)
