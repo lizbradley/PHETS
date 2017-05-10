@@ -331,7 +331,7 @@ if __name__ == '__main__':
 	# batch_wav_to_txt('C:\Users\PROGRAMMING\Documents\CU_research\piano_data\C134C')
 	# batch_wav_to_txt('input/viol_data')
 	# get_fund_freq('input/viol_data/01-viol.txt', window=(1, 2))
-	# get_fund_freq('input/piano_data/C134C/24-C134C.txt', window=(1, 2))
+	# get_fund_freq('datasets/times_series/piano_revisit/C134C/scale/28-C134C.txt', window=(1, 2))
 	# os.chdir('..')
 	print os.getcwd()
 
