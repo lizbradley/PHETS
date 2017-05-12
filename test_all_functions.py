@@ -68,7 +68,7 @@ from PersistentHomology.TestingFunctions import parameter_set
 #
 # 	embed_crop_1='auto',  # seconds or 'auto'
 # 	embed_crop_2='auto',  # seconds or 'auto'
-# 	crop_auto_len=.08,  # seconds for when embed_crop = 'auto'
+# 	auto_crop_length=.08,  # seconds for when embed_crop = 'auto'
 #
 # 	tau='auto detect',
 # 	tau_T=np.pi,  # for auto tau. tau = period * tau_T
@@ -118,7 +118,7 @@ mean_PRF_dist_plots(
 	params,
 	crop_1='auto',  # seconds or 'auto'
 	crop_2=(1, 1.3),  # seconds or 'auto'
-	crop_auto_len=.3,  # seconds. length of windows when crop is 'auto'
+	auto_crop_length=.3,  # seconds. length of windows when crop is 'auto'
 	window_size=.1,  # seconds
 	num_windows=10,  # evenly spaced
 	mean_samp_num=10,  # number of windows to use for mean

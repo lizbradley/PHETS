@@ -43,8 +43,6 @@ def plot_waveform(subplot, waveform_data, crop):
 
 	subplot.set_xlabel('time (s)')
 
-	subplot.set_ylim(-1.1, 1.1)
-	subplot.set_yticks([-1, 0, 1])
 
 
 def plot_waveform_zoom(ax, full_sig, crop):
@@ -64,6 +62,25 @@ def plot_waveform_zoom(ax, full_sig, crop):
 
 	# subplot.set_ylim(-1.1, 1.1)
 	# subplot.set_yticks([-1, 0, 1])
+
+def plot_waveform_zoom_only(ax, full_sig, crop, fname):
+
+	crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+	y = full_sig[crop[0]:crop[1]]
+	x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
+
+	# x0,x1 = ax.get_xlim()
+	# y0,y1 = ax.get_ylim()
+	# ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+
+	ax.plot(x, y, color='k', zorder=0, lw=.5)
+
+	ax.axis('tight')
+
+	ax.set_xlabel('time (s)')
+
+# subplot.set_ylim(-1.1, 1.1)
+# subplot.set_yticks([-1, 0, 1])
 
 
 
@@ -168,24 +185,30 @@ def plot_titlebox(subplots, table_arr):
 
 
 def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables):
-	fig = pyplot.figure(figsize=(12, 9), tight_layout=True, dpi=dpi)
+	fig = pyplot.figure(figsize=(16, 9), tight_layout=True, dpi=dpi)
 
-	param_title = pyplot.subplot2grid((9, 12), (0, 0), rowspan=3, colspan=3)
-	ideal_f_title = pyplot.subplot2grid((9, 12), (3, 0), rowspan=1, colspan=3)
-	comp_title_1 = pyplot.subplot2grid((9, 12), (4, 0), rowspan=2, colspan=3)
-	comp_title_2 = pyplot.subplot2grid((9, 12), (6, 0), rowspan=2, colspan=3)
+
+	param_title =		pyplot.subplot2grid((9, 16), (0, 0), rowspan=4, colspan=3)
+	comp_title_1 =		pyplot.subplot2grid((9, 16), (4, 0), rowspan=2, colspan=3)
+	comp_title_2 = 		pyplot.subplot2grid((9, 16), (6, 0), rowspan=2, colspan=3)
+	ideal_f_title = 	pyplot.subplot2grid((9, 16), (8, 0), rowspan=1, colspan=3)
+
+
+	ax1 = 				pyplot.subplot2grid((9, 16), (0, 4), rowspan=5, colspan=5)					# dce 1
+	ax2 = 				pyplot.subplot2grid((9, 16), (0, 10), rowspan=5, colspan=5)					# dce 2
+
+	ax3 = 				pyplot.subplot2grid((9, 16), (5, 4), colspan=5, rowspan=2)					# waveform full 1
+	ax4 = 				pyplot.subplot2grid((9, 16), (5, 10), colspan=5, rowspan=2, sharey=ax3)		# waveform full 2
+
+	ax5 = 				pyplot.subplot2grid((9, 16), (7, 4), colspan=5, rowspan=2)					# waveform zoom 1
+	ax6 = 				pyplot.subplot2grid((9, 16), (7, 10), colspan=5, rowspan=2, sharey=ax5)		# waveform zoom 2
+
+	# ax1.set_position([0, 0, 1, 1])
+	# ax2.set_position([0, 0, 1, 1])
+
 
 	title_plots = [param_title, ideal_f_title, comp_title_1, comp_title_2]
 
-
-	ax1 = pyplot.subplot2grid((9, 12), (0, 3), rowspan=4, colspan=4)
-	ax2 = pyplot.subplot2grid((9, 12), (0, 7), rowspan=4, colspan=4)
-
-	ax3 = pyplot.subplot2grid((9, 12), (4, 3), colspan=4)
-	ax4 = pyplot.subplot2grid((9, 12), (4, 7), colspan=4, sharey=ax3)
-
-	ax5 = pyplot.subplot2grid((9, 12), (5, 3), colspan=4, rowspan=4)
-	ax6 = pyplot.subplot2grid((9, 12), (5, 7), colspan=4, rowspan=4, sharey=ax5)
 
 	plot_titlebox(title_plots, title_tables)
 
@@ -197,6 +220,8 @@ def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, c
 
 	plot_waveform_zoom(ax5, sig1, crop_1)
 	plot_waveform_zoom(ax6, sig2, crop_2)
+
+
 
 	ax1.set_title(filename_1.split('/')[-1])
 	ax2.set_title(filename_2.split('/')[-1])

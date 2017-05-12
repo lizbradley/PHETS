@@ -65,7 +65,7 @@ if test == 2:
 		params,
 		crop_1=(1, 2),			# seconds or 'auto'
 		crop_2=(1, 2),			# seconds or 'auto'
-		crop_auto_len=.3,		# seconds. length of windows when crop is 'auto'
+		auto_crop_length=.3,		# seconds. length of windows when crop is 'auto'
 		window_size=.05, 		# seconds
 		num_windows=10, 		# evenly spaced
 		mean_samp_num=10,  		# number of windows to use for mean
@@ -99,7 +99,7 @@ if test == 3:
 		params,
 		crop_1=(1, 1.3),		# seconds or 'auto'
 		crop_2=(1, 1.3),		# seconds or 'auto'
-		crop_auto_len=.3,		# seconds. length of windows when crop is 'auto'
+		auto_crop_length=.3,		# seconds. length of windows when crop is 'auto'
 		window_size=.1, 		# seconds
 		num_windows=10, 		# evenly spaced
 		mean_samp_num=10,  		# number of windows to use for mean

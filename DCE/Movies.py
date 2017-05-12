@@ -101,17 +101,15 @@ def get_params_table(args_dict):
 		['i_lims', args_dict['i_lims']],
 		['embed_crop_1', args_dict['embed_crop_1']],
 		['embed_crop_2', args_dict['embed_crop_2']],
-		['crop_auto_len', args_dict['crop_auto_len']],
+		['auto_crop_length', args_dict['auto_crop_length']],
 		['tau_1', args_dict['tau_1']],
 		['tau_2', args_dict['tau_2']],
-		['tau_T', args_dict['tau_T']],
+		['tau_T', '{:.5f}'.format(args_dict['tau_T'])],
 		['normalize_volume', args_dict['normalize_volume']],
 		['save_worms', args_dict['save_worms']],
 		['save_movie', args_dict['save_movie']],
 	]
-	# for key, value in args_dict.items():
-	# 	if key not in ('dir1', 'dir1_base', 'dir2', 'dir2_base', 'dpi'):
-	# 		params_table.append([key, value])
+
 	return params_table
 
 
@@ -155,7 +153,7 @@ def compare_multi(
 
 		embed_crop_1=(1, 2),    # seconds or 'auto'
 		embed_crop_2=(1, 2),
-		crop_auto_len=.3,		# for when embed_crop = 'auto'
+		auto_crop_length=.3,		# for when embed_crop = 'auto'
 
 		tau_1='auto ideal',       # seconds or 'auto detect' or 'auto ideal'
 		tau_2='auto ideal',
@@ -165,6 +163,8 @@ def compare_multi(
 		save_movie=True,
 
 		normalize_volume=True,
+
+		waveform_zoom=None,
 		ds_rate=1, dpi=200, m=2
 	):
 	"""makes frames for comparison movie: proportional tau, constant, vary in files"""
@@ -177,6 +177,10 @@ def compare_multi(
 
 	remove_old_frames()
 	frame_idx = 0
+
+
+
+
 
 	for i in xrange(i_lims[0], i_lims[1]):
 
@@ -194,8 +198,8 @@ def compare_multi(
 		if normalize_volume: sig_1 = sig_1 / np.max(np.abs(sig_1))
 		if normalize_volume: sig_2 = sig_2 / np.max(np.abs(sig_2))
 
-		crop_1 = auto_crop(embed_crop_1, sig_1, crop_auto_len)
-		crop_2 = auto_crop(embed_crop_2, sig_2, crop_auto_len)
+		crop_1 = auto_crop(embed_crop_1, sig_1, auto_crop_length)
+		crop_2 = auto_crop(embed_crop_2, sig_2, auto_crop_length)
 
 		f_ideal, f_disp_1, tau_1 = auto_tau(tau_1_cmd, sig_1, i, tau_T, crop_1, filename_1)
 		f_ideal, f_disp_2, tau_2 = auto_tau(tau_2_cmd, sig_2, i, tau_T, crop_2, filename_2)

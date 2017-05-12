@@ -279,7 +279,7 @@ def mean_PRF_dist_plots(
 		filt_params,
 		crop_1='auto', 						# sec or 'auto'
 		crop_2='auto',
-		crop_auto_len=.3, 					# sec
+		auto_crop_length=.3, 					# sec
 		window_size=.05,					# sec
 		num_windows=10,						# per file
 		mean_samp_num=5,					# per file
@@ -332,7 +332,7 @@ def mean_PRF_dist_plots(
 		if normalize_volume: sig_full = sig_full / np.max(sig_full)
 
 		if crop == 'auto':
-			crop_samp = auto_crop(sig_full, crop_auto_len)
+			crop_samp = auto_crop(sig_full, auto_crop_length)
 		else:
 			crop_samp = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
 

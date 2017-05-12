@@ -45,7 +45,7 @@ def embed(
 # 		filename,
 #
 # 		crop='auto',
-# 		crop_auto_len=.3,
+# 		auto_crop_length=.3,
 #
 # 		tau='auto ideal',
 # 		tau_T = np.pi,
@@ -54,7 +54,7 @@ def embed(
 #
 # 	if isinstance(crop, basestring):
 # 		if crop == 'auto':
-# 			crop = np.array(auto_crop(np.loadtxt(filename), crop_auto_len)) / float(WAV_SAMPLE_RATE)
+# 			crop = np.array(auto_crop(np.loadtxt(filename), auto_crop_length)) / float(WAV_SAMPLE_RATE)
 # 		else:
 # 			print "ERROR: embed_crop_1 not recognized. Use 'auto' or explicit (seconds)."
 # 			sys.exit()

@@ -17,7 +17,7 @@ compare_multi(
 
 	embed_crop_1='auto',  	# 'auto' or (start, stop) in seconds
 	embed_crop_2=(2, 2.1),
-	crop_auto_len=.1,  	# in seconds, for when embed_crop = 'auto'
+	auto_crop_length=.1,  		# in seconds, for  embed_crop = 'auto'
 
 	tau_1='auto ideal',		# in seconds or 'auto detect' or 'auto ideal'
 	tau_2='auto detect', 	# note 'auto detect' is considerably slower that 'auto ideal'

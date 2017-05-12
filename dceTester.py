@@ -13,8 +13,8 @@ from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
 
 
 
-# test = 11
-test = int(sys.argv[1])
+test = 11
+# test = int(sys.argv[1])
 
 print 'running test %d...' % test
 
@@ -90,7 +90,7 @@ if test == 9:
 
 		embed_crop_1='auto',	 # seconds or 'auto'
 		embed_crop_2=(2, 2.3),	 # seconds or 'auto'
-		crop_auto_len=.3,  	 	 # seconds for when embed_crop = 'auto'
+		auto_crop_length=.3,  	 	 # seconds for when embed_crop = 'auto'
 
 		tau='auto detect',  	 # seconds 'auto detect' or 'auto ideal'. NOTE: 'auto detect' is considerably slower that 'auto ideal'
 		tau_T=math.pi, 		 	 # for auto tau. tau = period * tau_T
@@ -121,7 +121,7 @@ if test == 10:
 
 		embed_crop_1='auto',	 # seconds or 'auto'
 		embed_crop_2='auto',	 # seconds or 'auto'
-		crop_auto_len=.05,  	 	 # seconds for when embed_crop = 'auto'
+		auto_crop_length=.05,  	 	 # seconds for when embed_crop = 'auto'
 
 		tau='auto detect',  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_T=math.pi, 		 	 # for auto tau. tau = period * tau_T
@@ -137,6 +137,8 @@ if test == 11:
 	dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'  # numerical index goes in front of base
 	dir2, base2 = "datasets/time_series/C135B", '-C135B.txt'
 
+	out_filename = 'output/DCE/C134vC135.mp4'
+
 	compare_multi(
 		dir1, base1,
 		dir2, base2,
@@ -145,21 +147,22 @@ if test == 11:
 
 		embed_crop_1='auto',  # seconds or 'auto'
 		embed_crop_2='auto',  # seconds or 'auto'
-		crop_auto_len=.05,  # seconds for when embed_crop = 'auto'
+		auto_crop_length=.05,  # seconds for when embed_crop = 'auto'
 
-		tau_1='auto ideal',
+		tau_1='auto ideal', # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_2='auto ideal',
-		# seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_T=math.pi,  # for auto tau. tau = period * tau_T
 
 		normalize_volume=True,
 
 		save_worms=True,  # to output/DCE/saved_worms
-		save_movie=True  # False for faster worm creation
+		save_movie=True,  # False for faster worm creation
+
+		waveform_zoom = out_filename
 
 	)
 
-	frames_to_movie('output/DCE/C134vC135.mp4', framerate=1)
+	frames_to_movie(out_filename, framerate=1)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 
