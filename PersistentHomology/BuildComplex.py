@@ -14,7 +14,7 @@ import numpy as np
 import math
 import subprocess
 import multiprocessing
-
+from memory_profiler import profile
 import os
 
 d = [] #this is where distance to all landmarks for each witness goes.  It is a list of'
@@ -55,6 +55,8 @@ def sort(i):
 # }
 
 # def build_filtration(input_file_name, parameter_set = None, **overrides):
+f = open("PersistentHomology/output/build_filtration_memory.txt","wb")
+@profile(stream=f)
 def build_filtration(input_file_name, parameter_set):
     print os.getcwd()
     num_threads = 2

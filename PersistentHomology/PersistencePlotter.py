@@ -4,10 +4,16 @@ import matplotlib.pyplot as pyplot
 import itertools
 import numpy as np
 from os import system, chdir
-
+from memory_profiler import profile
 from sys import platform
+f=open("PersistentHomology/output/group_by_birth_time_memory.txt","wb")
+f2=open("PersistentHomology/output/expand_to_2simplexes_memory.txt","wb")
+f3=open("PersistentHomology/output/build_perseus_in_file_memory.txt","wb")
+f4=open("PersistentHomology/output/make_figure_memory.txt","wb")
 
 
+
+@profile(stream=f)
 def group_by_birth_time(complex_ID_list):
 	"""Reformats 1D list of SimplexBirth objects into 2D array of
 	landmark_set lists, where 2nd index is  birth time (? see below)"""
@@ -32,6 +38,8 @@ def group_by_birth_time(complex_ID_list):
 			time += 1
 	return complex_ID_array
 
+
+@profile(stream=f2)
 def expand_to_2simplexes(filt_array):
 	"""for each k-simplex in filtration array, if k > 2, replaces with the
 	component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
@@ -43,6 +51,9 @@ def expand_to_2simplexes(filt_array):
 			expanded_row.extend(expanded_set)
 		row[:] = expanded_row
 
+
+
+@profile(stream=f3)
 def build_perseus_in_file(filt_array):
 	print 'building perseus_in.txt...'
 	out_file = open('PersistentHomology/perseus/perseus_in.txt', 'a')
@@ -161,13 +172,13 @@ def add_persistence_plot(subplot, fig):
 		labelspacing=1,
 		framealpha=1,
 		columnspacing=0,
-		borderaxespad=3,
-		edgecolor='k'
+		borderaxespad=3
+		#edgecolor='k'
 	)
 	# end add legend #
 
 
-
+@profile(stream=f4)
 def make_figure(title_block_info, out_file_name):
 	filt_list = np.load('PersistentHomology/temp_data/complexes.npy')
 

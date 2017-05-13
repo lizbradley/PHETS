@@ -1,0 +1,45 @@
+Filename: /Users/sammolnar/Documents/GitRepos/Phets/PHETS/PersistentHomology/PersistencePlotter.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+   181   1074.8 MiB      0.0 MiB   @profile(stream=f4)
+   182                             def make_figure(title_block_info, out_file_name):
+   183   1076.3 MiB      1.5 MiB   	filt_list = np.load('PersistentHomology/temp_data/complexes.npy')
+   184                             
+   185                             	# filt_array = group_by_birth_time(filt_list)
+   186                             	# expand_to_2simplexes(filt_array)
+   187                             	# filt_array = np.asarray(filt_array)
+   188                             	#
+   189   1076.3 MiB      0.0 MiB   	filt_array = group_by_birth_time(filt_list)
+   190   1085.2 MiB      9.0 MiB   	expand_to_2simplexes(filt_array)
+   191                             
+   192   1085.2 MiB      0.0 MiB   	filt_array = np.asarray(filt_array)
+   193                             
+   194                             
+   195   1085.2 MiB      0.0 MiB   	build_perseus_in_file(filt_array)
+   196   1085.2 MiB      0.0 MiB   	print 'calling perseus...'
+   197   1085.2 MiB      0.0 MiB   	os.chdir('PersistentHomology/perseus')
+   198                             
+   199   1085.2 MiB      0.0 MiB   	if platform == "linux" or platform == "linux2":
+   200                             		subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
+   201                             
+   202   1085.2 MiB      0.0 MiB   	elif platform == "darwin":  # macOS
+   203   1085.2 MiB      0.0 MiB   		subprocess.call("./perseusMac nmfsimtop perseus_in.txt perseus_out", shell=True)
+   204                             
+   205                             	else:   # Windows
+   206                             		subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
+   207                             
+   208   1085.2 MiB      0.0 MiB   	os.chdir('..')
+   209   1085.2 MiB      0.0 MiB   	os.chdir('..')
+   210                             
+   211                             
+   212   1085.3 MiB      0.0 MiB   	fig = pyplot.figure(figsize=(8,6), tight_layout=True, dpi=300)
+   213   1085.5 MiB      0.3 MiB   	title_block = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3)
+   214   1085.9 MiB      0.4 MiB   	pers_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
+   215                             
+   216   1086.2 MiB      0.3 MiB   	add_persistence_plot(pers_plot, fig)
+   217   1086.7 MiB      0.5 MiB   	add_title(title_block, title_block_info)
+   218   1106.3 MiB     19.6 MiB   	pyplot.savefig(out_file_name)
+   219   1106.3 MiB      0.0 MiB   	pyplot.clf()
+
+

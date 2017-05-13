@@ -1,2 +1,1 @@
-45: tau = 0.00953073427177 (samples), embed_crop = [1.21848, 1.26848] (seconds) 
-46: tau = 0.0100974612231 (samples), embed_crop = [1.96855, 2.01855] (seconds) 
+49: tau = 0.01192 (samples), embed_crop = [1.72132, 1.77132] (seconds) 

@@ -1,0 +1,19 @@
+Filename: /Users/sammolnar/Documents/GitRepos/Phets/PHETS/PersistentHomology/PersistencePlotter.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    56   1085.2 MiB      0.0 MiB   @profile(stream=f3)
+    57                             def build_perseus_in_file(filt_array):
+    58   1085.2 MiB      0.0 MiB   	print 'building perseus_in.txt...'
+    59   1085.2 MiB      0.0 MiB   	out_file = open('PersistentHomology/perseus/perseus_in.txt', 'a')
+    60   1085.2 MiB      0.0 MiB   	out_file.truncate(0)
+    61   1085.2 MiB      0.0 MiB   	out_file.write('1\n')
+    62   1085.2 MiB      0.0 MiB   	for idx, row in enumerate(filt_array):
+    63   1085.2 MiB      0.0 MiB   		for simplex in row:
+    64                             			#   format for perseus...
+    65                             			line_str = str(len(simplex) - 1) + ' ' + ' '.join(
+    66   1085.2 MiB      0.0 MiB   				str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
+    67   1085.2 MiB      0.0 MiB   			out_file.write(line_str)
+    68   1085.2 MiB      0.0 MiB   	out_file.close()
+
+

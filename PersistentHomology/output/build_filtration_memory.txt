@@ -1,0 +1,638 @@
+Filename: /Users/sammolnar/Documents/GitRepos/Phets/PHETS/PersistentHomology/BuildComplex.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    59     56.8 MiB      0.0 MiB   @profile(stream=f)
+    60                             def build_filtration(input_file_name, parameter_set):
+    61     56.8 MiB      0.0 MiB       print os.getcwd()
+    62     56.8 MiB      0.0 MiB       num_threads = 2
+    63                                 global d
+    64     56.8 MiB      0.0 MiB       d = []
+    65                                 
+    66                             
+    67                                 # def get_param(key):
+    68                                 #     if overrides.has_key(key):
+    69                                 #         return overrides.get(key)
+    70                                 #     elif (not parameter_set is None) and parameter_set.has_key(key):
+    71                                 #         return parameter_set.get(key)
+    72                                 #     else:
+    73                                 #         # assert standard_parameter_set.has_key(key) # Remove this line once confident I didn't miss any when I rewrote this file.
+    74                                 #         return standard_parameter_set.pre_landmarks(key)
+    75                             
+    76    169.5 MiB    112.8 MiB       def get_param(key):
+    77    169.5 MiB      0.0 MiB           return parameter_set.get(key)
+    78                             
+    79                             # 	input_file = open("datasets/embedded/test_cases/"+input_file_name+'.txt')
+    80     56.8 MiB   -112.8 MiB       input_file = open(input_file_name)
+    81     56.8 MiB      0.0 MiB       speed_amplify = float(get_param("d_speed_amplify"))
+    82     56.8 MiB      0.0 MiB       orientation_amplify = float(get_param("d_orientation_amplify"))
+    83     56.8 MiB      0.0 MiB       stretch = float(get_param("d_stretch"))
+    84     56.8 MiB      0.0 MiB       ray_distance_amplify = get_param("d_ray_distance_amplify")
+    85     56.8 MiB      0.0 MiB       use_hamiltonian = float(get_param("d_use_hamiltonian"))
+    86     56.8 MiB      0.0 MiB       m2_d = float(get_param("m2_d"))
+    87     56.8 MiB      0.0 MiB       straight_VB = float(get_param("straight_VB"))
+    88     56.8 MiB      0.0 MiB       d_cov = get_param("d_cov")
+    89     56.8 MiB      0.0 MiB       graph_induced = get_param("graph_induced")
+    90     56.8 MiB      0.0 MiB       always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov==0.
+    91                             
+    92                             
+    93                             
+    94     56.8 MiB      0.0 MiB       filtration = Set()
+    95     56.8 MiB      0.0 MiB       extra_data = None
+    96     56.8 MiB      0.0 MiB       min_filtration_param = float(get_param("min_filtration_param"))
+    97     56.8 MiB      0.0 MiB       max_filtration_param = float(get_param("max_filtration_param"))
+    98     56.8 MiB      0.0 MiB       print "Max filtration parameter is ", max_filtration_param
+    99     56.8 MiB      0.0 MiB       if max_filtration_param < 0 and min_filtration_param != 0:
+   100                                     raise Exception("Argument 'min_filtration_param' is incompatible with automatic max_filtration_param selection.")
+   101     56.8 MiB      0.0 MiB       number_of_vertices = 0
+   102     56.8 MiB      0.0 MiB       start = get_param("start")
+   103     56.8 MiB      0.0 MiB       worm_length = get_param("worm_length")
+   104     56.8 MiB      0.0 MiB       store_top_simplices = get_param("store_top_simplices")
+   105     56.8 MiB      0.0 MiB       sort_output = get_param("sort_output")
+   106     56.8 MiB      0.0 MiB       absolute = get_param("absolute")
+   107     56.8 MiB      0.0 MiB       num_divisions = get_param("num_divisions")
+   108     56.8 MiB      0.0 MiB       simplex_cutoff = get_param("simplex_cutoff")
+   109                             
+   110                             
+   111                                 '''=============== This code written by Sam ======================'''
+   112                             
+   113                                 ## Read data into witness and landmark lists.
+   114     56.8 MiB      0.0 MiB       witnesses = []
+   115     56.8 MiB      0.0 MiB       landmarks = []
+   116     56.8 MiB      0.0 MiB       landmark_indices = []
+   117     56.8 MiB      0.0 MiB       ls = get_param("landmark_selector")
+   118     56.8 MiB      0.0 MiB       downsample_rate = get_param("ds_rate")
+   119     56.8 MiB      0.0 MiB       maxmin = False
+   120     56.8 MiB      0.0 MiB       counter = 0
+   121     56.8 MiB      0.0 MiB       for i in xrange(start):           #  Where to start reading data
+   122                                     input_file.readline()
+   123                                     counter+=1
+   124     56.8 MiB      0.0 MiB       landmark_indices=[]
+   125                             
+   126                             
+   127     57.3 MiB      0.5 MiB       for line in input_file.read().split("\n"):
+   128     57.3 MiB      0.0 MiB           if line != "" and counter>=start:
+   129     57.3 MiB      0.0 MiB               string_witness = line.split(" ")
+   130     57.3 MiB      0.0 MiB               witness = []
+   131     57.3 MiB      0.0 MiB               d.append([])
+   132     57.3 MiB      0.0 MiB               for coordinate in string_witness:
+   133     57.3 MiB      0.0 MiB                   if coordinate != "":
+   134     57.3 MiB      0.0 MiB                       witness.append(float(coordinate))
+   135     57.3 MiB      0.0 MiB               witnesses.append(witness)
+   136     57.3 MiB      0.0 MiB               counter += 1
+   137     57.3 MiB      0.0 MiB               if counter == worm_length:
+   138                                             break
+   139                             
+   140     57.3 MiB      0.0 MiB       number_of_datapoints = len(witnesses)
+   141     57.3 MiB      0.0 MiB       number_of_vertices = int(number_of_datapoints/downsample_rate)
+   142     57.3 MiB      0.0 MiB       num_coordinates = len(witnesses[0])
+   143     57.3 MiB      0.0 MiB       stop = start + counter
+   144                             
+   145     57.3 MiB      0.0 MiB       num_threads = 2
+   146                                 # for more information about these parameters type ./find_landmarks --help in the terminal
+   147                                 # the distance calculations are calculated and outputted to a file called find_landmarks.txt
+   148     57.3 MiB      0.0 MiB       if ls=="EST":
+   149                                     if always_euclidean:
+   150                                         if graph_induced:
+   151                                             subprocess.call([
+   152                                             "./find_landmarks",
+   153                                             "-n {}".format(num_threads),
+   154                                             "-l {}".format(number_of_vertices),
+   155                                             "-w {}-{}".format(start,stop),
+   156                                             "-i{}".format(input_file_name),
+   157                                             "-olandmark_outputs.txt",
+   158                                             "-m {}".format(int(m2_d)),
+   159                                             "-a {}".format(speed_amplify),
+   160                                             "-y {}".format(orientation_amplify),
+   161                                             "-h {}".format(use_hamiltonian),
+   162                                             "-r {}".format(ray_distance_amplify),
+   163                                             "-v {}".format(straight_VB),
+   164                                             "-s {}".format(stretch),
+   165                                             "-e {}".format(downsample_rate),
+   166                                             "-x {}".format(d_cov),
+   167                                             "-c",
+   168                                             "-f {}".format(max_filtration_param)
+   169                                             ])
+   170                                         else:
+   171                                             subprocess.call([
+   172                                             "./find_landmarks",
+   173                                             "-n {}".format(num_threads),
+   174                                             "-l {}".format(number_of_vertices),
+   175                                             "-w {}-{}".format(start,stop),
+   176                                             "-i{}".format(input_file_name),
+   177                                             "-olandmark_outputs.txt",
+   178                                             "-m {}".format(int(m2_d)),
+   179                                             "-a {}".format(speed_amplify),
+   180                                             "-y {}".format(orientation_amplify),
+   181                                             "-h {}".format(use_hamiltonian),
+   182                                             "-r {}".format(ray_distance_amplify),
+   183                                             "-v {}".format(straight_VB),
+   184                                             "-s {}".format(stretch),
+   185                                             "-e {}".format(downsample_rate),
+   186                                             "-x {}".format(d_cov),
+   187                                             "-c"
+   188                                             ])
+   189                                     else:
+   190                                         if graph_induced:
+   191                                             subprocess.call([
+   192                                             "./find_landmarks",
+   193                                             "-n {}".format(num_threads),
+   194                                             "-l {}".format(number_of_vertices),
+   195                                             "-w {}-{}".format(start,stop),
+   196                                             "-i{}".format(input_file_name),
+   197                                             "-olandmark_outputs.txt",
+   198                                             "-m {}".format(int(m2_d)),
+   199                                             "-a {}".format(speed_amplify),
+   200                                             "-y {}".format(orientation_amplify),
+   201                                             "-h {}".format(use_hamiltonian),
+   202                                             "-r {}".format(ray_distance_amplify),
+   203                                             "-v {}".format(straight_VB),
+   204                                             "-s {}".format(stretch),
+   205                                             "-x {}".format(d_cov),
+   206                                             "-e {}".format(downsample_rate),
+   207                                             "-f {}".format(max_filtration_param)
+   208                                             ])
+   209                                         else:
+   210                                             subprocess.call([
+   211                                             "./find_landmarks",
+   212                                             "-n {}".format(num_threads),
+   213                                             "-l {}".format(number_of_vertices),
+   214                                             "-w {}-{}".format(start,stop),
+   215                                             "-i{}".format(input_file_name),
+   216                                             "-olandmark_outputs.txt",
+   217                                             "-m {}".format(int(m2_d)),
+   218                                             "-a {}".format(speed_amplify),
+   219                                             "-y {}".format(orientation_amplify),
+   220                                             "-h {}".format(use_hamiltonian),
+   221                                             "-r {}".format(ray_distance_amplify),
+   222                                             "-v {}".format(straight_VB),
+   223                                             "-s {}".format(stretch),
+   224                                             "-x {}".format(d_cov),
+   225                                             "-e {}".format(downsample_rate)
+   226                                             ])
+   227                                 else:
+   228     57.3 MiB      0.0 MiB           if always_euclidean and m2_d!=0:
+   229                                         if graph_induced:
+   230                                             subprocess.call([
+   231                                             "./find_landmarks",
+   232                                             "-n {}".format(num_threads),
+   233                                             "-l {}".format(number_of_vertices),
+   234                                             "-w {}-{}".format(start,stop),
+   235                                             "-i{}".format(input_file_name),
+   236                                             "-olandmark_outputs.txt",
+   237                                             "-m {}".format(int(m2_d)),
+   238                                             "-a {}".format(speed_amplify),
+   239                                             "-y {}".format(orientation_amplify),
+   240                                             "-h {}".format(use_hamiltonian),
+   241                                             "-r {}".format(ray_distance_amplify),
+   242                                             "-v {}".format(straight_VB),
+   243                                             "-x {}".format(d_cov),
+   244                                             "-s {}".format(stretch),
+   245                                             "-f {}".format(max_filtration_param)
+   246                                             ])
+   247                                         else:
+   248                                             subprocess.call([
+   249                                             "./find_landmarks",
+   250                                             "-n {}".format(num_threads),
+   251                                             "-l {}".format(number_of_vertices),
+   252                                             "-w {}-{}".format(start,stop),
+   253                                             "-i{}".format(input_file_name),
+   254                                             "-olandmark_outputs.txt",
+   255                                             "-m {}".format(int(m2_d)),
+   256                                             "-a {}".format(speed_amplify),
+   257                                             "-y {}".format(orientation_amplify),
+   258                                             "-h {}".format(use_hamiltonian),
+   259                                             "-r {}".format(ray_distance_amplify),
+   260                                             "-v {}".format(straight_VB),
+   261                                             "-x {}".format(d_cov),
+   262                                             "-s {}".format(stretch)
+   263                                             ])
+   264     57.3 MiB      0.0 MiB           elif always_euclidean:
+   265     57.3 MiB      0.0 MiB               if graph_induced:
+   266                                             subprocess.call([
+   267                                             "./find_landmarks",
+   268                                             "-n {}".format(num_threads),
+   269                                             "-l {}".format(number_of_vertices),
+   270                                             "-w {}-{}".format(start,stop),
+   271                                             "-i{}".format(input_file_name),
+   272                                             "-olandmark_outputs.txt",
+   273                                             "-m {}".format(int(m2_d)),
+   274                                             "-a {}".format(speed_amplify),
+   275                                             "-y {}".format(orientation_amplify),
+   276                                             "-h {}".format(use_hamiltonian),
+   277                                             "-r {}".format(ray_distance_amplify),
+   278                                             "-v {}".format(straight_VB),
+   279                                             "-x {}".format(d_cov),
+   280                                             "-s {}".format(stretch),
+   281                                             "-c",
+   282                                             "-f {}".format(max_filtration_param)
+   283                                             ])
+   284                                         else:
+   285     57.3 MiB      0.0 MiB                   subprocess.call([
+   286     57.3 MiB      0.0 MiB                   "./find_landmarks",
+   287     57.3 MiB      0.0 MiB                   "-n {}".format(num_threads),
+   288     57.3 MiB      0.0 MiB                   "-l {}".format(number_of_vertices),
+   289     57.3 MiB      0.0 MiB                   "-w {}-{}".format(start,stop),
+   290     57.3 MiB      0.0 MiB                   "-i{}".format(input_file_name),
+   291     57.3 MiB      0.0 MiB                   "-olandmark_outputs.txt",
+   292     57.3 MiB      0.0 MiB                   "-m {}".format(int(m2_d)),
+   293     57.3 MiB      0.0 MiB                   "-a {}".format(speed_amplify),
+   294     57.3 MiB      0.0 MiB                   "-y {}".format(orientation_amplify),
+   295     57.3 MiB      0.0 MiB                   "-h {}".format(use_hamiltonian),
+   296     57.3 MiB      0.0 MiB                   "-r {}".format(ray_distance_amplify),
+   297     57.3 MiB      0.0 MiB                   "-v {}".format(straight_VB),
+   298     57.3 MiB      0.0 MiB                   "-x {}".format(d_cov),
+   299     57.3 MiB      0.0 MiB                   "-s {}".format(stretch),
+   300     57.3 MiB      0.0 MiB                   "-c"
+   301                                             ])
+   302                                     else:
+   303                                         if graph_induced:
+   304                                             subprocess.call([
+   305                                             "./find_landmarks",
+   306                                             "-n {}".format(num_threads),
+   307                                             "-l {}".format(number_of_vertices),
+   308                                             "-w {}-{}".format(start,stop),
+   309                                             "-i{}".format(input_file_name),
+   310                                             "-olandmark_outputs.txt",
+   311                                             "-m {}".format(int(m2_d)),
+   312                                             "-a {}".format(speed_amplify),
+   313                                             "-y {}".format(orientation_amplify),
+   314                                             "-h {}".format(use_hamiltonian),
+   315                                             "-r {}".format(ray_distance_amplify),
+   316                                             "-v {}".format(straight_VB),
+   317                                             "-x {}".format(d_cov),
+   318                                             "-s {}".format(stretch),
+   319                                             "-f {}".format(max_filtration_param)
+   320                                             ])
+   321                                         else:
+   322                                             subprocess.call([
+   323                                             "./find_landmarks",
+   324                                             "-n {}".format(num_threads),
+   325                                             "-l {}".format(number_of_vertices),
+   326                                             "-w {}-{}".format(start,stop),
+   327                                             "-i{}".format(input_file_name),
+   328                                             "-olandmark_outputs.txt",
+   329                                             "-m {}".format(int(m2_d)),
+   330                                             "-a {}".format(speed_amplify),
+   331                                             "-y {}".format(orientation_amplify),
+   332                                             "-h {}".format(use_hamiltonian),
+   333                                             "-r {}".format(ray_distance_amplify),
+   334                                             "-v {}".format(straight_VB),
+   335                                             "-x {}".format(d_cov),
+   336                                             "-s {}".format(stretch)
+   337                                             ])
+   338                             
+   339                             
+   340                                 ## Build and sort distance matrix.
+   341     57.3 MiB      0.0 MiB       landmarks_file = open("landmark_outputs.txt","rb")
+   342                             
+   343     59.9 MiB      2.7 MiB       l = landmarks_file.readlines()
+   344     59.9 MiB      0.0 MiB       sys.stdout.write("Reading in distance calculations...")
+   345     59.9 MiB      0.0 MiB       sys.stdout.flush()
+   346     59.9 MiB      0.0 MiB       landmark_index = 0
+   347    167.2 MiB    107.2 MiB       for line in l:
+   348    166.6 MiB     -0.6 MiB           f = line.strip('\n')
+   349    166.6 MiB      0.0 MiB           if "#" not in f:
+   350    166.6 MiB      0.0 MiB               landmark = int(f.split(":")[0])
+   351                             
+   352    166.7 MiB      0.1 MiB               distances = [float(i) for i in f.split(":")[1].split(",")]
+   353    167.2 MiB      0.5 MiB               for witness_index in range(0,len(distances)):
+   354                             
+   355    167.2 MiB      0.0 MiB                   d[witness_index].append(LandmarkDistance(landmark_index,distances[witness_index]))
+   356    167.2 MiB      0.0 MiB               landmarks.append(witnesses[landmark])
+   357    167.2 MiB      0.0 MiB               landmark_indices.append(landmark)
+   358    167.2 MiB      0.0 MiB               landmark_index+=1
+   359                             
+   360    167.2 MiB      0.0 MiB       assert(len(d)>0)
+   361    167.2 MiB      0.0 MiB       sys.stdout.write("done\n")
+   362    167.2 MiB      0.0 MiB       sys.stdout.flush()
+   363                             
+   364                             
+   365                             
+   366    167.2 MiB      0.0 MiB       sys.stdout.write("Sorting distances...")
+   367    167.2 MiB      0.0 MiB       sys.stdout.flush()
+   368                             
+   369                                 # p=multiprocessing.Pool(processes=4)   # commented out by Elliott 4/25
+   370                             
+   371                             
+   372    167.2 MiB      0.0 MiB       inputs=[]
+   373    167.2 MiB      0.0 MiB       for w in range(0,len(witnesses)):
+   374    167.2 MiB      0.0 MiB           inputs.append(w)
+   375    167.2 MiB      0.0 MiB           d[w].sort()
+   376                             
+   377                                 # p.map(sort,inputs)  # was commented out as of 4/25
+   378                             
+   379                                 # p.terminate()       # added by Elliott 4/25
+   380                             
+   381    167.2 MiB      0.0 MiB       sys.stdout.write("done\n")
+   382    167.2 MiB      0.0 MiB       sys.stdout.flush()
+   383    167.2 MiB      0.0 MiB       assert len(landmarks) == number_of_vertices
+   384                             
+   385                                 '''=============== End code written by Sam ======================'''
+   386                             
+   387    167.2 MiB      0.0 MiB       print("Building filtration...")
+   388                                 ## Build filtration
+   389    167.2 MiB      0.0 MiB       weak = get_param("weak")
+   390    167.2 MiB      0.0 MiB       dimension_cutoff = get_param("dimension_cutoff")
+   391    167.2 MiB      0.0 MiB       reentry_filter = get_param("reentry_filter")
+   392    167.2 MiB      0.0 MiB       if get_param("connect_time_1_skeleton") or reentry_filter: # Connect time-1-skeleton
+   393                                     for i in xrange(number_of_vertices - 1):
+   394                                         filtration.add(SimplexBirth(ImmutableSet([i, i + 1]), 0, sort_output))
+   395    167.2 MiB      0.0 MiB       use_cliques = get_param("use_cliques")
+   396    167.2 MiB      0.0 MiB       use_twr = get_param("use_twr")
+   397                             
+   398    167.2 MiB      0.0 MiB       print '%s' % use_twr
+   399    167.2 MiB      0.0 MiB       if use_cliques: # AKA "Lazy" witness relation.
+   400                                     g = nx.Graph()
+   401                                     for l in xrange(number_of_vertices):
+   402                                         g.add_node(l)
+   403    167.2 MiB      0.0 MiB       def filter_and_build():
+   404                                     g2 = None
+   405                                     if reentry_filter:
+   406                                         g2 = g.copy()
+   407                                         to_remove = Set()
+   408                                         for l1 in xrange(number_of_vertices):
+   409                                             l2 = l1 + 2
+   410                                             while l2 < number_of_vertices and g2.has_edge(l1, l2):
+   411                                                 to_remove.add(ImmutableSet([l1, l2]))
+   412                                                 l2 += 1
+   413                                         for edge in to_remove:
+   414                                             g2.remove_edge(*tuple(edge)) # May cause weird things to happen because removing edges doesn't remove them from the filtration.
+   415                                     else:
+   416                                         g2 = g
+   417                                     for clique in nx.find_cliques(g2):
+   418                                         filtration.add(SimplexBirth(clique, q, sort_output))
+   419    167.2 MiB      0.0 MiB       if weak: # Builds filtration based on k nearest neighbors.
+   420                                     if max_filtration_param % 1 != 0:
+   421                                         raise Exception("Argument 'max_filtration_param' must be an integer if using the weak witness relation.")
+   422                                     max_filtration_param = int(max_filtration_param)
+   423                                     for k in xrange(int(math.fabs(max_filtration_param))):
+   424                                         for witness_index in xrange(number_of_datapoints):
+   425                                             if use_cliques:
+   426                                                 for i in xrange(k):
+   427                                                     g.add_edge(d[witness_index][i].id_num, d[witness_index][k].id_num)
+   428                                             elif store_top_simplices:
+   429                                                 filtration.add(SimplexBirth([d[witness_index][landmark_index].id_num for landmark_index in xrange(k + 1)], k, sort_output))
+   430                                             else:
+   431                                                 if progress > 0:
+   432                                                     for base in itertools.combinations([d[witness_index][landmark_index].id_num for landmark_index in xrange(k)], min(k, dimension_cutoff)):
+   433                                                         new_subset = ImmutableSet(base + (d[witness_index][k].id_num,))
+   434                                                         filtration.add(SimplexBirth(new_subset, k, sort_output))
+   435                                         if use_cliques:
+   436                                             filter_and_build()
+   437    167.2 MiB      0.0 MiB       if use_twr:
+   438                                     print 'Using TWR'
+   439                                     if max_filtration_param < 0: # Automatically determine max.
+   440                                         depth = int(-max_filtration_param)
+   441                                         min_distance = None
+   442                                         for w in xrange(number_of_datapoints):
+   443                                             new_distance = d[w][depth].distance - (0 if absolute else d[w][0].distance)
+   444                                             if min_distance is None or new_distance < min_distance:
+   445                                                 min_distance = new_distance
+   446                                         max_filtration_param = min_distance
+   447                                     print 'The max_filtration_param is %d ' % max_filtration_param
+   448                                     step = float(max_filtration_param - min_filtration_param)/float(num_divisions) # Change in epsilon at each step.
+   449                                     print 'The step size is %f ' % step
+   450                                     print 'There will be %d steps in the filtration' % num_divisions
+   451                                     progress_index = [0]*number_of_datapoints
+   452                                     done = False
+   453                             
+   454                                     good_landmarks = [[] for x in range(number_of_datapoints)]
+   455                             
+   456                                     epsilons = []
+   457                                     for q in xrange(num_divisions):
+   458                                         threshold = (max_filtration_param if q == num_divisions - 1 else float(q + 1)*step + min_filtration_param)
+   459                                         print 'The threshold is currently %f' % threshold
+   460                                         epsilons.append(threshold)
+   461                                         Pre_landmarks = []
+   462                                         for witness_index in xrange(number_of_datapoints):
+   463                                             pre_landmarks = []
+   464                                             add_simplex = False
+   465                                             progress = 0
+   466                                             while True:
+   467                                                 progress = progress_index[witness_index]
+   468                                                 if simplex_cutoff > 0 and progress >= simplex_cutoff:
+   469                                                     break
+   470                                                 if progress == number_of_vertices:
+   471                                                     done = True
+   472                                                     break
+   473                             
+   474                                                 if d[witness_index][progress].distance < threshold + (0 if absolute else d[witness_index][0].distance):
+   475                                                     pre_landmarks.append(d[witness_index][progress].id_num) # PRE_LANDMARKS CONTAINS ID NUMBER
+   476                                                     progress_index[witness_index] += 1
+   477                                                 else:
+   478                             
+   479                                                     pre_landmarks_size = len(pre_landmarks)
+   480                                                     pre_landmarks_string = str(pre_landmarks) # MAKE LIST TO STRING
+   481                                                     print 'At threshold value %f, witness %d has %d associated landmarks: %s ' % (threshold, witness_index, pre_landmarks_size, pre_landmarks_string)
+   482                                                     break
+   483                                             Pre_landmarks.append(pre_landmarks)
+   484                                             Pre_landmarks_size = len(Pre_landmarks)
+   485                             
+   486                             
+   487                             
+   488                                         for witness_index in xrange(number_of_datapoints - downsample_rate):
+   489                                             if len(Pre_landmarks[witness_index]) == 1:
+   490                                                 set_range = 1
+   491                                             else:
+   492                                                 set_range = len(Pre_landmarks[witness_index])
+   493                                             for k in range(set_range):
+   494                                                 current_pre_landmark = Pre_landmarks[witness_index][k]
+   495                                                 next_pre_landmark = Pre_landmarks[witness_index][k]+1 # CHECKS ONE STEP UP FROM ID NUMBER *** SEE JAMIE'S COMMENTS ON SUCH OR CLARIFY ***
+   496                                             #	print 'current pre landmark = %d , next pre landmark = %d' % (current_pre_landmark, next_pre_landmark)
+   497                                                 check_pre_landmark = str(Pre_landmarks[witness_index + downsample_rate]) # HMMMMM
+   498                                         #		print 'We are considering the fate of landmark %d witnessed by witness %d...' % (current_pre_landmark, witness_index)
+   499                                         #		print 'Should witness %d not witness landmark %d, it will be GONE!' % (witness_index + downsample_rate, current_pre_landmark + 1,)
+   500                                         #		print 'Witness %d has landmark set %s' % (witness_index + downsample_rate, check_pre_landmark)
+   501                                                 print (Pre_landmarks[witness_index][k]) in Pre_landmarks[witness_index]
+   502                                                 if (Pre_landmarks[witness_index][k]+ 1) in Pre_landmarks[witness_index + downsample_rate]: # change from 1, downsample_rate to 0 to test!
+   503                                                     good_landmarks[witness_index].append(Pre_landmarks[witness_index][k])
+   504                                             print 'Up to threshold value %f, witness %d has landmark set %s' % (threshold, witness_index, str(good_landmarks[witness_index]))
+   505                                             if use_cliques:
+   506                                                 for i in xrange(len(good_landmarks[witness_index])):
+   507                                                     for j in xrange(i+1,len(good_landmarks[witness_index])):
+   508                                                             g.add_edge(good_landmarks[witness_index][i], good_landmarks[witness_index][j])
+   509                                             else:
+   510                                                 if not store_top_simplices and len(good_landmarks[witness_index]) > 0:
+   511                                                     for base in itertools.combinations(good_landmarks[witness_index], min(len(good_landmarks[witness_index]), dimension_cutoff)):
+   512                                                         new_subset = ImmutableSet(base + (good_landmarks[witness_index][i],))
+   513                                                         filtration.add(SimplexBirth(new_subset, q, sort_output))
+   514                                                 add_simplex = True
+   515                                             if (not use_cliques) and store_top_simplices and add_simplex and len(good_landmarks[witness_index])>= 2:
+   516                                                 filtration.add(SimplexBirth([good_landmarks[witness_index][i] for i in xrange(len(good_landmarks[witness_index]))], q, sort_output))
+   517                                             if done:
+   518                                                 break
+   519                                         if use_cliques:
+   520                                             filter_and_build()
+   521                                         if done:
+   522                                             break
+   523                                     #	print 'We are done with threshold %f' % threshold
+   524                                 else:
+   525    167.2 MiB      0.0 MiB           if max_filtration_param < 0: # Automatically determine max.
+   526                                         depth = int(-max_filtration_param)
+   527                                         min_distance = None
+   528                                         for w in xrange(number_of_datapoints):
+   529                             
+   530                                             new_distance = d[w][depth].distance - (0 if absolute else d[w][0].distance)
+   531                                             if min_distance is None or new_distance < min_distance:
+   532                             
+   533                                                 min_distance = new_distance
+   534                                                 if min_distance ==0:
+   535                                                     print "witness ",w
+   536                             
+   537                                         max_filtration_param = min_distance
+   538    167.2 MiB      0.0 MiB           step = float(max_filtration_param - min_filtration_param)/float(num_divisions) # Change in epsilon at each step.
+   539    167.2 MiB      0.0 MiB           progress_index = [0]*number_of_datapoints
+   540    167.2 MiB      0.0 MiB           done = False
+   541    167.2 MiB      0.0 MiB           epsilons = []
+   542    169.5 MiB      2.3 MiB           for q in xrange(num_divisions):
+   543    169.4 MiB     -0.1 MiB               threshold = (max_filtration_param if q == num_divisions - 1 else float(q + 1)*step + min_filtration_param)
+   544    169.4 MiB      0.0 MiB               print 'The threshold is currently %f' % threshold
+   545    169.4 MiB      0.0 MiB               epsilons.append(threshold)
+   546    169.5 MiB      0.1 MiB               for witness_index in xrange(number_of_datapoints):
+   547    169.5 MiB      0.0 MiB                   add_simplex = False
+   548    169.5 MiB      0.0 MiB                   progress = 0
+   549    169.5 MiB      0.0 MiB                   while True:
+   550    169.5 MiB      0.0 MiB                       progress = progress_index[witness_index]
+   551    169.5 MiB      0.0 MiB                       if simplex_cutoff > 0 and progress >= simplex_cutoff:
+   552                                                     break
+   553    169.5 MiB      0.0 MiB                       if progress == number_of_vertices:
+   554                                                     done = True
+   555                                                     break
+   556    169.5 MiB      0.0 MiB                       if d[witness_index][progress].distance < threshold + (0 if absolute else d[witness_index][0].distance):
+   557    169.5 MiB      0.0 MiB                           if use_cliques:
+   558                                                         for i in xrange(progress):
+   559                                                             g.add_edge(d[witness_index][i].id_num, d[witness_index][progress].id_num)
+   560                                                     else:
+   561    169.5 MiB      0.0 MiB                               if not store_top_simplices and progress > 0:
+   562                                                             for base in itertools.combinations([d[witness_index][landmark_index].id_num for landmark_index in xrange(progress)], min(progress, dimension_cutoff)):
+   563                                                                 new_subset = ImmutableSet(base + (d[witness_index][progress].id_num,))
+   564                                                                 filtration.add(SimplexBirth(new_subset, q, sort_output))
+   565    169.5 MiB      0.0 MiB                               add_simplex = True
+   566    169.5 MiB      0.0 MiB                           progress_index[witness_index] += 1
+   567                                                 else:
+   568    169.5 MiB      0.0 MiB                           break
+   569    169.5 MiB      0.0 MiB                   if (not use_cliques) and store_top_simplices and add_simplex and progress >= 2:
+   570    169.5 MiB      0.0 MiB                       list_o_landmarks = []
+   571    169.5 MiB      0.0 MiB                       for landmark_index in xrange(progress):
+   572    169.5 MiB      0.0 MiB                           list_o_landmarks.append(d[witness_index][landmark_index].id_num)
+   573                                                 #print 'At threshold %f, witness %d has landmark set %s' % (threshold, witness_index, str(list_o_landmarks))
+   574    169.5 MiB      0.0 MiB                       filtration.add(SimplexBirth([d[witness_index][landmark_index].id_num for landmark_index in xrange(progress)], q, sort_output))
+   575    169.5 MiB      0.0 MiB                   if done:
+   576                                                 break
+   577    169.5 MiB      0.0 MiB               if use_cliques:
+   578                                             filter_and_build()
+   579    169.5 MiB      0.0 MiB               if done:
+   580                                             break
+   581                             
+   582                             
+   583    169.5 MiB      0.0 MiB       np.savetxt('temp_data/epsilons.txt', epsilons)
+   584                             
+   585    169.5 MiB      0.0 MiB       extra_data = (landmarks, witnesses)
+   586    169.5 MiB      0.0 MiB       if weak:
+   587                                     max_epsilon = 0.0
+   588                                     for w in xrange(number_of_datapoints):
+   589                                         #print("type: %s" % type(d[w][max_filtration_param - 1].distance))
+   590                                         #print("value: %f" % d[w][max_filtration_param - 1].distance)
+   591                                         if (d[w][max_filtration_param - 1].distance) > max_epsilon:
+   592                                             max_epsilon = d[w][max_filtration_param - 1].distance
+   593                                     print("Done. Filtration contains %i top simplex birth events, with the largest epsilon equal to %f.\n" % (len(filtration), max_epsilon))
+   594                                 else:
+   595    169.5 MiB      0.0 MiB           max_sb_length = 0
+   596    169.5 MiB      0.0 MiB           for sb in filtration:
+   597    169.5 MiB      0.0 MiB               if len(sb.landmark_set) > max_sb_length:
+   598    169.5 MiB      0.0 MiB                   max_sb_length = len(sb.landmark_set)
+   599    169.5 MiB      0.0 MiB           print("Done. Filtration contains %i top simplex birth events, with the largest one comprised of %i landmarks.\nMax filtration parameter: %s.\n" % (len(filtration), max_sb_length, max_filtration_param))
+   600                             
+   601                                 ## Write to output file
+   602    169.5 MiB      0.0 MiB       output_file_name = get_param("out")
+   603                             
+   604    169.5 MiB      0.0 MiB       if not output_file_name is None:
+   605                                     output_file = open(output_file_name, "w")
+   606                                     output_file.truncate()
+   607                                     program = get_param("program")
+   608                                     if dimension_cutoff is None:
+   609                                         print("Writing filtration for input into %s..." % program)
+   610                                         dimension_cutoff = number_of_vertices
+   611                                     else:
+   612                                         print("Writing filtration to file %s for input into %s, ignoring simplices above dimension %i..." % (output_file_name,program, dimension_cutoff))
+   613                                     num_lines = 0
+   614                                     if program == "Perseus":
+   615                                         sets_printed_so_far = Set()
+   616                                         num_lines = len(filtration) + 1
+   617                                         output_file.write("1\n")
+   618                                         list_filtration = None
+   619                                         if (sort_output):
+   620                                             list_filtration = list(filtration)
+   621                                             list_filtration.sort()
+   622                                         for simplex_birth in (list_filtration if sort_output else filtration):
+   623                                             dimension = len(simplex_birth.landmark_set) - 1
+   624                                             if dimension > dimension_cutoff:
+   625                                                 for subtuple in itertools.combinations(simplex_birth.landmark_set, dimension_cutoff + 1):
+   626                                                     subset = ImmutableSet(subtuple)
+   627                                                     if not ((subset, simplex_birth.birth_time) in sets_printed_so_far):
+   628                                                         output_file.write(str(dimension_cutoff) + " ")
+   629                                                         for landmark in subset:
+   630                                                             output_file.write(str(landmark + 1) + " ")
+   631                                                         output_file.write(str(simplex_birth.birth_time + 1) + "\n")
+   632                                                         sets_printed_so_far.add((subset, simplex_birth.birth_time))
+   633                                             else:
+   634                                                 if not ((simplex_birth.landmark_set, simplex_birth.birth_time) in sets_printed_so_far):
+   635                                                     output_file.write(str(dimension) + " ")
+   636                                                     for landmark in (simplex_birth.sll if sort_output else simplex_birth.landmark_set):
+   637                                                         output_file.write(str(landmark + 1) + " ")
+   638                                                     output_file.write(str(simplex_birth.birth_time + 1) + "\n")
+   639                                                     sets_printed_so_far.add((simplex_birth.landmark_set, simplex_birth.birth_time))
+   640                                     elif program == "PHAT":
+   641                                         line_map = {}
+   642                                         for i in xrange(number_of_vertices - 1):
+   643                                             output_file.write("0\n")
+   644                                             line_map[ImmutableSet([i])] = i
+   645                                         output_file.write("0")
+   646                                         line_map[ImmutableSet([number_of_vertices - 1])] = number_of_vertices - 1
+   647                                         simultaneous_additions = []
+   648                                         class Context: # Note: if upgrading to Python 3, one could just use the nonlocal keyword (see below comment).
+   649                                             line_number = number_of_vertices
+   650                                         list_filtration = list(filtration)
+   651                                         list_filtration.sort()
+   652                                         last_birth_time = 0
+   653                                         def process_and_get_line_number(s):
+   654                                             #nonlocal line_number
+   655                                             if s in line_map:
+   656                                                 return line_map[s]
+   657                                             else:
+   658                                                 dimension = len(s) - 1
+   659                                                 if dimension > dimension_cutoff:
+   660                                                     for subset in itertools.combinations(s, dimension_cutoff + 1): # Take all subsets of size dimension_cutoff + 1
+   661                                                         process_and_get_line_number(ImmutableSet(subset))
+   662                                                 elif dimension > 0:
+   663                                                     subsets_line_numbers = []
+   664                                                     for e in s:
+   665                                                         subsets_line_numbers.append(process_and_get_line_number(ImmutableSet(s - Set([e]))))
+   666                                                     output_file.write("\n" + str(dimension))
+   667                                                     for l in subsets_line_numbers:
+   668                                                         output_file.write(" " + str(l))
+   669                                                     line_map[s] = Context.line_number
+   670                                                     Context.line_number += 1
+   671                                                     return Context.line_number - 1
+   672                                                 else:
+   673                                                     raise Exception("Should have already added single point for base case: " + str(s))
+   674                                         for simplex_birth in list_filtration:
+   675                                             if simplex_birth.birth_time > last_birth_time:
+   676                                                 simultaneous_additions.append((Context.line_number - 1, last_birth_time + 1)) # Every line up to and including that line number (indexing starts at 0) had that birth time or earlier (indexing starts at 1)
+   677                                                 last_birth_time = simplex_birth.birth_time
+   678                                             process_and_get_line_number(simplex_birth.landmark_set)
+   679                                         simultaneous_additions.append((sys.maxsize, last_birth_time))
+   680                                         output_file.write("\n\n# Simultaneous additions: Every line up to and including __ (indexing starts at 0) has birth time __ (or earlier).")
+   681                                         for addition in simultaneous_additions:
+   682                                             output_file.write("\n# %20i %20i" % addition)
+   683                                         extra_data = (extra_data[0], extra_data[1], simultaneous_additions)
+   684                                         num_lines = Context.line_number
+   685                                     else:
+   686                                         raise Exception("Only supported programs are 'Perseus' and 'PHAT'")
+   687                                     output_file.close()
+   688                                     print("Done. File contains %i lines.\n" % num_lines)
+   689    169.5 MiB      0.0 MiB       print("Filtration has been successfully built!\n")
+   690    169.5 MiB      0.0 MiB       return (filtration, extra_data + (max_filtration_param,))
+
+

@@ -14,8 +14,8 @@ from DCE.Plotter import plot_waveform_zoom_only
 
 
 
-test = 11
-# test = int(sys.argv[1])
+#test = 11
+test = int(sys.argv[1])
 
 print 'running test %d...' % test
 
@@ -144,15 +144,15 @@ if test == 11:
 		dir1, base1,
 		dir2, base2,
 
-		i_lims=(45, 50),  # specify note range
+		i_lims=(49, 50),  # specify note range
 
 		embed_crop_1='auto',  # seconds or 'auto'
 		embed_crop_2='auto',  # seconds or 'auto'
 		auto_crop_length=.05,  # seconds for when embed_crop = 'auto'
 
-		tau_1='auto ideal', # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
-		tau_2='auto ideal',
-		tau_T=math.pi,  # for auto tau. tau = period * tau_T
+		tau_1='auto detect', # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_2=.01192,
+		tau_T=1/math.pi,  # for auto tau. tau = period * tau_T
 
 		normalize_volume=True,
 
@@ -167,7 +167,7 @@ if test == 11:
 
 	plot_waveform_zoom_only(
 
-		'datasets/time_series/C134C/47-C134C.txt',		# in filename
+		'datasets/time_series/C135B/49-C135B.txt',		# in filename
 		'output/DCE/time_series_zoom.png',				# out filename
 
 		embed_crop='auto',

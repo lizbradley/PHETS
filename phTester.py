@@ -351,13 +351,10 @@ if test == 13:
 	build_filt_params = parameter_set
 	build_filt_params.update(
 		{
-			'ds_rate' : 50,
+			'ds_rate' : 10,
 			'worm_length' : 2000,
-			'min_filtration_param': .001,
 			'max_filtration_param': .01,
 			'num_divisions': 30,
-			'use_cliques': True
-
 		})
 
 	start_pt = 0   # skip first half of in data file (primitive sliding window)
@@ -380,5 +377,99 @@ if test == 13:
 	)
 
 
-print 'Runtime : %s ', % str(time.time() - start)
+runtime=time.time() - start
 print 'test %d complete.' % test
+
+
+## gathering memory usages
+
+
+
+
+build_filt = open("PersistentHomology/output/build_filtration_memory.txt","rb")
+
+build_filt.readline()
+build_filt.readline()
+sort_mem=0
+distance_mem=0
+for i in build_filt.readlines():
+    elements=i.split("    ")
+    if "d[w].sort()" in elements[-1]:
+    	for j in elements[1].split(' '):
+    		if "M" not in j and j!='':
+        		sort_mem=float(j)
+    if "subprocess.call" in elements[-1] and elements[1]!='':
+        distance_mem = float(elements[1].split(' ')[1])
+
+build_filt.close()
+
+
+build_perseus = open("PersistentHomology/output/build_perseus_in_file_memory.txt","rb")
+
+build_perseus.readline()
+build_perseus.readline()
+
+write_perseus = 0
+for i in build_perseus.readlines():
+    elements = i.split("    ")
+    if "@profile" in elements[-1]:
+        write_perseus=float(elements[2].split(' ')[1])
+        break
+build_perseus.close()
+simplex = open("PersistentHomology/output/expand_to_2simplexes_memory.txt","rb")
+
+simplex.readline()
+simplex.readline()
+
+expand_simplex = 0
+for i in simplex.readlines():
+    elements = i.split("    ")
+    if "@profile" in elements[-1]:
+        expand_simplex=float(elements[2].split(' ')[1])
+        break
+simplex.close()
+
+birth = open("PersistentHomology/output/group_by_birth_time_memory.txt","rb")
+
+birth.readline()
+birth.readline()
+
+group_birth = 0
+for i in birth.readlines():
+    elements = i.split("    ")
+    if "@profile" in elements[-1]:
+        group_birth=float(elements[2].split(' ')[1])
+        break
+birth.close()
+
+pers = open("PersistentHomology/output/make_figure_memory.txt","rb")
+
+pers.readline()
+pers.readline()
+
+run_pers = 0
+for i in pers.readlines():
+    elements = i.split("    ")
+    if "./perseus" in elements[-1] and elements[2]!='':
+        run_pers=float(elements[2].split(' ')[1])
+
+pers.close()
+
+
+
+
+with open("PersistentHomology/output/computational_costs.txt","wb") as f:
+	f.write("Computational costs\n")
+	f.write("Run time: "+str(runtime)+"\n")
+	f.write("Memory usage: "+str(sort_mem+distance_mem+write_perseus+expand_simplex+group_birth+run_pers)+" MiB\n")
+
+
+
+
+
+
+
+
+
+
+
