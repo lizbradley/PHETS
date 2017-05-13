@@ -151,8 +151,8 @@ def compare_multi(
 
 		i_lims=(1, 89),
 
-		embed_crop_1=(1, 2),    # seconds or 'auto'
-		embed_crop_2=(1, 2),
+		embed_crop_1='auto',    # (start, stop) in seconds or 'auto'
+		embed_crop_2='auto',
 		auto_crop_length=.3,		# for when embed_crop = 'auto'
 
 		tau_1='auto ideal',       # seconds or 'auto detect' or 'auto ideal'

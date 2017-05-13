@@ -6,6 +6,7 @@ from DCE.Tools import plot_power_spectrum
 from DCE.Plotter import make_window_frame
 from DCE.MovieTools import frames_to_movie
 from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
+from DCE.Plotter import plot_waveform_zoom_only
 
 # slide_window, vary_tau, compare_vary_tau: tau is in samples not seconds
 # compare_multi: tau is in seconds; has all options for tau and crop *****
@@ -143,7 +144,7 @@ if test == 11:
 		dir1, base1,
 		dir2, base2,
 
-		i_lims=(45, 55),  # specify note range
+		i_lims=(45, 50),  # specify note range
 
 		embed_crop_1='auto',  # seconds or 'auto'
 		embed_crop_2='auto',  # seconds or 'auto'
@@ -163,6 +164,15 @@ if test == 11:
 	)
 
 	frames_to_movie(out_filename, framerate=1)
+
+	plot_waveform_zoom_only(
+
+		'datasets/time_series/C134C/47-C134C.txt',		# in filename
+		'output/DCE/time_series_zoom.png',				# out filename
+
+		embed_crop='auto',
+		auto_crop_length=.05,
+	)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 

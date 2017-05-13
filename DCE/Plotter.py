@@ -230,3 +230,30 @@ def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, c
 	pyplot.savefig(out_filename)
 	pyplot.close(fig)
 
+
+from Tools import auto_crop
+
+def plot_waveform_zoom_only(
+		in_filename,
+		out_filename,
+		embed_crop='auto',
+		auto_crop_length=.3,
+		normalize_volume=True,
+
+	):
+	
+	
+	sig = np.loadtxt(in_filename)
+
+	if normalize_volume: sig = sig / np.max(np.abs(sig))
+
+	crop = auto_crop(embed_crop, sig, auto_crop_length)
+
+	fig = pyplot.figure(figsize=(5, 3), dpi=300, tight_layout=False)
+	ax = fig.add_subplot(1, 1, 1)
+	ax.set_title(in_filename.split('/')[-1])
+	ax.set_position([.2, .3, .6, .4])
+	plot_waveform_zoom(ax, sig, crop)
+
+
+	pyplot.savefig(out_filename)
