@@ -318,7 +318,7 @@ if test == 12:
 		print '%s' % in_data_file_name
 		build_filt_params.update(
 			{
-				'ds_rate': 50,
+				'ds_rate': 100,
 				'worm_length': 5000,
 				'max_filtration_param': -10,
 				'num_divisions': 50,
@@ -351,10 +351,10 @@ if test == 13:
 	build_filt_params = parameter_set
 	build_filt_params.update(
 		{
-			'ds_rate' : 10,
+			'ds_rate' : 1,
 			'worm_length' : 2000,
-			'max_filtration_param': .01,
-			'num_divisions': 30,
+			'max_filtration_param': .005,
+			'num_divisions': 2
 		})
 
 	start_pt = 0   # skip first half of in data file (primitive sliding window)
@@ -382,10 +382,6 @@ print 'test %d complete.' % test
 
 
 ## gathering memory usages
-
-
-
-
 build_filt = open("PersistentHomology/output/build_filtration_memory.txt","rb")
 
 build_filt.readline()
@@ -413,7 +409,10 @@ write_perseus = 0
 for i in build_perseus.readlines():
     elements = i.split("    ")
     if "@profile" in elements[-1]:
-        write_perseus=float(elements[2].split(' ')[1])
+    	for j in elements[1].split(' '):
+    		if "M" not in j and j!='':
+        		write_perseus=float(j)
+        		break;
         break
 build_perseus.close()
 simplex = open("PersistentHomology/output/expand_to_2simplexes_memory.txt","rb")
@@ -425,7 +424,10 @@ expand_simplex = 0
 for i in simplex.readlines():
     elements = i.split("    ")
     if "@profile" in elements[-1]:
-        expand_simplex=float(elements[2].split(' ')[1])
+    	for j in elements[1].split(' '):
+    		if "M" not in j and j!='':
+        		expand_simplex=float(j)
+        		break;
         break
 simplex.close()
 
@@ -438,7 +440,10 @@ group_birth = 0
 for i in birth.readlines():
     elements = i.split("    ")
     if "@profile" in elements[-1]:
-        group_birth=float(elements[2].split(' ')[1])
+    	for j in elements[1].split(' '):
+    		if "M" not in j and j!='':
+        		group_birth=float(j)
+        		break;
         break
 birth.close()
 
@@ -451,18 +456,22 @@ run_pers = 0
 for i in pers.readlines():
     elements = i.split("    ")
     if "./perseus" in elements[-1] and elements[2]!='':
-        run_pers=float(elements[2].split(' ')[1])
+    	for j in elements[1].split(' '):
+    		if "M" not in j and j!='':
+        		run_pers=float(j)
 
 pers.close()
 
+tris = open("PersistentHomology/output/num_triangles.txt")
+tri = tris.readline()
+tris.close()
 
 
-
-with open("PersistentHomology/output/computational_costs.txt","wb") as f:
+with open("PersistentHomology/output/computational_costs_w{}_ds{}_mf{}.txt".format(build_filt_params["worm_length"],build_filt_params["ds_rate"],build_filt_params["max_filtration_param"]),"wb") as f:
 	f.write("Computational costs\n")
 	f.write("Run time: "+str(runtime)+"\n")
 	f.write("Memory usage: "+str(sort_mem+distance_mem+write_perseus+expand_simplex+group_birth+run_pers)+" MiB\n")
-
+	f.write(tri)
 
 
 
