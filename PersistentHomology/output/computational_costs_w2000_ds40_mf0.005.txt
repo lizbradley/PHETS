@@ -1,0 +1,4 @@
+Computational costs
+Run time: 16.0857610703
+Memory usage: 141.2 MiB
+Number of triangles: 29

@@ -338,7 +338,7 @@ def mean_PRF_dist_plots(
 		sig_full = np.loadtxt(filename)
 
 
-		if normalize_volume: sig_full = sig_full / np.max(sig_full)
+		if normalize_volume: sig_full = sig_full / np.max(sig_full
 
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
 
