@@ -31,8 +31,8 @@ MEMORY_PROFILE_ON = False
 
 f = open("PersistentHomology/output/build_filtration_memory.txt","wb")
 
-# @profile(stream=f)
 # @mem_profile(f, MEMORY_PROFILE_ON)
+@profile(stream=f)
 def build_filtration(input_file_name, parameter_set):
 	print os.getcwd()
 	num_threads = 2
