@@ -6,13 +6,17 @@ import numpy as np
 from os import system, chdir
 from memory_profiler import profile
 from sys import platform
+
+from Utilities import mem_profile
+from config import MEMORY_PROFILE_ON
+
+
 f=open("PersistentHomology/output/group_by_birth_time_memory.txt","wb")
 f2=open("PersistentHomology/output/expand_to_2simplexes_memory.txt","wb")
 f3=open("PersistentHomology/output/build_perseus_in_file_memory.txt","wb")
 f4=open("PersistentHomology/output/make_figure_memory.txt","wb")
 
-
-
+# @mem_profile(f, MEMORY_PROFILE_ON)
 @profile(stream=f)
 def group_by_birth_time(complex_ID_list):
 	"""Reformats 1D list of SimplexBirth objects into 2D array of
@@ -83,6 +87,7 @@ def build_perseus_in_file(filt_array):
 			out_file.write(line_str)
 	out_file.close()
 
+
 def add_title(subplot, title_block_info):
 	in_file_name = title_block_info[0]
 	out_file_name = title_block_info[1]
@@ -111,7 +116,7 @@ def add_title(subplot, title_block_info):
 	title_table.auto_set_font_size(False)
 	title_table.auto_set_font_size(8)
 
-def add_persistence_plot(subplot, fig):
+def add_persistence_plot(subplot):
 	print 'plotting persistence diagram...'
 	birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True)
 
@@ -197,14 +202,8 @@ def add_persistence_plot(subplot, fig):
 @profile(stream=f4)
 def make_figure(title_block_info, out_file_name):
 	filt_list = np.load('PersistentHomology/temp_data/complexes.npy')
-
-	# filt_array = group_by_birth_time(filt_list)
-	# expand_to_2simplexes(filt_array)
-	# filt_array = np.asarray(filt_array)
-	#
 	filt_array = group_by_birth_time(filt_list)
 	expand_to_2simplexes(filt_array)
-
 	filt_array = np.asarray(filt_array)
 
 
@@ -229,7 +228,7 @@ def make_figure(title_block_info, out_file_name):
 	title_block = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3)
 	pers_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 
-	add_persistence_plot(pers_plot, fig)
+	add_persistence_plot(pers_plot)
 	add_title(title_block, title_block_info)
 	pyplot.savefig(out_file_name)
 	pyplot.clf()
