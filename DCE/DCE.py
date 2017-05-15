@@ -17,9 +17,11 @@ def embed(
 		channel=0
 	):
 
-	embed_crop_samp = np.array(embed_crop) * WAV_SAMPLE_RATE
+	if embed_crop:
+		embed_crop_samp = np.array(embed_crop) * WAV_SAMPLE_RATE
+		signal = signal[int(embed_crop_samp[0]):int(embed_crop_samp[1])]
+
 	tau_samp = int(tau * WAV_SAMPLE_RATE)
-	signal = signal[int(embed_crop_samp[0]):int(embed_crop_samp[1])]
 	end = len(signal) - (tau_samp * (m - 1)) - 1
 
 	output_file = open(output_file_name, "w")

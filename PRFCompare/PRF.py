@@ -8,17 +8,18 @@ import itertools
 import numpy as np
 from os import system, chdir
 
-
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+from DCE.DCE import embed
+from DCE.Plotter import plot_waveform
+from DCE.Tools import auto_tau
+
 from PersistentHomology.BuildComplex import build_filtration
-from DCE.DCETools import embed
-from DCE.DCEPlotter import plot_waveform
 from PersistentHomology.PersistencePlotter import add_persistence_plot
 from PersistentHomology.FiltrationPlotter import make_movie
 
-from DCE.DCETools import auto_crop
+from DCE.Tools import auto_crop
 
 WAV_SAMPLE_RATE = 44100
 
@@ -177,7 +178,7 @@ def build_rank_func(data):
 	return [xx, yy, grid_vals, max_lim]
 
 
-def get_rank_func(filename, filt_params):
+def get_PRF(filename, filt_params):
 	filt = get_filtration(filename, filt_params)
 	get_homology(filt)
 	intervals = get_interval_data()
@@ -248,7 +249,7 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 
 	filename = get_filename(i_ref)
 	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
-	ref_func = get_rank_func(filename, filt_params)[2]
+	ref_func = get_PRF(filename, filt_params)[2]
 	
 	funcs = []
 	for i in i_arr:
@@ -256,7 +257,7 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 		print '\n=================================================='
 		print filename
 		print '==================================================\n'
-		func = get_rank_func(filename, filt_params)
+		func = get_PRF(filename, filt_params)
 		funcs.append(func[2])
 
 		if PD_movie_int:
@@ -271,24 +272,28 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 	dists_plot(i_ref, i_arr, dists, out_filename)
 
 
-from DCE.DCETools import auto_tau
 
 def mean_PRF_dist_plots(
 		filename_1, filename_2,
 		out_filename,
 		filt_params,
+
 		crop_1='auto', 						# sec or 'auto'
 		crop_2='auto',
 		auto_crop_length=.3, 					# sec
+
 		window_size=.05,					# sec
 		num_windows=10,						# per file
 		mean_samp_num=5,					# per file
-		tau=.001,							# sec
+
+		tau=.001,							# sec or 'auto ideal' or 'auto detect'
 		tau_T=np.pi,
 		note_index=None,					#
-		PD_movie_int = 5,				
-		normalize_volume=True
-		):
+
+		normalize_volume=True,
+
+		PD_movie_int = 5,
+	):
 
 
 	def clear_old_files():
@@ -303,7 +308,9 @@ def mean_PRF_dist_plots(
 			else:
 				print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
+
 	def make_movie_and_PD(filename, i, ref=False):
+
 
 		base_name = filename.split('/')[-1].split('.')[0]
 		comp_name = 'mean_compare_{:s}_{:d}_'.format(base_name, i)
@@ -325,22 +332,25 @@ def mean_PRF_dist_plots(
 		title_block_info = [filename, 'worm {:d} of {:d}'.format(i, num_windows), filt_params, color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
 		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
 
-	def get_funcs(filename, crop):
+
+	def get_PRFs(filename, crop_cmd, tau_cmd):
 		funcs = []
 		sig_full = np.loadtxt(filename)
 
+
 		if normalize_volume: sig_full = sig_full / np.max(sig_full)
 
-		if crop == 'auto':
-			crop_samp = auto_crop(sig_full, auto_crop_length)
-		else:
-			crop_samp = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
 
-		sig = sig_full[crop_samp[0]:crop_samp[1]]
+		sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
+
+		# else:
+		# 	crop = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+
 
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
 
-		tau_samps = auto_tau(tau, filename, note_index, tau_T, crop)
+		f_deal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename)
 
 		for i, pt in enumerate(start_pts[:-1]):
 
@@ -349,11 +359,10 @@ def mean_PRF_dist_plots(
 			print '=============================================\n'
 
 			window = np.asarray(sig[pt:pt + window_size_samp])
-			np.savetxt('PRFCompare/temp_data/temp_sig.txt', window)
-			embed('PRFCompare/temp_data/temp_sig.txt', 'PRFCompare/temp_data/temp_worm.txt',
-				  'none', int(tau_samps), 2)
+			embed(window, 'PRFCompare/temp_data/temp_worm.txt',
+				  False, tau, 2)
 
-			func = get_rank_func('PRFCompare/temp_data/temp_worm.txt', filt_params)
+			func = get_PRF('PRFCompare/temp_data/temp_worm.txt', filt_params)
 			funcs.append(func[2])	# select grid_vals (third element)
 
 			if PD_movie_int:
@@ -361,7 +370,8 @@ def mean_PRF_dist_plots(
 					pass
 					make_movie_and_PD(filename, i)
 
-		return crop_samp, sig_full, funcs
+		return crop, sig_full, funcs
+
 
 	def dists_plot(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
 		fig = plt.figure(figsize=(14, 6), tight_layout=True)
@@ -423,8 +433,8 @@ def mean_PRF_dist_plots(
 
 	# ===========================================================
 
-	crop_1_samp, sig_1_full, funcs_1 = get_funcs(filename_1, crop_1)
-	crop_2_samp, sig_2_full, funcs_2 = get_funcs(filename_2, crop_2)
+	crop_1_samp, sig_1_full, funcs_1 = get_PRFs(filename_1, crop_1, tau)
+	crop_2_samp, sig_2_full, funcs_2 = get_PRFs(filename_2, crop_2, tau)
 
 	mean_1_samps = funcs_1[::num_windows//mean_samp_num]
 	mean_2_samps = funcs_2[::num_windows//mean_samp_num]
@@ -445,7 +455,6 @@ def mean_PRF_dist_plots(
 
 	diffs2_vs_2 = np.array([np.subtract(func, funcs_2_avg) for func in funcs_2])
 	dists2_vs_2 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs2_vs_2])
-
 
 
 	dists_plot(dists1_vs_1, dists2_vs_1, dists1_vs_2, dists2_vs_2, out_filename)

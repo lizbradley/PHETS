@@ -15,7 +15,7 @@ from PRFCompare.PRF import PRF_dist_plots, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 5
+test = 3
 
 if test == 1:
 	params = parameter_set
@@ -97,15 +97,18 @@ if test == 3:
 		'datasets/time_series/C135B/40-C135B.txt',  # input (right)
 		'output/PRFCompare/40_C134C_vs_C135B_exp_crop_usecliques_detect.png',  # out filename
 		params,
-		crop_1=(1, 1.3),		# seconds or 'auto'
-		crop_2=(1, 1.3),		# seconds or 'auto'
+
+		crop_1=(1, 1.3),			# seconds or 'auto'
+		crop_2=(1, 1.3),			# seconds or 'auto'
 		auto_crop_length=.3,		# seconds. length of windows when crop is 'auto'
-		window_size=.1, 		# seconds
-		num_windows=10, 		# evenly spaced
-		mean_samp_num=10,  		# number of windows to use for mean
-		tau='auto detect',		# seconds or 'auto ideal' or 'auto detect'
-		tau_T=np.pi,			# tau_T = tau / period
-		note_index=40,			# required for auto tau
-		PD_movie_int=0,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+		window_size=.1, 			# seconds
+		num_windows=10, 			# evenly spaced
+		mean_samp_num=10,  			# number of windows to use for mean
+
+		tau='auto ideal',			# seconds or 'auto ideal' or 'auto detect'
+		tau_T=np.pi,				# tau_T = tau / period
+		note_index=40,				# required for auto tau
+		PD_movie_int=0,  			# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
