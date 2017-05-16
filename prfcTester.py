@@ -14,8 +14,8 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 
-test = int(sys.argv[1])
-# test = 1
+# test = int(sys.argv[1])
+test = 3
 
 if test == 1:
 	params = parameter_set
@@ -40,7 +40,7 @@ if test == 1:
 
 	PRF_dist_plot(
 		direc, base_filename, filename_format, out_filename, i_ref, i_arr, params,
-		PD_movie_int=3		# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=0		# interval to build filt movies and PDs. 0 means no PDs or movies.
 	)
 
 
@@ -110,6 +110,6 @@ if test == 3:
 		tau='auto ideal',			# seconds or 'auto ideal' or 'auto detect'
 		tau_T=np.pi,				# tau_T = tau / period
 		note_index=40,				# required for auto tau
-		PD_movie_int=3,  			# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=0,  			# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)

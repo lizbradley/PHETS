@@ -196,6 +196,7 @@ def persistence_diagram(filename):
 
 
 
+
 def PRF_dist_plot(dir, base_filename, fname_format,
 				  out_filename,
 				  i_ref, i_arr,
@@ -220,7 +221,7 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 		plt.savefig(out_filename)
 		plt.close(fig)
 
-	def get_filename(i):
+	def get_in_filename(i):
 		if fname_format == 'i base':
 			filename = '{}/{}{}'.format(dir, i, base_filename)
 		elif fname_format == 'base i':
@@ -250,14 +251,15 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 		persistence_diagram(PD_filename)
 		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
 
-	filename = get_filename(i_ref)
-
-	ref_func = get_PRF(filename, filt_params)[2]
+	filename = get_in_filename(i_ref)
+	ref_func = get_PRF(filename, filt_params)
+	PRF_contour_plot(ref_func, 'output/PRFCompare/REFERENCE_CONTOUR.png')
+	ref_func = ref_func[2]
 	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
 	
 	funcs = []
 	for i in i_arr:
-		filename = get_filename(i)
+		filename = get_in_filename(i)
 		print '\n=================================================='
 		print filename
 		print '==================================================\n'
@@ -308,7 +310,7 @@ def mean_PRF_dist_plots(
 		path = 'output/PRFCompare/PDs_and_movies/'
 		old_files = os.listdir(path)
 		if old_files and PD_movie_int:
-			ans = raw_input('Clear old files in ' + path + ' ? (y/n) \n')
+			ans = raw_input('Clear old files in ' + path + '? (y/n) \n')
 			if ans == 'y':
 				for f in old_files:
 					if f != '.gitkeep':
@@ -341,23 +343,17 @@ def mean_PRF_dist_plots(
 
 
 	def get_PRFs(filename, crop_cmd, tau_cmd):
-		funcs = []
+
 		sig_full = np.loadtxt(filename)
-
-
 		if normalize_volume: sig_full = sig_full / np.max(sig_full)
 
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
 		sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
 
-		# else:
-		# 	crop = np.floor(np.array(crop) * WAV_SAMPLE_RATE).astype(int)
-
-
-		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
-
 		f_deal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename)
 
+		funcs = []
+		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
 		for i, pt in enumerate(start_pts[:-1]):
 
 			print '\n============================================='
@@ -458,6 +454,13 @@ def mean_PRF_dist_plots(
 	funcs_1_avg = np.mean(mean_1_samps, axis=0)
 	funcs_2_avg = np.mean(mean_2_samps, axis=0)
 
+
+	func = get_PRF('PRFCompare/temp_data/temp_worm.txt', filt_params)
+	func[2] = funcs_1_avg
+	PRF_contour_plot(func, 'output/PRFCompare/MEAN_CONTOUR_LEFT.png')
+	func[2] = funcs_2_avg
+	PRF_contour_plot(func, 'output/PRFCompare/MEAN_CONTOUR_RIGHT.png')
+
 	box_area = 1
 
 	diffs1_vs_1 = np.array([np.subtract(func, funcs_1_avg) for func in funcs_1])
@@ -477,35 +480,20 @@ def mean_PRF_dist_plots(
 
 
 
-def see(filename, filt_params):
+def PRF_contour_plot(func, out_filename):
 
-	filt = get_filtration(filename, filt_params)
-	get_homology(filt)
-	intervals = get_interval_data()
-	max_lim = intervals[3]
-	x, y, z = build_PRF(intervals)
+	x, y, z, max_lim = func
 	z = np.log10(z + 1)
 
-	fig = plt.figure(figsize=(12, 4), dpi = 300, tight_layout=True)
-	ax = fig.add_subplot(131, projection='3d')
-	ax.set_xlim([0, max_lim])
-	ax.set_ylim([0, max_lim])
-	ax.view_init(35, 135)
-	ax.plot_surface(x, y, z)
 
-	# plt.show()
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
 
-	ax = fig.add_subplot(132)
 	ax.set_xlim([0, max_lim])
 	ax.set_ylim([0, max_lim])
 	ax.set_aspect('equal')
 	ax.contourf(x, y, z)
 
-	ax = fig.add_subplot(133)
-	ax.set_xlim([0, max_lim])
-	ax.set_ylim([0, max_lim])
-	ax.set_aspect('equal')
-	ax.scatter(intervals[0], intervals[1], s=intervals[2] * 5)
 
-	plt.savefig('rank_function_log.png')
+	plt.savefig(out_filename)
 
