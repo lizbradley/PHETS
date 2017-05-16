@@ -2,7 +2,7 @@ import sys
 import numpy as np
 
 from PersistentHomology.TestingFunctions import parameter_set
-from PRFCompare.PRF import PRF_dist_plots, mean_PRF_dist_plots
+from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 # TODO: fix embed movie titlebox
 # TODO: finish auto_embed
@@ -15,7 +15,7 @@ from PRFCompare.PRF import PRF_dist_plots, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 3
+test = 1
 
 if test == 1:
 	params = parameter_set
@@ -29,15 +29,15 @@ if test == 1:
 		}
 	)
 
-	i_ref = 35
-	i_arr = np.arange(20, 40, 2)
+	i_ref = 30
+	i_arr = np.arange(21, 40, 2)
 	direc = 'datasets/embedded/test_cases'
 	base_filename = 'L63_x_m2_tau'
 	filename_format = 'base i'				# 'i base' or 'base i'
 
 	out_filename = 'output/PRFCompare/distances1.png'
 
-	PRF_dist_plots(
+	PRF_dist_plot(
 		direc, base_filename, filename_format, out_filename, i_ref, i_arr, params,
 		PD_movie_int=0		# interval to build filt movies and PDs. 0 means no PDs or movies.
 	)
@@ -103,8 +103,8 @@ if test == 3:
 		auto_crop_length=.3,		# seconds. length of windows when crop is 'auto'
 
 		window_size=.1, 			# seconds
-		num_windows=10, 			# evenly spaced
-		mean_samp_num=10,  			# number of windows to use for mean
+		num_windows=6, 				# evenly spaced
+		mean_samp_num=5,  			# number of windows to use for mean
 
 		tau='auto ideal',			# seconds or 'auto ideal' or 'auto detect'
 		tau_T=np.pi,				# tau_T = tau / period

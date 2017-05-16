@@ -17,7 +17,7 @@ import multiprocessing
 from memory_profiler import profile
 import os
 
-from Utilities import mem_profile
+# from Utilities import mem_profile
 from config import MEMORY_PROFILE_ON
 
 d = [] #this is where distance to all landmarks for each witness goes.  It is a list of'
@@ -32,7 +32,7 @@ MEMORY_PROFILE_ON = False
 f = open("PersistentHomology/output/build_filtration_memory.txt","wb")
 
 # @mem_profile(f, MEMORY_PROFILE_ON)
-# @profile(stream=f)
+@profile(stream=f)
 def build_filtration(input_file_name, parameter_set):
 	print os.getcwd()
 	num_threads = 2

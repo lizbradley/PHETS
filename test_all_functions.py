@@ -83,7 +83,7 @@ from PersistentHomology.TestingFunctions import parameter_set
 ########################################################################################################################
 # PRFCompare
 ########################################################################################################################
-from PRFCompare.PRF import PRF_dist_plots, mean_PRF_dist_plots
+from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 params = parameter_set
 # params = standard_parameter_set
@@ -105,7 +105,7 @@ filename_format = 'base i'  # 'i base' or 'base i'
 out_filename = 'output/unit_tests/PRF_dist_plots.png'
 
 print '\ntesting PRF_dist_plots()...\n'
-PRF_dist_plots(
+PRF_dist_plot(
 	direc, base_filename, filename_format, out_filename, i_ref, i_arr, params,
 	PD_movie_int=0  # interval to build filt movies and PDs. 0 means no PDs or movies.
 )

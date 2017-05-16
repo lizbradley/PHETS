@@ -7,7 +7,7 @@ from os import system, chdir
 from memory_profiler import profile
 from sys import platform
 
-from Utilities import mem_profile
+# from Utilities import mem_profile
 from config import MEMORY_PROFILE_ON
 
 

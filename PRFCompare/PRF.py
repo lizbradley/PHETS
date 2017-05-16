@@ -153,7 +153,7 @@ def get_homology(filt_list):
 	os.chdir('..')
 
 
-def build_rank_func(data):
+def build_PRF(data):
 	""" helper for get_rank_func()"""
 	x, y, z, max_lim = data
 	min_lim = 0
@@ -182,7 +182,7 @@ def get_PRF(filename, filt_params):
 	filt = get_filtration(filename, filt_params)
 	get_homology(filt)
 	intervals = get_interval_data()
-	f = build_rank_func(intervals)
+	f = build_PRF(intervals)
 	return f
 
 
@@ -196,11 +196,11 @@ def persistence_diagram(filename):
 
 
 
-def PRF_dist_plots(dir, base_filename, fname_format,
-				   out_filename,
-				   i_ref, i_arr,
-				   filt_params,
-				   PD_movie_int=5):
+def PRF_dist_plot(dir, base_filename, fname_format,
+				  out_filename,
+				  i_ref, i_arr,
+				  filt_params,
+				  PD_movie_int=5):
 
 	""" plots distance from reference rank function over a range of embedded input files"""
 
@@ -208,12 +208,15 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 		fig = plt.figure(figsize=(10, 5))
 		ax = fig.add_subplot(111)
 		ax.plot(i_arr, dists)
+		ax.axvline(x=i_ref, linestyle='--', color='k')
 		ax.set_xlabel('$tau \quad (samples)$')
-		ax.set_ylabel('$distance \quad ({\epsilon}^2 \; \# \; holes)$')
+		# ax.set_ylabel('$distance \quad ({\epsilon}^2 \; \# \; holes)$')
+		ax.set_ylabel('$distance$')
 		ax.xaxis.set_ticks(i_arr[::2])
 		ax.grid()
 		ax.set_ylim(bottom=0)
-		ax.set_title('reference tau: ' + str(i_ref))
+		title = ax.set_title(base_filename + ' PRF distances')
+		title.set_position([.5, 1.05])
 		plt.savefig(out_filename)
 		plt.close(fig)
 
@@ -265,10 +268,14 @@ def PRF_dist_plots(dir, base_filename, fname_format,
 				make_movie_and_PD(filename, i)
 
 	funcs = np.asarray(funcs)
+
 	# box_area = (ref_func[3] / len(ref_func[2])) ** 2
 	box_area = 1
+
 	diffs = np.array([np.subtract(func, ref_func) for func in funcs])
+
 	dists = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs])
+
 	dists_plot(i_ref, i_arr, dists, out_filename)
 
 
@@ -311,7 +318,6 @@ def mean_PRF_dist_plots(
 
 	def make_movie_and_PD(filename, i, ref=False):
 
-
 		base_name = filename.split('/')[-1].split('.')[0]
 		comp_name = 'mean_compare_{:s}_{:d}_'.format(base_name, i)
 		if ref: comp_name += 'MEAN'
@@ -338,10 +344,9 @@ def mean_PRF_dist_plots(
 		sig_full = np.loadtxt(filename)
 
 
-		if normalize_volume: sig_full = sig_full / np.max(sig_full
+		if normalize_volume: sig_full = sig_full / np.max(sig_full)
 
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
-
 		sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
 
 		# else:
@@ -378,6 +383,7 @@ def mean_PRF_dist_plots(
 
 		ax1 = fig.add_subplot(321)
 		ax1.plot(d_1_vs_1)
+		ax1.axhline(y=np.mean(d_1_vs_1), linestyle='--', color='k')
 		ax1.grid()
 		ax1.set_ylim(bottom=0)
 		plt.setp(ax1.get_xticklabels(), visible=False)
@@ -385,6 +391,8 @@ def mean_PRF_dist_plots(
 
 		ax2 = fig.add_subplot(322, sharey=ax1)
 		ax2.plot(d_2_vs_1)
+		ax2.axhline(y=np.mean(d_2_vs_1), linestyle='--', color='k')
+
 		ax2.grid()
 		plt.setp(ax2.get_yticklabels(), visible=False)
 		plt.setp(ax2.get_yticklines(), visible=False)
@@ -394,10 +402,13 @@ def mean_PRF_dist_plots(
 
 		ax3 = fig.add_subplot(323, sharey=ax1)
 		ax3.plot(d_1_vs_2)
+		ax3.axhline(y=np.mean(d_1_vs_2), linestyle='--', color='k')
 		ax3.grid()
 
 		ax4 = fig.add_subplot(324, sharey=ax1)
 		ax4.plot(d_2_vs_2)
+		ax4.axhline(y=np.mean(d_2_vs_2), linestyle='--', color='k')
+
 		ax4.grid()
 		plt.setp(ax4.get_yticklabels(), visible=False)
 		plt.setp(ax4.get_yticklines(), visible=False)
@@ -405,16 +416,17 @@ def mean_PRF_dist_plots(
 
 		ax1.set_title (filename_1.split('/')[-1])
 		ax2.set_title (filename_2.split('/')[-1])
-		ax1.set_ylabel('ref: left', rotation=0, size='large', labelpad=50)
-		ax3.set_ylabel('ref: right', rotation=0, size='large', labelpad=50)
+		del_12 = np.abs(np.mean(d_1_vs_1) - np.mean(d_1_vs_2))
+		del_34 = np.abs(np.mean(d_2_vs_1) - np.mean(d_2_vs_2))
+
+		ax1.set_ylabel('ref: left \n \n $\Delta$: {:.2f}'.format(del_12), rotation=0, size='large', labelpad=50)
+		ax3.set_ylabel('ref: right \n \n $\Delta$: {:.2f}'.format(del_34), rotation=0, size='large', labelpad=50)
 
 		ax5 = fig.add_subplot(325)
-		crop = np.asarray(crop_1_samp) / WAV_SAMPLE_RATE
-		plot_waveform(ax5, sig_1_full, crop)
+		plot_waveform(ax5, sig_1_full, crop_1)
 
 		ax6 = fig.add_subplot(326, sharey=ax5)
-		crop = np.asarray(crop_2_samp) / WAV_SAMPLE_RATE
-		plot_waveform(ax6, sig_2_full, crop)
+		plot_waveform(ax6, sig_2_full, crop_2)
 		plt.setp(ax6.get_yticklabels(), visible=False)
 		plt.setp(ax6.get_yticklines(), visible=False)
 
@@ -431,10 +443,13 @@ def mean_PRF_dist_plots(
 	print 'using worm_length:', filt_params['worm_length']
 	window_size_samp = int(window_size * WAV_SAMPLE_RATE)
 
+	crop_1_cmd = crop_1
+	crop_2_cmd = crop_2
+
 	# ===========================================================
 
-	crop_1_samp, sig_1_full, funcs_1 = get_PRFs(filename_1, crop_1, tau)
-	crop_2_samp, sig_2_full, funcs_2 = get_PRFs(filename_2, crop_2, tau)
+	crop_1, sig_1_full, funcs_1 = get_PRFs(filename_1, crop_1_cmd, tau)
+	crop_2, sig_2_full, funcs_2 = get_PRFs(filename_2, crop_2_cmd, tau)
 
 	mean_1_samps = funcs_1[::num_windows//mean_samp_num]
 	mean_2_samps = funcs_2[::num_windows//mean_samp_num]
@@ -461,14 +476,13 @@ def mean_PRF_dist_plots(
 
 
 
-
 def see(filename, filt_params):
 
 	filt = get_filtration(filename, filt_params)
 	get_homology(filt)
 	intervals = get_interval_data()
 	max_lim = intervals[3]
-	x, y, z = build_rank_func(intervals)
+	x, y, z = build_PRF(intervals)
 	z = np.log10(z + 1)
 
 	fig = plt.figure(figsize=(12, 4), dpi = 300, tight_layout=True)
