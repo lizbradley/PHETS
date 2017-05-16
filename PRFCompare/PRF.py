@@ -21,7 +21,7 @@ from PersistentHomology.FiltrationPlotter import make_movie
 
 from DCE.Tools import auto_crop
 
-WAV_SAMPLE_RATE = 44100
+WAV_SAMPLE_RATE = 44100.
 
 def get_filtration(in_filename, params, start=0):
 	# lines = open(in_filename).readlines()
@@ -251,8 +251,9 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
 
 	filename = get_filename(i_ref)
-	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
+
 	ref_func = get_PRF(filename, filt_params)[2]
+	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
 	
 	funcs = []
 	for i in i_arr:
