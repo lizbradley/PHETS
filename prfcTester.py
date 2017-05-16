@@ -14,8 +14,8 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 
-# test = int(sys.argv[1])
-test = 1
+test = int(sys.argv[1])
+# test = 1
 
 if test == 1:
 	params = parameter_set
