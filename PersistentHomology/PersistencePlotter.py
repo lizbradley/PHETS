@@ -51,7 +51,7 @@ def expand_to_2simplexes(filt_array):
 		expanded_row = []
 		for landmark_ID_set in row:
 			expanded_set = list(itertools.combinations(landmark_ID_set, 3)) \
-				if len(landmark_ID_set) >3 else [list(landmark_ID_set)]
+				if len(landmark_ID_set) > 3 else [list(landmark_ID_set)]
 			expanded_row.extend(expanded_set)
 		row[:] = expanded_row
 	num_tris=0
@@ -120,7 +120,6 @@ def add_persistence_plot(subplot):
 	print 'plotting persistence diagram...'
 	birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True)
 
-	print os.getcwd()
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
 	max_lim = np.max(epsilons)
 	# min_lim = np.min(epsilons)
