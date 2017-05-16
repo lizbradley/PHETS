@@ -14,8 +14,8 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 
-# test = int(sys.argv[1])
-test = 1
+test = int(sys.argv[1])
+#test = 1
 
 if test == 1:
 	params = parameter_set
@@ -26,11 +26,12 @@ if test == 1:
 			'worm_length': 5000,
 			'max_filtration_param': -10,
 			'num_divisions': 50,
+			'use_cliques': True
 		}
 	)
 
-	i_ref = 30
-	i_arr = np.arange(21, 40, 2)
+	i_ref = 17
+	i_arr = np.arange(2, 40, 2)
 	direc = 'datasets/embedded/test_cases'
 	base_filename = 'L63_x_m2_tau'
 	filename_format = 'base i'				# 'i base' or 'base i'
@@ -39,7 +40,7 @@ if test == 1:
 
 	PRF_dist_plot(
 		direc, base_filename, filename_format, out_filename, i_ref, i_arr, params,
-		PD_movie_int=0		# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=3		# interval to build filt movies and PDs. 0 means no PDs or movies.
 	)
 
 
