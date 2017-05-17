@@ -15,7 +15,7 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 4
+test = 1
 
 if test == 1:
 	params = parameter_set
@@ -24,24 +24,32 @@ if test == 1:
 		{
 			'ds_rate': 50,
 			'worm_length': 5000,
-			'max_filtration_param': -10,
-			'num_divisions': 50,
+			'max_filtration_param':.1,
+			'num_divisions': 25,
 			'use_cliques': True
 		}
 	)
 
-	i_ref = 17
-	i_arr = np.arange(2, 40, 2)
-	direc = 'datasets/embedded/test_cases'
-	base_filename = 'L63_x_m2_tau'
-	filename_format = 'base i'				# 'i base' or 'base i'
-
-	out_filename = 'output/PRFCompare/distances1.png'
-
 	PRF_dist_plot(
-		direc, base_filename, filename_format, out_filename, i_ref, i_arr, params,
-		PD_movie_int=0		# interval to build filt movies and PDs. 0 means no PDs or movies.
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/test_1.png', 		 # output filename
+		params,
+
+		i_ref=17,
+		i_arr=np.arange(2, 40, 2),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: .1 * (j - i),  						# linear, k = .1
+
+		PRF_res=20,  		# num divisions
+
+		PD_movie_int=0,  	# interval to build filt movies and PDs. 0 means no PDs or movies.
+
 	)
+
+
 
 
 
@@ -54,7 +62,7 @@ if test == 2:
 		{
 			'ds_rate': 50,
 			'worm_length': 5000,
-			'max_filtration_param': -10,
+			'max_filtration_param': -1,
 			'num_divisions': 30
 		}
 	)
@@ -66,7 +74,7 @@ if test == 2:
 		params,
 		crop_1=(1, 2),			# seconds or 'auto'
 		crop_2=(1, 2),			# seconds or 'auto'
-		auto_crop_length=.3,		# seconds. length of windows when crop is 'auto'
+		auto_crop_length=.3,	# seconds. length of windows when crop is 'auto'
 		window_size=.05, 		# seconds
 		num_windows=10, 		# evenly spaced
 		mean_samp_num=10,  		# number of windows to use for mean
@@ -127,23 +135,23 @@ if test == 4:
 		}
 	)
 
-	i_ref = 15
-	i_arr = np.arange(10, 20, 1)
-	direc = 'datasets/embedded/test_cases'
-	base_filename = 'L63_x_m2_tau'
-	filename_format = 'base i'					# 'i base' or 'base i'
-
-	out_filename = 'output/PRFCompare/PRF_dist_plots_EXPWEIGHTABS.png'
 
 	PRF_dist_plot(
-		direc, base_filename, filename_format, out_filename, i_ref, i_arr, params,
+		'datasets/embedded/test_cases',						# input directory
+		'L63_x_m2_tau',										# input base filename
+		'base i',											# input filename format: 'base i or 'i base'
+		'output/PRFCompare/PRF_dist_plots_noweight.png',	# output filename
+		params,
 
-		PD_movie_int=0,												# interval to build filt movies and PDs. 0 means no PDs or movies.
-		PRF_res=20,
+		i_ref=15,
+		i_arr=np.arange(10, 20, 1),
 
-		# lmk if you don't like this, just wanted to give it a try as it is very flexible
-		weighting_func= lambda i,j: np.power(np.e, .1 * (j - i)) 				# exponential decay, k = .1
-		# weighting_func=lambda i, j: .1 * (j - i)								# linear, k = .1
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential, k = .1
+		weight_func=lambda i, j: .1 * (j - i),  						# linear, k = .1
+
+		PRF_res=20,								# num divisions
+
+		PD_movie_int=0,							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -178,6 +186,10 @@ if test == 5:
 		tau='auto ideal',			# seconds or 'auto ideal' or 'auto detect'
 		tau_T=np.pi,				# tau_T = tau / period
 		note_index=40,				# required for auto tau
+
+		weight_func=lambda i, j: 1,	# constant
+		PRF_res=50,					# num divisions
+
 		PD_movie_int=0,  			# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
