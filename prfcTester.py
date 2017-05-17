@@ -15,7 +15,7 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 4
+test = 5
 
 if test == 1:
 	params = parameter_set
@@ -147,7 +147,7 @@ if test == 5:
 		{
 			'ds_rate': 50,
 			'worm_length': 5000,
-			'max_filtration_param': -10,
+			'max_filtration_param': .01,
 			'num_divisions': 30,
 			'use_cliques': True,
 
@@ -157,7 +157,7 @@ if test == 5:
 	mean_PRF_dist_plots(
 		'datasets/time_series/C134C/40-C134C.txt',  # input (left)
 		'datasets/time_series/C135B/40-C135B.txt',  # input (right)
-		'output/PRFCompare/40_C134C_vs_C135B_exp_crop_usecliques_detect.png',  # out filename
+		'output/PRFCompare/mean_PRF_dist_plots.png',  # out filename
 		params,
 
 		crop_1=(1, 1.3),			# seconds or 'auto'

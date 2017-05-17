@@ -198,14 +198,10 @@ def persistence_diagram(filename):
 	plt.close(fig)
 
 
-def PRF_contour_plot(func, out_filename):
+def PRF_contour_plot(ax, func):
 
 	x, y, z, max_lim = func
-	z = np.log10(z + 1)
-
-
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
+	# z = np.log10(z + 1)
 
 	ax.set_xlim([0, max_lim])
 	ax.set_ylim([0, max_lim])
@@ -213,7 +209,6 @@ def PRF_contour_plot(func, out_filename):
 	ax.contourf(x, y, z)
 
 
-	plt.savefig(out_filename)
 
 
 
@@ -226,7 +221,7 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 
 	""" plots distance from reference rank function over a range of embedded input files"""
 
-	def dists_plot(i_ref, i_arr, dists, out_filename):
+	def plot_distances(i_ref, i_arr, dists, out_filename):
 		fig = plt.figure(figsize=(10, 5))
 		ax = fig.add_subplot(111)
 		ax.plot(i_arr, dists)
@@ -276,7 +271,12 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 
 	ref_func = get_PRF(filename, filt_params)
 
-	PRF_contour_plot(ref_func, 'output/PRFCompare/REFERENCE_CONTOUR.png')
+
+	# PRF_contour_plot(ref_func, 'output/PRFCompare/REFERENCE_CONTOUR.png')
+	# fig = plt.figure()
+	ax = plt.add_subplot(111)
+	PRF_contour_plot(ax, ref_func)
+	plt.savefig('output/PRFCompare/ref_contour.png')
 
 	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
 	
@@ -304,7 +304,7 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 
 	dists = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs])
 
-	dists_plot(i_ref, i_arr, dists, out_filename)
+	plot_distances(i_ref, i_arr, dists, out_filename)
 
 
 
@@ -390,7 +390,7 @@ def mean_PRF_dist_plots(
 				  False, tau, 2)
 
 			func = get_PRF('PRFCompare/temp_data/temp_worm.txt', filt_params)
-			funcs.append(func[2])	# select grid_vals (third element)
+			funcs.append(func)	# select grid_vals (third element)
 
 			if PD_movie_int:
 				if i % PD_movie_int == 0:
@@ -400,7 +400,7 @@ def mean_PRF_dist_plots(
 		return crop, sig_full, funcs
 
 
-	def dists_plot(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
+	def plot_distances(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
 		fig = plt.figure(figsize=(14, 6), tight_layout=True)
 
 		ax1 = fig.add_subplot(321)
@@ -473,35 +473,50 @@ def mean_PRF_dist_plots(
 	crop_1, sig_1_full, funcs_1 = get_PRFs(filename_1, crop_1_cmd, tau)
 	crop_2, sig_2_full, funcs_2 = get_PRFs(filename_2, crop_2_cmd, tau)
 
-	mean_1_samps = funcs_1[::num_windows//mean_samp_num]
-	mean_2_samps = funcs_2[::num_windows//mean_samp_num]
+	if not np.array_equal(funcs_1[0][0], funcs_1[1][0]):
+		print 'ERROR: variable PRF domain detected. mean_PRF_dist_plot() may only be used with explicit max_filtartion_param.'
+		sys.exit()
 
-	funcs_1_avg = np.mean(mean_1_samps, axis=0)
-	funcs_2_avg = np.mean(mean_2_samps, axis=0)
+	funcs_1_z = np.asarray(funcs_1)[:, 2]
+	funcs_2_z = np.asarray(funcs_2)[:, 2]
+
+	mean_1_funcs_z = funcs_1_z[::num_windows//mean_samp_num]
+	mean_2_funcs_z = funcs_2_z[::num_windows//mean_samp_num]
+
+	funcs_1_avg_z = np.mean(mean_1_funcs_z, axis=0)
+	funcs_2_avg_z = np.mean(mean_2_funcs_z, axis=0)
 
 
-	func = get_PRF('PRFCompare/temp_data/temp_worm.txt', filt_params)
-	func[2] = funcs_1_avg
-	PRF_contour_plot(func, 'output/PRFCompare/MEAN_CONTOUR_LEFT.png')
-	func[2] = funcs_2_avg
-	PRF_contour_plot(func, 'output/PRFCompare/MEAN_CONTOUR_RIGHT.png')
+	ref_func_1 = funcs_1[0]			# get xx, yy
+	ref_func_1[2] = funcs_1_avg_z
+
+	ref_func_2 = funcs_2[0]			# get xx, yy
+	ref_func_2[2] = funcs_2_avg_z
+
+	fig = plt.figure(tight_layout=True, figsize=(8, 4))
+	ax1, ax2 = fig.add_subplot(121), fig.add_subplot(122)
+	PRF_contour_plot(ax1, ref_func_1)
+	PRF_contour_plot(ax2, ref_func_2)
+	ax1.set_title('left')
+	ax2.set_title('right')
+	fig.savefig('output/PRFCompare/mean_PRF_REF_contour_plots.png')
 
 	box_area = 1
 
-	diffs1_vs_1 = np.array([np.subtract(func, funcs_1_avg) for func in funcs_1])
+	diffs1_vs_1 = np.array([np.subtract(func, funcs_1_avg_z) for func in funcs_1_z])
 	dists1_vs_1 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs1_vs_1])
 
-	diffs2_vs_1 = np.array([np.subtract(func, funcs_1_avg) for func in funcs_2])
+	diffs2_vs_1 = np.array([np.subtract(func, funcs_1_avg_z) for func in funcs_2_z])
 	dists2_vs_1 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs2_vs_1])
 
-	diffs1_vs_2 = np.array([np.subtract(func, funcs_2_avg) for func in funcs_1])
+	diffs1_vs_2 = np.array([np.subtract(func, funcs_2_avg_z) for func in funcs_1_z])
 	dists1_vs_2 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs1_vs_2])
 
-	diffs2_vs_2 = np.array([np.subtract(func, funcs_2_avg) for func in funcs_2])
+	diffs2_vs_2 = np.array([np.subtract(func, funcs_2_avg_z) for func in funcs_2_z])
 	dists2_vs_2 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs2_vs_2])
 
 
-	dists_plot(dists1_vs_1, dists2_vs_1, dists1_vs_2, dists2_vs_2, out_filename)
+	plot_distances(dists1_vs_1, dists2_vs_1, dists1_vs_2, dists2_vs_2, out_filename)
 
 
 
