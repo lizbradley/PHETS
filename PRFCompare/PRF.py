@@ -276,11 +276,10 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 	ref_func = get_PRF(filename, filt_params, PRF_res)
 
 
-	# PRF_contour_plot(ref_func, 'output/PRFCompare/REFERENCE_CONTOUR.png')
-	# fig = plt.figure()
-	ax = plt.add_subplot(111)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
 	PRF_contour_plot(ax, ref_func)
-	plt.savefig('output/PRFCompare/ref_contour.png')
+	fig.savefig('output/PRFCompare/ref_contour.png')
 
 	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
 	
