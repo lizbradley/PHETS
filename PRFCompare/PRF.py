@@ -84,7 +84,9 @@ def get_interval_data():
 
 
 def get_homology(filt_list):
-	""" calls perseus, creating perseus_out_*.tdt """
+	""" calls perseus, creating perseus_out_*.txt
+		TODO: move to PersistentHomology and replace equivalent code there
+	"""
 
 	def group_by_birth_time(complex_ID_list):
 		"""Reformats 1D list of SimplexBirth objects into 2D array of
@@ -186,6 +188,8 @@ def get_PRF(filename, filt_params):
 	return f
 
 
+
+
 def persistence_diagram(filename):
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
@@ -193,6 +197,23 @@ def persistence_diagram(filename):
 	plt.savefig(filename)
 	plt.close(fig)
 
+
+def PRF_contour_plot(func, out_filename):
+
+	x, y, z, max_lim = func
+	z = np.log10(z + 1)
+
+
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+
+	ax.set_xlim([0, max_lim])
+	ax.set_ylim([0, max_lim])
+	ax.set_aspect('equal')
+	ax.contourf(x, y, z)
+
+
+	plt.savefig(out_filename)
 
 
 
@@ -252,9 +273,11 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
 
 	filename = get_in_filename(i_ref)
+
 	ref_func = get_PRF(filename, filt_params)
+
 	PRF_contour_plot(ref_func, 'output/PRFCompare/REFERENCE_CONTOUR.png')
-	ref_func = ref_func[2]
+
 	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
 	
 	funcs = []
@@ -264,18 +287,20 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 		print filename
 		print '==================================================\n'
 		func = get_PRF(filename, filt_params)
-		funcs.append(func[2])
+		funcs.append(func)
 
 		if PD_movie_int:
 			if i % PD_movie_int == 0:
 				make_movie_and_PD(filename, i)
 
-	funcs = np.asarray(funcs)
+	funcs_z = np.asarray(funcs)[:,2]
+	ref_func_z = ref_func[2]
+
 
 	# box_area = (ref_func[3] / len(ref_func[2])) ** 2
 	box_area = 1
 
-	diffs = np.array([np.subtract(func, ref_func) for func in funcs])
+	diffs = np.array([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
 
 	dists = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs])
 
@@ -479,21 +504,4 @@ def mean_PRF_dist_plots(
 	dists_plot(dists1_vs_1, dists2_vs_1, dists1_vs_2, dists2_vs_2, out_filename)
 
 
-
-def PRF_contour_plot(func, out_filename):
-
-	x, y, z, max_lim = func
-	z = np.log10(z + 1)
-
-
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-
-	ax.set_xlim([0, max_lim])
-	ax.set_ylim([0, max_lim])
-	ax.set_aspect('equal')
-	ax.contourf(x, y, z)
-
-
-	plt.savefig(out_filename)
 
