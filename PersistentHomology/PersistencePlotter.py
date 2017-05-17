@@ -53,26 +53,30 @@ def expand_to_2simplexes(filt_array):
 	for row in filt_array:
 		expanded_row = []
 		for landmark_ID_set in row:
-			expanded_set = list(itertools.combinations(landmark_ID_set, 3)) \
-				if len(landmark_ID_set) > 3 else [list(landmark_ID_set)]
+			if len(landmark_ID_set) > 3:
+				expanded_set = list(itertools.combinations(landmark_ID_set, 3))
+			else:
+				expanded_set = [list(landmark_ID_set)]
 			expanded_row.extend(expanded_set)
 		row[:] = expanded_row
-	num_tris=0
-	
-	
-	count =0
-	triangles=[]
-	for i in filt_array:
-		for j in i:
-			if len(j)==3:
-				tri=set(j)
-				if tri not in triangles:
-					triangles.append(tri)
-				
-	
-	
-	with open("PersistentHomology/output/num_triangles.txt","wb") as f:
-		f.write("Number of triangles: "+str(len(triangles)))
+
+
+	# print 'counting triangles...'
+	# num_tris=0
+	# count =0
+	# triangles=[]
+	# for i in filt_array:
+	# 	for j in i:
+	# 		if len(j)==3:
+	# 			tri=set(j)
+	# 			if tri not in triangles:
+	# 				triangles.append(tri)
+	#
+	#
+	#
+	#
+	# with open("PersistentHomology/output/num_triangles.txt","wb") as f:
+	# 	f.write("Number of triangles: "+str(len(triangles)))
 
 
 
@@ -120,7 +124,7 @@ def add_title(subplot, title_block_info):
 	title_table.auto_set_font_size(8)
 
 def add_persistence_plot(subplot):
-	print 'preparing persistence diagram...'
+	print 'plotting persistence diagram...'
 	birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True)
 
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
@@ -149,16 +153,20 @@ def add_persistence_plot(subplot):
 			if pt == scanner_pt:
 				count[i] += 1
 
+	# normal #
+	min_size = 0
 	t_ms_scale = 50
 	p_ms_scale = 30
+	color = 'C0'
 
-	min_size = 300
-
+	# BIG for paper #
+	# min_size = 300
 	# t_ms_scale = 150
 	# p_ms_scale = 60
+	# color = 'red'
 
 	x, y = immortal_holes, [max_lim for i in immortal_holes]
-	subplot.scatter(x, y, marker='^', s=(count * t_ms_scale) + min_size, c='red', clip_on=False)
+	subplot.scatter(x, y, marker='^', s=(count * t_ms_scale) + min_size, c=color, clip_on=False)
 	# end plot immortal holes#
 
 
@@ -176,38 +184,38 @@ def add_persistence_plot(subplot):
 			if pt == scanner_pt:
 				count[i] += 1
 
-	subplot.scatter(birth_e, death_e, s=(count * p_ms_scale) + min_size, clip_on=False, c='red')
+	subplot.scatter(birth_e, death_e, s=(count * p_ms_scale) + min_size, clip_on=False, c=color)
 	# end plot doomed holes #
 
 
 
 	# add legend #
-	mark_t_1 = subplot.scatter([], [], marker='^', s=t_ms_scale, c='red')
-	mark_t_3 = subplot.scatter([], [], marker='^', s=t_ms_scale * 3, c='red')
-	mark_t_5 = subplot.scatter([], [], marker='^', s=t_ms_scale * 5, c='red')
+	mark_t_1 = subplot.scatter([], [], marker='^', s=t_ms_scale,	 c=color)
+	mark_t_3 = subplot.scatter([], [], marker='^', s=t_ms_scale * 3, c=color)
+	mark_t_5 = subplot.scatter([], [], marker='^', s=t_ms_scale * 5, c=color)
 
-	mark_p_1 = subplot.scatter([], [], s=p_ms_scale, c='red')
-	mark_p_3 = subplot.scatter([], [], s=p_ms_scale * 3, c='red')
-	mark_p_5 = subplot.scatter([], [], s=p_ms_scale * 5, c='red')
+	mark_p_1 = subplot.scatter([], [], s=p_ms_scale,	 c=color)
+	mark_p_3 = subplot.scatter([], [], s=p_ms_scale * 3, c=color)
+	mark_p_5 = subplot.scatter([], [], s=p_ms_scale * 5, c=color)
 
 	marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
 	labels = ('', '', '', '1', '3', '5')
 
-	# subplot.legend(
-	# 	marks, labels, loc='lower right', ncol=2, markerscale=1,
-	# 	borderpad=1,
-	# 	labelspacing=1,
-	# 	framealpha=1,
-	# 	columnspacing=0,
-	# 	borderaxespad=3
-	# 	#edgecolor='k'
-	# )
+	subplot.legend(
+		marks, labels, loc='lower right', ncol=2, markerscale=1,
+		borderpad=1,
+		labelspacing=1,
+		framealpha=1,
+		columnspacing=0,
+		borderaxespad=3
+		#edgecolor='k'
+	)
 	# end add legend #
 
 
 # @profile(stream=f4)
 def make_figure(title_block_info, out_file_name):
-	print 'plotting persistence diagram...'
+	print 'unpacking filtration...'
 	filt_list = np.load('PersistentHomology/temp_data/complexes.npy')
 	filt_array = group_by_birth_time(filt_list)
 	expand_to_2simplexes(filt_array)

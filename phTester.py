@@ -9,7 +9,7 @@ import time
 start = time.time()
 
 
-test = 13
+test = 15
 # test = int(sys.argv[1])
 
 
@@ -355,9 +355,9 @@ if test == 13:
 			'ds_rate' : 10,
 			'worm_length' : 2000,
 			'min_filtration_param': .001,
-			'max_filtration_param': .011,
-			'num_divisions': 30,
-			'use_cliques': True
+			'max_filtration_param': .005,
+			'num_divisions': 2,
+			# 'use_cliques': True
 		})
 
 	start_pt = 0   # skip first half of in data file (primitive sliding window)
@@ -378,6 +378,88 @@ if test == 13:
 									# of cycles through color gradient. (ie use larger cycles for faster color changes.)
 		framerate=1,
 	)
+
+if test == 14:
+	# figure 4
+	in_data_file_name = "output/DCE/saved_worms/double/b/49-C135B.txt"
+	build_filt_params = parameter_set
+	build_filt_params.update(
+		{
+			'ds_rate' : 1,
+			'worm_length' : 2000,
+			'min_filtration_param': .001,
+			'max_filtration_param': .005,
+			'num_divisions': 2,
+			#'use_cliques': True
+		})
+
+	start_pt = 0   # skip first half of in data file (primitive sliding window)
+	# build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) # comment out to reuse filtration
+
+	# make_persistence_diagram(
+	# 	in_data_file_name,
+	# 	"output/PersistentHomology/49_C135B_Cech.png",
+	# 	build_filt_params
+	# )
+
+	# make_filtration_movie(
+	# 	in_data_file_name,             						# used to check if saved filtration is up to date, and in titlebox
+	# 	"output/PersistentHomology/49_C135B_Cech.mp4",      		# output filename
+	# 	build_filt_params,              					# passed to BuildComplex.build_filtration()
+	#
+	# 	color_scheme='none',		# 'none' or 'highlight new' or ('birth time gradient', cycles), where cycles is number
+	# 								# of cycles through color gradient. (ie use larger cycles for faster color changes.)
+	# 	framerate=1,
+	# )
+
+
+if test == 15:
+	in_data_file_name = "output/DCE/saved_worms/double/b/49-C135B.txt"
+	build_filt_params = parameter_set
+	build_filt_params.update(
+		{
+			'ds_rate' : 10,
+			'worm_length' : 2000,
+			'min_filtration_param': .001,
+			'max_filtration_param': .015,
+			'num_divisions': 30,
+			# 'use_cliques': True
+		})
+
+	start_pt = 0   # skip first half of in data file (primitive sliding window)
+	build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) # comment out to reuse filtration
+
+	make_persistence_diagram(
+		in_data_file_name,
+		"output/PersistentHomology/49-C135B.png",
+		build_filt_params
+	)
+
+	# make_filtration_movie(
+	# 	in_data_file_name,             						# used to check if saved filtration is up to date, and in titlebox
+	# 	"output/PersistentHomology/49-C135B.mp4",      		# output filename
+	# 	build_filt_params,              					# passed to BuildComplex.build_filtration()
+	#
+	# 	color_scheme='none',		# 'none' or 'highlight new' or ('birth time gradient', cycles), where cycles is number
+	# 								# of cycles through color gradient. (ie use larger cycles for faster color changes.)
+	# 	framerate=1,
+	# )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

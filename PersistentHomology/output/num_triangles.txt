@@ -1,1 +1,1 @@
-Number of triangles: 9362
+Number of triangles: 1195
