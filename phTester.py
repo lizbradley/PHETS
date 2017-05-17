@@ -9,8 +9,8 @@ import time
 start = time.time()
 
 
-#test = 13
-test = int(sys.argv[1])
+test = 13
+# test = int(sys.argv[1])
 
 
 
@@ -347,18 +347,27 @@ if test == 12:
 		)
 
 if test == 13:
+	# figure 3
 	in_data_file_name = "output/DCE/saved_worms/double/b/49-C135B.txt"
 	build_filt_params = parameter_set
 	build_filt_params.update(
 		{
-			'ds_rate' : 1,
+			'ds_rate' : 10,
 			'worm_length' : 2000,
-			'max_filtration_param': .005,
-			'num_divisions': 2
+			'min_filtration_param': .001,
+			'max_filtration_param': .011,
+			'num_divisions': 30,
+			'use_cliques': True
 		})
 
 	start_pt = 0   # skip first half of in data file (primitive sliding window)
 	build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) # comment out to reuse filtration
+
+	make_persistence_diagram(
+		in_data_file_name,
+		"output/PersistentHomology/49-C135B.png",
+		build_filt_params
+	)
 
 	make_filtration_movie(
 		in_data_file_name,             						# used to check if saved filtration is up to date, and in titlebox
@@ -370,11 +379,7 @@ if test == 13:
 		framerate=1,
 	)
 
-	make_persistence_diagram(
-		in_data_file_name,
-		"output/PersistentHomology/49-C135B.png",
-		build_filt_params
-	)
+
 
 
 runtime=time.time() - start
@@ -389,13 +394,13 @@ build_filt.readline()
 sort_mem=0
 distance_mem=0
 for i in build_filt.readlines():
-    elements=i.split("    ")
-    if "d[w].sort()" in elements[-1]:
-    	for j in elements[1].split(' '):
-    		if "M" not in j and j!='':
-        		sort_mem=float(j)
-    if "subprocess.call" in elements[-1] and elements[1]!='':
-        distance_mem = float(elements[1].split(' ')[1])
+	elements=i.split("    ")
+	if "d[w].sort()" in elements[-1]:
+		for j in elements[1].split(' '):
+			if "M" not in j and j!='':
+				sort_mem=float(j)
+	if "subprocess.call" in elements[-1] and elements[1]!='':
+		distance_mem = float(elements[1].split(' ')[1])
 
 build_filt.close()
 
@@ -407,13 +412,13 @@ build_perseus.readline()
 
 write_perseus = 0
 for i in build_perseus.readlines():
-    elements = i.split("    ")
-    if "@profile" in elements[-1]:
-    	for j in elements[1].split(' '):
-    		if "M" not in j and j!='':
-        		write_perseus=float(j)
-        		break;
-        break
+	elements = i.split("    ")
+	if "@profile" in elements[-1]:
+		for j in elements[1].split(' '):
+			if "M" not in j and j!='':
+				write_perseus=float(j)
+				break;
+		break
 build_perseus.close()
 simplex = open("PersistentHomology/output/expand_to_2simplexes_memory.txt","rb")
 
@@ -422,13 +427,13 @@ simplex.readline()
 
 expand_simplex = 0
 for i in simplex.readlines():
-    elements = i.split("    ")
-    if "@profile" in elements[-1]:
-    	for j in elements[1].split(' '):
-    		if "M" not in j and j!='':
-        		expand_simplex=float(j)
-        		break;
-        break
+	elements = i.split("    ")
+	if "@profile" in elements[-1]:
+		for j in elements[1].split(' '):
+			if "M" not in j and j!='':
+				expand_simplex=float(j)
+				break;
+		break
 simplex.close()
 
 birth = open("PersistentHomology/output/group_by_birth_time_memory.txt","rb")
@@ -438,13 +443,13 @@ birth.readline()
 
 group_birth = 0
 for i in birth.readlines():
-    elements = i.split("    ")
-    if "@profile" in elements[-1]:
-    	for j in elements[1].split(' '):
-    		if "M" not in j and j!='':
-        		group_birth=float(j)
-        		break;
-        break
+	elements = i.split("    ")
+	if "@profile" in elements[-1]:
+		for j in elements[1].split(' '):
+			if "M" not in j and j!='':
+				group_birth=float(j)
+				break;
+		break
 birth.close()
 
 pers = open("PersistentHomology/output/make_figure_memory.txt","rb")
@@ -454,11 +459,11 @@ pers.readline()
 
 run_pers = 0
 for i in pers.readlines():
-    elements = i.split("    ")
-    if "./perseus" in elements[-1] and elements[2]!='':
-    	for j in elements[1].split(' '):
-    		if "M" not in j and j!='':
-        		run_pers=float(j)
+	elements = i.split("    ")
+	if "./perseus" in elements[-1] and elements[2]!='':
+		for j in elements[1].split(' '):
+			if "M" not in j and j!='':
+				run_pers=float(j)
 
 pers.close()
 

@@ -6,6 +6,9 @@ import itertools
 
 import TestingFunctions
 
+# import matplotlib
+# matplotlib.rcParams['gray'] = True
+
 from matplotlib import collections
 import matplotlib.pyplot as pyplot
 import matplotlib.markers
@@ -148,7 +151,7 @@ def remove_old_frames():
 def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_time):
 	"""helper for plot_complex()"""
 	if scheme == 'none':
-		facecolor = 'C0'
+		facecolor = 'lightblue'
 		edgecolor = 'black'
 
 	elif scheme == 'highlight new':
@@ -156,7 +159,7 @@ def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_tim
 			facecolor = 'red'
 			edgecolor = 'firebrick'
 		else:
-			facecolor = 'C0'
+			facecolor = 'lightblue'
 			edgecolor = 'black'
 
 	elif hasattr(scheme, '__len__') and scheme[0] == 'birth time gradient':
@@ -323,7 +326,7 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 		landmark_data = np.array(landmark_data)
 		x = landmark_data[:, 0]
 		y = landmark_data[:, 1]
-		return subplot.scatter(x, y, color='lime', s=10)
+		return subplot.scatter(x, y, color='darkblue', s=35)
 
 	def plot_complex(subplot, i):
 		"""plots all complexes for full filtration"""
@@ -341,6 +344,10 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 
 	filt_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 	filt_plot.set_aspect('equal')
+
+	filt_plot.tick_params(labelsize=23)
+	filt_plot.xaxis.major.locator.set_params(nbins=5)
+	filt_plot.yaxis.major.locator.set_params(nbins=5)
 
 	witness_data = filt_data[0]
 	landmark_data = filt_data[1]
@@ -489,6 +496,7 @@ def make_frame3D(birth_time, camera_angle=(135, 55), hide_1simplexes=False, alph
 	plot_witnesses(filt_data[0])
 	plot_landmarks(filt_data[1])
 	plot_complex(filt_data[2], birth_time, filt_data[1])
+
 
 	# mlab.savefig(filename='frames/sub_img%03d.png' % i)   # for debugging
 	mlab.show()

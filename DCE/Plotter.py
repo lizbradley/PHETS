@@ -23,11 +23,13 @@ def plot_dce(ax, in_file_name):
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 	ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
-	# xlims = ax.get_xlim()
-	# ax.set_xticks([0, xlims[1]])
-	#
-	# ylims = ax.get_ylim()
-	# ax.set_yticks([0, ylims[1]])
+	ax.tick_params(axis='both', which='major', labelsize=26)
+
+	xlims = ax.get_xlim()
+	ax.set_xticks([xlims[0], 0, xlims[1]])
+
+	ylims = ax.get_ylim()
+	ax.set_yticks([0, ylims[1]])
 
 
 
@@ -223,8 +225,8 @@ def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, c
 
 
 
-	ax1.set_title(filename_1.split('/')[-1])
-	ax2.set_title(filename_2.split('/')[-1])
+	# ax1.set_title(filename_1.split('/')[-1])
+	# ax2.set_title(filename_2.split('/')[-1])
 
 	out_filename = 'DCE/frames/frame%03d.png' % frame_idx
 	pyplot.savefig(out_filename)

@@ -14,8 +14,8 @@ from DCE.Plotter import plot_waveform_zoom_only
 
 
 
-#test = 11
-test = int(sys.argv[1])
+test = 11
+# test = int(sys.argv[1])
 
 print 'running test %d...' % test
 
@@ -138,7 +138,7 @@ if test == 11:
 	dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'  # numerical index goes in front of base
 	dir2, base2 = "datasets/time_series/C135B", '-C135B.txt'
 
-	out_filename = 'output/DCE/C134vC135.mp4'
+	out_filename = 'output/DCE/C134vC135_fontsize.mp4'
 
 	compare_multi(
 		dir1, base1,
@@ -152,7 +152,7 @@ if test == 11:
 
 		tau_1='auto detect', # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_2=.01192,
-		tau_T=1/math.pi,  # for auto tau. tau = period * tau_T
+		tau_T=math.pi,  # for auto tau. tau = period * tau_T
 
 		normalize_volume=True,
 

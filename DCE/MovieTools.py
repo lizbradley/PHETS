@@ -34,7 +34,7 @@ def save_worms_double(filename1, filename2, i, tau1, tau2, crop_1, crop_2):
 	shutil.copyfile('DCE/temp_data/embedded_coords_comp2.txt', out_filename2)
 
 	info_file_1 = open('output/DCE/saved_worms/double/a/WORM_INFO.txt', 'a')
-	info_file_1.write('{:d}: tau = {} (samples), embed_crop = [{:.5f}, {:.5f}] (seconds) \n'.format(i, tau1, crop_1[0], crop_1[1]))
+	info_file_1.write('{:d}: tau = {} (seconds), embed_crop = [{:.5f}, {:.5f}] (seconds) \n'.format(i, tau1, crop_1[0], crop_1[1]))
 	info_file_1.close()
 
 	info_file_1 = open('output/DCE/saved_worms/double/b/WORM_INFO.txt', 'a')

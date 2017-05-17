@@ -7,6 +7,9 @@ from os import system, chdir
 from memory_profiler import profile
 from sys import platform
 
+from matplotlib.ticker import FormatStrFormatter
+
+
 # from Utilities import mem_profile
 from config import MEMORY_PROFILE_ON
 
@@ -17,7 +20,7 @@ f3=open("PersistentHomology/output/build_perseus_in_file_memory.txt","wb")
 f4=open("PersistentHomology/output/make_figure_memory.txt","wb")
 
 # @mem_profile(f, MEMORY_PROFILE_ON)
-@profile(stream=f)
+# @profile(stream=f)
 def group_by_birth_time(complex_ID_list):
 	"""Reformats 1D list of SimplexBirth objects into 2D array of
 	landmark_set lists, where 2nd index is  birth time (? see below)"""
@@ -43,7 +46,7 @@ def group_by_birth_time(complex_ID_list):
 	return complex_ID_array
 
 
-@profile(stream=f2)
+# @profile(stream=f2)
 def expand_to_2simplexes(filt_array):
 	"""for each k-simplex in filtration array, if k > 2, replaces with the
 	component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
@@ -73,7 +76,7 @@ def expand_to_2simplexes(filt_array):
 
 
 
-@profile(stream=f3)
+# @profile(stream=f3)
 def build_perseus_in_file(filt_array):
 	print 'building perseus_in.txt...'
 	out_file = open('PersistentHomology/perseus/perseus_in.txt', 'a')
@@ -117,7 +120,7 @@ def add_title(subplot, title_block_info):
 	title_table.auto_set_font_size(8)
 
 def add_persistence_plot(subplot):
-	print 'plotting persistence diagram...'
+	print 'preparing persistence diagram...'
 	birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True)
 
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
@@ -126,15 +129,14 @@ def add_persistence_plot(subplot):
 	min_lim = 0
 
 	subplot.set_aspect('equal')
-	subplot.grid(which=u'major', zorder=0)
-	subplot.minorticks_on()
+
 
 
 	subplot.set_xlim(min_lim, max_lim)
 	subplot.set_ylim(min_lim, max_lim)
-
-	subplot.set_xlabel('birth time')
-	subplot.set_ylabel('death time')
+	 
+	# subplot.set_xlabel('birth time')
+	# subplot.set_ylabel('death time')
 
 
 	subplot.plot([min_lim, max_lim], [min_lim, max_lim], color='k') # diagonal line
@@ -148,9 +150,15 @@ def add_persistence_plot(subplot):
 				count[i] += 1
 
 	t_ms_scale = 50
+	p_ms_scale = 30
+
+	min_size = 300
+
+	# t_ms_scale = 150
+	# p_ms_scale = 60
 
 	x, y = immortal_holes, [max_lim for i in immortal_holes]
-	subplot.scatter(x, y, marker='^', s=(count * t_ms_scale), c='C0', clip_on=False)
+	subplot.scatter(x, y, marker='^', s=(count * t_ms_scale) + min_size, c='red', clip_on=False)
 	# end plot immortal holes#
 
 
@@ -168,38 +176,38 @@ def add_persistence_plot(subplot):
 			if pt == scanner_pt:
 				count[i] += 1
 
-	p_ms_scale = 30
-	subplot.scatter(birth_e, death_e, s=(count * p_ms_scale), clip_on=False)
+	subplot.scatter(birth_e, death_e, s=(count * p_ms_scale) + min_size, clip_on=False, c='red')
 	# end plot doomed holes #
 
 
 
 	# add legend #
-	mark_t_1 = subplot.scatter([], [], marker='^', s=t_ms_scale, c='C0')
-	mark_t_3 = subplot.scatter([], [], marker='^', s=t_ms_scale * 3, c='C0')
-	mark_t_5 = subplot.scatter([], [], marker='^', s=t_ms_scale * 5, c='C0')
+	mark_t_1 = subplot.scatter([], [], marker='^', s=t_ms_scale, c='red')
+	mark_t_3 = subplot.scatter([], [], marker='^', s=t_ms_scale * 3, c='red')
+	mark_t_5 = subplot.scatter([], [], marker='^', s=t_ms_scale * 5, c='red')
 
-	mark_p_1 = subplot.scatter([], [], s=p_ms_scale, c='C0')
-	mark_p_3 = subplot.scatter([], [], s=p_ms_scale * 3, c='C0')
-	mark_p_5 = subplot.scatter([], [], s=p_ms_scale * 5, c='C0')
+	mark_p_1 = subplot.scatter([], [], s=p_ms_scale, c='red')
+	mark_p_3 = subplot.scatter([], [], s=p_ms_scale * 3, c='red')
+	mark_p_5 = subplot.scatter([], [], s=p_ms_scale * 5, c='red')
 
 	marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
 	labels = ('', '', '', '1', '3', '5')
 
-	subplot.legend(
-		marks, labels, loc='lower right', ncol=2, markerscale=1,
-		borderpad=1,
-		labelspacing=1,
-		framealpha=1,
-		columnspacing=0,
-		borderaxespad=3
-		#edgecolor='k'
-	)
+	# subplot.legend(
+	# 	marks, labels, loc='lower right', ncol=2, markerscale=1,
+	# 	borderpad=1,
+	# 	labelspacing=1,
+	# 	framealpha=1,
+	# 	columnspacing=0,
+	# 	borderaxespad=3
+	# 	#edgecolor='k'
+	# )
 	# end add legend #
 
 
-@profile(stream=f4)
+# @profile(stream=f4)
 def make_figure(title_block_info, out_file_name):
+	print 'plotting persistence diagram...'
 	filt_list = np.load('PersistentHomology/temp_data/complexes.npy')
 	filt_array = group_by_birth_time(filt_list)
 	expand_to_2simplexes(filt_array)
@@ -228,7 +236,27 @@ def make_figure(title_block_info, out_file_name):
 	pers_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 
 	add_persistence_plot(pers_plot)
-	add_title(title_block, title_block_info)
+
+	# add_title(title_block, title_block_info)
+
+	# paper figures
+	# title_block.tick_params(labelsize=23)
+	title_block.axis('off')
+
+	ax = pers_plot
+	xlims = ax.get_xlim()
+	ax.set_xticks([0, round(xlims[1]/2., 4), xlims[1]])
+	ylims = ax.get_ylim()
+	ax.set_yticks([round(ylims[1]/2., 4), ylims[1]])
+	pers_plot.tick_params(labelsize=23)
+
+	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	# ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+
+	ax.grid(which=u'both', zorder=0)
+	ax.minorticks_on()
+
+	
 	pyplot.savefig(out_file_name)
 	pyplot.clf()
 
