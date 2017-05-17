@@ -220,7 +220,8 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 				  i_ref, i_arr,
 				  filt_params,
 				  PD_movie_int=5,
-				  PRF_res=50  			# number of divisions used for PRF
+				  PRF_res=50,  			# number of divisions used for PRF
+				  weighting_func=lambda i, j : 1
 				  ):
 
 	""" plots distance from reference rank function over a range of embedded input files"""
@@ -273,8 +274,10 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 
 	filename = get_in_filename(i_ref)
 
-	ref_func = get_PRF(filename, filt_params, PRF_res)
-
+	# ref_func = get_PRF(filename, filt_params, PRF_res)
+	#
+	# np.save('ref_func_debug.npy', ref_func)
+	ref_func = np.load('ref_func_debug.npy')
 
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
@@ -283,18 +286,27 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 
 	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
 	
-	funcs = []
-	for i in i_arr:
-		filename = get_in_filename(i)
-		print '\n=================================================='
-		print filename
-		print '==================================================\n'
-		func = get_PRF(filename, filt_params, PRF_res)
-		funcs.append(func)
+	# funcs = []
+	# for i in i_arr:
+	# 	filename = get_in_filename(i)
+	# 	print '\n=================================================='
+	# 	print filename
+	# 	print '==================================================\n'
+	# 	func = get_PRF(filename, filt_params, PRF_res)
+	# 	funcs.append(func)
+	#
+	# 	if PD_movie_int:
+	# 		if i % PD_movie_int == 0:
+	# 			make_movie_and_PD(filename, i)
+	#
+	# if not np.array_equal(funcs[0][0], funcs[1][0]):
+	# 	print 'ERROR: variable PRF domain detected. mean_PRF_dist_plot() may only be used with explicit max_filtartion_param.'
+	# 	sys.exit()
 
-		if PD_movie_int:
-			if i % PD_movie_int == 0:
-				make_movie_and_PD(filename, i)
+
+	# np.save('funcs_debug.npy', np.asarray(funcs))
+
+	funcs = np.load('funcs_debug.npy')
 
 	funcs_z = np.asarray(funcs)[:,2]
 	ref_func_z = ref_func[2]
@@ -302,9 +314,16 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 
 	box_area = (1 / PRF_res) ** 2
 
+	norm_x, norm_y = np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res))
+
+	weighting_func = weighting_func(norm_x, norm_y)
+
 	diffs = np.array([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
 
-	dists = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs])
+	diffs_weighted = np.array([np.multiply(diff, weighting_func) for diff in diffs])
+
+
+	dists = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs_weighted])
 
 	plot_distances(i_ref, i_arr, dists, out_filename)
 
@@ -317,7 +336,7 @@ def mean_PRF_dist_plots(
 
 		crop_1='auto', 						# sec or 'auto'
 		crop_2='auto',
-		auto_crop_length=.3, 					# sec
+		auto_crop_length=.3, 				# sec
 
 		window_size=.05,					# sec
 		num_windows=10,						# per file
@@ -464,6 +483,16 @@ def mean_PRF_dist_plots(
 		plt.close(fig)
 
 
+	def contour_plots(ref_func_1, ref_func_2):
+		fig = plt.figure(tight_layout=True, figsize=(8, 4))
+		ax1, ax2 = fig.add_subplot(121), fig.add_subplot(122)
+		PRF_contour_plot(ax1, ref_func_1)
+		PRF_contour_plot(ax2, ref_func_2)
+		ax1.set_title('left')
+		ax2.set_title('right')
+		fig.savefig('output/PRFCompare/mean_PRF_REF_contour_plots.png')
+
+
 	# ======================= SETUP	============================
 	clear_old_files()
 	filt_params.update({'worm_length' : np.floor(window_size * WAV_SAMPLE_RATE).astype(int)})
@@ -498,15 +527,10 @@ def mean_PRF_dist_plots(
 	ref_func_2 = funcs_2[0]			# get xx, yy
 	ref_func_2[2] = funcs_2_avg_z
 
-	fig = plt.figure(tight_layout=True, figsize=(8, 4))
-	ax1, ax2 = fig.add_subplot(121), fig.add_subplot(122)
-	PRF_contour_plot(ax1, ref_func_1)
-	PRF_contour_plot(ax2, ref_func_2)
-	ax1.set_title('left')
-	ax2.set_title('right')
-	fig.savefig('output/PRFCompare/mean_PRF_REF_contour_plots.png')
+	contour_plots(ref_func_1, ref_func_1)
 
-	box_area = 1
+	box_area = (1 / PRF_res) ** 2
+
 
 	diffs1_vs_1 = np.array([np.subtract(func, funcs_1_avg_z) for func in funcs_1_z])
 	dists1_vs_1 = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs1_vs_1])
