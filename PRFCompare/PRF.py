@@ -155,14 +155,16 @@ def get_homology(filt_list):
 	os.chdir('..')
 
 
-def build_PRF(data):
+def build_PRF(data, PRF_res):
 	""" helper for get_rank_func()"""
 	x, y, z, max_lim = data
 	min_lim = 0
 
-	div = .05 * max_lim
-	x_ = np.arange(min_lim, max_lim, div)
-	y_ = np.arange(min_lim, max_lim, div)
+	# div = .05 * max_lim
+	# x_ = np.arange(min_lim, max_lim, div)
+	# y_ = np.arange(min_lim, max_lim, div)
+
+	x_ = y_ = np.linspace(min_lim, max_lim, PRF_res)
 	xx, yy = np.meshgrid(x_, y_)
 
 	pts = zip(x, y, z)
@@ -180,11 +182,11 @@ def build_PRF(data):
 	return [xx, yy, grid_vals, max_lim]
 
 
-def get_PRF(filename, filt_params):
+def get_PRF(filename, filt_params, PRF_res):
 	filt = get_filtration(filename, filt_params)
 	get_homology(filt)
 	intervals = get_interval_data()
-	f = build_PRF(intervals)
+	f = build_PRF(intervals, PRF_res)
 	return f
 
 
@@ -217,7 +219,9 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 				  out_filename,
 				  i_ref, i_arr,
 				  filt_params,
-				  PD_movie_int=5):
+				  PD_movie_int=5,
+				  PRF_res=50  			# number of divisions used for PRF
+				  ):
 
 	""" plots distance from reference rank function over a range of embedded input files"""
 
@@ -269,7 +273,7 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 
 	filename = get_in_filename(i_ref)
 
-	ref_func = get_PRF(filename, filt_params)
+	ref_func = get_PRF(filename, filt_params, PRF_res)
 
 
 	# PRF_contour_plot(ref_func, 'output/PRFCompare/REFERENCE_CONTOUR.png')
@@ -286,7 +290,7 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 		print '\n=================================================='
 		print filename
 		print '==================================================\n'
-		func = get_PRF(filename, filt_params)
+		func = get_PRF(filename, filt_params, PRF_res)
 		funcs.append(func)
 
 		if PD_movie_int:
@@ -297,8 +301,7 @@ def PRF_dist_plot(dir, base_filename, fname_format,
 	ref_func_z = ref_func[2]
 
 
-	# box_area = (ref_func[3] / len(ref_func[2])) ** 2
-	box_area = 1
+	box_area = (1 / PRF_res) ** 2
 
 	diffs = np.array([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
 
@@ -328,7 +331,10 @@ def mean_PRF_dist_plots(
 		normalize_volume=True,
 
 		PD_movie_int = 5,
-	):
+
+		PRF_res=50,  						# number of divisions used for PRF
+
+):
 
 
 	def clear_old_files():
@@ -389,7 +395,7 @@ def mean_PRF_dist_plots(
 			embed(window, 'PRFCompare/temp_data/temp_worm.txt',
 				  False, tau, 2)
 
-			func = get_PRF('PRFCompare/temp_data/temp_worm.txt', filt_params)
+			func = get_PRF('PRFCompare/temp_data/temp_worm.txt', filt_params, PRF_res)
 			funcs.append(func)	# select grid_vals (third element)
 
 			if PD_movie_int:
