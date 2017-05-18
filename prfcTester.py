@@ -167,7 +167,7 @@ if test == 5:
 	params.update(
 		{
 			'ds_rate': 30,
-			'max_filtration_param': .01,
+			'max_filtration_param': -7,
 			'num_divisions': 30,
 			'use_cliques': True,
 
@@ -175,13 +175,13 @@ if test == 5:
 	)
 
 	mean_PRF_dist_plots(
-		'datasets/time_series/C134C/45-C134C.txt',  # input (left)
-		'datasets/time_series/C135B/45-C135B.txt',  # input (right)
+		'datasets/time_series/C134C/49-C134C.txt',  # input (left)
+		'datasets/time_series/C135B/49-C135B.txt',  # input (right)
 		'output/PRFCompare/test_5_none.png',  		# out filename
 		params,
 
-		crop_1=(2, 2.3),				# seconds or 'auto'
-		crop_2=(2, 2.3),				# seconds or 'auto'
+		crop_1='auto',				# seconds or 'auto'
+		crop_2='auto',				# seconds or 'auto'
 		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
 
 		window_size=.05, 				# seconds
@@ -190,7 +190,7 @@ if test == 5:
 
 		tau='auto ideal',				# seconds or 'auto ideal' or 'auto detect'
 		tau_T=np.pi,					# tau_T = tau / period
-		note_index=45,					# required for auto tau
+		note_index=49,					# required for auto tau
 
 		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
 
@@ -198,6 +198,9 @@ if test == 5:
 
 		dist_scale='none',  			# 'none', 'a', 'b', or 'a + b'
 										# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+		normalize_sub_volume=True,
 
 		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 

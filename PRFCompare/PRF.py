@@ -386,6 +386,7 @@ def mean_PRF_dist_plots(
 		note_index=None,					#
 
 		normalize_volume=True,
+		normalize_sub_volume=True,
 
 		PRF_res=50,  						# number of divisions used for PRF
 		dist_scale='none',					# 'none', 'a', or 'a + b'
@@ -432,10 +433,17 @@ def mean_PRF_dist_plots(
 	def get_PRFs(filename, crop_cmd, tau_cmd):
 
 		sig_full = np.loadtxt(filename)
-		if normalize_volume: sig_full = sig_full / np.max(sig_full)
+		if normalize_volume: sig_full = sig_full / np.max(np.abs(sig_full))
+
+
 
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
+
+		if normalize_sub_volume:
+			sig_full = sig_full / np.max(np.abs(sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]))
+
 		sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
+
 
 		f_deal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename)
 
@@ -447,8 +455,8 @@ def mean_PRF_dist_plots(
 			print filename.split('/')[-1], 'worm #', i
 			print '=============================================\n'
 
-			window = np.asarray(sig[pt:pt + window_size_samp])
-			embed(window, 'PRFCompare/temp_data/temp_worm.txt',
+			sig_window = np.asarray(sig[pt:pt + window_size_samp])
+			embed(sig_window, 'PRFCompare/temp_data/temp_worm.txt',
 				  False, tau, 2)
 
 			func = get_PRF('PRFCompare/temp_data/temp_worm.txt', filt_params, PRF_res)
