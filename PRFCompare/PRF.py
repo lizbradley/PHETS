@@ -8,11 +8,14 @@ import itertools
 import numpy as np
 from os import system, chdir
 
+from math import ceil
+
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from DCE.DCE import embed
-from DCE.Plotter import plot_waveform
+from DCE.Plotter import plot_waveform, plot_waveform_zoom
 from DCE.Tools import auto_tau
 
 from PersistentHomology.BuildComplex import build_filtration
@@ -160,10 +163,6 @@ def build_PRF(data, PRF_res):
 	x, y, z, max_lim = data
 	min_lim = 0
 
-	# div = .05 * max_lim
-	# x_ = np.arange(min_lim, max_lim, div)
-	# y_ = np.arange(min_lim, max_lim, div)
-
 	x_ = y_ = np.linspace(min_lim, max_lim, PRF_res)
 	xx, yy = np.meshgrid(x_, y_)
 
@@ -190,17 +189,43 @@ def get_PRF(filename, filt_params, PRF_res):
 	return f
 
 
-def get_dists(funcs_z, ref_func_z, weighting_func, PRF_res):
+def get_scaled_dists(funcs_z, ref_func_z, weighting_func, scale, PRF_res):
 
 	box_area = (1 / PRF_res) ** 2
 	norm_x, norm_y = np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res))
 	weighting_func_arr = weighting_func(norm_x, norm_y)
 
-	diffs = np.array([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
-	diffs_weighted = np.array([np.multiply(diff, weighting_func_arr) for diff in diffs])
-	dists = np.array([np.nansum(np.abs(diff)) * box_area for diff in diffs_weighted])
+	def get_dists(funcs_z, ref_func_z):
+		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
+		diffs_weighted = np.asarray([np.multiply(diff, weighting_func_arr) for diff in diffs])
+		dists = np.asarray([(np.nansum(np.abs(diff)) * box_area) for diff in diffs_weighted])
+		return dists
 
-	return dists
+
+	dists = get_dists(funcs_z, ref_func_z)
+
+	dists_0 = get_dists(funcs_z, np.zeros_like(ref_func_z))
+
+	dist_ref_0 = get_dists([ref_func_z], np.zeros_like(ref_func_z))
+
+	dists_ref_0 = [dist_ref_0[0] for i in dists]
+
+	if scale == 'none':
+		scaled_dists = dists
+
+	elif scale == 'a':
+		scaled_dists = np.true_divide(dists, dists_0)
+
+	elif scale == 'b':
+		scaled_dists = np.true_divide(dists, dists_ref_0)
+
+	elif scale == 'a + b':
+		scaled_dists = np.true_divide(dists, np.add(dists_0, dists_ref_0))
+
+	else:
+		print "ERROR: dist_scale '" + scale + "' is not recognized. Use 'none', 'a', 'b', or 'a + b'."
+
+	return scaled_dists
 
 
 
@@ -238,10 +263,11 @@ def PRF_dist_plot(
 
 
 		weight_func=lambda i, j: 1,
+		dist_scale='none',					# 'none', 'a', or 'a + b'
+		PRF_res=50,  						# number of divisions used for PRF
 
 
 		PD_movie_int=5,
-		PRF_res=50,  # number of divisions used for PRF
 ):
 
 	""" plots distance from reference rank function over a range of embedded input files"""
@@ -309,9 +335,9 @@ def PRF_dist_plot(
 
 		return np.asarray(funcs)
 
-	# ===========================================================================
-	# 		PRF_dist_plots()
-	# ===========================================================================
+	# ===================================================== #
+	# 				MAIN:	PRF_dist_plots()				#
+	# ===================================================== #
 
 	filename = get_in_filename(i_ref)
 
@@ -336,7 +362,7 @@ def PRF_dist_plot(
 
 	ref_func_z = ref_func[2]
 
-	dists = get_dists(funcs_z, ref_func_z, weight_func, PRF_res)
+	dists = get_scaled_dists(funcs_z, ref_func_z, weight_func, dist_scale, PRF_res)
 
 	plot_distances(i_ref, i_arr, dists, out_filename)
 
@@ -361,11 +387,11 @@ def mean_PRF_dist_plots(
 
 		normalize_volume=True,
 
-		PD_movie_int = 5,
-
 		PRF_res=50,  						# number of divisions used for PRF
-
+		dist_scale='none',					# 'none', 'a', or 'a + b'
 		weight_func=lambda i, j: 1,
+
+		PD_movie_int=5
 
 ):
 
@@ -415,7 +441,7 @@ def mean_PRF_dist_plots(
 
 		funcs = []
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
-		for i, pt in enumerate(start_pts[:-1]):
+		for i, pt in enumerate(start_pts):
 
 			print '\n============================================='
 			print filename.split('/')[-1], 'worm #', i
@@ -437,56 +463,89 @@ def mean_PRF_dist_plots(
 		return crop, sig_full, np.asarray(funcs)
 
 	def plot_distances(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
-		fig = plt.figure(figsize=(14, 6), tight_layout=True)
 
-		ax1 = fig.add_subplot(321)
-		ax1.plot(d_1_vs_1)
-		ax1.axhline(y=np.mean(d_1_vs_1), linestyle='--', color='k')
-		ax1.grid()
-		ax1.set_ylim(bottom=0)
+		def plot_pane(ax, d, mean, crop):
+			t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
+			ticks = np.linspace(crop[0], crop[1], num_windows + 1, endpoint=True)
+			ax.plot(t, d, marker='o', linestyle='None', ms=10)
+			ax.axhline(y=mean, linestyle='--', color='forestgreen', lw=2)
+			ax.grid(axis='x')
+			ax.set_xticks(ticks)
+			# ax.set_xlim(left=crop[0], right=crop[1])
+
+		fig = plt.figure(figsize=(18, 9), tight_layout=True)
+
+		mean_1 = np.mean(d_1_vs_1)
+		mean_2 = np.mean(d_2_vs_1)
+		mean_3 = np.mean(d_1_vs_2)
+		mean_4 = np.mean(d_2_vs_2)
+
+
+		ax1 = fig.add_subplot(421)
+		plot_pane(ax1, d_1_vs_1, mean_1, crop_1)
 		plt.setp(ax1.get_xticklabels(), visible=False)
 		plt.setp(ax1.get_xticklines(), visible=False)
+		ax1.set_ylim(bottom=0)
 
-		ax2 = fig.add_subplot(322, sharey=ax1)
-		ax2.plot(d_2_vs_1)
-		ax2.axhline(y=np.mean(d_2_vs_1), linestyle='--', color='k')
-
-		ax2.grid()
+		ax2 = fig.add_subplot(422, sharey=ax1)
+		plot_pane(ax2, d_2_vs_1, mean_2, crop_2)
 		plt.setp(ax2.get_yticklabels(), visible=False)
-		plt.setp(ax2.get_yticklines(), visible=False)
+		# plt.setp(ax2.get_yticklines(), visible=False)
 		plt.setp(ax2.get_xticklabels(), visible=False)
 		plt.setp(ax2.get_xticklines(), visible=False)
 
+		ax3 = fig.add_subplot(423, sharey=ax1, sharex=ax1)
+		plot_pane(ax3, d_1_vs_2, mean_3, crop_1)
+		plt.setp(ax3.get_xticklabels(), visible=False)
+		plt.setp(ax3.get_xticklines(), visible=False)
 
-		ax3 = fig.add_subplot(323, sharey=ax1)
-		ax3.plot(d_1_vs_2)
-		ax3.axhline(y=np.mean(d_1_vs_2), linestyle='--', color='k')
-		ax3.grid()
 
-		ax4 = fig.add_subplot(324, sharey=ax1)
-		ax4.plot(d_2_vs_2)
-		ax4.axhline(y=np.mean(d_2_vs_2), linestyle='--', color='k')
-
-		ax4.grid()
+		ax4 = fig.add_subplot(424, sharey=ax1, sharex=ax2)
+		plot_pane(ax4, d_2_vs_2, mean_4, crop_2)
 		plt.setp(ax4.get_yticklabels(), visible=False)
-		plt.setp(ax4.get_yticklines(), visible=False)
+		# plt.setp(ax4.get_yticklines(), visible=False)
+
+		plt.setp(ax4.get_xticklabels(), visible=False)
+		plt.setp(ax4.get_xticklines(), visible=False)
+
+		ax5 = fig.add_subplot(425, sharex=ax1)
+		plot_waveform_zoom(ax5, sig_1_full, crop_1)
+		ax5.grid(axis='x', zorder=0)
 
 
-		ax1.set_title (filename_1.split('/')[-1])
-		ax2.set_title (filename_2.split('/')[-1])
-		del_12 = np.abs(np.mean(d_1_vs_1) - np.mean(d_1_vs_2))
-		del_34 = np.abs(np.mean(d_2_vs_1) - np.mean(d_2_vs_2))
-
-		ax1.set_ylabel('ref: left \n \n $\Delta$: {:.2f}'.format(del_12), rotation=0, size='large', labelpad=50)
-		ax3.set_ylabel('ref: right \n \n $\Delta$: {:.2f}'.format(del_34), rotation=0, size='large', labelpad=50)
-
-		ax5 = fig.add_subplot(325)
-		plot_waveform(ax5, sig_1_full, crop_1)
-
-		ax6 = fig.add_subplot(326, sharey=ax5)
-		plot_waveform(ax6, sig_2_full, crop_2)
+		ax6 = fig.add_subplot(426, sharex=ax2)
+		plot_waveform_zoom(ax6, sig_2_full, crop_2)
+		ax6.grid(axis='x', zorder=0)
 		plt.setp(ax6.get_yticklabels(), visible=False)
-		plt.setp(ax6.get_yticklines(), visible=False)
+		# plt.setp(ax6.get_yticklines(), visible=False)
+
+		ylim = np.max(np.abs(np.append(ax5.get_ylim(), ax6.get_ylim())))
+		ax5.set_ylim(-ylim, ylim)
+		ax6.set_ylim(-ylim, ylim)
+
+
+
+
+
+		ax7 = fig.add_subplot(427)
+		plot_waveform(ax7, sig_1_full, crop_1)
+
+
+		ax8 = fig.add_subplot(428, sharey=ax7)
+		plot_waveform(ax8, sig_2_full, crop_2)
+		plt.setp(ax8.get_yticklabels(), visible=False)
+		plt.setp(ax8.get_yticklines(), visible=False)
+
+
+
+		ax1.set_title(filename_1.split('/')[-1])
+		ax2.set_title(filename_2.split('/')[-1])
+
+		del_12 = mean_2 - mean_1
+		del_34 = mean_4 - mean_3
+
+		ax1.set_ylabel('\n \n ref: left \n \n $\Delta$: {:.3f}'.format(del_12), rotation=0, size='large', labelpad=50)
+		ax3.set_ylabel('\n \n ref: right \n \n $\Delta$: {:.3f}'.format(del_34), rotation=0, size='large', labelpad=50)
 
 
 		plt.savefig(out_filename)
@@ -496,7 +555,8 @@ def mean_PRF_dist_plots(
 
 	def contour_plots(ref_func_1, ref_func_2):
 		fig = plt.figure(tight_layout=True, figsize=(8, 4))
-		ax1, ax2 = fig.add_subplot(121), fig.add_subplot(122)
+		ax1 = fig.add_subplot(121)
+		ax2 = fig.add_subplot(122, sharex=ax1, sharey=ax1)
 		PRF_contour_plot(ax1, ref_func_1)
 		PRF_contour_plot(ax2, ref_func_2)
 		ax1.set_title('left')
@@ -520,17 +580,16 @@ def mean_PRF_dist_plots(
 	funcs_1_z = funcs_1[:, 2]
 	funcs_2_z = funcs_2[:, 2]
 
-	mean_1_funcs_z = funcs_1_z[::num_windows//mean_samp_num]
-	mean_2_funcs_z = funcs_2_z[::num_windows//mean_samp_num]
+	mean_1_funcs_z = funcs_1_z[::int(ceil(num_windows/mean_samp_num))]
+	mean_2_funcs_z = funcs_2_z[::int(ceil(num_windows/mean_samp_num))]
 
 	funcs_1_avg_z = np.mean(mean_1_funcs_z, axis=0)
 	funcs_2_avg_z = np.mean(mean_2_funcs_z, axis=0)
 
-	dists_1_vs_1 = get_dists(funcs_1_z, funcs_1_avg_z, weight_func, PRF_res)
-	dists_2_vs_1 = get_dists(funcs_2_z, funcs_1_avg_z, weight_func, PRF_res)
-	dists_1_vs_2 = get_dists(funcs_1_z, funcs_2_avg_z, weight_func, PRF_res)
-	dists_2_vs_2 = get_dists(funcs_2_z, funcs_2_avg_z, weight_func, PRF_res)
-
+	dists_1_vs_1 = get_scaled_dists(funcs_1_z, funcs_1_avg_z, weight_func, dist_scale, PRF_res)
+	dists_2_vs_1 = get_scaled_dists(funcs_2_z, funcs_1_avg_z, weight_func, dist_scale, PRF_res)
+	dists_1_vs_2 = get_scaled_dists(funcs_1_z, funcs_2_avg_z, weight_func, dist_scale, PRF_res)
+	dists_2_vs_2 = get_scaled_dists(funcs_2_z, funcs_2_avg_z, weight_func, dist_scale, PRF_res)
 
 	plot_distances(dists_1_vs_1, dists_2_vs_1, dists_1_vs_2, dists_2_vs_2, out_filename)
 
@@ -539,7 +598,7 @@ def mean_PRF_dist_plots(
 	ref_func_1[2] = funcs_1_avg_z
 	ref_func_2 = funcs_2[0]  # get xx, yy
 	ref_func_2[2] = funcs_2_avg_z
-	contour_plots(ref_func_1, ref_func_1)
+	contour_plots(ref_func_1, ref_func_2)
 	# end plot ref PRFs #
 
 

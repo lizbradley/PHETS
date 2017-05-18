@@ -45,6 +45,10 @@ def plot_waveform(subplot, waveform_data, crop):
 
 	subplot.set_xlabel('time (s)')
 
+	y0,y1 = subplot.get_ylim()
+	ylim = abs(y0) if abs(y0) >= abs(y1) else abs(y1)
+	subplot.set_ylim([-ylim, ylim])
+
 
 
 def plot_waveform_zoom(ax, full_sig, crop):
@@ -54,13 +58,16 @@ def plot_waveform_zoom(ax, full_sig, crop):
 
 	# x0,x1 = ax.get_xlim()
 	# y0,y1 = ax.get_ylim()
+	# ylim = abs(y0) if abs(y0) >= abs(y1) else abs(y1)
+	# ax.set_ylim([-ylim, ylim])
+
 	# ax.set_aspect(abs(x1-x0)/abs(y1-y0))
 
 	ax.plot(x, y, color='k', zorder=0, lw= .5)
 
-	ax.axis('tight')
+	# ax.axis('tight')
 
-	ax.set_xlabel('time (s)')
+	# ax.set_xlabel('time (s)')
 
 	# subplot.set_ylim(-1.1, 1.1)
 	# subplot.set_yticks([-1, 0, 1])
