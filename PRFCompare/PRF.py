@@ -339,11 +339,13 @@ def PRF_dist_plot(
 	# 				MAIN:	PRF_dist_plots()				#
 	# ===================================================== #
 
-	filename = get_in_filename(i_ref)
+	ref_filename = get_in_filename(i_ref)
 
-	if PD_movie_int: make_movie_and_PD(filename, i_ref, ref=True)
 
-	ref_func = get_PRF(filename, filt_params, PRF_res)
+	ref_func = get_PRF(ref_filename, filt_params, PRF_res)
+
+	if PD_movie_int: make_movie_and_PD(ref_filename, i_ref, ref=True)		# call after get_PRF for reference (loads saved filtration)
+
 	funcs = get_PRFs()		# also makes PDs and movies
 
 	## plot ref PRF ##
@@ -435,8 +437,6 @@ def mean_PRF_dist_plots(
 		sig_full = np.loadtxt(filename)
 		if normalize_volume: sig_full = sig_full / np.max(np.abs(sig_full))
 
-
-
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
 
 		if normalize_sub_volume:
@@ -472,10 +472,11 @@ def mean_PRF_dist_plots(
 
 	def plot_distances(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
 
-		def plot_pane(ax, d, mean, crop):
+		def plot_dists_pane(ax, d, mean, crop):
 			t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
 			ticks = np.linspace(crop[0], crop[1], num_windows + 1, endpoint=True)
-			ax.plot(t, d, marker='o', linestyle='None', ms=10)
+			offset = (t[1] - t[0]) / 2
+			ax.plot(t + offset, d, marker='o', linestyle='None', ms=10, zorder=3)
 			ax.axhline(y=mean, linestyle='--', color='forestgreen', lw=2)
 			ax.grid(axis='x')
 			ax.set_xticks(ticks)
@@ -490,26 +491,26 @@ def mean_PRF_dist_plots(
 
 
 		ax1 = fig.add_subplot(421)
-		plot_pane(ax1, d_1_vs_1, mean_1, crop_1)
+		plot_dists_pane(ax1, d_1_vs_1, mean_1, crop_1)
 		plt.setp(ax1.get_xticklabels(), visible=False)
 		plt.setp(ax1.get_xticklines(), visible=False)
 		ax1.set_ylim(bottom=0)
 
 		ax2 = fig.add_subplot(422, sharey=ax1)
-		plot_pane(ax2, d_2_vs_1, mean_2, crop_2)
+		plot_dists_pane(ax2, d_2_vs_1, mean_2, crop_2)
 		plt.setp(ax2.get_yticklabels(), visible=False)
 		# plt.setp(ax2.get_yticklines(), visible=False)
 		plt.setp(ax2.get_xticklabels(), visible=False)
 		plt.setp(ax2.get_xticklines(), visible=False)
 
 		ax3 = fig.add_subplot(423, sharey=ax1, sharex=ax1)
-		plot_pane(ax3, d_1_vs_2, mean_3, crop_1)
+		plot_dists_pane(ax3, d_1_vs_2, mean_3, crop_1)
 		plt.setp(ax3.get_xticklabels(), visible=False)
 		plt.setp(ax3.get_xticklines(), visible=False)
 
 
 		ax4 = fig.add_subplot(424, sharey=ax1, sharex=ax2)
-		plot_pane(ax4, d_2_vs_2, mean_4, crop_2)
+		plot_dists_pane(ax4, d_2_vs_2, mean_4, crop_2)
 		plt.setp(ax4.get_yticklabels(), visible=False)
 		# plt.setp(ax4.get_yticklines(), visible=False)
 
@@ -530,9 +531,6 @@ def mean_PRF_dist_plots(
 		ylim = np.max(np.abs(np.append(ax5.get_ylim(), ax6.get_ylim())))
 		ax5.set_ylim(-ylim, ylim)
 		ax6.set_ylim(-ylim, ylim)
-
-
-
 
 
 		ax7 = fig.add_subplot(427)
