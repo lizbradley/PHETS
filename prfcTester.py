@@ -15,7 +15,7 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 5
+test = 4
 
 if test == 1:
 	params = parameter_set
@@ -133,7 +133,7 @@ if test == 4:
 		{
 			'ds_rate': 50,
 			'worm_length': 5000,
-			'max_filtration_param':.1,
+			'max_filtration_param':.01,
 			'num_divisions': 30,
 			'use_cliques': True
 		}
@@ -202,6 +202,6 @@ if test == 5:
 		normalize_volume=True,
 		normalize_sub_volume=True,
 
-		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=3,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)

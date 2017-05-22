@@ -42,10 +42,14 @@ def get_filtration(in_filename, params, start=0):
 	return complexes
 
 
-def get_interval_data():
+def get_interval_data(filename):
 	""" formats perseus output """
 	# NOTE: should be merged back into PersistencePlotter
-	birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True, ndmin=1)
+	try:
+		birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True, ndmin=1)
+	except ValueError:
+		print 'WARNING: no homology for', filename
+		return None
 
 	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
 	lim = np.max(epsilons)
@@ -71,7 +75,7 @@ def get_interval_data():
 
 	try:
 		count = np.zeros(len(birth_t))
-	except TypeError:	# only one interval point
+	except TypeError:		# only one interval point
 		count = [0]
 	for i, pt in enumerate(zip(birth_e, death_e)):
 		for scanner_pt in zip(birth_e, death_e):
@@ -160,6 +164,11 @@ def get_homology(filt_list):
 
 def build_PRF(data, PRF_res):
 	""" helper for get_rank_func()"""
+
+	if not data:
+		print
+		return [None, None, np.zeros([PRF_res, PRF_res]), None]
+
 	x, y, z, max_lim = data
 	min_lim = 0
 
@@ -184,7 +193,7 @@ def build_PRF(data, PRF_res):
 def get_PRF(filename, filt_params, PRF_res):
 	filt = get_filtration(filename, filt_params)
 	get_homology(filt)
-	intervals = get_interval_data()
+	intervals = get_interval_data(filename)
 	f = build_PRF(intervals, PRF_res)
 	return f
 
@@ -232,7 +241,10 @@ def get_scaled_dists(funcs_z, ref_func_z, weighting_func, scale, PRF_res):
 def persistence_diagram(filename):
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
-	add_persistence_plot(ax)
+	try:
+		add_persistence_plot(ax)
+	except ValueError:
+		pass
 	plt.savefig(filename)
 	plt.close(fig)
 
@@ -241,6 +253,11 @@ def PRF_contour_plot(ax, func):
 
 	x, y, z, max_lim = func
 	# z = np.log10(z + 1)
+
+	if not max_lim:
+		x, y = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
+		z = np.zeros((10, 10))
+		max_lim = 1
 
 	ax.set_xlim([0, max_lim])
 	ax.set_ylim([0, max_lim])

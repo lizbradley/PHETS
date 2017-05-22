@@ -222,7 +222,7 @@ def update_time_table(time_plot, i):
 	e = epsilons[i]
 	time_table = time_plot.table(
 		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
-		bbox=[.25, .8, .5, .05],    # x0, y0, width, height
+		bbox=[.15, .8, .7, .05],    # x0, y0, width, height
 		colWidths=[.5, 1],
 		cellLoc='center',
 
