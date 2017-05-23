@@ -1,4 +1,4 @@
-import BuildComplex
+import BuildFiltration
 import FiltrationPlotter
 import PersistencePlotter
 import numpy as np
@@ -48,7 +48,7 @@ def build_and_save_filtration(in_file_name, params, start=0):
 	open('temp_data/worm_data.txt', 'w').writelines(lines[start_idx:])
 
 	print "building filtration..."
-	filtration = BuildComplex.build_filtration('temp_data/worm_data.txt', params)
+	filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)
 	witness_coords = filtration[1][1]
 	landmark_coords = filtration[1][0]
 

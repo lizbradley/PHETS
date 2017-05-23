@@ -18,7 +18,7 @@ from DCE.DCE import embed
 from DCE.Plotter import plot_waveform, plot_waveform_zoom
 from DCE.Tools import auto_tau
 
-from PersistentHomology.BuildComplex import build_filtration
+from PersistentHomology.BuildFiltration import build_filtration
 from PersistentHomology.PersistencePlotter import add_persistence_plot
 from PersistentHomology.FiltrationPlotter import make_movie
 
@@ -41,53 +41,6 @@ def get_filtration(in_filename, params, start=0):
 	np.save('temp_data/landmark_coords.npy', landmark_coords)
 	return complexes
 
-
-def get_interval_data(filename):
-	""" formats perseus output """
-	# NOTE: should be merged back into PersistencePlotter
-	try:
-		birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True, ndmin=1)
-	except ValueError:
-		print 'WARNING: no homology for', filename
-		return None
-
-	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
-	lim = np.max(epsilons)
-
-	birth_e = []
-	death_e = []
-
-	timess = np.vstack([birth_t, death_t]).T
-	for times in timess:
-		if times[1] != - 1:
-			birth_e.append(epsilons[int(times[0])])
-			death_e.append(epsilons[int(times[1])])
-
-	immortal_holes = []
-	for i, death_time in np.ndenumerate(death_t):    # place immortal holes at [birth time, time lim]
-		if death_time == -1:
-			immortal_holes.append([epsilons[int(birth_t[i])], lim * .95])
-	immortal_holes = np.array(immortal_holes)
-
-	if len(immortal_holes):
-		birth_e.extend(immortal_holes[:,0])
-		death_e.extend(immortal_holes[:,1])
-
-	try:
-		count = np.zeros(len(birth_t))
-	except TypeError:		# only one interval point
-		count = [0]
-	for i, pt in enumerate(zip(birth_e, death_e)):
-		for scanner_pt in zip(birth_e, death_e):
-			if pt == scanner_pt:
-				count[i] += 1
-
-	points = np.asarray([birth_e, death_e, count]).T
-	points = np.vstack({tuple(row) for row in points})  # toss duplicates
-
-	x, y, z = points[:,0], points[:,1], points[:,2]
-
-	return x, y, z, lim
 
 
 def get_homology(filt_list):
