@@ -17,10 +17,9 @@ class Filtration:
 		self.landmark_coords = arr[1]
 		self.abstract_filtration = self.unpack(arr[2])
 
-		self.PD_data = None
 
 
-
+	# private #
 	def build_and_save(self, in_file_name, params, start=0):
 		print "building filtration..."
 		start_time = time.time()
@@ -98,7 +97,69 @@ class Filtration:
 					f.write("Number of triangles: "+str(len(triangles)))
 
 		filt_ID_array = group_by_birth_time(filt_ID_list)	# 1d list -> 2d array
-		return expand_to_2simplexes(filt_ID_array)
+		expand_to_2simplexes(filt_ID_array)
+		return filt_ID_array
+	# end private #
+
+
+
+	# public #
+	def get_data_for_mpl(self):
+		def IDs_to_coords(ID_array):
+			"""Replaces each landmark_ID with corresponding coordinates"""
+			for row in ID_array:
+				for parent_simplex in row:
+					new_parent_simplex = []
+					for child in parent_simplex:
+						new_parent_simplex.append(list(child))
+					for child in new_parent_simplex:
+						new_child = []
+						for landmark_ID in child:
+							landmark_coords = self.landmark_coords[landmark_ID]
+							new_child.append(landmark_coords)
+						child[:] = new_child
+					parent_simplex[:] = new_parent_simplex
+
+		def flatten_rows(ID_array):
+			for row in ID_array:
+				new_row = []
+				for parent in row:
+					for child in parent:
+						new_row.append(child)
+				row[:] = new_row
+
+		data = self.abstract_filtration
+		IDs_to_coords(data)
+		flatten_rows(data)
+		return data
+
+
+	def get_data_for_mayavi(self):
+		def separate_by_k(array):
+			lines = []
+			triangles = []
+			for row in array:
+				lines_row = []
+				triangles_row = []
+				for simplex in row:
+					if len(simplex) == 2:
+						lines_row.append(simplex)
+					else:  # if len(simplex) == 3:
+						triangles_row.append(simplex)
+				triangles.append(triangles_row)
+				lines.append(lines_row)
+			return [lines, triangles]
+
+		return separate_by_k(self.abstract_filtration)
+
+
+	def get_intervals(self):
+		pass
+
+	def get_PRF(self):
+		pass
+
+	# end public #
 
 ###########################################################################################
 #	from PersitencePlotter.py #
@@ -120,21 +181,21 @@ def build_perseus_in_file(filt_array):
 			out_file.write(line_str)
 	out_file.close()
 
-	build_perseus_in_file(filt_array)
-	print 'calling perseus...'
-	os.chdir('PersistentHomology/perseus')
+build_perseus_in_file(filt_array)
+print 'calling perseus...'
+os.chdir('PersistentHomology/perseus')
 
-	if platform == "linux" or platform == "linux2":
-		subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
+if platform == "linux" or platform == "linux2":
+	subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
 
-	elif platform == "darwin":  # macOS
-		subprocess.call("./perseusMac nmfsimtop perseus_in.txt perseus_out", shell=True)
+elif platform == "darwin":  # macOS
+	subprocess.call("./perseusMac nmfsimtop perseus_in.txt perseus_out", shell=True)
 
-	else:   # Windows
-		subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
+else:   # Windows
+	subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
 
-	os.chdir('..')
-	os.chdir('..')
+os.chdir('..')
+os.chdir('..')
 
 
 # duplicates PRF.get_homology()
@@ -231,46 +292,6 @@ def add_persistence_plot(subplot):
 #	from FiltrationPlotter.py #
 ###########################################################################################
 
-def unpack_complex_data_2D(complex_list, landmark_coords_data):
-
-	def IDs_to_coords(ID_array):
-		"""Replaces each landmark_ID with corresponding coordinates"""
-		for row in ID_array:
-			for parent_simplex in row:
-				new_parent_simplex = []
-				for child in parent_simplex:
-					new_parent_simplex.append(list(child))
-				for child in new_parent_simplex:
-					new_child = []
-					for landmark_ID in child:
-						landmark_coords = landmark_coords_data[landmark_ID]
-						new_child.append(landmark_coords)
-					child[:] = new_child
-				parent_simplex[:] = new_parent_simplex
-
-	def flatten_rows(ID_array):
-		for row in ID_array:
-			new_row = []
-			for parent in row:
-				for child in parent:
-					new_row.append(child)
-			row[:] = new_row
-
-	filt_array = group_by_birth_time(complex_list)
-	expand_to_2simplexes(filt_array)
-
-	IDs_to_coords(filt_array)
-	flatten_rows(filt_array)
-
-	return filt_array
-
-def unpack_complex_data_3D(complex_list):
-
-
-	ID_array = group_by_birth_time(complex_list)
-	expand_to_2simplexes(ID_array)
-	complexes = separate_by_k(ID_array)
-	return complexes
 
 ###########################################################################################
 #	from PRF.py #
