@@ -1,6 +1,6 @@
 import BuildFiltration
 import FiltrationPlotter
-import PersistencePlotter
+import PDPlotter
 import numpy as np
 import os
 import sys
@@ -40,54 +40,7 @@ parameter_set = {
 	"graph_induced": False    # Use graph induced complex to build filtration.
 }
 
-def build_and_save_filtration(in_file_name, params, start=0):
-	start_time = time.time()
-	lines = open(in_file_name).readlines()
-	start_idx = int(len(lines) * start)
-	os.chdir('PersistentHomology')
-	open('temp_data/worm_data.txt', 'w').writelines(lines[start_idx:])
 
-	print "building filtration..."
-	filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)
-	witness_coords = filtration[1][1]
-	landmark_coords = filtration[1][0]
-
-	complexes = sorted(list(filtration[0]))
-
-	print "saving filtration..."
-	np.save('temp_data/witness_coords.npy', witness_coords)
-	np.save('temp_data/landmark_coords.npy', landmark_coords)
-	np.save('temp_data/complexes.npy', complexes)
-	os.chdir('..')
-	print("build_and_save_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
-
-def frames_to_movie(out_file_name, framerate):
-	print 'building movie...'
-
-	in_str = ('ffmpeg -y -framerate %i ' % framerate) + '-i frames/image%03d.png'
-	out_str = (' -r %d ' % 24) + out_file_name
-
-	os.system(in_str + out_str)
-	print os.getcwd() + ('\\' if os.name == 'nt' else '/') + out_file_name
-
-
-def check_saved_filtration(in_file_name):
-	"""checks that the first? last? line of saved array and text file match"""
-	saved_witness_data = np.load('PersistentHomology/temp_data/witness_coords.npy')
-	in_file_data = open(in_file_name)
-	line_saved = saved_witness_data[1]
-	line_in = in_file_data.readline().split()
-	if len(line_saved) == len(line_in):
-		same = True
-		# for x_s, x_i in zip(line_saved, line_in):
-		#     if x_s != float(x_i):
-		#         same = False
-	else: same = False
-
-	if not same:
-		print('ERROR: in_data_file_name does not match saved filtration.')
-		print('Try running build_and_save_filtration()?')
-		sys.exit()
 
 def check_overwrite(out_file_name):
 	os.chdir('output')
@@ -114,7 +67,6 @@ def make_filtration_movie(
 		framerate=1             # number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
 	):
 
-	check_saved_filtration(in_file_name)
 	check_overwrite(out_file_name)
 	start_time = time.time()
 	title_block_info = [in_file_name, out_file_name, parameter_set, color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
@@ -132,7 +84,7 @@ def make_persistence_diagram(
 	check_overwrite(out_file_name)
 	start_time = time.time()
 	title_block_info = [in_file_name, out_file_name, parameter_set]
-	PersistencePlotter.make_figure(title_block_info, out_file_name)
+	PDPlotter.make_figure(title_block_info, out_file_name)
 	print("make_persistence_diagram() time elapsed: %d seconds \n" % (time.time() - start_time))
 
 if __name__ == '__main__':

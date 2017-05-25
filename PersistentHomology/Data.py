@@ -1,48 +1,73 @@
 import os
+import sys
 import BuildFiltration
 import numpy as np
 import time
+import pickle
+import subprocess
+
+def load_saved_filtration():
+	caller_dir = os.getcwd()
+	abspath = os.path.abspath(__file__)
+	# dname = os.path.dirname(abspath)
+	# os.chdir(dname)
+	os.chdir(abspath)
+
+	filtration = pickle.load('temp_data/filtration')
+	os.chdir(caller_dir)
+	return filtration
+
 
 class Filtration:
 
 	def __init__(self, in_filename, params, start=0):
-		if in_filename == 'load':
-			print "WARNING: in_filename='load'. Reusing saved filtration."
-			arr = np.load('temp_data/filtration.npy')
 
-		else:
-			arr = self.build_and_save(in_filename, params, start=0)
+		self.filename = in_filename
+		arr = self._build(in_filename, params, start=0)
 
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
-		self.abstract_filtration = self.unpack(arr[2])
+		self.complexes = self._unpack_complexes(arr[2])
+		self.epsilons = arr[3]
 
+		self.intervals = None
+		self.PD_data = None
+		self.PRF = None
+
+		pickle.dump(self, open('temp_data/filtration.p', 'wb'))
 
 
 	# private #
-	def build_and_save(self, in_file_name, params, start=0):
+	def _build(self, sig, params, start=0):
 		print "building filtration..."
 		start_time = time.time()
 
+		caller_dir = os.getcwd()
 		abspath = os.path.abspath(__file__)
-		dname = os.path.dirname(abspath)
-		os.chdir(dname)
+		# dname = os.path.dirname(abspath)
+		# os.chdir(dname)
+		os.chdir(abspath)
 
-		# sliding window #
-		lines = open(in_file_name).readlines()
-		start_idx = int(len(lines) * start)
-		open('temp_data/worm_data.txt', 'w').writelines(lines[start_idx:])
+		if isinstance(sig, basestring):			# is filename
+			lines = open(sig).readlines()
+			start_idx = int(len(lines) * start)
+			worm = lines[start_idx:]
+		else:									# is array
+			start_idx = int(len(sig) * start)
+			worm = sig[start_idx]
+		open('temp_data/worm_data.txt', 'w').writelines(worm)
 
 		filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)
 		witness_coords = filtration[1][1]
 		landmark_coords = filtration[1][0]
 		abstract_filtration = sorted(list(filtration[0]))
+		epsilons = filtration[2]		# add to build_filtration return
 
-		np.save('temp_data/filtration.npy', [witness_coords, landmark_coords, abstract_filtration])
 		print("build_and_save_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
-		return [witness_coords, landmark_coords, abstract_filtration]
+		os.chdir(caller_dir)
+		return [witness_coords, landmark_coords, abstract_filtration, epsilons]
 
-	def unpack(self, filt_ID_list):
+	def _unpack_complexes(self, filt_ID_list):
 
 		def group_by_birth_time(ID_list):
 			"""Reformats 1D list of SimplexBirth objects into 2D array of
@@ -99,12 +124,128 @@ class Filtration:
 		filt_ID_array = group_by_birth_time(filt_ID_list)	# 1d list -> 2d array
 		expand_to_2simplexes(filt_ID_array)
 		return filt_ID_array
-	# end private #
 
+	def _get_intervals(self):
+		if self.intervals:
+			return
+
+		def build_perseus_in_file(filt_array):
+			print 'building perseus_in.txt...'
+			out_file = open('PersistentHomology/perseus/perseus_in.txt', 'a')
+			out_file.truncate(0)
+			out_file.write('1\n')
+			for idx, row in enumerate(filt_array):
+				for simplex in row:
+					#   format for perseus...
+					line_str = str(len(simplex) - 1) + ' ' + ' '.join(
+						str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
+					out_file.write(line_str)
+			out_file.close()
+
+		def call_perseus():
+
+			os.chdir('PersistentHomology/perseus')
+
+			if sys.platform == "linux" or sys.platform == "linux2":
+				subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
+
+			elif sys.platform == "darwin":  # macOS
+				subprocess.call("./perseusMac nmfsimtop perseus_in.txt perseus_out", shell=True)
+
+			else:  # Windows
+				subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
+
+		def load_perseus_out_file():
+			try:
+				self.intervals = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', ndmin=1)
+			except ValueError:
+				print 'WARNING: no homology for', self.filename
+				self.intervals = 'empty'
+
+		build_perseus_in_file(self.complexes)
+		call_perseus()
+		load_perseus_out_file()
+
+	def _build_PD_data(self):
+		""" formats perseus output """
+		if self.PD_data:
+			return
+
+		if self.intervals == 'empty':
+			self.PD_data = 'empty'
+			return
+
+		birth_e, death_e = self.intervals
+		lim = np.max(self.epsilons)
+
+		birth_e = []
+		death_e = []
+
+		timess = np.vstack([birth_t, death_t]).T
+		for times in timess:
+			if times[1] != - 1:
+				birth_e.append(epsilons[int(times[0])])
+				death_e.append(epsilons[int(times[1])])
+
+		immortal_holes = []
+		for i, death_time in np.ndenumerate(death_t):  # place immortal holes at [birth time, time lim]
+			if death_time == -1:
+				immortal_holes.append([epsilons[int(birth_t[i])], lim * .95])
+		immortal_holes = np.array(immortal_holes)
+
+		if len(immortal_holes):
+			birth_e.extend(immortal_holes[:, 0])
+			death_e.extend(immortal_holes[:, 1])
+
+		try:
+			count = np.zeros(len(birth_t))
+		except TypeError:  # only one interval point
+			count = [0]
+		for i, pt in enumerate(zip(birth_e, death_e)):
+			for scanner_pt in zip(birth_e, death_e):
+				if pt == scanner_pt:
+					count[i] += 1
+
+		points = np.asarray([birth_e, death_e, count]).T
+		points = np.vstack({tuple(row) for row in points})  # toss duplicates
+
+		x, y, z = points[:, 0], points[:, 1], points[:, 2]
+
+		self.PD_data = [x, y, z, lim]
+
+	def _build_PRF(self):
+
+		if self.PRF:
+			return
+
+		if self.PD_data == 'empty':
+			print
+			return [None, None, np.zeros([PRF_res, PRF_res]), None]
+
+		x, y, z, max_lim = self.PD_data
+		min_lim = 0
+
+		x_ = y_ = np.linspace(min_lim, max_lim, PRF_res)
+		xx, yy = np.meshgrid(x_, y_)
+
+		pts = zip(x, y, z)
+		grid_pts = zip(np.nditer(xx), np.nditer(yy))
+		grid_vals = np.zeros(len(grid_pts))
+		for i, grid_pt in enumerate(grid_pts):
+			if grid_pt[0] <= grid_pt[1]:
+				for pt in pts:
+					if pt[0] <= grid_pt[0] and pt[1] >= grid_pt[1]:
+						grid_vals[i] += pt[2]
+			else:
+				grid_vals[i] = np.nan
+		grid_vals = np.reshape(grid_vals, xx.shape)
+
+		self.PRF = [xx, yy, grid_vals, max_lim]
 
 
 	# public #
-	def get_data_for_mpl(self):
+	def get_complexes_mpl(self):
+
 		def IDs_to_coords(ID_array):
 			"""Replaces each landmark_ID with corresponding coordinates"""
 			for row in ID_array:
@@ -128,13 +269,13 @@ class Filtration:
 						new_row.append(child)
 				row[:] = new_row
 
-		data = self.abstract_filtration
+		data = self.complexes
 		IDs_to_coords(data)
 		flatten_rows(data)
 		return data
 
+	def get_complexes_mayavi(self):
 
-	def get_data_for_mayavi(self):
 		def separate_by_k(array):
 			lines = []
 			triangles = []
@@ -150,239 +291,16 @@ class Filtration:
 				lines.append(lines_row)
 			return [lines, triangles]
 
-		return separate_by_k(self.abstract_filtration)
+		return separate_by_k(self.complexes)
 
-
-	def get_intervals(self):
-		pass
+	def get_PD_data(self):
+		self._get_intervals()	# calls perseus, sets self.intervals
+		self._build_PD_data()	# sets self.PD_data, returns PD_data
+		return self.PD_data
 
 	def get_PRF(self):
-		pass
-
-	# end public #
-
-###########################################################################################
-#	from PersitencePlotter.py #
-###########################################################################################
-
-
-
-# @profile(stream=f3)
-def build_perseus_in_file(filt_array):
-	print 'building perseus_in.txt...'
-	out_file = open('PersistentHomology/perseus/perseus_in.txt', 'a')
-	out_file.truncate(0)
-	out_file.write('1\n')
-	for idx, row in enumerate(filt_array):
-		for simplex in row:
-			#   format for perseus...
-			line_str = str(len(simplex) - 1) + ' ' + ' '.join(
-				str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
-			out_file.write(line_str)
-	out_file.close()
-
-build_perseus_in_file(filt_array)
-print 'calling perseus...'
-os.chdir('PersistentHomology/perseus')
-
-if platform == "linux" or platform == "linux2":
-	subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-elif platform == "darwin":  # macOS
-	subprocess.call("./perseusMac nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-else:   # Windows
-	subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-os.chdir('..')
-os.chdir('..')
-
-
-# duplicates PRF.get_homology()
-def add_persistence_plot(subplot):
-	print 'plotting persistence diagram...'
-	birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True)
-
-	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
-	max_lim = np.max(epsilons)
-	# min_lim = np.min(epsilons)
-	min_lim = 0
-
-	subplot.set_aspect('equal')
-
-	subplot.set_xlim(min_lim, max_lim)
-	subplot.set_ylim(min_lim, max_lim)
-
-	# subplot.set_xlabel('birth time')
-	# subplot.set_ylabel('death time')
-
-
-	subplot.plot([min_lim, max_lim], [min_lim, max_lim], color='k')  # diagonal line
-
-	# plot immortal holes #
-	immortal_holes = [epsilons[int(birth_t[i]) - 1] for i, death_time in enumerate(death_t) if death_time == -1]
-	count = np.zeros(len(immortal_holes))
-	for i, pt in enumerate(immortal_holes):
-		for scanner_pt in immortal_holes:
-			if pt == scanner_pt:
-				count[i] += 1
-
-	# normal #
-	min_size = 0
-	t_ms_scale = 50
-	p_ms_scale = 30
-	color = 'C0'
-
-	# BIG for paper #
-	# min_size = 300
-	# t_ms_scale = 150
-	# p_ms_scale = 60
-	# color = 'red'
-
-	x, y = immortal_holes, [max_lim for i in immortal_holes]
-	subplot.scatter(x, y, marker='^', s=(count * t_ms_scale) + min_size, c=color, clip_on=False)
-	# end plot immortal holes#
-
-
-
-	# plot doomed holes #
-	birth_e, death_e = [], []
-	for times in zip(birth_t, death_t):
-		if times[1] != - 1:
-			birth_e.append(epsilons[int(times[0] - 1)])
-			death_e.append(epsilons[int(times[1] - 1)])
-
-	count = np.zeros(len(birth_t))
-	for i, pt in enumerate(zip(birth_t, death_t)):
-		for scanner_pt in zip(birth_t, death_t):
-			if pt == scanner_pt:
-				count[i] += 1
-
-	subplot.scatter(birth_e, death_e, s=(count * p_ms_scale) + min_size, clip_on=False, c=color)
-	# end plot doomed holes #
-
-
-
-	# add legend #
-	mark_t_1 = subplot.scatter([], [], marker='^', s=t_ms_scale, c=color)
-	mark_t_3 = subplot.scatter([], [], marker='^', s=t_ms_scale * 3, c=color)
-	mark_t_5 = subplot.scatter([], [], marker='^', s=t_ms_scale * 5, c=color)
-
-	mark_p_1 = subplot.scatter([], [], s=p_ms_scale, c=color)
-	mark_p_3 = subplot.scatter([], [], s=p_ms_scale * 3, c=color)
-	mark_p_5 = subplot.scatter([], [], s=p_ms_scale * 5, c=color)
-
-	marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
-	labels = ('', '', '', '1', '3', '5')
-
-	subplot.legend(
-		marks, labels, loc='lower right', ncol=2, markerscale=1,
-		borderpad=1,
-		labelspacing=1,
-		framealpha=1,
-		columnspacing=0,
-		borderaxespad=3
-		# edgecolor='k'
-	)
-
-
-# end add legend #
-
-###########################################################################################
-#	from FiltrationPlotter.py #
-###########################################################################################
-
-
-###########################################################################################
-#	from PRF.py #
-###########################################################################################
-
-# duplicates PersistencePlotter.add_persistence_plot()
-def get_homology(filt_list):
-	""" calls perseus, creating perseus_out_*.txt
-		TODO: move to PersistentHomology and replace equivalent code there
-	"""
-
-	def build_perseus_in_file(filt_array):
-		print 'building perseus_in.txt...'
-		out_file = open('perseus/perseus_in.txt', 'a')
-		out_file.truncate(0)
-		out_file.write('1\n')
-		for idx, row in enumerate(filt_array):
-			for simplex in row:
-				#   format for perseus...
-				line_str = str(len(simplex) - 1) + ' ' + ' '.join(
-					str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
-				out_file.write(line_str)
-		out_file.close()
-
-	filt_array = group_by_birth_time(filt_list)
-	expand_to_2simplexes(filt_array)
-	filt_array = np.asarray(filt_array)
-	build_perseus_in_file(filt_array)
-
-	print 'calling perseus...'
-	os.chdir('perseus')
-
-	if platform == "linux" or platform == "linux2":
-		subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-	elif platform == "darwin":  # macOS
-		subprocess.call("./perseusMac nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-	else:   # Windows
-		subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-	os.chdir('..')
-	os.chdir('..')
-
-
-
-def get_interval_data(filename):
-	""" formats perseus output """
-	# NOTE: should be merged back into PersistencePlotter
-	try:
-		birth_t, death_t = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', unpack=True, ndmin=1)
-	except ValueError:
-		print 'WARNING: no homology for', filename
-		return None
-
-	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
-	lim = np.max(epsilons)
-
-	birth_e = []
-	death_e = []
-
-	timess = np.vstack([birth_t, death_t]).T
-	for times in timess:
-		if times[1] != - 1:
-			birth_e.append(epsilons[int(times[0])])
-			death_e.append(epsilons[int(times[1])])
-
-	immortal_holes = []
-	for i, death_time in np.ndenumerate(death_t):    # place immortal holes at [birth time, time lim]
-		if death_time == -1:
-			immortal_holes.append([epsilons[int(birth_t[i])], lim * .95])
-	immortal_holes = np.array(immortal_holes)
-
-	if len(immortal_holes):
-		birth_e.extend(immortal_holes[:,0])
-		death_e.extend(immortal_holes[:,1])
-
-	try:
-		count = np.zeros(len(birth_t))
-	except TypeError:		# only one interval point
-		count = [0]
-	for i, pt in enumerate(zip(birth_e, death_e)):
-		for scanner_pt in zip(birth_e, death_e):
-			if pt == scanner_pt:
-				count[i] += 1
-
-	points = np.asarray([birth_e, death_e, count]).T
-	points = np.vstack({tuple(row) for row in points})  # toss duplicates
-
-	x, y, z = points[:,0], points[:,1], points[:,2]
-
-	return x, y, z, lim
-
+		self._get_intervals()
+		self._build_PD_data()
+		self._build_PRF()
+		return self.PRF
 

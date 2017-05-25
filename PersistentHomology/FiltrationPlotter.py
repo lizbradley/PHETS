@@ -16,18 +16,12 @@ import matplotlib.markers
 from matplotlib import animation
 
 
-def load_data():
-	witness_data = np.load('PersistentHomology/temp_data/witness_coords.npy')
-	landmark_data = np.load('PersistentHomology/temp_data/landmark_coords.npy')
-	complex_data = np.load('PersistentHomology/temp_data/complexes.npy')
-	ambient_dim = len(witness_data[1])
-	return ambient_dim, [witness_data, landmark_data, complex_data]
-
 def remove_old_frames():
 	dir = 'PersistentHomology/frames'
 	for f in os.listdir(dir):
 		if f.endswith(".png"):
 			os.remove(dir + f)
+
 
 def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_time):
 	"""helper for plot_complex()"""
@@ -284,14 +278,14 @@ def make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framer
 
 		ani.save('output/PersistentHomology/temp.mp4', fps=10)
 
-		subprocess.call(['ffmpeg', '-y', '-i', 'output/PersistentHomology/temp.mp4','-filter:v',
-						 'setpts={:d}*PTS'.format(int(10 / framerate)), out_file_name])
+		subprocess.call(['ffmpeg', '-y', '-i',
+						 'output/PersistentHomology/temp.mp4',
+						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
+						 out_file_name])
 
 		os.remove('output/PersistentHomology/temp.mp4')
 
 	elif ambient_dim == 3:
-		print "Sorry, 3D filtration movies are not currently supported."
-		sys.exit()
 		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."
 		print "Response times may be impossibly long, especially for large 'max_filtration_param'."
 		filt_data[2] = unpack_complex_data_3D(filt_data[2])
@@ -304,7 +298,7 @@ def make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framer
 
 
 
-def make_frame3D(birth_time, camera_angle=(135, 55), hide_1simplexes=False, alpha=.7, color_scheme='none'):
+def make_frame_3D(birth_time, camera_angle=(135, 55), hide_1simplexes=False, alpha=.7, color_scheme='none'):
 	from mayavi import mlab
 	ambient_dim, filt_data = load_data()
 

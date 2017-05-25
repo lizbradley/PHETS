@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 from PersistentHomology.TestingFunctions import build_and_save_filtration, make_filtration_movie, make_persistence_diagram
-from PersistentHomology.FiltrationPlotter import make_frame3D
+from PersistentHomology.FiltrationPlotter import make_frame_3D
 from PersistentHomology.TestingFunctions import parameter_set
 
 import time
@@ -78,7 +78,7 @@ if test == 2:
 		camera_angle=[55, 135]
 	)
 
-	make_frame3D(5, hide_1simplexes=True, alpha=1)
+	make_frame_3D(5, hide_1simplexes=True, alpha=1)
 
 
 if test == 3:

@@ -547,8 +547,6 @@ def build_filtration(input_file_name, parameter_set):
 				break
 
 
-	np.savetxt('temp_data/epsilons.txt', epsilons)
-
 	extra_data = (landmarks, witnesses)
 	if weak:
 		max_epsilon = 0.0
@@ -654,7 +652,7 @@ def build_filtration(input_file_name, parameter_set):
 		output_file.close()
 		print("Done. File contains %i lines.\n" % num_lines)
 	print("Filtration has been successfully built!\n")
-	return (filtration, extra_data + (max_filtration_param,))
+	return (filtration, extra_data + (max_filtration_param,), epsilons)
 
 class SimplexBirth:
 	# An object that contains a set of landmarks that define a simplex, and a birth time measured in integer units.

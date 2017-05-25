@@ -19,136 +19,16 @@ from DCE.Plotter import plot_waveform, plot_waveform_zoom
 from DCE.Tools import auto_tau
 
 from PersistentHomology.BuildFiltration import build_filtration
-from PersistentHomology.PersistencePlotter import add_persistence_plot
+from PersistentHomology.PDPlotter import add_persistence_plot
 from PersistentHomology.FiltrationPlotter import make_movie
 
 from DCE.Tools import auto_crop
 
 WAV_SAMPLE_RATE = 44100.
 
-def get_filtration(in_filename, params, start=0):
-	# lines = open(in_filename).readlines()
-	print "building filtration..."
-	in_filename = os.getcwd() + '/' + in_filename
-	os.chdir('PersistentHomology/')
-	filtration = build_filtration(in_filename, params)
-
-	witness_coords = filtration[1][1]
-	landmark_coords = filtration[1][0]
-	complexes = sorted(list(filtration[0]))
-	np.save('temp_data/complexes.npy', complexes)
-	np.save('temp_data/witness_coords.npy', witness_coords)
-	np.save('temp_data/landmark_coords.npy', landmark_coords)
-	return complexes
 
 
 
-def get_homology(filt_list):
-	""" calls perseus, creating perseus_out_*.txt
-		TODO: move to PersistentHomology and replace equivalent code there
-	"""
-
-	def group_by_birth_time(complex_ID_list):
-		"""Reformats 1D list of SimplexBirth objects into 2D array of
-		landmark_set lists, where 2nd index is  birth time (? see below)"""
-
-		# TODO: ensure that if a time t has no births, the row t is empty/skipped
-
-		complex_ID_array = []  # list of complex_at_t lists
-		complex_at_t = []  # list of simplices with same birth_time
-		i = 0
-		time = 0
-		list_length = len(complex_ID_list)
-		while i < list_length:
-			birth_time = complex_ID_list[i].birth_time
-			if birth_time == time:
-				complex_at_t.append(complex_ID_list[i].landmark_set)
-				i += 1
-			else:
-				complex_ID_array.append(complex_at_t)
-				complex_at_t = []
-				time += 1
-		return complex_ID_array
-
-	def expand_to_2simplexes(filt_array):
-		"""for each k-simplex in filtration array, if k > 2, replaces with the
-		component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
-		for row in filt_array:
-			expanded_row = []
-			for landmark_ID_set in row:
-				expanded_set = list(itertools.combinations(landmark_ID_set, 3)) \
-					if len(landmark_ID_set) > 3 else [list(landmark_ID_set)]
-				expanded_row.extend(expanded_set)
-			row[:] = expanded_row
-
-	def build_perseus_in_file(filt_array):
-		print 'building perseus_in.txt...'
-		out_file = open('perseus/perseus_in.txt', 'a')
-		out_file.truncate(0)
-		out_file.write('1\n')
-		for idx, row in enumerate(filt_array):
-			for simplex in row:
-				#   format for perseus...
-				line_str = str(len(simplex) - 1) + ' ' + ' '.join(
-					str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
-				out_file.write(line_str)
-		out_file.close()
-
-	filt_array = group_by_birth_time(filt_list)
-	expand_to_2simplexes(filt_array)
-	filt_array = np.asarray(filt_array)
-	build_perseus_in_file(filt_array)
-
-	print 'calling perseus...'
-	os.chdir('perseus')
-
-	if platform == "linux" or platform == "linux2":
-		subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-	elif platform == "darwin":  # macOS
-		subprocess.call("./perseusMac nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-	else:   # Windows
-		subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
-
-	os.chdir('..')
-	os.chdir('..')
-
-
-def build_PRF(data, PRF_res):
-	""" helper for get_rank_func()"""
-
-	if not data:
-		print
-		return [None, None, np.zeros([PRF_res, PRF_res]), None]
-
-	x, y, z, max_lim = data
-	min_lim = 0
-
-	x_ = y_ = np.linspace(min_lim, max_lim, PRF_res)
-	xx, yy = np.meshgrid(x_, y_)
-
-	pts = zip(x, y, z)
-	grid_pts = zip(np.nditer(xx), np.nditer(yy))
-	grid_vals = np.zeros(len(grid_pts))
-	for i, grid_pt in enumerate(grid_pts):
-		if grid_pt[0] <= grid_pt[1]:
-			for pt in pts:
-				if pt[0] <= grid_pt[0] and pt[1] >= grid_pt[1]:
-					grid_vals[i] += pt[2]
-		else:
-			grid_vals[i] = np.nan
-	grid_vals = np.reshape(grid_vals, xx.shape)
-
-	return [xx, yy, grid_vals, max_lim]
-
-
-def get_PRF(filename, filt_params, PRF_res):
-	filt = get_filtration(filename, filt_params)
-	get_homology(filt)
-	intervals = get_interval_data(filename)
-	f = build_PRF(intervals, PRF_res)
-	return f
 
 
 def get_scaled_dists(funcs_z, ref_func_z, weighting_func, scale, PRF_res):
