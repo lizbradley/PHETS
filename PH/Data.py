@@ -126,8 +126,8 @@ class Filtration:
 						expanded_set = list(itertools.combinations(landmark_ID_set, 3))
 					else:
 						expanded_set = [list(landmark_ID_set)]
-					# expanded_row.extend(expanded_set)		# flatten
-					expanded_row.append(expanded_set)		# group by parent
+					expanded_row.extend(expanded_set)		# flatten
+					# expanded_row.append(expanded_set)		# group by parent
 				row[:] = expanded_row
 
 
@@ -157,7 +157,7 @@ class Filtration:
 
 		def build_perseus_in_file(filt_array):
 			print 'building perseus_in.txt...'
-			out_file = open('PH/perseus/perseus_in.txt', 'a')
+			out_file = open('perseus/perseus_in.txt', 'a')
 			out_file.truncate(0)
 			out_file.write('1\n')
 			for idx, row in enumerate(filt_array):
@@ -170,7 +170,11 @@ class Filtration:
 
 		def call_perseus():
 
-			os.chdir('PH/perseus')
+			os.chdir('perseus')
+
+			for f in os.listdir('.'):
+				if f.startswith('perseus_out'):
+					os.remove(f)
 
 			if sys.platform == "linux" or sys.platform == "linux2":
 				subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
@@ -181,64 +185,80 @@ class Filtration:
 			else:  # Windows
 				subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
 
+			os.chdir('..')
+
 		def load_perseus_out_file():
 			try:
-				self.intervals = np.loadtxt('PH/perseus/perseus_out_1.txt', ndmin=1)
-			except ValueError:
+				self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
+			except IOError:
 				print 'WARNING: no homology for', self.filename
 				self.intervals = 'empty'
 
+		caller_dir = os.getcwd()
+		os.chdir(SCRIPT_DIR)
 		build_perseus_in_file(self.complexes)
 		call_perseus()
 		load_perseus_out_file()
+		os.chdir(caller_dir)
 
 	def _build_PD_data(self):
 		""" formats perseus output """
+
+		def get_multiplicity(birth_e, death_e):
+			try:
+				count = np.zeros_like(birth_e)
+			except TypeError:  # only one interval point
+				count = [0]
+			if not death_e:
+				death_e = [-1 for e in birth_e]
+			for i, pt in enumerate(zip(birth_e, death_e)):
+				for scanner_pt in zip(birth_e, death_e):
+					if pt == scanner_pt:
+						count[i] += 1
+			return count
+
 		if self.PD_data:
 			return
 
-		if self.intervals == 'empty':
-			self.PD_data = 'empty'
-			return
+		if isinstance(self.intervals, basestring):
+			if self.intervals == 'empty':
+				self.PD_data = 'empty'
+				return
 
-		birth_t, death_t = self.intervals
 		epsilons = self.epsilons
 		lim = np.max(epsilons)
 
-		birth_e = []
-		death_e = []
+		birth_e_mor = []
+		death_e_mor = []
 
-		timess = np.vstack([birth_t, death_t]).T
-		for times in timess:
-			if times[1] != - 1:
-				birth_e.append(epsilons[int(times[0])])
-				death_e.append(epsilons[int(times[1])])
+		birth_e_imm = []
 
-		immortal_holes = []
-		for i, death_time in np.ndenumerate(death_t):  # place immortal holes at [birth time, time lim]
-			if death_time == -1:
-				immortal_holes.append([epsilons[int(birth_t[i])], lim * .95])
-		immortal_holes = np.array(immortal_holes)
+		birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
+		for interval in zip(birth_t, death_t):
+			if interval[1] == -1:	# immortal
+				birth_e_imm.append(epsilons[int(interval[0])])
 
-		if len(immortal_holes):
-			birth_e.extend(immortal_holes[:, 0])
-			death_e.extend(immortal_holes[:, 1])
+			else:
+				birth_e_mor.append(epsilons[int(interval[0])])
+				death_e_mor.append(epsilons[int(interval[1])])
 
-		try:
-			count = np.zeros(len(birth_t))
-		except TypeError:  # only one interval point
-			count = [0]
-		for i, pt in enumerate(zip(birth_e, death_e)):
-			for scanner_pt in zip(birth_e, death_e):
-				if pt == scanner_pt:
-					count[i] += 1
+		count_mor = get_multiplicity(birth_e_mor, birth_e_mor)
+		mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
+		mortal = np.vstack({tuple(row) for row in mortal}).T  # toss duplicates
 
-		points = np.asarray([birth_e, death_e, count]).T
-		points = np.vstack({tuple(row) for row in points})  # toss duplicates
+		count_imm = get_multiplicity(birth_e_imm, None)
+		immortal = np.asarray([birth_e_imm, count_imm]).T
+		immortal = np.vstack({tuple(row) for row in immortal}).T # toss duplicates
 
-		x, y, z = points[:, 0], points[:, 1], points[:, 2]
+		class PDData:
+			def __init__(self, mortal, immortal, lim):
+				self.mortal = mortal
+				self.immortal = immortal
+				self.lim = lim
 
-		self.PD_data = [x, y, z, lim]
+		data = PDData(mortal, immortal, lim)
+
+		self.PD_data = data
 
 	def _build_PRF(self, num_div):
 
@@ -249,7 +269,8 @@ class Filtration:
 			print
 			return [None, None, np.zeros([num_div, num_div]), None]
 
-		x, y, z, max_lim = self.PD_data
+		x, y, z = self.PD_data().mortal
+		max_lim = self.PD_data().lim
 		min_lim = 0
 
 		x_ = y_ = np.linspace(min_lim, max_lim, num_div)
@@ -273,20 +294,35 @@ class Filtration:
 	# public #
 	def get_complexes_mpl(self):
 
+		# old version, for simplexes are not flattened #
+		# def IDs_to_coords(ID_array):
+		# 	"""Replaces each landmark_ID with corresponding coordinates"""
+		# 	for row in ID_array:
+		# 		for parent_simplex in row:
+		# 			new_parent_simplex = []
+		# 			for child in parent_simplex:
+		# 				new_parent_simplex.append(list(child))
+		# 			for child in new_parent_simplex:
+		# 				new_child = []
+		# 				for landmark_ID in child:
+		# 					landmark_coords = self.landmark_coords[landmark_ID]
+		# 					new_child.append(landmark_coords)
+		# 				child[:] = new_child
+		# 			parent_simplex[:] = new_parent_simplex
+
 		def IDs_to_coords(ID_array):
 			"""Replaces each landmark_ID with corresponding coordinates"""
 			for row in ID_array:
-				for parent_simplex in row:
-					new_parent_simplex = []
-					for child in parent_simplex:
-						new_parent_simplex.append(list(child))
-					for child in new_parent_simplex:
-						new_child = []
-						for landmark_ID in child:
-							landmark_coords = self.landmark_coords[landmark_ID]
-							new_child.append(landmark_coords)
-						child[:] = new_child
-					parent_simplex[:] = new_parent_simplex
+				new_row = []
+				for simplex in row:
+					simplex_coords = []
+					for landmark_ID in simplex:
+						landmark_coords = self.landmark_coords[landmark_ID]
+						simplex_coords.append(landmark_coords)
+					new_row.append(simplex_coords)
+				row[:] = new_row
+
+
 
 		def flatten_rows(ID_array):
 			for row in ID_array:
@@ -298,7 +334,7 @@ class Filtration:
 
 		data = self.complexes
 		IDs_to_coords(data)
-		flatten_rows(data)		# if grouped by parent simplex
+		# flatten_rows(data)		# if grouped by parent simplex
 		return data
 
 	def get_complexes_mayavi(self):

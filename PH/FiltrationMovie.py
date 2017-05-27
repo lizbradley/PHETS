@@ -91,9 +91,9 @@ def add_title(subplot, title_block_info, i):
 	return title_table, param_table   # for init()
 
 
-def update_time_table(time_plot, i):
+def update_time_table(time_plot, i, filtration):
 
-	epsilons = np.loadtxt('PH/temp_data/epsilons.txt')
+	epsilons = filtration.epsilons
 	e = epsilons[i]
 	time_table = time_plot.table(
 		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
@@ -242,7 +242,7 @@ def make_frames_2D(filtration, title_block_info, color_scheme, alpha, save_frame
 	def animate(i):
 		print 'frame', i
 		ret_comp = plot_complex(filt_plot, i)
-		ret_title = update_time_table(title_block, i)
+		ret_title = update_time_table(title_block, i, filtration)
 		ret_list = list(ret_comp)
 		ret_list.extend(ret_title)
 
@@ -299,7 +299,7 @@ def make_movie(
 						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
 						 out_filename])
 
-		# os.remove('output/PH/temp.mp4')
+		os.remove('output/PH/temp.mp4')
 
 	elif ambient_dim == 3:
 		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."

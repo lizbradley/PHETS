@@ -50,19 +50,21 @@ def add_title(subplot, title_block_info):
 	title_table.auto_set_font_size(False)
 	title_table.auto_set_font_size(8)
 
-def add_persistence_plot(subplot, filtration):
+def add_persistence_plot(ax, filtration):
 
-	subplot.set_aspect('equal')
+	ax.set_aspect('equal')
 	min_lim = 0
 	max_lim = np.max(filtration.epsilons)
-	subplot.set_xlim(min_lim, max_lim)
-	subplot.set_ylim(min_lim, max_lim)
+	ax.set_xlim(min_lim, max_lim)
+	ax.set_ylim(min_lim, max_lim)
 
-	# subplot.set_xlabel('birth time')
-	# subplot.set_ylabel('death time')
+	ax.set_xlabel('birth ($\epsilon$)')
+	ax.set_ylabel('death ($\epsilon$)')
 
+	ax.grid(which=u'both', zorder=0)
+	ax.minorticks_on()
 
-	subplot.plot([min_lim, max_lim], [min_lim, max_lim], color='k') # diagonal line
+	ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k')		# diagonal line
 
 
 	# normal #
@@ -77,30 +79,20 @@ def add_persistence_plot(subplot, filtration):
 	# p_ms_scale = 60
 	# color = 'red'
 
-	immortal_holes, birth_e, death_ = filtration.PD_data()
-	x, y = immortal_holes, [max_lim for i in immortal_holes]
-	subplot.scatter(x, y, marker='^', s=(count * t_ms_scale) + min_size, c=color, clip_on=False)
-	# end plot immortal holes#
-
-
-	subplot.scatter(birth_e, death_e, s=(count * p_ms_scale) + min_size, clip_on=False, c=color)
-	# end plot doomed holes #
-
-
 
 	# add legend #
-	mark_t_1 = subplot.scatter([], [], marker='^', s=t_ms_scale,	 c=color)
-	mark_t_3 = subplot.scatter([], [], marker='^', s=t_ms_scale * 3, c=color)
-	mark_t_5 = subplot.scatter([], [], marker='^', s=t_ms_scale * 5, c=color)
+	mark_t_1 = ax.scatter([], [], marker='^', s=t_ms_scale, c=color)
+	mark_t_3 = ax.scatter([], [], marker='^', s=t_ms_scale * 3, c=color)
+	mark_t_5 = ax.scatter([], [], marker='^', s=t_ms_scale * 5, c=color)
 
-	mark_p_1 = subplot.scatter([], [], s=p_ms_scale,	 c=color)
-	mark_p_3 = subplot.scatter([], [], s=p_ms_scale * 3, c=color)
-	mark_p_5 = subplot.scatter([], [], s=p_ms_scale * 5, c=color)
+	mark_p_1 = ax.scatter([], [], s=p_ms_scale, c=color)
+	mark_p_3 = ax.scatter([], [], s=p_ms_scale * 3, c=color)
+	mark_p_5 = ax.scatter([], [], s=p_ms_scale * 5, c=color)
 
 	marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
 	labels = ('', '', '', '1', '3', '5')
 
-	subplot.legend(
+	ax.legend(
 		marks, labels, loc='lower right', ncol=2, markerscale=1,
 		borderpad=1,
 		labelspacing=1,
@@ -109,6 +101,18 @@ def add_persistence_plot(subplot, filtration):
 		borderaxespad=3
 		#edgecolor='k'
 	)
+
+	data = filtration.get_PD_data()
+	if data == 'empty':
+		return
+
+	x_mor, y_mor, count_mor = data.mortal
+	ax.scatter(x_mor, y_mor, s=(count_mor * p_ms_scale) + min_size, clip_on=False, c=color)
+
+	x_imm, count_imm = data.immortal
+	y_imm = [max_lim for i in x_imm]
+	ax.scatter(x_imm, y_imm, marker='^', s=(count_imm * t_ms_scale) + min_size, c=color, clip_on=False)
+
 	# end add legend #
 
 
@@ -121,7 +125,7 @@ def make_PD(filtration, out_filename):
 
 	title_info = [filtration.filename, out_filename, filtration.params]
 
-	add_persistence_plot(ax, )
+	add_persistence_plot(ax, filtration)
 	add_title(title_plot, title_info)
 
 	# IDA paper figures #
@@ -129,16 +133,14 @@ def make_PD(filtration, out_filename):
 	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 	# ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
-	xlims = ax.get_xlim()
-	ax.set_xticks([0, round(xlims[1]/2., 4), xlims[1]])
-	ylims = ax.get_ylim()
-	ax.set_yticks([round(ylims[1]/2., 4), ylims[1]])
-	ax.tick_params(labelsize=23)
+	# xlims = ax.get_xlim()
+	# ax.set_xticks([0, round(xlims[1]/2., 4), xlims[1]])
+	# ylims = ax.get_ylim()
+	# ax.set_yticks([round(ylims[1]/2., 4), ylims[1]])
+	# ax.tick_params(labelsize=23)
 
-	ax.grid(which=u'both', zorder=0)
-	ax.minorticks_on()
 	title_plot.axis('off')
-	
+
 	pyplot.savefig(out_filename)
 	pyplot.clf()
 
