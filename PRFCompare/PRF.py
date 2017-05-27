@@ -18,17 +18,13 @@ from DCE.DCE import embed
 from DCE.Plotter import plot_waveform, plot_waveform_zoom
 from DCE.Tools import auto_tau
 
-from PersistentHomology.BuildFiltration import build_filtration
-from PersistentHomology.PDPlotter import add_persistence_plot
-from PersistentHomology.FiltrationPlotter import make_movie
+from PH.BuildFiltration import build_filtration
+from PH.PDPlotter import add_persistence_plot
+from PH.FiltrationMovie import make_movie
 
 from DCE.Tools import auto_crop
 
 WAV_SAMPLE_RATE = 44100.
-
-
-
-
 
 
 def get_scaled_dists(funcs_z, ref_func_z, weighting_func, scale, PRF_res):
@@ -71,15 +67,6 @@ def get_scaled_dists(funcs_z, ref_func_z, weighting_func, scale, PRF_res):
 
 
 
-def persistence_diagram(filename):
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	try:
-		add_persistence_plot(ax)
-	except ValueError:
-		pass
-	plt.savefig(filename)
-	plt.close(fig)
 
 
 def PRF_contour_plot(ax, func):

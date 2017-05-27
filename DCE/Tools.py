@@ -153,7 +153,6 @@ def plot_power_spectrum(sig, out_file, crop=(1,2)):
 	FFT_neg = FFT[(len(FFT)/2) + 1:]
 	spec = FFT_pos + FFT_neg[::-1]
 
-	# TODO: show grid, more ticks
 
 	subplots[0].set_xscale('log')
 	subplots[0].set_xlim([20, 20000])

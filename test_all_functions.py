@@ -1,14 +1,14 @@
 import sys
 import numpy as np
-from PersistentHomology.TestingFunctions import parameter_set
+from PH.TestingFunctions import parameter_set
 
 
 #
 # ########################################################################################################################
-# #	PersistentHomology
+# #	PH
 # ########################################################################################################################
 #
-# from PersistentHomology.TestingFunctions import build_and_save_filtration, make_filtration_movie, make_persistence_diagram
+# from PH.TestingFunctions import build_and_save_filtration, make_filtration_movie, make_persistence_diagram
 #
 # in_data_file_name = "datasets/embedded/L63_x_m2/L63_x_m2_tau7.txt"
 # build_filt_params = parameter_set

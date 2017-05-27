@@ -33,4 +33,3 @@ compare_multi(
 frames_to_movie('output/DCE/C134vC135.mp4', framerate=1)
 
 
-# TODO: auto tau broken

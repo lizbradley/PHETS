@@ -1,16 +1,8 @@
 import sys
 import numpy as np
 
-from PersistentHomology.TestingFunctions import parameter_set
+from PH.TestingFunctions import parameter_set
 from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
-
-# TODO: fix embed movie titlebox
-# TODO: finish auto_embed
-# TODO: add PRF contour plot
-# TODO: prfc weighting functions
-# TODO: clarinet data
-# TODO: GI Complex
-# TODO: make dce take tau (sec), update all calling functions ?
 
 
 
