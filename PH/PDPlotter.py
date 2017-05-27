@@ -14,10 +14,10 @@ from matplotlib.ticker import FormatStrFormatter
 from config import MEMORY_PROFILE_ON
 
 
-f=open("PersistentHomology/output/group_by_birth_time_memory.txt","wb")
-f2=open("PersistentHomology/output/expand_to_2simplexes_memory.txt","wb")
-f3=open("PersistentHomology/output/build_perseus_in_file_memory.txt","wb")
-f4=open("PersistentHomology/output/make_figure_memory.txt","wb")
+f=open("output/run_info/group_by_birth_time_memory.txt","wb")
+f2=open("output/run_info/expand_to_2simplexes_memory.txt","wb")
+f3=open("output/run_info/build_perseus_in_file_memory.txt","wb")
+f4=open("output/run_info/make_figure_memory.txt","wb")
 
 # @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)
@@ -50,9 +50,11 @@ def add_title(subplot, title_block_info):
 	title_table.auto_set_font_size(False)
 	title_table.auto_set_font_size(8)
 
-def add_persistence_plot(filtration):
+def add_persistence_plot(subplot, filtration):
 
 	subplot.set_aspect('equal')
+	min_lim = 0
+	max_lim = np.max(filtration.epsilons)
 	subplot.set_xlim(min_lim, max_lim)
 	subplot.set_ylim(min_lim, max_lim)
 
@@ -69,7 +71,7 @@ def add_persistence_plot(filtration):
 	p_ms_scale = 30
 	color = 'C0'
 
-	# BIG for paper #
+	# BIG for IDA paper #
 	# min_size = 300
 	# t_ms_scale = 150
 	# p_ms_scale = 60
@@ -111,37 +113,35 @@ def add_persistence_plot(filtration):
 
 
 # @profile(stream=f4)
-def make_figure(title_block_info, out_file_name):
+def make_PD(filtration, out_filename):
 
 	fig = pyplot.figure(figsize=(8,6), tight_layout=True, dpi=300)
-	title_block = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3)
-	pers_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
+	title_plot = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3)
+	ax = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 
-	add_persistence_plot(pers_plot)
+	title_info = [filtration.filename, out_filename, filtration.params]
 
-	# add_title(title_block, title_block_info)
+	add_persistence_plot(ax, )
+	add_title(title_plot, title_info)
 
-	# paper figures
+	# IDA paper figures #
 	# title_block.tick_params(labelsize=23)
-	title_block.axis('off')
+	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	# ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
-	ax = pers_plot
 	xlims = ax.get_xlim()
 	ax.set_xticks([0, round(xlims[1]/2., 4), xlims[1]])
 	ylims = ax.get_ylim()
 	ax.set_yticks([round(ylims[1]/2., 4), ylims[1]])
-	pers_plot.tick_params(labelsize=23)
-
-	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-	# ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	ax.tick_params(labelsize=23)
 
 	ax.grid(which=u'both', zorder=0)
 	ax.minorticks_on()
-
+	title_plot.axis('off')
 	
-	pyplot.savefig(out_file_name)
+	pyplot.savefig(out_filename)
 	pyplot.clf()
 
 
 if __name__ == '__main__':
-	make_figure('filt_test.txt')
+	make_PD('filt_test.txt')

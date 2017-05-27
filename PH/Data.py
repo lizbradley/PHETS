@@ -69,7 +69,7 @@ class Filtration:
 		try:
 			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)
 		except OSError:
-			print "WARNING: invalid PersistentHomology/find_landmarks binary. Recompiling..."
+			print "WARNING: invalid PH/find_landmarks binary. Recompiling..."
 
 			if sys.platform == "linux" or sys.platform == "linux2":
 				compile_str = find_landmarks_c_compile_str['linux']
@@ -144,7 +144,7 @@ class Filtration:
 								triangles.append(tri)
 
 
-				with open("PersistentHomology/output/num_triangles.txt","wb") as f:
+				with open("output/run_info/num_triangles.txt","wb") as f:
 					f.write("Number of triangles: "+str(len(triangles)))
 
 		filt_ID_array = group_by_birth_time(filt_ID_list)	# 1d list -> 2d array
@@ -157,7 +157,7 @@ class Filtration:
 
 		def build_perseus_in_file(filt_array):
 			print 'building perseus_in.txt...'
-			out_file = open('PersistentHomology/perseus/perseus_in.txt', 'a')
+			out_file = open('PH/perseus/perseus_in.txt', 'a')
 			out_file.truncate(0)
 			out_file.write('1\n')
 			for idx, row in enumerate(filt_array):
@@ -170,7 +170,7 @@ class Filtration:
 
 		def call_perseus():
 
-			os.chdir('PersistentHomology/perseus')
+			os.chdir('PH/perseus')
 
 			if sys.platform == "linux" or sys.platform == "linux2":
 				subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
@@ -183,7 +183,7 @@ class Filtration:
 
 		def load_perseus_out_file():
 			try:
-				self.intervals = np.loadtxt('PersistentHomology/perseus/perseus_out_1.txt', ndmin=1)
+				self.intervals = np.loadtxt('PH/perseus/perseus_out_1.txt', ndmin=1)
 			except ValueError:
 				print 'WARNING: no homology for', self.filename
 				self.intervals = 'empty'

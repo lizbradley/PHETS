@@ -1,8 +1,8 @@
 import sys
 import numpy as np
-from PersistentHomology.TestingFunctions import build_and_save_filtration, make_filtration_movie, make_persistence_diagram
-from PersistentHomology.FiltrationMovie import make_frame_3D
-from PersistentHomology.TestingFunctions import parameter_set
+from PH.TestingFunctions import build_and_save_filtration, make_filtration_movie, make_persistence_diagram
+from PH.FiltrationMovie import make_frame_3D
+from PH.TestingFunctions import parameter_set
 
 
 
@@ -24,7 +24,7 @@ build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) 
 #
 # make_filtration_movie(
 # 	in_data_file_name,              # used to check if saved filtration is up to date, and in titlebox
-# 	"output/PersistentHomology/L63_x_m2_tau7_movie.mp4",      		# output filename
+# 	"output/PH/L63_x_m2_tau7_movie.mp4",      		# output filename
 # 	build_filt_params,              # passed to BuildComplex.build_filtration()
 #
 # 	# the following are optional plotting parameters and may be omitted
@@ -35,6 +35,6 @@ build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) 
 
 make_persistence_diagram(
 	in_data_file_name,
-	"output/PersistentHomology/L63_x_m2_tau7_persistence_new.png",
+	"output/PH/L63_x_m2_tau7_persistence_new.png",
 	build_filt_params
 )

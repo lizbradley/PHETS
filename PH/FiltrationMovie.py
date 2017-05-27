@@ -17,7 +17,7 @@ from matplotlib import animation
 
 
 def remove_old_frames():
-	dir = 'PersistentHomology/frames'
+	dir = 'PH/frames'
 	for f in os.listdir(dir):
 		if f.endswith(".png"):
 			os.remove(dir + f)
@@ -93,7 +93,7 @@ def add_title(subplot, title_block_info, i):
 
 def update_time_table(time_plot, i):
 
-	epsilons = np.loadtxt('PersistentHomology/temp_data/epsilons.txt')
+	epsilons = np.loadtxt('PH/temp_data/epsilons.txt')
 	e = epsilons[i]
 	time_table = time_plot.table(
 		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
@@ -220,9 +220,10 @@ def make_frames_2D(filtration, title_block_info, color_scheme, alpha, save_frame
 	filt_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 	filt_plot.set_aspect('equal')
 
-	filt_plot.tick_params(labelsize=23)
-	filt_plot.xaxis.major.locator.set_params(nbins=5)
-	filt_plot.yaxis.major.locator.set_params(nbins=5)
+	# IDA paper formatting #
+	# filt_plot.tick_params(labelsize=23)
+	# filt_plot.xaxis.major.locator.set_params(nbins=5)
+	# filt_plot.yaxis.major.locator.set_params(nbins=5)
 
 	witness_data = filtration.witness_coords
 	landmark_data = filtration.landmark_coords
@@ -290,15 +291,15 @@ def make_movie(
 		# consequence of all simplexes being hidden in the init function.
 
 		print 'saving...'
-		ani.save('output/PersistentHomology/temp.mp4', fps=10)
+		ani.save('output/PH/temp.mp4', fps=10)
 		print 'correcting framerate...'
 
 		subprocess.call(['ffmpeg', '-y', '-i',
-						 'output/PersistentHomology/temp.mp4',
+						 'output/PH/temp.mp4',
 						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
 						 out_filename])
 
-		# os.remove('output/PersistentHomology/temp.mp4')
+		# os.remove('output/PH/temp.mp4')
 
 	elif ambient_dim == 3:
 		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."

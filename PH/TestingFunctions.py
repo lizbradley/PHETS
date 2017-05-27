@@ -84,7 +84,7 @@ def make_persistence_diagram(
 	check_overwrite(out_file_name)
 	start_time = time.time()
 	title_block_info = [in_file_name, out_file_name, parameter_set]
-	PDPlotter.make_figure(title_block_info, out_file_name)
+	PDPlotter.make_PD(title_block_info, out_file_name)
 	print("make_persistence_diagram() time elapsed: %d seconds \n" % (time.time() - start_time))
 
 if __name__ == '__main__':

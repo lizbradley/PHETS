@@ -29,7 +29,7 @@ def sort(i):
 MEMORY_PROFILE_ON = False
 
 
-f = open("output/PersistentHomology/build_filtration_memory.txt","wb")
+# f = open("output/PH/build_filtration_memory.txt","wb")
 
 # @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)
