@@ -1,34 +1,46 @@
 import os
 import sys
-import BuildFiltration
-import numpy as np
 import time
 import pickle
 import subprocess
 
+import numpy as np
+import itertools
+
+import BuildFiltration
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
 def load_saved_filtration():
 	caller_dir = os.getcwd()
-	abspath = os.path.abspath(__file__)
-	# dname = os.path.dirname(abspath)
-	# os.chdir(dname)
-	os.chdir(abspath)
-
-	filtration = pickle.load('temp_data/filtration')
+	os.chdir(SCRIPT_DIR)
+	filtration = pickle.load(open('temp_data/filtration.p'))
 	os.chdir(caller_dir)
 	return filtration
 
 
+
+import subprocess
+from config import find_landmarks_c_compile_str
 class Filtration:
 
 	def __init__(self, in_filename, params, start=0):
+		caller_dir = os.getcwd()
+		os.chdir(SCRIPT_DIR)
 
-		self.filename = in_filename
-		arr = self._build(in_filename, params, start=0)
+		self.filename = caller_dir + '/' +  in_filename
+		self.params = params
+
+		arr = self._build(self.filename, params, start=0)
 
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
 		self.complexes = self._unpack_complexes(arr[2])
 		self.epsilons = arr[3]
+
+		self.ambient_dim = len(self.witness_coords[0])
+		self.num_div = len(self.complexes)
 
 		self.intervals = None
 		self.PD_data = None
@@ -36,17 +48,13 @@ class Filtration:
 
 		pickle.dump(self, open('temp_data/filtration.p', 'wb'))
 
+		os.chdir(caller_dir)
+
 
 	# private #
 	def _build(self, sig, params, start=0):
 		print "building filtration..."
 		start_time = time.time()
-
-		caller_dir = os.getcwd()
-		abspath = os.path.abspath(__file__)
-		# dname = os.path.dirname(abspath)
-		# os.chdir(dname)
-		os.chdir(abspath)
 
 		if isinstance(sig, basestring):			# is filename
 			lines = open(sig).readlines()
@@ -55,16 +63,33 @@ class Filtration:
 		else:									# is array
 			start_idx = int(len(sig) * start)
 			worm = sig[start_idx]
+
 		open('temp_data/worm_data.txt', 'w').writelines(worm)
 
-		filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)
+		try:
+			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)
+		except OSError:
+			print "WARNING: invalid PersistentHomology/find_landmarks binary. Recompiling..."
+
+			if sys.platform == "linux" or sys.platform == "linux2":
+				compile_str = find_landmarks_c_compile_str['linux']
+			elif sys.platform == 'darwin':
+				compile_str = find_landmarks_c_compile_str['macOS']
+			else:
+				print 'Sorry, PHETS requires linux or macOS.'
+				sys.exit()
+
+			subprocess.call(compile_str, shell=True)
+			print "find_landmarks recompilation complete. Please repeat your test."
+			sys.exit()
+
+
 		witness_coords = filtration[1][1]
 		landmark_coords = filtration[1][0]
 		abstract_filtration = sorted(list(filtration[0]))
 		epsilons = filtration[2]		# add to build_filtration return
 
 		print("build_and_save_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
-		os.chdir(caller_dir)
 		return [witness_coords, landmark_coords, abstract_filtration, epsilons]
 
 	def _unpack_complexes(self, filt_ID_list):
@@ -101,7 +126,8 @@ class Filtration:
 						expanded_set = list(itertools.combinations(landmark_ID_set, 3))
 					else:
 						expanded_set = [list(landmark_ID_set)]
-					expanded_row.extend(expanded_set)
+					# expanded_row.extend(expanded_set)		# flatten
+					expanded_row.append(expanded_set)		# group by parent
 				row[:] = expanded_row
 
 
@@ -175,8 +201,9 @@ class Filtration:
 			self.PD_data = 'empty'
 			return
 
-		birth_e, death_e = self.intervals
-		lim = np.max(self.epsilons)
+		birth_t, death_t = self.intervals
+		epsilons = self.epsilons
+		lim = np.max(epsilons)
 
 		birth_e = []
 		death_e = []
@@ -213,19 +240,19 @@ class Filtration:
 
 		self.PD_data = [x, y, z, lim]
 
-	def _build_PRF(self):
+	def _build_PRF(self, num_div):
 
 		if self.PRF:
 			return
 
 		if self.PD_data == 'empty':
 			print
-			return [None, None, np.zeros([PRF_res, PRF_res]), None]
+			return [None, None, np.zeros([num_div, num_div]), None]
 
 		x, y, z, max_lim = self.PD_data
 		min_lim = 0
 
-		x_ = y_ = np.linspace(min_lim, max_lim, PRF_res)
+		x_ = y_ = np.linspace(min_lim, max_lim, num_div)
 		xx, yy = np.meshgrid(x_, y_)
 
 		pts = zip(x, y, z)
@@ -271,7 +298,7 @@ class Filtration:
 
 		data = self.complexes
 		IDs_to_coords(data)
-		flatten_rows(data)
+		flatten_rows(data)		# if grouped by parent simplex
 		return data
 
 	def get_complexes_mayavi(self):
@@ -298,9 +325,9 @@ class Filtration:
 		self._build_PD_data()	# sets self.PD_data, returns PD_data
 		return self.PD_data
 
-	def get_PRF(self):
+	def get_PRF(self, num_div):
 		self._get_intervals()
 		self._build_PD_data()
-		self._build_PRF()
+		self._build_PRF(num_div)
 		return self.PRF
 

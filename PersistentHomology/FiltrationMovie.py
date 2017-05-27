@@ -190,7 +190,7 @@ def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angl
 		pyplot.savefig('frames/image%03d.png' % i)
 
 
-def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug):
+def make_frames_2D(filtration, title_block_info, color_scheme, alpha, save_frames):
 	def plot_witnesses(subplot, attractor_data):
 		attractor_data = np.array(attractor_data)
 		x = attractor_data[:, 0]
@@ -224,9 +224,9 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 	filt_plot.xaxis.major.locator.set_params(nbins=5)
 	filt_plot.yaxis.major.locator.set_params(nbins=5)
 
-	witness_data = filt_data[0]
-	landmark_data = filt_data[1]
-	complex_data = filt_data[2]
+	witness_data = filtration.witness_coords
+	landmark_data = filtration.landmark_coords
+	complex_data = filtration.get_complexes_mpl()
 
 	def init():
 		print 'initializing...'
@@ -245,28 +245,41 @@ def make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug
 		ret_list = list(ret_comp)
 		ret_list.extend(ret_title)
 
-		if frame_debug: pyplot.savefig('frames/image%03d.png' % i)
+		if save_frames: pyplot.savefig('frames/image%03d.png' % i)
 
 		return ret_list
 
 	return init, animate
 
+import Utilities
 
+def make_movie(
+		filtration,
+		out_filename,
+		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
+		camera_angle=(135, 55),  		# for 3D mode. [azimuthal, elevation]
+		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
+		dpi=150,  						# dots per inch (resolution)
+		max_frames=None,  				# cut off frame (for testing or when only interested in the beginning of a movie)
+		hide_1simplexes=False,			# i need to find a way to optimize the plotting of 1-simplexes(lines) 3D plotting, as of now they slow mayavi significantly.
+		save_frames=False,  			# save frames to /frames/ dir
+		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
 
-def make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, frame_debug):
+):
 
-	remove_old_frames()
+	# remove_old_frames()
 
-	ambient_dim, filt_data = load_data()
+	# Utilities.check_overwrite(out_filename)
+
+	title_block_info = [filtration.filename, out_filename, filtration.params,
+						color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
 
 	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
 
-	if ambient_dim == 2:
-
-		pre_unpack = filt_data[2]
-		filt_data[2] = unpack_complex_data_2D(filt_data[2], filt_data[1])
-		init, animate = make_frames_2D(filt_data, title_block_info, color_scheme, alpha, frame_debug=frame_debug)
-		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=len(filt_data[2]), blit=True, repeat=False)
+	if filtration.ambient_dim == 2:
+		print 'building movie...'
+		init, animate = make_frames_2D(filtration, title_block_info, color_scheme, alpha, save_frames=save_frames)
+		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div, blit=True, repeat=False)
 
 		# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
 		# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
@@ -276,14 +289,16 @@ def make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framer
 		# to configure it correctly, it doesn't make much any(?) difference in time-to-run. However, this may be a
 		# consequence of all simplexes being hidden in the init function.
 
+		print 'saving...'
 		ani.save('output/PersistentHomology/temp.mp4', fps=10)
+		print 'correcting framerate...'
 
 		subprocess.call(['ffmpeg', '-y', '-i',
 						 'output/PersistentHomology/temp.mp4',
 						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
-						 out_file_name])
+						 out_filename])
 
-		os.remove('output/PersistentHomology/temp.mp4')
+		# os.remove('output/PersistentHomology/temp.mp4')
 
 	elif ambient_dim == 3:
 		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."

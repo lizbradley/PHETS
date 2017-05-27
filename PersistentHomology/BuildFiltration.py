@@ -29,7 +29,7 @@ def sort(i):
 MEMORY_PROFILE_ON = False
 
 
-f = open("PersistentHomology/output/build_filtration_memory.txt","wb")
+f = open("output/PersistentHomology/build_filtration_memory.txt","wb")
 
 # @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)
@@ -112,6 +112,8 @@ def build_filtration(input_file_name, parameter_set):
 	num_threads = 2
 	# for more information about these parameters type ./find_landmarks --help in the terminal
 	# the distance calculations are calculated and outputted to a file called find_landmarks.txt
+	print os.getcwd()
+
 	if ls=="EST":
 		if always_euclidean:
 			if graph_induced:

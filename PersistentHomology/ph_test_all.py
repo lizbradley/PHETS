@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 from PersistentHomology.TestingFunctions import build_and_save_filtration, make_filtration_movie, make_persistence_diagram
-from PersistentHomology.FiltrationPlotter import make_frame_3D
+from PersistentHomology.FiltrationMovie import make_frame_3D
 from PersistentHomology.TestingFunctions import parameter_set
 
 

@@ -1,5 +1,5 @@
 import BuildFiltration
-import FiltrationPlotter
+import FiltrationMovie
 import PDPlotter
 import numpy as np
 import os
@@ -70,7 +70,7 @@ def make_filtration_movie(
 	check_overwrite(out_file_name)
 	start_time = time.time()
 	title_block_info = [in_file_name, out_file_name, parameter_set, color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
-	FiltrationPlotter.make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
+	FiltrationMovie.make_movie(out_file_name, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
 	print("make_filtration_movie() time elapsed: %d seconds \n" % (time.time() - start_time))
 
 
