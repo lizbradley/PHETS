@@ -152,7 +152,7 @@ class Filtration:
 		return filt_ID_array
 
 	def _get_intervals(self):
-		if self.intervals:
+		if self.intervals is not None:
 			return
 
 		def build_perseus_in_file(filt_array):
@@ -188,9 +188,8 @@ class Filtration:
 			os.chdir('..')
 
 		def load_perseus_out_file():
-			try:
-				self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
-			except IOError:
+			self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
+			if len(self.intervals) == 0:
 				print 'WARNING: no homology for', self.filename
 				self.intervals = 'empty'
 
@@ -269,8 +268,8 @@ class Filtration:
 			print
 			return [None, None, np.zeros([num_div, num_div]), None]
 
-		x, y, z = self.PD_data().mortal
-		max_lim = self.PD_data().lim
+		x, y, z = self.get_PD_data().mortal
+		max_lim = self.PD_data.lim
 		min_lim = 0
 
 		x_ = y_ = np.linspace(min_lim, max_lim, num_div)

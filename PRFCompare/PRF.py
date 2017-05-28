@@ -18,8 +18,7 @@ from DCE.DCE import embed
 from DCE.Plotter import plot_waveform, plot_waveform_zoom
 from DCE.Tools import auto_tau
 
-from PH.BuildFiltration import build_filtration
-from PH.PDPlotter import add_persistence_plot
+from PH.PDPlotter import make_PD
 from PH.FiltrationMovie import make_movie
 
 from DCE.Tools import auto_crop
@@ -135,25 +134,15 @@ def PRF_dist_plot(
 			sys.exit()
 		return filename
 
-	def make_movie_and_PD(filename, i, ref=False):
-		base_name = filename.split('/')[-1].split('.')[0]
+	def make_movie_and_PD(filt, i, ref=False):
+		base_name = filt.filename.split('/')[-1].split('.')[0]
 		comp_name = 'ref_compare_{}_{}_'.format(base_name, i)
 		if ref: comp_name += 'REFERENCE'
 		PD_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'PD.png'
 		movie_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'movie.mp4'
 
-		color_scheme = 'none'
-		camera_angle = (135, 55)
-		alpha = 1
-		dpi = 150
-		max_frames = None
-		hide_1simplexes = False
-		save_frames = False
-		framerate = 1
-		title_block_info = [filename, '', filt_params, color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
-
-		persistence_diagram(PD_filename)
-		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
+		make_PD(filt, PD_filename)
+		make_movie(filt, movie_filename)
 
 	def get_PRFs():
 		funcs = []
@@ -162,12 +151,13 @@ def PRF_dist_plot(
 			print '\n=================================================='
 			print filename
 			print '==================================================\n'
-			func = get_PRF(filename, filt_params, PRF_res)
+			filt = Filtration(filename, filt_params)
+			func = filt.get_PRF(PRF_res)
 			funcs.append(func)
 
 			if PD_movie_int:
 				if i % PD_movie_int == 0:
-					make_movie_and_PD(filename, i)
+					make_movie_and_PD(filt, i)
 
 
 		return np.asarray(funcs)
@@ -177,11 +167,11 @@ def PRF_dist_plot(
 	# ===================================================== #
 
 	ref_filename = get_in_filename(i_ref)
+	from PH.Data import Filtration
+	ref_filt = Filtration(ref_filename, filt_params)
+	ref_func = ref_filt.get_PRF(PRF_res)
 
-
-	ref_func = get_PRF(ref_filename, filt_params, PRF_res)
-
-	if PD_movie_int: make_movie_and_PD(ref_filename, i_ref, ref=True)		# call after get_PRF for reference (loads saved filtration)
+	if PD_movie_int: make_movie_and_PD(ref_filt, i_ref, ref=True)		# call after get_PRF for reference (loads saved filtration)
 
 	funcs = get_PRFs()		# also makes PDs and movies
 

@@ -125,7 +125,7 @@ if test == 4:
 		{
 			'ds_rate': 50,
 			'worm_length': 5000,
-			'max_filtration_param':.01,
+			'max_filtration_param':-7,
 			'num_divisions': 30,
 			'use_cliques': True
 		}
