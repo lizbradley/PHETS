@@ -61,7 +61,7 @@ def add_persistence_plot(ax, filtration):
 	ax.set_xlabel('birth ($\epsilon$)')
 	ax.set_ylabel('death ($\epsilon$)')
 
-	ax.grid(which=u'both', zorder=0)
+	ax.grid(which=u'major', zorder=0)
 	ax.minorticks_on()
 
 	ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k')		# diagonal line
@@ -106,12 +106,14 @@ def add_persistence_plot(ax, filtration):
 	if data == 'empty':
 		return
 
-	x_mor, y_mor, count_mor = data.mortal
-	ax.scatter(x_mor, y_mor, s=(count_mor * p_ms_scale) + min_size, clip_on=False, c=color)
+	if len(data.mortal) > 0:
+		x_mor, y_mor, count_mor = data.mortal
+		ax.scatter(x_mor, y_mor, s=(count_mor * p_ms_scale) + min_size, clip_on=False, c=color)
 
-	x_imm, count_imm = data.immortal
-	y_imm = [max_lim for i in x_imm]
-	ax.scatter(x_imm, y_imm, marker='^', s=(count_imm * t_ms_scale) + min_size, c=color, clip_on=False)
+	if len(data.immortal) > 0:
+		x_imm, count_imm = data.immortal
+		y_imm = [max_lim for i in x_imm]
+		ax.scatter(x_imm, y_imm, marker='^', s=(count_imm * t_ms_scale) + min_size, c=color, clip_on=False)
 
 	# end add legend #
 

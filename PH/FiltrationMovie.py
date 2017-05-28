@@ -4,7 +4,6 @@ import subprocess
 import numpy as np
 import itertools
 
-import TestingFunctions
 
 # import matplotlib
 # matplotlib.rcParams['gray'] = True

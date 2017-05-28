@@ -235,11 +235,11 @@ class Filtration:
 		birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
 		for interval in zip(birth_t, death_t):
 			if interval[1] == -1:	# immortal
-				birth_e_imm.append(epsilons[int(interval[0])])
+				birth_e_imm.append(epsilons[int(interval[0] - 1)])
 
 			else:
-				birth_e_mor.append(epsilons[int(interval[0])])
-				death_e_mor.append(epsilons[int(interval[1])])
+				birth_e_mor.append(epsilons[int(interval[0] - 1)])
+				death_e_mor.append(epsilons[int(interval[1] - 1)])
 
 		count_mor = get_multiplicity(birth_e_mor, birth_e_mor)
 		mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
@@ -247,7 +247,8 @@ class Filtration:
 
 		count_imm = get_multiplicity(birth_e_imm, None)
 		immortal = np.asarray([birth_e_imm, count_imm]).T
-		immortal = np.vstack({tuple(row) for row in immortal}).T # toss duplicates
+		if len(immortal) != 0:
+			immortal = np.vstack({tuple(row) for row in immortal}).T # toss duplicates
 
 		class PDData:
 			def __init__(self, mortal, immortal, lim):

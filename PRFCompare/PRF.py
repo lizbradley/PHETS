@@ -65,10 +65,9 @@ def get_scaled_dists(funcs_z, ref_func_z, weighting_func, scale, PRF_res):
 	return scaled_dists
 
 
-
-
-
-def PRF_contour_plot(ax, func):
+def contour_plot(func, filename):
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
 
 	x, y, z, max_lim = func
 	# z = np.log10(z + 1)
@@ -83,8 +82,7 @@ def PRF_contour_plot(ax, func):
 	ax.set_aspect('equal')
 	ax.contourf(x, y, z)
 
-
-
+	fig.savefig(filename)
 
 
 
@@ -136,8 +134,8 @@ def PRF_dist_plot(
 
 	def make_movie_and_PD(filt, i, ref=False):
 		base_name = filt.filename.split('/')[-1].split('.')[0]
-		comp_name = 'ref_compare_{}_{}_'.format(base_name, i)
-		if ref: comp_name += 'REFERENCE'
+		comp_name = 'ref_compare_' + base_name
+		if ref: comp_name += '_REFERENCE_'
 		PD_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'PD.png'
 		movie_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'movie.mp4'
 
@@ -176,10 +174,8 @@ def PRF_dist_plot(
 	funcs = get_PRFs()		# also makes PDs and movies
 
 	## plot ref PRF ##
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	PRF_contour_plot(ax, ref_func)
-	fig.savefig('output/PRFCompare/ref_contour.png')
+
+	contour_plot(ref_func,'output/PRFCompare/ref_contour.png')
 
 	## debugging ##
 	# np.save('ref_func_debug.npy', ref_func)
@@ -237,27 +233,18 @@ def mean_PRF_dist_plots(
 			else:
 				print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
-	def make_movie_and_PD(filename, i, ref=False):
-
+	def make_movie_and_PD(filt, i, ref=False):
+		filename = filt.filename
 		base_name = filename.split('/')[-1].split('.')[0]
 		comp_name = 'mean_compare_{:s}_{:d}_'.format(base_name, i)
 		if ref: comp_name += 'MEAN'
 		PD_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'PD.png'
 		movie_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'movie.mp4'
 
-		persistence_diagram(PD_filename)
+		make_PD(filt, PD_filename)
 
-		color_scheme = 'none'
-		camera_angle = (135, 55)
-		alpha = 1
-		dpi = 150
-		max_frames = None
-		hide_1simplexes = False
-		save_frames = False
-		framerate = 1
+		make_movie(filt, movie_filename)
 
-		title_block_info = [filename, 'worm {:d} of {:d}'.format(i, num_windows), filt_params, color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
-		make_movie(movie_filename, title_block_info, color_scheme, alpha, dpi, framerate, camera_angle, hide_1simplexes, save_frames)
 
 	def get_PRFs(filename, crop_cmd, tau_cmd):
 
@@ -283,16 +270,17 @@ def mean_PRF_dist_plots(
 			print '=============================================\n'
 
 			sig_window = np.asarray(sig[pt:pt + window_size_samp])
-			embed(sig_window, 'PRFCompare/temp_data/temp_worm.txt',
-				  False, tau, 2)
+			embed(sig_window, 'PRFCompare/temp_data/temp_worm.txt', False, tau, 2)
 
-			func = get_PRF('PRFCompare/temp_data/temp_worm.txt', filt_params, PRF_res)
+			from PH.Data import Filtration
+			filt = Filtration('PRFCompare/temp_data/temp_worm.txt', filt_params)
+			func = filt.get_PRF(PRF_res)
 			funcs.append(func)	# select grid_vals (third element)
 
 			if PD_movie_int:
 				if i % PD_movie_int == 0:
 					pass
-					make_movie_and_PD(filename, i)
+					make_movie_and_PD(filt, i)
 
 
 		return crop, sig_full, np.asarray(funcs)
@@ -386,16 +374,6 @@ def mean_PRF_dist_plots(
 
 		plt.close(fig)
 
-	def contour_plots(ref_func_1, ref_func_2):
-		fig = plt.figure(tight_layout=True, figsize=(8, 4))
-		ax1 = fig.add_subplot(121)
-		ax2 = fig.add_subplot(122, sharex=ax1, sharey=ax1)
-		PRF_contour_plot(ax1, ref_func_1)
-		PRF_contour_plot(ax2, ref_func_2)
-		ax1.set_title('left')
-		ax2.set_title('right')
-		fig.savefig('output/PRFCompare/mean_PRF_REF_contour_plots.png')
-
 	# ===========================================================================
 	# 		mean_PRF_dist_plots()
 	# ===========================================================================
@@ -428,10 +406,11 @@ def mean_PRF_dist_plots(
 
 	# plot ref PRFs #
 	ref_func_1 = funcs_1[0]  # get xx, yy
-	ref_func_1[2] = funcs_1_avg_z
 	ref_func_2 = funcs_2[0]  # get xx, yy
+	ref_func_1[2] = funcs_1_avg_z
 	ref_func_2[2] = funcs_2_avg_z
-	contour_plots(ref_func_1, ref_func_2)
+	contour_plot(ref_func_1, 'output/PRFCompare/ref_1_contour.png')
+	contour_plot(ref_func_2, 'output/PRFCompare/ref_2_contour.png')
 	# end plot ref PRFs #
 
 

@@ -1,13 +1,12 @@
 import sys
 import numpy as np
-
-from PH.TestingFunctions import parameter_set
+from config import default_filtration_params as parameter_set
 from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 
 # test = int(sys.argv[1])
-test = 4
+test = 5
 
 if test == 1:
 	params = parameter_set
@@ -149,7 +148,7 @@ if test == 4:
 
 		PRF_res=20,									# num divisions
 
-		PD_movie_int=0,								# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=3,								# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -172,8 +171,8 @@ if test == 5:
 		'output/PRFCompare/test_5_none.png',  		# out filename
 		params,
 
-		crop_1='auto',				# seconds or 'auto'
-		crop_2='auto',				# seconds or 'auto'
+		crop_1='auto',					# seconds or 'auto'
+		crop_2='auto',					# seconds or 'auto'
 		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
 
 		window_size=.05, 				# seconds
@@ -194,6 +193,6 @@ if test == 5:
 		normalize_volume=True,
 		normalize_sub_volume=True,
 
-		PD_movie_int=3,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
