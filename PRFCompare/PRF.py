@@ -116,8 +116,9 @@ def PRF_dist_plot(
 
 
 		weight_func=lambda i, j: 1,
-		dist_scale='none',					# 'none', 'a', or 'a + b'
+
 		metric='L2',						# 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',					# 'none', 'a', or 'a + b'
 
 		PRF_res=50,  						# number of divisions used for PRF
 
