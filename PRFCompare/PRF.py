@@ -18,6 +18,7 @@ from DCE.DCE import embed
 from DCE.Plotter import plot_waveform, plot_waveform_zoom
 from DCE.Tools import auto_tau
 
+from PH.Data import Filtration
 from PH.PDPlotter import make_PD
 from PH.FiltrationMovie import make_movie
 
@@ -26,7 +27,19 @@ from DCE.Tools import auto_crop
 WAV_SAMPLE_RATE = 44100.
 
 
-def get_scaled_dists(funcs_z, ref_func_z, weighting_func, scale, PRF_res):
+def clear_old_files(path, PD_movie_int):
+	old_files = os.listdir(path)
+	if old_files and PD_movie_int:
+		ans = raw_input('Clear old files in ' + path + '? (y/n) \n')
+		if ans == 'y':
+			for f in old_files:
+				if f != '.gitkeep':
+					os.remove(path + f)
+		else:
+			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
+
+
+def get_scaled_dists(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_res):
 
 	box_area = (1 / PRF_res) ** 2
 	norm_x, norm_y = np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res))
@@ -35,7 +48,13 @@ def get_scaled_dists(funcs_z, ref_func_z, weighting_func, scale, PRF_res):
 	def get_dists(funcs_z, ref_func_z):
 		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
 		diffs_weighted = np.asarray([np.multiply(diff, weighting_func_arr) for diff in diffs])
-		dists = np.asarray([(np.nansum(np.abs(diff)) * box_area) for diff in diffs_weighted])
+		if metric == 'L1':
+			dists = np.asarray([(np.nansum(np.abs(diff))) * box_area for diff in diffs_weighted])
+		elif metric == 'L2':
+			dists = np.asarray([np.nansum(np.sqrt(np.power(diff, 2))) * box_area for diff in diffs_weighted])
+		else:
+			print "ERROR: metric not recognized. Use 'L1' or 'L2'."
+			sys.exit()
 		return dists
 
 
@@ -98,6 +117,8 @@ def PRF_dist_plot(
 
 		weight_func=lambda i, j: 1,
 		dist_scale='none',					# 'none', 'a', or 'a + b'
+		metric='L2',						# 'L1' (abs) or 'L2' (euclidean)
+
 		PRF_res=50,  						# number of divisions used for PRF
 
 
@@ -133,11 +154,11 @@ def PRF_dist_plot(
 		return filename
 
 	def make_movie_and_PD(filt, i, ref=False):
-		base_name = filt.filename.split('/')[-1].split('.')[0]
-		comp_name = 'ref_compare_' + base_name
+		base_name = base_filename.split('/')[-1].split('.')[0]
+		comp_name = '{:s}_{:d}_'.format(base_name, i)
 		if ref: comp_name += '_REFERENCE_'
-		PD_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'PD.png'
-		movie_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'movie.mp4'
+		PD_filename = 'output/PRFCompare/ref_PRFC/PDs_and_movies/' + comp_name + 'PD.png'
+		movie_filename = 'output/PRFCompare/ref_PRFC/PDs_and_movies/' + comp_name + 'movie.mp4'
 
 		make_PD(filt, PD_filename)
 		make_movie(filt, movie_filename)
@@ -164,8 +185,8 @@ def PRF_dist_plot(
 	# 				MAIN:	PRF_dist_plots()				#
 	# ===================================================== #
 
+	clear_old_files('output/PRFCompare/ref_PRFC/PDs_and_movies/', PD_movie_int)
 	ref_filename = get_in_filename(i_ref)
-	from PH.Data import Filtration
 	ref_filt = Filtration(ref_filename, filt_params)
 	ref_func = ref_filt.get_PRF(PRF_res)
 
@@ -175,7 +196,7 @@ def PRF_dist_plot(
 
 	## plot ref PRF ##
 
-	contour_plot(ref_func,'output/PRFCompare/ref_contour.png')
+	contour_plot(ref_func,'output/PRFCompare/ref_PRFC/PRF_REFERENCE.png')
 
 	## debugging ##
 	# np.save('ref_func_debug.npy', ref_func)
@@ -187,7 +208,7 @@ def PRF_dist_plot(
 
 	ref_func_z = ref_func[2]
 
-	dists = get_scaled_dists(funcs_z, ref_func_z, weight_func, dist_scale, PRF_res)
+	dists = get_scaled_dists(funcs_z, ref_func_z, weight_func, metric, dist_scale, PRF_res)
 
 	plot_distances(i_ref, i_arr, dists, out_filename)
 
@@ -215,34 +236,21 @@ def mean_PRF_dist_plots(
 
 		PRF_res=50,  						# number of divisions used for PRF
 		dist_scale='none',					# 'none', 'a', or 'a + b'
+		metric='L2',						# 'L1' (abs) or 'L2' (euclidean)
 		weight_func=lambda i, j: 1,
 
 		PD_movie_int=5
 
-):
+		):
 
-	def clear_old_files():
-		path = 'output/PRFCompare/PDs_and_movies/'
-		old_files = os.listdir(path)
-		if old_files and PD_movie_int:
-			ans = raw_input('Clear old files in ' + path + '? (y/n) \n')
-			if ans == 'y':
-				for f in old_files:
-					if f != '.gitkeep':
-						os.remove(path + f)
-			else:
-				print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
-	def make_movie_and_PD(filt, i, ref=False):
-		filename = filt.filename
+	def make_movie_and_PD(filt, i, filename):
 		base_name = filename.split('/')[-1].split('.')[0]
-		comp_name = 'mean_compare_{:s}_{:d}_'.format(base_name, i)
-		if ref: comp_name += 'MEAN'
-		PD_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'PD.png'
-		movie_filename = 'output/PRFCompare/PDs_and_movies/' + comp_name + 'movie.mp4'
+		comp_name = '{:s}_{:d}_'.format(base_name, i)
+		PD_filename = 'output/PRFCompare/mean_PRFC/PDs_and_movies/' + comp_name + 'PD.png'
+		movie_filename = 'output/PRFCompare/mean_PRFC/PDs_and_movies/' + comp_name + 'movie.mp4'
 
 		make_PD(filt, PD_filename)
-
 		make_movie(filt, movie_filename)
 
 
@@ -280,7 +288,7 @@ def mean_PRF_dist_plots(
 			if PD_movie_int:
 				if i % PD_movie_int == 0:
 					pass
-					make_movie_and_PD(filt, i)
+					make_movie_and_PD(filt, i, filename)
 
 
 		return crop, sig_full, np.asarray(funcs)
@@ -365,8 +373,8 @@ def mean_PRF_dist_plots(
 		del_12 = mean_2 - mean_1
 		del_34 = mean_4 - mean_3
 
-		ax1.set_ylabel('\n \n ref: left \n \n $\Delta$: {:.3f}'.format(del_12), rotation=0, size='large', labelpad=50)
-		ax3.set_ylabel('\n \n ref: right \n \n $\Delta$: {:.3f}'.format(del_34), rotation=0, size='large', labelpad=50)
+		ax1.set_ylabel('\n \n ref: ' + filename_1.split('/')[-1].split('.')[0] + ' \n \n $\Delta$: {:.3f}'.format(del_12), rotation=0, size='large', labelpad=50)
+		ax3.set_ylabel('\n \n ref: ' + filename_2.split('/')[-1].split('.')[0] + ' \n \n $\Delta$: {:.3f}'.format(del_34), rotation=0, size='large', labelpad=50)
 
 
 		plt.savefig(out_filename)
@@ -378,7 +386,7 @@ def mean_PRF_dist_plots(
 	# 		mean_PRF_dist_plots()
 	# ===========================================================================
 
-	clear_old_files()
+	clear_old_files('output/PRFCompare/mean_PRFC/PDs_and_movies/', PD_movie_int)
 	filt_params.update({'worm_length' : np.floor(window_size * WAV_SAMPLE_RATE).astype(int)})
 	print 'using worm_length:', filt_params['worm_length']
 	window_size_samp = int(window_size * WAV_SAMPLE_RATE)
@@ -397,10 +405,10 @@ def mean_PRF_dist_plots(
 	funcs_1_avg_z = np.mean(mean_1_funcs_z, axis=0)
 	funcs_2_avg_z = np.mean(mean_2_funcs_z, axis=0)
 
-	dists_1_vs_1 = get_scaled_dists(funcs_1_z, funcs_1_avg_z, weight_func, dist_scale, PRF_res)
-	dists_2_vs_1 = get_scaled_dists(funcs_2_z, funcs_1_avg_z, weight_func, dist_scale, PRF_res)
-	dists_1_vs_2 = get_scaled_dists(funcs_1_z, funcs_2_avg_z, weight_func, dist_scale, PRF_res)
-	dists_2_vs_2 = get_scaled_dists(funcs_2_z, funcs_2_avg_z, weight_func, dist_scale, PRF_res)
+	dists_1_vs_1 = get_scaled_dists(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_2_vs_1 = get_scaled_dists(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_1_vs_2 = get_scaled_dists(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_2_vs_2 = get_scaled_dists(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
 
 	plot_distances(dists_1_vs_1, dists_2_vs_1, dists_1_vs_2, dists_2_vs_2, out_filename)
 
@@ -409,8 +417,11 @@ def mean_PRF_dist_plots(
 	ref_func_2 = funcs_2[0]  # get xx, yy
 	ref_func_1[2] = funcs_1_avg_z
 	ref_func_2[2] = funcs_2_avg_z
-	contour_plot(ref_func_1, 'output/PRFCompare/ref_1_contour.png')
-	contour_plot(ref_func_2, 'output/PRFCompare/ref_2_contour.png')
+
+	base_filename_1 = filename_1.split('/')[-1].split('.')[0]
+	base_filename_2 = filename_2.split('/')[-1].split('.')[0]
+	contour_plot(ref_func_1, 'output/PRFCompare/mean_PRFC/MEAN_PRF_' + base_filename_1 + '.png')
+	contour_plot(ref_func_2, 'output/PRFCompare/mean_PRFC/MEAN_PRF_' + base_filename_2 + '.png')
 	# end plot ref PRFs #
 
 

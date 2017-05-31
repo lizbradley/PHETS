@@ -122,10 +122,10 @@ if test == 4:
 	# params = standard_parameter_set
 	params.update(
 		{
-			'ds_rate': 50,
+			'ds_rate': 57,
 			'worm_length': 5000,
-			'max_filtration_param':-7,
-			'num_divisions': 30,
+			'max_filtration_param':-5,
+			'num_divisions': 20,
 			'use_cliques': True
 		}
 	)
@@ -135,20 +135,21 @@ if test == 4:
 		'datasets/embedded/test_cases',						# input directory
 		'L63_x_m2_tau',										# input base filename
 		'base i',											# input filename format: 'base i or 'i base'
-		'output/PRFCompare/PRF_dist_plots_noweight.png',	# output filename
+		'output/PRFCompare/ref_PRFC/test4_L1.png',			# output filename
 		params,
 
 		i_ref=15,
-		i_arr=np.arange(10, 20, 1),
+		i_arr=np.arange(10, 20, 2),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential, k = .1
 		weight_func=lambda i, j: .1 * (j - i),  						# linear, k = .1
 
+		metric='L1',								# 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='a + b', 						# 'none', 'a', or 'a + b'
 
 		PRF_res=20,									# num divisions
 
-		PD_movie_int=3,								# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=0,								# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -158,8 +159,8 @@ if test == 5:
 	params.update(
 		{
 			'ds_rate': 30,
-			'max_filtration_param': -7,
-			'num_divisions': 30,
+			'max_filtration_param': -5,
+			'num_divisions': 20,
 			'use_cliques': True,
 
 		}
@@ -168,7 +169,7 @@ if test == 5:
 	mean_PRF_dist_plots(
 		'datasets/time_series/C134C/49-C134C.txt',  # input (left)
 		'datasets/time_series/C135B/49-C135B.txt',  # input (right)
-		'output/PRFCompare/test_5_none.png',  		# out filename
+		'output/PRFCompare/mean_PRFC/test_5.png',  		# out filename
 		params,
 
 		crop_1='auto',					# seconds or 'auto'
@@ -176,7 +177,7 @@ if test == 5:
 		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
 
 		window_size=.05, 				# seconds
-		num_windows=10, 				# evenly spaced
+		num_windows=5, 					# evenly spaced
 		mean_samp_num=5,  				# number of windows to use for mean
 
 		tau='auto ideal',				# seconds or 'auto ideal' or 'auto detect'
@@ -187,6 +188,7 @@ if test == 5:
 
 		PRF_res=50,						# num divisions
 
+		metric='L2', 					# 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  			# 'none', 'a', 'b', or 'a + b'
 										# a is magnitude of window PRF, b is magnitude of ref PRF
 
