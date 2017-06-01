@@ -6,7 +6,7 @@ import numpy as np
 from config import default_filtration_params as parameter_set
 from PH.Data import Filtration, load_saved_filtration
 from PH.FiltrationMovie import make_movie
-from PH.PDPlotter import make_PD
+from PH.Plots import make_PD, make_PRF_plot
 
 import time
 
@@ -469,14 +469,23 @@ if test == 16:
 
 	make_PD(
 		filtration,
-		'output/PH/49-C135B.png'
+		'output/PH/49-C135B_PD.png',
+	)
+
+	make_PRF_plot(
+		filtration,
+		'output/PH/49-C135B_PRF.png',
+		PRF_res=50
+
 	)
 
 	make_movie(
 		filtration,
-		'output/PH/49-C135B.mp4',
+		'output/PH/49-C135B_movie.mp4',
 		color_scheme='highlight new'
 	)
+
+
 
 
 

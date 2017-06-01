@@ -58,11 +58,9 @@ class Filtration:
 
 		if isinstance(sig, basestring):			# is filename
 			lines = open(sig).readlines()
-			start_idx = int(len(lines) * start)
-			worm = lines[start_idx:]
+			worm = lines
 		else:									# is array
-			start_idx = int(len(sig) * start)
-			worm = sig[start_idx]
+			worm = sig
 
 		open('temp_data/worm_data.txt', 'w').writelines(worm)
 

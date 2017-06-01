@@ -19,7 +19,7 @@ from DCE.Plotter import plot_waveform, plot_waveform_zoom
 from DCE.Tools import auto_tau
 
 from PH.Data import Filtration
-from PH.PDPlotter import make_PD
+from PH.Plots import make_PD, make_PRF_plot
 from PH.FiltrationMovie import make_movie
 
 from DCE.Tools import auto_crop
@@ -84,24 +84,9 @@ def get_scaled_dists(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_res
 	return scaled_dists
 
 
-def contour_plot(func, filename):
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
 
-	x, y, z, max_lim = func
-	# z = np.log10(z + 1)
 
-	if not max_lim:
-		x, y = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
-		z = np.zeros((10, 10))
-		max_lim = 1
 
-	ax.set_xlim([0, max_lim])
-	ax.set_ylim([0, max_lim])
-	ax.set_aspect('equal')
-	ax.contourf(x, y, z)
-
-	fig.savefig(filename)
 
 
 
@@ -197,7 +182,12 @@ def PRF_dist_plot(
 
 	## plot ref PRF ##
 
-	contour_plot(ref_func,'output/PRFCompare/ref_PRFC/PRF_REFERENCE.png')
+	make_PRF_plot(
+		ref_func,
+	  	'output/PRFCompare/ref_PRFC/PRF_REFERENCE.png',
+		params=filt_params,
+		in_filename='REF'
+	)
 
 	## debugging ##
 	# np.save('ref_func_debug.npy', ref_func)
@@ -421,8 +411,10 @@ def mean_PRF_dist_plots(
 
 	base_filename_1 = filename_1.split('/')[-1].split('.')[0]
 	base_filename_2 = filename_2.split('/')[-1].split('.')[0]
-	contour_plot(ref_func_1, 'output/PRFCompare/mean_PRFC/MEAN_PRF_' + base_filename_1 + '.png')
-	contour_plot(ref_func_2, 'output/PRFCompare/mean_PRFC/MEAN_PRF_' + base_filename_2 + '.png')
+	out_fname_1 =  'output/PRFCompare/mean_PRFC/MEAN_PRF_' + base_filename_1 + '.png'
+	out_fname_2 = 'output/PRFCompare/mean_PRFC/MEAN_PRF_' + base_filename_2 + '.png'
+	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params, in_filename='MEAN')
+	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params, in_filename='MEAN')
 	# end plot ref PRFs #
 
 

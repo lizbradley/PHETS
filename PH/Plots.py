@@ -13,6 +13,7 @@ from matplotlib.ticker import FormatStrFormatter
 # from Utilities import mem_profile
 from config import MEMORY_PROFILE_ON
 
+from Data import Filtration
 
 f=open("output/run_info/group_by_birth_time_memory.txt","wb")
 f2=open("output/run_info/expand_to_2simplexes_memory.txt","wb")
@@ -32,8 +33,26 @@ def add_title(subplot, title_block_info):
 	subplot.set_xlim([0,1])
 	subplot.set_ylim([0,1])
 
-	param_data = np.array(
-		[[key, parameter_set[key]] for key in parameter_set.keys()])
+	display_params = (
+		"max_filtration_param",
+		"min_filtration_param",
+		"start",
+		"worm_length",
+		"ds_rate",
+		"landmark_selector",
+		"d_orientation_amplify",
+		"d_use_hamiltonian",
+		"d_cov",
+		"simplex_cutoff",
+		"use_cliques",
+		"use_twr",
+		"m2_d",
+		"straight_VB",
+		"dimension_cutoff",
+		"graph_induced"
+	)
+	param_data = np.array([[key, parameter_set[key]] for key in display_params])
+
 	param_table = subplot.table(
 		cellText=param_data,
 		colWidths=[1.5, .5],
@@ -120,9 +139,9 @@ def add_persistence_plot(ax, filtration):
 
 # @profile(stream=f4)
 def make_PD(filtration, out_filename):
-
+	print '\nplotting persistence diagram...'
 	fig = pyplot.figure(figsize=(8,6), tight_layout=True, dpi=300)
-	title_plot = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3)
+	title_plot = pyplot.subplot2grid((3, 4), (0, 0), rowspan=2)
 	ax = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 
 	title_info = [filtration.filename, out_filename, filtration.params]
@@ -141,10 +160,44 @@ def make_PD(filtration, out_filename):
 	# ax.set_yticks([round(ylims[1]/2., 4), ylims[1]])
 	# ax.tick_params(labelsize=23)
 
-	title_plot.axis('off')
-
 	pyplot.savefig(out_filename)
 	pyplot.clf()
+
+
+def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None):
+	print "\nplotting PRF... \n"
+
+	if isinstance(filt, Filtration):
+		func = filt.get_PRF(PRF_res)
+		title_info = [filt.filename, out_filename, filt.params]
+	else:
+		func = filt
+		title_info = title_info = [in_filename, out_filename, params]
+
+	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
+	title_plot = 	pyplot.subplot2grid((3, 4), (0, 0), rowspan=2)
+	ax = 			pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
+
+	x, y, z, max_lim = func
+	# z = np.log10(z + 1)
+
+	if not max_lim:
+		x, y = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
+		z = np.zeros((10, 10))
+		max_lim = 1
+
+	ax.set_xlim([0, max_lim])
+	ax.set_ylim([0, max_lim])
+	ax.set_aspect('equal')
+	cm = ax.contourf(x, y, z)
+	fig.colorbar(cm, ax=ax)
+
+	add_title(title_plot, title_info)
+
+
+	fig.savefig(out_filename)
+
+
 
 
 if __name__ == '__main__':
