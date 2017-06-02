@@ -23,15 +23,24 @@ f4=open("output/run_info/make_figure_memory.txt","wb")
 # @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)
 
-def add_title(subplot, title_block_info):
-	in_file_name = title_block_info[0]
-	out_file_name = title_block_info[1]
-	parameter_set = title_block_info[2]
+def add_filename_table(ax, filenames):
+	ax.axis('off')
+	title_table = ax.table(
+		cellText=[
+			[filenames.split('/')[-1]],   # remove leading "datasets/"
+		],
+		bbox=[0, 0, 1, 1],
+		cellLoc='center'
+	)
+	# title_table.auto_set_font_size(False)
+	# title_table.auto_set_font_size(8)
 
-	# subplot.axis('tight')
+
+def add_params_table(subplot, filt_params):
 	subplot.axis('off')
 	subplot.set_xlim([0,1])
 	subplot.set_ylim([0,1])
+
 
 	display_params = (
 		"max_filtration_param",
@@ -51,26 +60,19 @@ def add_title(subplot, title_block_info):
 		"dimension_cutoff",
 		"graph_induced"
 	)
-	param_data = np.array([[key, parameter_set[key]] for key in display_params])
-
+	param_data = np.array([[key, filt_params[key]] for key in display_params])
 	param_table = subplot.table(
 		cellText=param_data,
 		colWidths=[1.5, .5],
-		bbox=[0, 0, 1, .8],  # x0, y0, width, height
+		bbox=[0, 0, 1, 1],  # x0, y0, width, height
 	)
 	param_table.auto_set_font_size(False)
-	param_table.set_fontsize(4.5)
+	param_table.set_fontsize(6)
 
-	title_table = subplot.table(
-		cellText = [[in_file_name.split('/')[-1]],   # remove leading "datasets/"
-					[out_file_name.split('/')[-1]]],
-		bbox=[0, .9, 1, .1],
-	)
-	title_table.auto_set_font_size(False)
-	title_table.auto_set_font_size(8)
+
+
 
 def add_persistence_plot(ax, filtration):
-
 	ax.set_aspect('equal')
 	min_lim = 0
 	max_lim = np.max(filtration.epsilons)
@@ -138,17 +140,19 @@ def add_persistence_plot(ax, filtration):
 
 
 # @profile(stream=f4)
-def make_PD(filtration, out_filename):
+def make_PD(filt, out_filename):
 	print '\nplotting persistence diagram...'
-	fig = pyplot.figure(figsize=(8,6), tight_layout=True, dpi=300)
-	title_plot = pyplot.subplot2grid((3, 4), (0, 0), rowspan=2)
-	ax = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 
-	title_info = [filtration.filename, out_filename, filtration.params]
+	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
 
-	add_persistence_plot(ax, filtration)
-	add_title(title_plot, title_info)
+	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
+	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)
+	params_ax = 	pyplot.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
+	plot_ax = 		pyplot.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 
+	add_persistence_plot(plot_ax, filt)
+	add_filename_table(fname_ax, filt.filename)
+	add_params_table(params_ax, filt.params)
 	# IDA paper figures #
 	# title_block.tick_params(labelsize=23)
 	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
@@ -169,14 +173,16 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 
 	if isinstance(filt, Filtration):
 		func = filt.get_PRF(PRF_res)
-		title_info = [filt.filename, out_filename, filt.params]
 	else:
 		func = filt
-		title_info = title_info = [in_filename, out_filename, params]
 
 	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
-	title_plot = 	pyplot.subplot2grid((3, 4), (0, 0), rowspan=2)
-	ax = 			pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
+	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
+	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)
+	params_ax = 	pyplot.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
+	plot_ax = 		pyplot.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
+	cbar_ax = 		pyplot.subplot2grid((6, 10), (0, 9), rowspan=6)
+
 
 	x, y, z, max_lim = func
 	# z = np.log10(z + 1)
@@ -186,13 +192,15 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 		z = np.zeros((10, 10))
 		max_lim = 1
 
-	ax.set_xlim([0, max_lim])
-	ax.set_ylim([0, max_lim])
-	ax.set_aspect('equal')
-	cm = ax.contourf(x, y, z)
-	fig.colorbar(cm, ax=ax)
+	plot_ax.set_xlim([0, max_lim])
+	plot_ax.set_ylim([0, max_lim])
+	plot_ax.set_aspect('equal')
 
-	add_title(title_plot, title_info)
+	cm = plot_ax.contourf(x, y, z)
+	fig.colorbar(cm, cax=cbar_ax)
+
+	add_filename_table(fname_ax, filt.filename)
+	add_params_table(params_ax, filt.params)
 
 
 	fig.savefig(out_filename)

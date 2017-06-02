@@ -14,6 +14,9 @@ import matplotlib.markers
 
 from matplotlib import animation
 
+from Plots import add_params_table, add_filename_table
+
+
 
 def remove_old_frames():
 	dir = 'PH/frames'
@@ -47,65 +50,173 @@ def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_tim
 	return facecolor, edgecolor
 
 
-def add_title(subplot, title_block_info, i):
-	in_file_name = title_block_info[0]
-	out_file_name = title_block_info[1]
-	parameter_set = title_block_info[2]
-	color_scheme = title_block_info[3]
-	camera_angle = title_block_info[4]
-	alpha = title_block_info[5]
-	dpi = title_block_info[6]
-	max_frames = title_block_info[7]
-	hide_1simplexes = title_block_info[8]
 
-	subplot.axis('tight')
-	subplot.axis('off')
-	# subplot.set_xticks([])
-	subplot.set_xlim([0,1])
-	subplot.set_ylim([0,1])
-
-	row_height = .025
-	font_size = 6
-
-	title_table = subplot.table(
-		cellText = [[in_file_name.split('/')[-1]],   # remove leading "datasets/"
-					[out_file_name.split('/')[-1]]],
-		bbox=[0, .9, 1, .05 * 2],    # x0, y0, width, height
-		cellLoc='center'
-	)
-	title_table.auto_set_font_size(False)
-	title_table.set_fontsize(8)
-
-	param_data = np.array([[key, parameter_set[key]] for key in parameter_set.keys()])
-	num_rows = len(param_data)
-	h = num_rows * row_height
-	param_table = subplot.table(
-		cellText=param_data,
-		colWidths=[1.5, .5],
-		bbox=[0, 0, 1, h], # x0, y0, width, height
-	)
-	param_table.auto_set_font_size(False)
-	param_table.set_fontsize(6)
-
-	return title_table, param_table   # for init()
-
-
-def update_time_table(time_plot, i, filtration):
-
+def update_epsilon(ax, i, filtration):
+	ax.axis('off')
 	epsilons = filtration.epsilons
 	e = epsilons[i]
-	time_table = time_plot.table(
+	time_table = ax.table(
 		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
-		bbox=[.15, .8, .7, .05],    # x0, y0, width, height
+		bbox=[0, 0, 1, 1],    # x0, y0, width, height
 		colWidths=[.5, 1],
 		cellLoc='center',
 
 		animated=True,
 	)
-	time_table.auto_set_font_size(False)
-	time_table.set_fontsize(8)
+	# time_table.auto_set_font_size(False)
+	# time_table.set_fontsize(8)
 
 	return time_table,
+
+def add_movie_params_table(ax, params):
+	ax.axis('off')
+
+	table = ax.table(
+		cellText=[
+			['color scheme',params[0]],
+			['alpha', params[1]],
+			# ['camera angle',params[2]],
+		]
+	)
+
+def make_frames_2D(filtration, color_scheme, alpha, save_frames):
+	def plot_witnesses(subplot, attractor_data):
+		attractor_data = np.array(attractor_data)
+		x = attractor_data[:, 0]
+		y = attractor_data[:, 1]
+		return subplot.scatter(x, y, color='black', marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'), facecolor='black', s=.1)
+
+	def plot_landmarks(subplot, landmark_data):
+		landmark_data = np.array(landmark_data)
+		x = landmark_data[:, 0]
+		y = landmark_data[:, 1]
+		return subplot.scatter(x, y, color='darkblue', s=35)
+
+	def plot_complex(subplot, i):
+		"""plots all complexes for full filtration"""
+		patches = []
+		for j, simplexes_coords in enumerate(complex_data[:i + 1]):
+
+			f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
+
+			simplexes = collections.PolyCollection(
+				simplexes_coords,
+				edgecolors=e_color,
+				facecolors=f_color,
+				lw=1,
+				alpha=alpha,
+				zorder=0,
+				animated=True,
+				antialiased=True)
+
+			patches.append(subplot.add_collection(simplexes))
+
+		return patches
+
+	fname_ax = 			pyplot.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
+	epsilon_ax = 		pyplot.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
+	movie_params_ax =	pyplot.subplot2grid((12, 8), (4, 0), rowspan=2, colspan=2)
+	filt_params_ax =	pyplot.subplot2grid((12, 8), (6, 0), rowspan=6, colspan=2)
+	plot_ax = 			pyplot.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
+
+	add_filename_table(fname_ax, filtration.filename)
+	add_movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
+	add_params_table(filt_params_ax, filtration.params)
+
+
+	# IDA paper formatting #
+	# plot_ax.tick_params(labelsize=23)
+	# plot_ax.xaxis.major.locator.set_params(nbins=5)
+	# plot_ax.yaxis.major.locator.set_params(nbins=5)
+
+	witness_data = filtration.witness_coords
+	landmark_data = filtration.landmark_coords
+	complex_data = filtration.get_complexes_mpl()
+
+	def init():
+		print 'initializing...'
+		plot_ax.set_aspect('equal')
+		witnesses = plot_witnesses(plot_ax, witness_data)
+		landmarks = plot_landmarks(plot_ax, landmark_data)
+		ret_list = [witnesses, landmarks]
+		return ret_list
+
+	def animate(i):
+		print 'frame', i
+		ret_comp = plot_complex(plot_ax, i)
+		ret_eps = update_epsilon(epsilon_ax, i, filtration)
+		ret_list = list(ret_comp)
+		ret_list.extend(ret_eps)
+
+		if save_frames: pyplot.savefig('frames/image%03d.png' % i)
+
+		return ret_list
+
+	return init, animate
+
+import Utilities
+
+def make_movie(
+		filtration,
+		out_filename,
+		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
+		camera_angle=(135, 55),  		# for 3D mode. [azimuthal, elevation]
+		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
+		dpi=150,  						# dots per inch (resolution)
+		max_frames=None,  				# cut off frame (for testing or when only interested in the beginning of a movie)
+		hide_1simplexes=False,			# i need to find a way to optimize the plotting of 1-simplexes(lines) 3D plotting, as of now they slow mayavi significantly.
+		save_frames=False,  			# save frames to /frames/ dir
+		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
+
+):
+
+	# remove_old_frames()
+
+	# Utilities.check_overwrite(out_filename)
+
+
+	movie_info = [color_scheme, camera_angle, alpha]
+
+	fnames = [filtration.filename, out_filename]
+
+
+	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
+
+	if filtration.ambient_dim == 2:
+		print 'building movie...'
+		init, animate = make_frames_2D(filtration, color_scheme, alpha, save_frames=save_frames)
+		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div, blit=True, repeat=False)
+
+		# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
+		# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
+		# As a workaround, ani.save(fps=10) is used and then ffmpeg is called to reduce the speed of the video by a 10x
+
+		# FuncAnimation.save() offers blitting, which should improve performance even further, but despite my best efforts
+		# to configure it correctly, it doesn't make much any(?) difference in time-to-run. However, this may be a
+		# consequence of all simplexes being hidden in the init function.
+
+		print 'saving...'
+		ani.save('output/PH/temp.mp4', fps=10)
+		print 'correcting framerate...'
+
+		subprocess.call(['ffmpeg', '-y', '-i',
+						 'output/PH/temp.mp4',
+						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
+						 out_filename])
+
+		os.remove('output/PH/temp.mp4')
+
+	elif ambient_dim == 3:
+		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."
+		print "Response times may be impossibly long, especially for large 'max_filtration_param'."
+		filt_data[2] = unpack_complex_data_3D(filt_data[2])
+		make_frames_3D(filt_data, fnames, color_scheme, alpha, camera_angle, hide_1simplexes)
+		TestingFunctions.frames_to_movie(out_file_name, framerate)
+	else:
+		print "ERROR: ambient_dim = {:d}. Check input filtration file."
+		sys.exit()
+
+
 
 
 def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angle, hide_1simplexes):
@@ -161,7 +272,7 @@ def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angl
 		mlab.figure(bgcolor=(1, 1, 1), size=(800, 800))
 		mlab.view(azimuth=camera_angle[0], elevation=camera_angle[1],focalpoint='auto', distance='auto')
 
-		update_time_table(title_plot, i)
+		update_epsilon(title_plot, i)
 
 		plot_witnesses(filt_data[0])
 		plot_landmarks(filt_data[1])
@@ -178,139 +289,15 @@ def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angl
 
 
 	title_plot = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3, colspan=1)
-	add_title(title_plot, title_block_info, 0)
+	add_params_table(title_plot, title_block_info, 0)
 
 	filt_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 	filt_plot.set_aspect('equal')
 
 	for i in xrange(len(filt_data[2][1])):
 		print 'frame', i
-		make_frame(filt_plot,title_plot, i)
+		make_frame(filt_plot, title_plot, i)
 		pyplot.savefig('frames/image%03d.png' % i)
-
-
-def make_frames_2D(filtration, title_block_info, color_scheme, alpha, save_frames):
-	def plot_witnesses(subplot, attractor_data):
-		attractor_data = np.array(attractor_data)
-		x = attractor_data[:, 0]
-		y = attractor_data[:, 1]
-		return subplot.scatter(x, y, color='black', marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'), facecolor='black', s=.1)
-
-	def plot_landmarks(subplot, landmark_data):
-		landmark_data = np.array(landmark_data)
-		x = landmark_data[:, 0]
-		y = landmark_data[:, 1]
-		return subplot.scatter(x, y, color='darkblue', s=35)
-
-	def plot_complex(subplot, i):
-		"""plots all complexes for full filtration"""
-		patches = []
-		for j, simplexes_coords in enumerate(complex_data[:i + 1]):
-
-			f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
-			simplexes = collections.PolyCollection(simplexes_coords, edgecolors=e_color, facecolors=f_color, lw=1, alpha=alpha, animated=True, antialiased=True, zorder=0)
-			patches.append(subplot.add_collection(simplexes))
-		return patches
-
-
-	title_block = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3, colspan=1)
-	add_title(title_block, title_block_info, 0)
-
-	filt_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
-	filt_plot.set_aspect('equal')
-
-	# IDA paper formatting #
-	# filt_plot.tick_params(labelsize=23)
-	# filt_plot.xaxis.major.locator.set_params(nbins=5)
-	# filt_plot.yaxis.major.locator.set_params(nbins=5)
-
-	witness_data = filtration.witness_coords
-	landmark_data = filtration.landmark_coords
-	complex_data = filtration.get_complexes_mpl()
-
-	def init():
-		print 'initializing...'
-		# title = add_title(title_block, title_block_info, 0)
-		witnesses = plot_witnesses(filt_plot, witness_data)
-		landmarks = plot_landmarks(filt_plot, landmark_data)
-		ret_list = [witnesses, landmarks]
-		# ret_list.extend(complexes)
-		# ret_list.extend(title)
-		return ret_list
-
-	def animate(i):
-		print 'frame', i
-		ret_comp = plot_complex(filt_plot, i)
-		ret_title = update_time_table(title_block, i, filtration)
-		ret_list = list(ret_comp)
-		ret_list.extend(ret_title)
-
-		if save_frames: pyplot.savefig('frames/image%03d.png' % i)
-
-		return ret_list
-
-	return init, animate
-
-import Utilities
-
-def make_movie(
-		filtration,
-		out_filename,
-		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
-		camera_angle=(135, 55),  		# for 3D mode. [azimuthal, elevation]
-		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
-		dpi=150,  						# dots per inch (resolution)
-		max_frames=None,  				# cut off frame (for testing or when only interested in the beginning of a movie)
-		hide_1simplexes=False,			# i need to find a way to optimize the plotting of 1-simplexes(lines) 3D plotting, as of now they slow mayavi significantly.
-		save_frames=False,  			# save frames to /frames/ dir
-		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
-
-):
-
-	# remove_old_frames()
-
-	# Utilities.check_overwrite(out_filename)
-
-	title_block_info = [filtration.filename, out_filename, filtration.params,
-						color_scheme, camera_angle, alpha, dpi, max_frames, hide_1simplexes]
-
-	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
-
-	if filtration.ambient_dim == 2:
-		print 'building movie...'
-		init, animate = make_frames_2D(filtration, title_block_info, color_scheme, alpha, save_frames=save_frames)
-		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div, blit=True, repeat=False)
-
-		# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
-		# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
-		# As a workaround, ani.save(fps=10) is used and then ffmpeg is called to reduce the speed of the video by a 10x
-
-		# FuncAnimation.save() offers blitting, which should improve performance even further, but despite my best efforts
-		# to configure it correctly, it doesn't make much any(?) difference in time-to-run. However, this may be a
-		# consequence of all simplexes being hidden in the init function.
-
-		print 'saving...'
-		ani.save('output/PH/temp.mp4', fps=10)
-		print 'correcting framerate...'
-
-		subprocess.call(['ffmpeg', '-y', '-i',
-						 'output/PH/temp.mp4',
-						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
-						 out_filename])
-
-		os.remove('output/PH/temp.mp4')
-
-	elif ambient_dim == 3:
-		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."
-		print "Response times may be impossibly long, especially for large 'max_filtration_param'."
-		filt_data[2] = unpack_complex_data_3D(filt_data[2])
-		make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angle, hide_1simplexes)
-		TestingFunctions.frames_to_movie(out_file_name, framerate)
-	else:
-		print "ERROR: ambient_dim = {:d}. Check input filtration file."
-		sys.exit()
-
-
 
 
 def make_frame_3D(birth_time, camera_angle=(135, 55), hide_1simplexes=False, alpha=.7, color_scheme='none'):
