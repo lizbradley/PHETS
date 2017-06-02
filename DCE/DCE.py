@@ -27,6 +27,7 @@ def embed(
 	output_file = open(output_file_name, "w")
 	output_file.truncate(0)
 
+
 	for i in xrange(end):
 		for j in xrange(m):
 			output_file.write("%f " % signal[i + (j*tau_samp)])

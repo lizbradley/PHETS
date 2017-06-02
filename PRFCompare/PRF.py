@@ -210,6 +210,8 @@ def mean_PRF_dist_plots(
 		out_filename,
 		filt_params,
 
+		load_saved_filtrations=False,
+
 		crop_1='auto', 						# sec or 'auto'
 		crop_2='auto',
 		auto_crop_length=.3, 				# sec
@@ -218,12 +220,12 @@ def mean_PRF_dist_plots(
 		num_windows=10,						# per file
 		mean_samp_num=5,					# per file
 
-		tau=.001,							# sec or 'auto ideal' or 'auto detect'
+		tau_1=.001,							# sec or 'auto ideal' or 'auto detect'
+		tau_2=.001,
 		tau_T=np.pi,
 		note_index=None,					#
 
 		normalize_volume=True,
-		normalize_sub_volume=True,
 
 		PRF_res=50,  						# number of divisions used for PRF
 		dist_scale='none',					# 'none', 'a', or 'a + b'
@@ -244,48 +246,55 @@ def mean_PRF_dist_plots(
 		make_PD(filt, PD_filename)
 		make_movie(filt, movie_filename)
 
-
-	def get_PRFs(filename, crop_cmd, tau_cmd):
-
-		sig_full = np.loadtxt(filename)
-		if normalize_volume: sig_full = sig_full / np.max(np.abs(sig_full))
-
+	def crop_sig(sig_full, crop_cmd, auto_crop_len):
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
-
-		if normalize_sub_volume:
-			sig_full = sig_full / np.max(np.abs(sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]))
-
 		sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
+		if normalize_volume: sig = sig / np.max(sig)
+		return crop, sig_full, sig
 
-
-		f_deal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename)
-
-		funcs = []
+	def slice_sig(sig):
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
-		for i, pt in enumerate(start_pts):
+		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
+		return windows
 
+	def embed_sigs(windows, tau):
+		worms = []
+		for window in windows:
+			embed(window, 'PRFCompare/temp_data/temp_worm.txt', False, tau, 2)
+			worm = np.loadtxt('PRFCompare/temp_data/temp_worm.txt')
+			worms.append(worm)
+		return worms
+	
+	def get_filtrations(worms, filename):
+		print 'building filtrations'
+		filts = []
+		for i, worm in enumerate(worms):
 			print '\n============================================='
 			print filename.split('/')[-1], 'worm #', i
 			print '=============================================\n'
-
-			sig_window = np.asarray(sig[pt:pt + window_size_samp])
-			embed(sig_window, 'PRFCompare/temp_data/temp_worm.txt', False, tau, 2)
-
-			from PH.Data import Filtration
-			filt = Filtration('PRFCompare/temp_data/temp_worm.txt', filt_params)
-			func = filt.get_PRF(PRF_res)
-			funcs.append(func)	# select grid_vals (third element)
-
+			filt = (Filtration(worm, filt_params))
+			filts.append(filt)
+			
 			if PD_movie_int:
 				if i % PD_movie_int == 0:
 					pass
 					make_movie_and_PD(filt, i, filename)
+			
+		return filts
 
-
+	def get_PRFs(filename, crop_cmd, tau_cmd):
+		sig = np.loadtxt(filename)
+		crop, sig_full, sig = crop_sig(sig, crop_cmd, auto_crop_length)
+		f_ideal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, None, filename)
+		sigs = slice_sig(sig)
+		worms = embed_sigs(sigs, tau)
+		filts = get_filtrations(worms, filename)
+		funcs = [filt.get_PRF(PRF_res) for filt in filts]
 		return crop, sig_full, np.asarray(funcs)
 
-	def plot_distances(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
 
+	def plot_distances(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
+		print 'plotting distances...\n'
 		def plot_dists_pane(ax, d, mean, crop):
 			t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
 			ticks = np.linspace(crop[0], crop[1], num_windows + 1, endpoint=True)
@@ -381,11 +390,20 @@ def mean_PRF_dist_plots(
 	filt_params.update({'worm_length' : np.floor(window_size * WAV_SAMPLE_RATE).astype(int)})
 	print 'using worm_length:', filt_params['worm_length']
 	window_size_samp = int(window_size * WAV_SAMPLE_RATE)
-	crop_1_cmd = crop_1
-	crop_2_cmd = crop_2
+	crop_1_cmd, crop_2_cmd = crop_1, crop_2
+	tau_1_cmd, tau_2_cmd = tau_1, tau_2
 
-	crop_1, sig_1_full, funcs_1 = get_PRFs(filename_1, crop_1_cmd, tau)		# also makes PDs and movies
-	crop_2, sig_2_full, funcs_2 = get_PRFs(filename_2, crop_2_cmd, tau)		# also makes PDs and movies
+
+
+	if load_saved_filtrations:
+		crop_1, sig_1_full, funcs_1 = np.load('PRFCompare/funcs_1.npy')
+		crop_2, sig_2_full, funcs_2 = np.load('PRFCompare/funcs_2.npy')
+	else:
+		crop_1, sig_1_full, funcs_1 = get_PRFs(filename_1, crop_1_cmd, tau_1_cmd)
+		crop_2, sig_2_full, funcs_2 = get_PRFs(filename_2, crop_2_cmd, tau_2_cmd)
+		np.save('PRFCompare/funcs_1.npy', (crop_1, sig_1_full, funcs_1))
+		np.save('PRFCompare/funcs_2.npy', (crop_1, sig_1_full, funcs_2))
+
 
 	funcs_1_z = funcs_1[:, 2]
 	funcs_2_z = funcs_2[:, 2]

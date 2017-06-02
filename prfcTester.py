@@ -172,6 +172,8 @@ if test == 5:
 		'output/PRFCompare/mean_PRFC/test_5.png',  		# out filename
 		params,
 
+		load_saved_filtrations=True,
+
 		crop_1='auto',					# seconds or 'auto'
 		crop_2='auto',					# seconds or 'auto'
 		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
@@ -180,7 +182,8 @@ if test == 5:
 		num_windows=5, 					# evenly spaced
 		mean_samp_num=5,  				# number of windows to use for mean
 
-		tau='auto ideal',				# seconds or 'auto ideal' or 'auto detect'
+		tau_1='auto ideal',				# seconds or 'auto ideal' or 'auto detect'
+		tau_2='auto ideal',
 		tau_T=np.pi,					# tau_T = tau / period
 		note_index=49,					# required for auto tau
 
@@ -193,7 +196,6 @@ if test == 5:
 										# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,
-		normalize_sub_volume=True,
 
 		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 

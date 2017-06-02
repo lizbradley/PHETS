@@ -167,12 +167,13 @@ def plot_power_spectrum(sig, out_file, crop=(1,2)):
 
 
 
-def get_fund_freq(sig, expected, window=(1, 2), tol=10):
+def get_fund_freq(sig, expected, window=None, tol=10):
 	samp_freq = 44100.
 	window_sec = window
 	window = np.array(window) * samp_freq
 
-	sig_crop = sig[int(window[0]): int(window[1])]
+	if window is None: sig_crop = sig[int(window[0]): int(window[1])]
+	else: sig_crop = sig
 
 	window_len_sec = window_sec[1] - window_sec[0]
 	spec_prec = int(100000 / (samp_freq * window_len_sec))  # hz ?

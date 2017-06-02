@@ -25,14 +25,20 @@ import subprocess
 from config import find_landmarks_c_compile_str
 class Filtration:
 
-	def __init__(self, in_filename, params, start=0):
+	def __init__(self, sig, params, start=0):
 		caller_dir = os.getcwd()
+
+		if isinstance(sig, basestring):			# is filename
+			self.sig = np.loadtxt(sig)
+			self.filename = caller_dir + '/' + sig
+		else:									# is array
+			self.sig = sig
+
 		os.chdir(SCRIPT_DIR)
 
-		self.filename = caller_dir + '/' +  in_filename
 		self.params = params
 
-		arr = self._build(self.filename, params, start=0)
+		arr = self._build(params, start=0)
 
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
@@ -52,17 +58,10 @@ class Filtration:
 
 
 	# private #
-	def _build(self, sig, params, start=0):
+	def _build(self, params, start=0):
 		print "building filtration..."
 		start_time = time.time()
-
-		if isinstance(sig, basestring):			# is filename
-			lines = open(sig).readlines()
-			worm = lines
-		else:									# is array
-			worm = sig
-
-		open('temp_data/worm_data.txt', 'w').writelines(worm)
+		np.savetxt('temp_data/worm_data.txt', self.sig)
 
 		try:
 			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)

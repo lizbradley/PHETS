@@ -173,6 +173,8 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 
 	if isinstance(filt, Filtration):
 		func = filt.get_PRF(PRF_res)
+		in_filename = filt.filename
+		params = filt.params
 	else:
 		func = filt
 
@@ -199,8 +201,8 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 	cm = plot_ax.contourf(x, y, z)
 	fig.colorbar(cm, cax=cbar_ax)
 
-	add_filename_table(fname_ax, filt.filename)
-	add_params_table(params_ax, filt.params)
+	add_filename_table(fname_ax, in_filename)
+	add_params_table(params_ax, params)
 
 
 	fig.savefig(out_filename)
