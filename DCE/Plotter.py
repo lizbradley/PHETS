@@ -34,8 +34,10 @@ def plot_dce(ax, in_file_name):
 
 
 def plot_waveform(subplot, waveform_data, crop):
+
 	y = waveform_data
 	x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
+	if crop is None: crop = (0, np.max(x))
 
 	subplot.plot(x, y, color='k', zorder=0, lw= .5)
 	subplot.axis('tight')
@@ -52,7 +54,10 @@ def plot_waveform(subplot, waveform_data, crop):
 
 
 def plot_waveform_zoom(ax, full_sig, crop):
+	if crop is None:
+		return
 	crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+
 	y = full_sig[crop[0]:crop[1]]
 	x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
 

@@ -172,7 +172,7 @@ if test == 5:
 		'output/PRFCompare/mean_PRFC/test_5.png',  		# out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		crop_1='auto',					# seconds or 'auto'
 		crop_2='auto',					# seconds or 'auto'
@@ -184,6 +184,57 @@ if test == 5:
 
 		tau_1='auto ideal',				# seconds or 'auto ideal' or 'auto detect'
 		tau_2='auto ideal',
+		tau_T=np.pi,					# tau_T = tau / period
+		note_index=49,					# required for auto tau
+
+		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
+
+		PRF_res=50,						# num divisions
+
+		metric='L2', 					# 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  			# 'none', 'a', 'b', or 'a + b'
+										# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+
+if test == 6:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 30,
+			'max_filtration_param': -5,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	mean_PRF_dist_plots(
+		# 'datasets/time_series/C134C/49-C134C.txt',  # input (left)
+		# 'datasets/time_series/C135B/49-C135B.txt',  # input (right)
+		'datasets/embedded/btc200thou.txt',
+		'datasets/embedded/L96N22F5_x1_m2tau10.txt',
+		'output/PRFCompare/mean_PRFC/test_6.png',  		# out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		crop_1=(1, 2),					# seconds or 'auto'
+		crop_2=(1, 2),					# seconds or 'auto'
+		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
+
+		window_size=.05, 				# seconds
+		num_windows=5, 					# evenly spaced
+		mean_samp_num=5,  				# number of windows to use for mean
+
+		tau_1=.001,				# seconds or 'auto ideal' or 'auto detect'
+		tau_2=.001,
 		tau_T=np.pi,					# tau_T = tau / period
 		note_index=49,					# required for auto tau
 
