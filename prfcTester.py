@@ -5,8 +5,8 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 
-# test = int(sys.argv[1])
-test = 5
+test = int(sys.argv[1])
+#test = 5
 
 if test == 1:
 	params = parameter_set
@@ -218,9 +218,9 @@ if test == 6:
 	mean_PRF_dist_plots(
 		# 'datasets/time_series/C134C/49-C134C.txt',  # input (left)
 		# 'datasets/time_series/C135B/49-C135B.txt',  # input (right)
-		'datasets/embedded/btc200thou.txt',
-		'datasets/embedded/L96N22F5_x1_m2tau10.txt',
-		'output/PRFCompare/mean_PRFC/test_6.png',  		# out filename
+		'datasets/embedded/L63_x_m2/L63_x_m2_tau18.txt',
+		'datasets/embedded/L63_x_m2/L63_x_m2_tau30.txt',
+		'output/PRFCompare/mean_PRFC/L63_x_m2_tau18_v_tau30.png',  		# out filename
 		params,
 
 		load_saved_filtrations=True,
@@ -230,8 +230,8 @@ if test == 6:
 		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
 
 		window_size=.05, 				# seconds
-		num_windows=5, 					# evenly spaced
-		mean_samp_num=5,  				# number of windows to use for mean
+		num_windows=10, 					# evenly spaced
+		mean_samp_num=10,  				# number of windows to use for mean
 
 		tau_1=.001,				# seconds or 'auto ideal' or 'auto detect'
 		tau_2=.001,
@@ -249,5 +249,47 @@ if test == 6:
 		normalize_volume=True,
 
 		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 7:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'worm_length': 2000,
+			'ds_rate': 10,
+			'max_filtration_param': -5,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	mean_PRF_dist_plots(
+		# 'datasets/time_series/C134C/49-C134C.txt',  # input (left)
+		# 'datasets/time_series/C135B/49-C135B.txt',  # input (right)
+		'datasets/embedded/L63_x_m2/L63_x_m2_tau18.txt',
+		'datasets/embedded/L63_x_m2/L63_x_m2_tau30.txt',
+		'output/PRFCompare/mean_PRFC/L63_x_m2_tau18_v_tau30.png',  		# out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		window_size= .5, 				# seconds
+		num_windows=10, 					# evenly spaced
+		mean_samp_num=10,  				# number of windows to use for mean
+
+		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
+
+		PRF_res=50,						# num divisions
+
+		metric='L2', 					# 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  			# 'none', 'a', 'b', or 'a + b'
+										# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		PD_movie_int=5,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
