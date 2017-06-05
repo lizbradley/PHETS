@@ -249,27 +249,29 @@ def mean_PRF_dist_plots(
 		make_PD(filt, PD_filename)
 		make_movie(filt, movie_filename)
 
+
 	def crop_sig(sig_full, crop_cmd, auto_crop_len):
 
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
-		if crop is None:
-			sig = sig_full
+
+		if time_units == 'samples':
+			sig = sig_full[crop[0]:crop[1]]
+		elif time_units == 'seconds':
+			sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
 		else:
-			if time_units == 'samples':
-				sig = sig_full[crop[0]:crop[1]]
-			elif time_units == 'seconds':
-				sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
-			else:
-				print 'ERROR: invalid time_units.'
-				sys.exit()
+			print 'ERROR: invalid time_units.'
+			sys.exit()
 
 		if normalize_volume: sig = sig / np.max(sig)
 		return crop, sig_full, sig
 
+
 	def slice_sig(sig):
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
 		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
+
 		return windows
+
 
 	def embed_sigs(windows, tau):
 		worms = []
@@ -278,7 +280,8 @@ def mean_PRF_dist_plots(
 			worm = np.loadtxt('PRFCompare/temp_data/temp_worm.txt')
 			worms.append(worm)
 		return worms
-	
+
+
 	def get_filtrations(worms, filename):
 		print 'building filtrations'
 		filts = []
@@ -315,7 +318,7 @@ def mean_PRF_dist_plots(
 
 		filts = get_filtrations(worms, filename)
 		funcs = [filt.get_PRF(PRF_res) for filt in filts]
-		return crop, sig_full, np.asarray(funcs)
+		return crop, sig_full, sig, np.asarray(funcs)
 
 
 	def plot_distances(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
@@ -367,12 +370,12 @@ def mean_PRF_dist_plots(
 
 
 		ax5 = fig.add_subplot(425, sharex=ax1)
-		plot_waveform_zoom(ax5, sig_1_full, crop_1, time_units=time_units)
+		plot_waveform_zoom(ax5, None, crop_1, time_units=time_units, sig=sig_1)
 		ax5.grid(axis='x', zorder=0)
 
 
 		ax6 = fig.add_subplot(426, sharex=ax2)
-		plot_waveform_zoom(ax6, sig_2_full, crop_2, time_units=time_units)
+		plot_waveform_zoom(ax6, None, crop_2, time_units=time_units, sig=sig_2)
 		ax6.grid(axis='x', zorder=0)
 		plt.setp(ax6.get_yticklabels(), visible=False)
 		# plt.setp(ax6.get_yticklines(), visible=False)
@@ -384,6 +387,8 @@ def mean_PRF_dist_plots(
 
 		ax7 = fig.add_subplot(427)
 		plot_waveform(ax7, sig_1_full, crop_1, time_units=time_units)
+		plt.setp(ax7.get_yticklabels(), visible=False)
+		plt.setp(ax7.get_yticklines(), visible=False)
 
 
 		ax8 = fig.add_subplot(428, sharey=ax7)
@@ -413,8 +418,6 @@ def mean_PRF_dist_plots(
 	# ===========================================================================
 
 	clear_old_files('output/PRFCompare/mean_PRFC/PDs_and_movies/', PD_movie_int)
-
-
 	if time_units == 'seconds':
 		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
 	elif time_units == 'samples':
@@ -422,22 +425,19 @@ def mean_PRF_dist_plots(
 	else:
 		print 'ERROR: invalid time_units.'
 		sys.exit()
-
 	filt_params.update({'worm_length' : window_size_samp})
 	print 'using worm_length:', filt_params['worm_length']
-
-
 	crop_1_cmd, crop_2_cmd = crop_1, crop_2
 	tau_1_cmd, tau_2_cmd = tau_1, tau_2
 
 
 
 	if load_saved_filtrations:
-		crop_1, sig_1_full, funcs_1 = np.load('PRFCompare/funcs_1.npy')
-		crop_2, sig_2_full, funcs_2 = np.load('PRFCompare/funcs_2.npy')
+		crop_1, sig_1_full, sig_1, funcs_1 = np.load('PRFCompare/funcs_1.npy')
+		crop_2, sig_2_full, sig_2, funcs_2 = np.load('PRFCompare/funcs_2.npy')
 	else:
-		crop_1, sig_1_full, funcs_1 = get_PRFs(filename_1, crop_1_cmd, tau_1_cmd)
-		crop_2, sig_2_full, funcs_2 = get_PRFs(filename_2, crop_2_cmd, tau_2_cmd)
+		crop_1, sig_1_full, sig_1, funcs_1 = get_PRFs(filename_1, crop_1_cmd, tau_1_cmd)
+		crop_2, sig_2_full, sig_2, funcs_2 = get_PRFs(filename_2, crop_2_cmd, tau_2_cmd)
 		np.save('PRFCompare/funcs_1.npy', (crop_1, sig_1_full, funcs_1))
 		np.save('PRFCompare/funcs_2.npy', (crop_1, sig_1_full, funcs_2))
 

@@ -59,16 +59,20 @@ def plot_waveform(subplot, waveform_data, crop, time_units='seconds'):
 
 
 
-def plot_waveform_zoom(ax, full_sig, crop, time_units='seconds'):
+def plot_waveform_zoom(ax, full_sig, crop, time_units='seconds', sig=None):
 
-	if time_units == 'samples':
-		crop = crop
-		x = np.arange(crop[0], crop[1])
-	elif time_units == 'seconds':
-		crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
-		x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
+	if full_sig is None:
+		x = np.linspace(crop[0], crop[1], len(sig))
+		y = sig
 
-	y = full_sig[crop[0]:crop[1]]
+	else:
+		# backwards compatibility #
+		if time_units == 'samples':
+			x = np.arange(crop[0], crop[1])
+		elif time_units == 'seconds':
+			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+			x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
+		y = full_sig[crop[0]:crop[1]]
 
 	# x0,x1 = ax.get_xlim()
 	# y0,y1 = ax.get_ylim()
