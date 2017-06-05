@@ -274,10 +274,10 @@ if test == 7:
 		'output/PRFCompare/mean_PRFC/L63_x_m2_tau18_v_tau30.png',  		# out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		window_size= .5, 				# seconds
-		num_windows=10, 					# evenly spaced
+		num_windows=10, 				# evenly spaced
 		mean_samp_num=10,  				# number of windows to use for mean
 
 		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
