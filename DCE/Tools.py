@@ -107,25 +107,30 @@ def auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename):
 
 
 	# do it #
-	ideal_freq = math.pow(2, (40 - float(note_index)) / 12) * 440  # Hz, descending index
 
-	if not isinstance(tau_cmd, basestring):
+	if isinstance(tau_cmd, basestring):
+
+		ideal_freq = math.pow(2, (40 - float(note_index)) / 12) * 440  # Hz, descending index
+
+		if tau_cmd == 'auto detect':
+			f = get_fund_freq(sig, ideal_freq, crop)
+			T = 1. / f
+			tau_sec = tau_T * T
+			tau = tau_sec
+			f_disp = f
+
+		elif tau_cmd == 'auto ideal':
+			f = ideal_freq
+			T = 1. / f
+			tau_sec = tau_T * T
+			tau = tau_sec
+			f_disp = 'none'
+
+	else:
+		ideal_freq = None
 		tau = tau_cmd
 		f_disp = 'none'
 
-	elif tau_cmd == 'auto detect':
-		f = get_fund_freq(sig, ideal_freq, crop)
-		T = 1. / f
-		tau_sec = tau_T * T
-		tau = tau_sec
-		f_disp = f
-
-	elif tau_cmd == 'auto ideal':
-		f = ideal_freq
-		T = 1. / f
-		tau_sec = tau_T * T
-		tau = tau_sec
-		f_disp = 'none'
 
 
 	print 'auto tau: {:.5f} (sec), {:d} (samples)'.format(tau, int(tau * WAV_SAMPLE_RATE))

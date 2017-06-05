@@ -212,6 +212,9 @@ def mean_PRF_dist_plots(
 
 		load_saved_filtrations=False,
 
+		time_units='seconds',
+
+
 		crop_1='auto', 						# sec or 'auto'
 		crop_2='auto',
 		auto_crop_length=.3, 				# sec
@@ -247,11 +250,19 @@ def mean_PRF_dist_plots(
 		make_movie(filt, movie_filename)
 
 	def crop_sig(sig_full, crop_cmd, auto_crop_len):
+
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
 		if crop is None:
 			sig = sig_full
 		else:
-			sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
+			if time_units == 'samples':
+				sig = sig_full[crop[0]:crop[1]]
+			elif time_units == 'seconds':
+				sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
+			else:
+				print 'ERROR: invalid time_units.'
+				sys.exit()
+
 		if normalize_volume: sig = sig / np.max(sig)
 		return crop, sig_full, sig
 
@@ -275,7 +286,7 @@ def mean_PRF_dist_plots(
 			print '\n============================================='
 			print filename.split('/')[-1], 'worm #', i
 			print '=============================================\n'
-			filt = (Filtration(worm, filt_params))
+			filt = (Filtration(worm, filt_params, filename=filename))
 			filts.append(filt)
 			
 			if PD_movie_int:
@@ -296,7 +307,7 @@ def mean_PRF_dist_plots(
 			dim = len(sig[0])
 			print 'Input dimension: ' + str(dim) + '. Skipping embedding, dropping coords for time series.'
 			worms = sigs
-			sig_full = sig[::dim]
+			sig_full = sig_full[:, 0]
 		elif type(sig[0] is np.float64):
 			dim = 1
 			print 'Input dimension: ' + str(dim) + '. Embedding signals...'
@@ -310,12 +321,8 @@ def mean_PRF_dist_plots(
 	def plot_distances(d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2, out_filename):
 		print 'plotting distances...\n'
 		def plot_dists_pane(ax, d, mean, crop):
-			if crop is None:
-				t = np.arange(num_windows)
-				ticks = np.arange(num_windows)
-			else:
-				t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
-				ticks = np.linspace(crop[0], crop[1], num_windows + 1, endpoint=True)
+			t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
+			ticks = np.linspace(crop[0], crop[1], num_windows + 1, endpoint=True)
 			offset = (t[1] - t[0]) / 2
 			ax.plot(t + offset, d, marker='o', linestyle='None', ms=10, zorder=3)
 			ax.axhline(y=mean, linestyle='--', color='forestgreen', lw=2)
@@ -358,13 +365,14 @@ def mean_PRF_dist_plots(
 		plt.setp(ax4.get_xticklabels(), visible=False)
 		plt.setp(ax4.get_xticklines(), visible=False)
 
+
 		ax5 = fig.add_subplot(425, sharex=ax1)
-		plot_waveform_zoom(ax5, sig_1_full, crop_1)
+		plot_waveform_zoom(ax5, sig_1_full, crop_1, time_units=time_units)
 		ax5.grid(axis='x', zorder=0)
 
 
 		ax6 = fig.add_subplot(426, sharex=ax2)
-		plot_waveform_zoom(ax6, sig_2_full, crop_2)
+		plot_waveform_zoom(ax6, sig_2_full, crop_2, time_units=time_units)
 		ax6.grid(axis='x', zorder=0)
 		plt.setp(ax6.get_yticklabels(), visible=False)
 		# plt.setp(ax6.get_yticklines(), visible=False)
@@ -375,11 +383,11 @@ def mean_PRF_dist_plots(
 
 
 		ax7 = fig.add_subplot(427)
-		plot_waveform(ax7, sig_1_full, crop_1)
+		plot_waveform(ax7, sig_1_full, crop_1, time_units=time_units)
 
 
 		ax8 = fig.add_subplot(428, sharey=ax7)
-		plot_waveform(ax8, sig_2_full, crop_2)
+		plot_waveform(ax8, sig_2_full, crop_2, time_units=time_units)
 		plt.setp(ax8.get_yticklabels(), visible=False)
 		plt.setp(ax8.get_yticklines(), visible=False)
 
@@ -405,9 +413,20 @@ def mean_PRF_dist_plots(
 	# ===========================================================================
 
 	clear_old_files('output/PRFCompare/mean_PRFC/PDs_and_movies/', PD_movie_int)
-	filt_params.update({'worm_length' : np.floor(window_size * WAV_SAMPLE_RATE).astype(int)})
+
+
+	if time_units == 'seconds':
+		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
+	elif time_units == 'samples':
+		window_size_samp = int(window_size)
+	else:
+		print 'ERROR: invalid time_units.'
+		sys.exit()
+
+	filt_params.update({'worm_length' : window_size_samp})
 	print 'using worm_length:', filt_params['worm_length']
-	window_size_samp = int(window_size * WAV_SAMPLE_RATE)
+
+
 	crop_1_cmd, crop_2_cmd = crop_1, crop_2
 	tau_1_cmd, tau_2_cmd = tau_1, tau_2
 

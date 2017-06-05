@@ -5,8 +5,8 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 
-test = int(sys.argv[1])
-#test = 5
+# test = int(sys.argv[1])
+test = 6
 
 if test == 1:
 	params = parameter_set
@@ -207,7 +207,7 @@ if test == 6:
 	# params = standard_parameter_set
 	params.update(
 		{
-			'ds_rate': 30,
+			'ds_rate': 50,
 			'max_filtration_param': -5,
 			'num_divisions': 20,
 			'use_cliques': True,
@@ -216,27 +216,22 @@ if test == 6:
 	)
 
 	mean_PRF_dist_plots(
-		# 'datasets/time_series/C134C/49-C134C.txt',  # input (left)
-		# 'datasets/time_series/C135B/49-C135B.txt',  # input (right)
 		'datasets/embedded/L63_x_m2/L63_x_m2_tau18.txt',
-		'datasets/embedded/L63_x_m2/L63_x_m2_tau30.txt',
-		'output/PRFCompare/mean_PRFC/L63_x_m2_tau18_v_tau30.png',  		# out filename
+		'datasets/embedded/L63_x_m2/L63_x_m2_tau35.txt',
+		'output/PRFCompare/mean_PRFC/test_6.png',  		# out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
-		crop_1=(1, 2),					# seconds or 'auto'
-		crop_2=(1, 2),					# seconds or 'auto'
-		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
+		time_units='samples',
 
-		window_size=.05, 				# seconds
-		num_windows=10, 					# evenly spaced
-		mean_samp_num=10,  				# number of windows to use for mean
+		crop_1=(100, 5100),					# time_units or 'auto'
+		crop_2=(100, 5100),					# time_units or 'auto'
 
-		tau_1=.001,				# seconds or 'auto ideal' or 'auto detect'
-		tau_2=.001,
-		tau_T=np.pi,					# tau_T = tau / period
-		note_index=49,					# required for auto tau
+		window_size=2000, 				# time_units
+		num_windows=5, 					# evenly spaced
+		mean_samp_num=3,  				# number of windows to use for mean
+
 
 		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
 
@@ -276,11 +271,18 @@ if test == 7:
 
 		load_saved_filtrations=False,
 
-		window_size= .5, 				# seconds
-		num_windows=10, 				# evenly spaced
+		crop_1=(1, 2),					# seconds or 'auto'
+		crop_2=(1, 2),					# seconds or 'auto'
+		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
+
+		window_size=.05, 				# seconds
+		num_windows=5, 					# evenly spaced
 		mean_samp_num=10,  				# number of windows to use for mean
 
-		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
+		tau_1=.001,						# seconds or 'auto ideal' or 'auto detect'
+		tau_2=.001,
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
 		PRF_res=50,						# num divisions
 

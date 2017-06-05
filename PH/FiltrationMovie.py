@@ -120,6 +120,7 @@ def make_frames_2D(filtration, color_scheme, alpha, save_frames):
 	plot_ax = 			pyplot.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
 
 	add_filename_table(fname_ax, filtration.filename)
+
 	add_movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
 	add_params_table(filt_params_ax, filtration.params)
 

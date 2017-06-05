@@ -25,7 +25,7 @@ import subprocess
 from config import find_landmarks_c_compile_str
 class Filtration:
 
-	def __init__(self, sig, params, start=0):
+	def __init__(self, sig, params, filename=None, start=0):
 		caller_dir = os.getcwd()
 
 		if isinstance(sig, basestring):			# is filename
@@ -33,6 +33,7 @@ class Filtration:
 			self.filename = caller_dir + '/' + sig
 		else:									# is array
 			self.sig = sig
+			self.filename = filename
 
 		os.chdir(SCRIPT_DIR)
 
