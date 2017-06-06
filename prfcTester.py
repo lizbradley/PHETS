@@ -208,7 +208,7 @@ if test == 6:
 	params.update(
 		{
 			'ds_rate': 50,
-			'max_filtration_param': -5,
+			'max_filtration_param': -10,
 			'num_divisions': 20,
 			'use_cliques': True,
 
@@ -218,19 +218,19 @@ if test == 6:
 	mean_PRF_dist_plots(
 		'datasets/embedded/L63_x_m2/L63_x_m2_tau18.txt',
 		'datasets/embedded/L63_x_m2/L63_x_m2_tau35.txt',
-		'output/PRFCompare/mean_PRFC/test_6.png',  		# out filename
+		'output/PRFCompare/mean_PRFC/L63_tau18v35_W1000dsr50.png',  		# out filename
 		params,
 
 		load_saved_filtrations=False,
 
 		time_units='samples',
 
-		crop_1=(100, 5100),					# time_units or 'auto'
-		crop_2=(100, 5100),					# time_units or 'auto'
+		crop_1=(100, 20100),					# time_units or 'auto'
+		crop_2=(100, 20100),					# time_units or 'auto'
 
-		window_size=2000, 				# time_units
-		num_windows=5, 					# evenly spaced
-		mean_samp_num=3,  				# number of windows to use for mean
+		window_size= 2000, 				# time_units
+		num_windows=10, 					# evenly spaced
+		mean_samp_num=5,  				# number of windows to use for mean
 
 
 		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
@@ -243,7 +243,7 @@ if test == 6:
 
 		normalize_volume=True,
 
-		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+		PD_movie_int=5,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 	
