@@ -6,7 +6,7 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 7
+test = 6
 
 if test == 1:
 	params = parameter_set
@@ -40,11 +40,6 @@ if test == 1:
 		PD_movie_int=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-
-
-
-
-
 
 
 if test == 2:
@@ -250,16 +245,13 @@ if test == 6:
 if test == 7:
 	params = parameter_set
 	# params = standard_parameter_set
-	params.update(
-		{
-			'worm_length': 2000,
-			'ds_rate': 10,
-			'max_filtration_param': -5,
-			'num_divisions': 20,
-			'use_cliques': True,
-
-		}
-	)
+	params.update({
+		'worm_length': 2000,
+		'ds_rate': 10,
+		'max_filtration_param': -5,
+		'num_divisions': 20,
+		'use_cliques': True,
+		})
 
 	mean_PRF_dist_plots(
 		# 'datasets/time_series/C134C/49-C134C.txt',  # input (left)

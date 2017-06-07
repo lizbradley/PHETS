@@ -68,6 +68,7 @@ class Filtration:
 			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)
 		except OSError:
 			print "WARNING: invalid PH/find_landmarks binary. Recompiling..."
+			print 'If problem persists, you will need to manually compile PH/find_landmarks.c. See config.py for default GCC commands.'
 
 			if sys.platform == "linux" or sys.platform == "linux2":
 				compile_str = find_landmarks_c_compile_str['linux']
@@ -79,6 +80,8 @@ class Filtration:
 
 			subprocess.call(compile_str, shell=True)
 			print "find_landmarks recompilation complete. Please repeat your test."
+			print 'If problem persists, you will need to manually compile PH/find_landmarks.c. See config.py for default GCC commands.'
+
 			sys.exit()
 
 

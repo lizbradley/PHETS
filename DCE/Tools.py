@@ -11,9 +11,10 @@ WAV_SAMPLE_RATE = 44100.
 
 
 def auto_crop(crop_cmd, sig, length):
-	""" 
-		finds max of volume envelope: (xmax, ymax)
-		gets first point (x, y) on envelope where y < .1 * ymax and x > xmax 
+	"""
+		returns crop in seconds. if 'auto':
+			finds max of volume envelope: (xmax, ymax)
+			gets first point (x, y) on envelope where y < .1 * ymax and x > xmax
 	"""
 
 	# lowpass from http://stackoverflow.com/questions/25191620/creating-lowpass-filter-in-scipy-understanding-methods-and-units
@@ -80,6 +81,9 @@ def auto_crop(crop_cmd, sig, length):
 	else:
 		crop = crop_cmd
 
+	if (crop[0] + crop[1]) * WAV_SAMPLE_RATE > len(sig):
+		print 'ERROR: crop_cmd is out of bounds.'
+		sys.exit()
 	return crop
 
 
