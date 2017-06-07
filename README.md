@@ -83,7 +83,7 @@ make persistence diagram
 * **make_PRF_plot()**  
 plot persistent rank function
 
-#### PRFCompare: persistent rank function comparision
+#### PRFC: persistent rank function comparision
 
 
 * **PRF_dist_plot()**  
