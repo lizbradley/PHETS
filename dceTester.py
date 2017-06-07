@@ -180,20 +180,20 @@ if test == 11:
 		dir1, base1,
 		dir2, base2,
 
-		i_lims=(49, 50),  # specify note range
+		i_lims=(49, 50), 			 	# specify note range
 
-		embed_crop_1='auto',  # seconds or 'auto'
-		embed_crop_2='auto',  # seconds or 'auto'
-		auto_crop_length=.05,  # seconds for when embed_crop = 'auto'
+		embed_crop_1='auto',		 	# seconds or 'auto'
+		embed_crop_2='auto',  			# seconds or 'auto'
+		auto_crop_length=.05, 			# seconds for when embed_crop = 'auto'
 
-		tau_1='auto detect', # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_1='auto detect', 			# seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_2=.01192,
-		tau_T=math.pi,  # for auto tau. tau = period * tau_T
+		tau_T=math.pi,  				# for auto tau. tau = period * tau_T
 
 		normalize_volume=True,
 
-		save_worms=True,  # to output/DCE/saved_worms
-		save_movie=True,  # False for faster worm creation
+		save_worms=True,  				# to output/DCE/saved_worms
+		save_movie=True,  				# False for faster worm creation
 
 		waveform_zoom = out_filename
 

@@ -6,9 +6,13 @@ This repository offers high-level tools for exploration and visualization of
 * delay coordinate embedding from 1D to 2D
 * persistent homology in 2D
 
-and is used to investigate the utalization of these tools together as a signal processing technique.
+and is used to investigate the utilization of these tools together as a signal 
+processing technique.
 
-Also included is a dataset of time-series (mostly musical instrument recordings) and higher dimensional trajectories in .txt.
+Also included is a dataset of time-series (mostly musical instrument recordings) and 
+higher dimensional trajectories in .txt.
+
+
 3D functionality is under construction.
 
 ## Installation
@@ -51,18 +55,21 @@ example: test 4
 takes one input file shows embedding over range of tau
 
 * **slide_window()**  
-example: test 5
+example: test 5  
 takes one input file, shows embedding over a range of windows
 
-* **compare_vary_tau()**
-example: test 6
+* **compare_vary_tau()**  
+example: test 6  
 like vary_tau(), but takes two input files and shows their embeddings side by side.
 
 * **compare_multi()**  
-example: test 9
+example: test 9    
 takes two directories of (eg one with piano notes, another with range of viol 
 notes), and generates a movie over a range note indexes (pitch). Tau and crop may be 
-set explicity or automatically.
+set explicity or automatically.  
+The `save_worms` option will save all embedded trajectories which are generated for 
+the movie to `output/DCE/saved_worms`. These may then be passed as arguments to the 
+functions in `PH`.
 
 
 #### PH: persistent homology
@@ -81,13 +88,15 @@ plot persistent rank function
 
 * **PRF_dist_plot()**  
 example: test 4
-takes range of time-series files and a reference file. Generates PRF for each, and finds distances to reference PRF,
+takes range of time-series files and a reference file. Generates PRF for each, and 
+finds distances to reference PRF,
 plots distance vs index. 
 
 * **mean_PRF_dist_plot()**  
 example (1D input): test 6
 example (2D input): test 7
-takes two time-series or 2D trajectory files. for each input, slices each into a number of windows. if inputs are time-series, embeds
-each window. gets PRF for each window. Takes subset of window PRFs for each input, computes their mean, plots distance to mean PRF
-vs time.
+takes two time-series or 2D trajectory files. for each input, slices each into a 
+number of windows. if inputs are time-series, embeds each window. gets PRF for each 
+window. selects subset of window PRFs, computes their mean, plots distance to mean 
+PRF vs time.
 
