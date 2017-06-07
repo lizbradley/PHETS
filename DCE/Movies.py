@@ -1,4 +1,5 @@
 import DCE
+from MovieTools import frames_to_movie
 import Plotter
 import numpy as np
 import sys
@@ -14,6 +15,7 @@ WAV_SAMPLE_RATE = 44100
 
 def slide_window(
 		txt_wave_file,
+		out_filename,
 		window_size=.5,    # seconds
 		step_size=.1,      # seconds
 		tau=10,
@@ -40,12 +42,15 @@ def slide_window(
 
 		if save_worms: save_worms_single('{:d}-{}'.format(i, txt_wave_file), i,  tau, embed_crop)
 
-		if save_movie: Plotter.make_window_frame('DCE/temp_data/embedded_coords.txt', txt_wave_file, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
+		if save_movie:
+			Plotter.make_window_frame('DCE/temp_data/embedded_coords.txt', txt_wave_file, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
 
-		if max_frames != 0 and i > max_frames: break
+	if save_movie:
+		frames_to_movie(out_filename, framerate=1)
 
-
-def vary_tau(txt_wave_file,
+def vary_tau(
+		in_filename,
+		out_filename,
 		tau_lims=(1, 15),
 		tau_inc=1,
 		embed_crop=(1, 2),
@@ -61,18 +66,22 @@ def vary_tau(txt_wave_file,
 
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
-		sig = np.loadtxt(txt_wave_file)
+		sig = np.loadtxt(in_filename)
 		DCE.embed(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m,  ds_rate=ds_rate)
 
-		if save_worms: save_worms_single('{:d}-{}'.format(i, txt_wave_file), i, int(tau), embed_crop)
+		if save_worms: save_worms_single('{:d}-{}'.format(i, in_filename), i, int(tau), embed_crop)
 
-		if save_movie: Plotter.make_window_frame('DCE/temp_data/embedded_coords.txt', txt_wave_file, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
+		if save_movie: Plotter.make_window_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
+
+	if save_movie:
+		frames_to_movie(out_filename, framerate=1)
 
 
 def compare_vary_tau(
 
 		txt_wave_file1,
 		txt_wave_file2,
+		out_filename,
 		tau_lims,
 		tau_inc=1,
 		embed_crop=(1, 2),
@@ -94,8 +103,11 @@ def compare_vary_tau(
 
 		if save_worms: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop, embed_crop)
 
-		if save_movie: Plotter.compare_vary_tau_frame('DCE/frames/frame%03d.png' % i, txt_wave_file1, txt_wave_file2, i, tau, embed_crop)
+		if save_movie:
+			Plotter.compare_vary_tau_frame('DCE/frames/frame%03d.png' % i, txt_wave_file1, txt_wave_file2, i, tau, embed_crop)
 
+	if save_movie:
+		frames_to_movie(out_filename, framerate=1)
 
 
 def get_params_table(args_dict):
@@ -150,6 +162,7 @@ from Tools import auto_crop
 def compare_multi(
 		dir1, dir1_base,
 		dir2, dir2_base,
+		out_filename,
 
 		i_lims=(1, 89),
 
@@ -214,6 +227,11 @@ def compare_multi(
 		if save_worms: save_worms_double(filename_1, filename_2, i, tau_1, tau_2, crop_1, crop_2)
 
 		title_tables = [params_table, computed_tables]
-		if save_movie: Plotter.compare_multi_frame(frame_idx, sig_1, sig_2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables)
+		if save_movie:
+			Plotter.compare_multi_frame(frame_idx, sig_1, sig_2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables)
+
+	if save_movie:
+		frames_to_movie(out_filename, framerate=1)
+
 
 
