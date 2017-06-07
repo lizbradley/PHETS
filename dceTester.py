@@ -14,7 +14,7 @@ from DCE.Plotter import plot_waveform_zoom_only
 
 
 
-test = 11
+test = 9
 # test = int(sys.argv[1])
 
 print 'running test %d...' % test
@@ -70,6 +70,40 @@ if test == 3:
 		frames_to_movie('output/DCE/compare_tau_%s.mp4' % str(note), framerate=1)
 
 
+if test == 4:
+	vary_tau(
+		'datasets/time_series/C134C/49-C134C.txt',
+		tau_lims=(.001, .008),
+		tau_inc=.001,  # seconds
+		embed_crop=(1, 2),  # aka window position, in seconds
+		ds_rate=1
+	)  # downsample rate (takes every third sample)
+	frames_to_movie('output/DCE/test_4.mp4', framerate=1)
+
+
+if test == 5:
+	slide_window(
+		'datasets/time_series/C134C/49-C134C.txt',
+		window_size=.1,    	# seconds
+		tau=.001,			# seconds
+		step_size=1)      	# how much to move window each frame
+	frames_to_movie('output/DCE/test_5.mp4')
+
+
+if test == 6:
+	compare_vary_tau(
+		'datasets/time_series/C135B/49-C135B.txt',
+		'datasets/time_series/C134C/49-C134C.txt',
+		tau_lims=(.001, .005),
+		tau_inc=.001, 			 # seconds
+		embed_crop=(.5, .7),
+		ds_rate=5
+	)
+	frames_to_movie('output/DCE/test_6.mp4')
+
+
+
+
 if test == 8:
 	# still trying to figure out exactly how the units should work here
 	plot_power_spectrum(
@@ -77,6 +111,7 @@ if test == 8:
 		'output/DCE/power_spectrum_34-C134C.png',
 		crop=(1, 2),    # window for analysis (seconds)
 	)
+
 
 
 if test == 9:
@@ -93,7 +128,8 @@ if test == 9:
 		embed_crop_2=(2, 2.3),	 # seconds or 'auto'
 		auto_crop_length=.3,  	 	 # seconds for when embed_crop = 'auto'
 
-		tau='auto detect',  	 # seconds 'auto detect' or 'auto ideal'. NOTE: 'auto detect' is considerably slower that 'auto ideal'
+		tau_1='auto detect',  	 # seconds 'auto detect' or 'auto ideal'. NOTE: 'auto detect' is considerably slower that 'auto ideal'
+		tau_2='auto ideal',
 		tau_T=math.pi, 		 	 # for auto tau. tau = period * tau_T
 
 		save_worms=True,		 # to output/DCE/saved_worms

@@ -35,7 +35,8 @@ def slide_window(
 		print 'frame %i of %i' % (i, num_frames)
 
 		embed_crop = [start, start + window_size]
-		DCE.embed(txt_wave_file, 'DCE/temp_data/embedded_coords.txt', embed_crop, int(tau), 2, ds_rate=ds_rate)
+		sig = np.loadtxt(txt_wave_file)
+		DCE.embed(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, 2, ds_rate=ds_rate)
 
 		if save_worms: save_worms_single('{:d}-{}'.format(i, txt_wave_file), i,  tau, embed_crop)
 
@@ -60,7 +61,8 @@ def vary_tau(txt_wave_file,
 
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
-		DCE.embed(txt_wave_file, 'DCE/temp_data/embedded_coords.txt', embed_crop, int(tau), m,  ds_rate=ds_rate)
+		sig = np.loadtxt(txt_wave_file)
+		DCE.embed(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m,  ds_rate=ds_rate)
 
 		if save_worms: save_worms_single('{:d}-{}'.format(i, txt_wave_file), i, int(tau), embed_crop)
 
@@ -86,9 +88,9 @@ def compare_vary_tau(
 
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
-
-		DCE.embed(txt_wave_file1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, int(tau), m, ds_rate=ds_rate)
-		DCE.embed(txt_wave_file2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, int(tau), m, ds_rate=ds_rate)
+		sig_1, sig_2 = np.loadtxt(txt_wave_file1), np.loadtxt(txt_wave_file2)
+		DCE.embed(sig_1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, ds_rate=ds_rate)
+		DCE.embed(sig_2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, ds_rate=ds_rate)
 
 		if save_worms: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop, embed_crop)
 
