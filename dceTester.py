@@ -14,7 +14,7 @@ from DCE.Plotter import plot_waveform_zoom_only
 
 
 
-test = 9
+test = 6
 # test = int(sys.argv[1])
 
 print 'running test %d...' % test
