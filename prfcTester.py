@@ -224,8 +224,8 @@ if test == 6:
 		crop_2=(100, 8000),					# time_units or 'auto'
 
 		window_size= 2000, 				# time_units
-		num_windows=10, 					# evenly spaced
-		mean_samp_num=5,  				# number of windows to use for mean
+		num_windows=10, 				# evenly spaced
+		mean_samp_num=10,  				# number of windows to use for mean
 
 
 		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
@@ -261,7 +261,7 @@ if test == 7:
 		'output/PRFCompare/mean_PRFC/L63_x_m2_tau18_v_tau30.png',  		# out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 		time_units='seconds',
 
 		crop_1=(.1, .2),				# seconds or 'auto'

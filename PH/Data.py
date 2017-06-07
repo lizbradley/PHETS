@@ -246,6 +246,7 @@ class Filtration:
 			self.PD_data = 'empty'
 			return
 
+
 		for interval in zip(birth_t, death_t):
 			if interval[1] == -1:	# immortal
 				birth_e_imm.append(epsilons[int(interval[0] - 1)])
@@ -274,9 +275,8 @@ class Filtration:
 			return
 
 		if self.PD_data == 'empty':
-			print
-			return [None, None, np.zeros([num_div, num_div]), None]
-
+			self.PRF = [None, None, np.zeros([num_div, num_div]), None]
+			return
 		x, y, z = self.get_PD_data().mortal
 		max_lim = self.PD_data.lim
 		min_lim = 0
