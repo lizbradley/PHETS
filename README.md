@@ -68,8 +68,8 @@ takes two directories of (eg one with piano notes, another with range of viol
 notes), and generates a movie over a range note indexes (pitch). Tau and crop may be 
 set explicity or automatically.  
 The `save_worms` option will save all embedded trajectories which are generated for 
-the movie to `output/DCE/saved_worms`. These may then be passed as arguments to the 
-functions in `PH`.
+the movie to text files in`output/DCE/saved_worms`. These may then be passed as input
+to the functions in `PH`.
 
 
 #### PH: persistent homology
@@ -87,14 +87,14 @@ plot persistent rank function
 
 
 * **PRF_dist_plot()**  
-example: test 4
+example: test 4  
 takes range of time-series files and a reference file. Generates PRF for each, and 
 finds distances to reference PRF,
 plots distance vs index. 
 
 * **mean_PRF_dist_plot()**  
-example (1D input): test 6
-example (2D input): test 7
+example (1D input): test 6  
+example (2D input): test 7  
 takes two time-series or 2D trajectory files. for each input, slices each into a 
 number of windows. if inputs are time-series, embeds each window. gets PRF for each 
 window. selects subset of window PRFs, computes their mean, plots distance to mean 
