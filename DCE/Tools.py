@@ -10,7 +10,7 @@ from scipy.signal import butter, lfilter, freqz
 WAV_SAMPLE_RATE = 44100.
 
 
-def auto_crop(crop_cmd, sig, length):
+def auto_crop(crop_cmd, sig, length, time_units='seconds'):
 	"""
 		returns crop in seconds. if 'auto':
 			finds max of volume envelope: (xmax, ymax)
@@ -81,8 +81,16 @@ def auto_crop(crop_cmd, sig, length):
 	else:
 		crop = crop_cmd
 
-	if (crop[0] + crop[1]) * WAV_SAMPLE_RATE > len(sig):
-		print 'ERROR: crop_cmd is out of bounds.'
+	if time_units == 'seconds':
+		crop_end = crop[1] * WAV_SAMPLE_RATE
+	elif time_units == 'samples':
+		crop_end = crop_end =  crop[1]
+		crop = np.true_divide(crop, WAV_SAMPLE_RATE)
+	else:
+		print 'ERROR: invalid sample time_units.'
+		sys.exit()
+	if crop_end > len(sig):
+		print 'ERROR: crop is out of bounds.'
 		sys.exit()
 	return crop
 

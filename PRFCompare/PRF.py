@@ -252,15 +252,11 @@ def mean_PRF_dist_plots(
 
 	def crop_sig(sig_full, crop_cmd, auto_crop_len):
 
-		crop = auto_crop(crop_cmd, sig_full, auto_crop_length)		# returns crop in seconds
+		crop = auto_crop(crop_cmd, sig_full, auto_crop_length, time_units=time_units)		# returns crop in seconds
 
-		if time_units == 'samples':
-			sig = sig_full[crop[0]:crop[1]]
-		elif time_units == 'seconds':
-			sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
-		else:
-			print 'ERROR: invalid time_units.'
-			sys.exit()
+
+		sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
+
 
 		if normalize_volume: sig = sig / np.max(sig)
 		return crop, sig_full, sig

@@ -6,7 +6,7 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 6
+test = 7
 
 if test == 1:
 	params = parameter_set
@@ -220,8 +220,8 @@ if test == 6:
 
 		time_units='samples',
 
-		crop_1=(100, 20100),					# time_units or 'auto'
-		crop_2=(100, 20100),					# time_units or 'auto'
+		crop_1=(100, 8000),					# time_units or 'auto'
+		crop_2=(100, 8000),					# time_units or 'auto'
 
 		window_size= 2000, 				# time_units
 		num_windows=10, 					# evenly spaced
