@@ -267,7 +267,11 @@ def mean_PRF_dist_plots(
 
 
 	def slice_sig(sig):
+		if mean_samp_num > num_windows:
+			print 'ERROR: mean_samp_num may not exceed num_windows'
+			sys.exit()
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
+		print 'window start points', start_pts
 		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
 
 		return windows
