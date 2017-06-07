@@ -203,6 +203,12 @@ class Filtration:
 
 	def _build_PD_data(self):
 		""" formats perseus output """
+		class PDData:
+			def __init__(self, mortal, immortal, lim):
+				self.mortal = mortal
+				self.immortal = immortal
+				self.lim = lim
+
 
 		def get_multiplicity(birth_e, death_e):
 			try:
@@ -233,7 +239,13 @@ class Filtration:
 
 		birth_e_imm = []
 
-		birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
+		try:
+			birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
+		except IndexError:
+			print('WARNING: no homology for', self.filename)
+			self.PD_data = 'empty'
+			return
+
 		for interval in zip(birth_t, death_t):
 			if interval[1] == -1:	# immortal
 				birth_e_imm.append(epsilons[int(interval[0] - 1)])
@@ -251,11 +263,6 @@ class Filtration:
 		if len(immortal) != 0:
 			immortal = np.vstack({tuple(row) for row in immortal}).T # toss duplicates
 
-		class PDData:
-			def __init__(self, mortal, immortal, lim):
-				self.mortal = mortal
-				self.immortal = immortal
-				self.lim = lim
 
 		data = PDData(mortal, immortal, lim)
 

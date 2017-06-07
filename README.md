@@ -71,6 +71,9 @@ The `save_worms` option will save all embedded trajectories which are generated 
 the movie to text files in`output/DCE/saved_worms`. These may then be passed as input
 to the functions in `PH`.
 
+TODO: function for plotting embeddings without varying a parameter or input, as an image.
+(For now, a single frame movies can be used.)
+
 
 #### PH: persistent homology
 examples: test 16
@@ -82,6 +85,9 @@ make persistence diagram
 
 * **make_PRF_plot()**  
 plot persistent rank function
+
+TODO: a function for a single frame of the filtration (i.e. fixed epsilon) as an image.
+(For now, a single frame movie can be used.)
 
 #### PRFC: persistent rank function comparision
 

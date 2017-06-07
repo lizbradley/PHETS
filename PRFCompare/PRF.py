@@ -433,13 +433,14 @@ def mean_PRF_dist_plots(
 
 
 	if load_saved_filtrations:
+		debug = np.load('PRFCompare/funcs_1.npy')
 		crop_1, sig_1_full, sig_1, funcs_1 = np.load('PRFCompare/funcs_1.npy')
 		crop_2, sig_2_full, sig_2, funcs_2 = np.load('PRFCompare/funcs_2.npy')
 	else:
 		crop_1, sig_1_full, sig_1, funcs_1 = get_PRFs(filename_1, crop_1_cmd, tau_1_cmd)
 		crop_2, sig_2_full, sig_2, funcs_2 = get_PRFs(filename_2, crop_2_cmd, tau_2_cmd)
-		np.save('PRFCompare/funcs_1.npy', (crop_1, sig_1_full, funcs_1))
-		np.save('PRFCompare/funcs_2.npy', (crop_1, sig_1_full, funcs_2))
+		np.save('PRFCompare/funcs_1.npy', (crop_1, sig_1_full, sig_1,funcs_1))
+		np.save('PRFCompare/funcs_2.npy', (crop_1, sig_1_full, sig_2,funcs_2))
 
 
 	funcs_1_z = funcs_1[:, 2]
