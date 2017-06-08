@@ -13,7 +13,7 @@ import time
 start = time.time()
 
 
-test = 16
+test = 17
 # test = int(sys.argv[1])
 
 
@@ -454,7 +454,7 @@ if test == 15:
 
 
 if test == 16:
-	in_filename = "output/DCE/saved_worms/double/b/49-C135B.txt"
+	in_filename = "datasets/embedded/L96N22F5_x1_m2tau10.txt"
 	filt_params = parameter_set
 	filt_params.update(
 		{
@@ -492,7 +492,33 @@ if test == 16:
 
 
 
+if test == 17:
+	in_filename = 'datasets/embedded/REALDEAL/L63_2mil.txt'
 
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 200,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	# filtration = Filtration(in_filename, filt_params)
+	filtration = load_saved_filtration()		# reuses previous filtration
+
+
+	make_PD(
+		filtration,
+		'output/PH/realdeal.png'
+	)
+
+	make_movie(
+		filtration,
+		'output/PH/realdeal.mp4'
+	)
 
 
 

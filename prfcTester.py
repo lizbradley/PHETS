@@ -6,7 +6,7 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 7
+test = 11
 
 if test == 1:
 	params = parameter_set
@@ -286,5 +286,50 @@ if test == 7:
 		normalize_volume=True,
 
 		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+if test == 11:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 75,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	mean_PRF_dist_plots(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean_PRFC/L63_2000W100L.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=7500,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)

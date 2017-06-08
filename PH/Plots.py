@@ -45,6 +45,7 @@ def add_params_table(subplot, filt_params):
 	display_params = (
 		"max_filtration_param",
 		"min_filtration_param",
+		'num_divisions',
 		"start",
 		"worm_length",
 		"ds_rate",
@@ -58,7 +59,6 @@ def add_params_table(subplot, filt_params):
 		"m2_d",
 		"straight_VB",
 		"dimension_cutoff",
-		"graph_induced"
 	)
 	param_data = np.array([[key, filt_params[key]] for key in display_params])
 	param_table = subplot.table(

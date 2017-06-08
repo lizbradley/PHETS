@@ -25,7 +25,7 @@ import subprocess
 from config import find_landmarks_c_compile_str
 class Filtration:
 
-	def __init__(self, sig, params, filename=None, start=0):
+	def __init__(self, sig, params, filename=None):
 		caller_dir = os.getcwd()
 
 		if isinstance(sig, basestring):			# is filename
@@ -39,7 +39,7 @@ class Filtration:
 
 		self.params = params
 
-		arr = self._build(params, start=0)
+		arr = self._build(params)
 
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
@@ -84,6 +84,7 @@ class Filtration:
 
 			sys.exit()
 
+		os.remove('temp_data/worm_data.txt')
 
 		witness_coords = filtration[1][1]
 		landmark_coords = filtration[1][0]
@@ -209,13 +210,12 @@ class Filtration:
 				self.immortal = immortal
 				self.lim = lim
 
-
 		def get_multiplicity(birth_e, death_e):
 			try:
 				count = np.zeros_like(birth_e)
 			except TypeError:  # only one interval point
 				count = [0]
-			if not death_e:
+			if death_e is None:
 				death_e = [-1 for e in birth_e]
 			for i, pt in enumerate(zip(birth_e, death_e)):
 				for scanner_pt in zip(birth_e, death_e):
@@ -223,12 +223,15 @@ class Filtration:
 						count[i] += 1
 			return count
 
+
 		if self.PD_data:
 			return
 
 		if isinstance(self.intervals, basestring):
 			if self.intervals == 'empty':
 				self.PD_data = 'empty'
+				print('WARNING: no homology for a window in', self.filename)
+
 				return
 
 		epsilons = self.epsilons
@@ -239,29 +242,24 @@ class Filtration:
 
 		birth_e_imm = []
 
-		try:
-			birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
-		except IndexError:
-			print('WARNING: no homology for', self.filename)
-			self.PD_data = 'empty'
-			return
 
+		birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
 
 		for interval in zip(birth_t, death_t):
-			if interval[1] == -1:	# immortal
+			if interval[1] == -1:				# immortal
 				birth_e_imm.append(epsilons[int(interval[0] - 1)])
-
 			else:
 				birth_e_mor.append(epsilons[int(interval[0] - 1)])
 				death_e_mor.append(epsilons[int(interval[1] - 1)])
 
-		count_mor = get_multiplicity(birth_e_mor, birth_e_mor)
+		count_mor = get_multiplicity(birth_e_mor, death_e_mor)
 		mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
-		mortal = np.vstack({tuple(row) for row in mortal}).T  # toss duplicates
+		if len(mortal):
+			mortal = np.vstack({tuple(row) for row in mortal}).T  # toss duplicates
 
 		count_imm = get_multiplicity(birth_e_imm, None)
 		immortal = np.asarray([birth_e_imm, count_imm]).T
-		if len(immortal) != 0:
+		if len(immortal):
 			immortal = np.vstack({tuple(row) for row in immortal}).T # toss duplicates
 
 
@@ -331,7 +329,6 @@ class Filtration:
 				row[:] = new_row
 
 
-
 		def flatten_rows(ID_array):
 			for row in ID_array:
 				new_row = []
@@ -344,6 +341,7 @@ class Filtration:
 		IDs_to_coords(data)
 		# flatten_rows(data)		# if grouped by parent simplex
 		return data
+
 
 	def get_complexes_mayavi(self):
 
@@ -365,8 +363,8 @@ class Filtration:
 		return separate_by_k(self.complexes)
 
 	def get_PD_data(self):
-		self._get_intervals()	# calls perseus, sets self.intervals
-		self._build_PD_data()	# sets self.PD_data, returns PD_data
+		self._get_intervals()		# calls perseus, sets self.intervals
+		self._build_PD_data()		# sets self.PD_data, returns PD_data
 		return self.PD_data
 
 	def get_PRF(self, num_div):
