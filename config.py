@@ -4,6 +4,7 @@ MEMORY_PROFILE_ON = True
 
 find_landmarks_c_compile_str = {
 	'linux': '/usr/bin/gcc-5 -fopenmp -lpopt find_landmarks.c -o find_landmarks -lm -lpopt',
+
 	'macOS': '/usr/local/bin/gcc-5 -fopenmp -lpopt -o find_landmarks find_landmarks.c'
 }
 
@@ -28,8 +29,8 @@ default_filtration_params = {
 	"absolute": False,
 	"use_cliques": False,
 	"use_twr": False,
-	"m2_d": 0,  #Set to anything but 0 to run, set 'time_order_landmarks' = TRUE (don't think i need last part anymore - CHECK)
-	"straight_VB": 0, #
+	"m2_d": 0, 					 #Set to anything but 0 to run, set 'time_order_landmarks' = TRUE (don't think i need last part anymore - CHECK)
+	"straight_VB": 0,
 	"out": None,
 	"program": "Perseus",
 	"dimension_cutoff": 2,

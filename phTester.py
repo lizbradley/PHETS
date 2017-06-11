@@ -506,8 +506,8 @@ if test == 17:
 		}
 	)
 
-	# filtration = Filtration(in_filename, filt_params)
-	filtration = load_saved_filtration()		# reuses previous filtration
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
 
 
 	make_PD(

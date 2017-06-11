@@ -6,7 +6,7 @@ from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 
 
 # test = int(sys.argv[1])
-test = 11
+test = 7
 
 if test == 1:
 	params = parameter_set
@@ -261,7 +261,7 @@ if test == 7:
 		'output/PRFCompare/mean_PRFC/L63_x_m2_tau18_v_tau30.png',  		# out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_filtrations=True,
 		time_units='seconds',
 
 		crop_1=(.1, .2),				# seconds or 'auto'

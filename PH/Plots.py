@@ -8,6 +8,8 @@ from memory_profiler import profile
 from sys import platform
 
 from matplotlib.ticker import FormatStrFormatter
+import matplotlib.colors as colors
+from TitleBox import add_filename_table, add_params_table
 
 
 # from Utilities import mem_profile
@@ -22,53 +24,6 @@ f4=open("output/run_info/make_figure_memory.txt","wb")
 
 # @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)
-
-def add_filename_table(ax, filenames):
-	ax.axis('off')
-	title_table = ax.table(
-		cellText=[
-			[filenames.split('/')[-1]],   # remove leading "datasets/"
-		],
-		bbox=[0, 0, 1, 1],
-		cellLoc='center'
-	)
-	# title_table.auto_set_font_size(False)
-	# title_table.auto_set_font_size(8)
-
-
-def add_params_table(subplot, filt_params):
-	subplot.axis('off')
-	subplot.set_xlim([0,1])
-	subplot.set_ylim([0,1])
-
-
-	display_params = (
-		"max_filtration_param",
-		"min_filtration_param",
-		'num_divisions',
-		"start",
-		"worm_length",
-		"ds_rate",
-		"landmark_selector",
-		"d_orientation_amplify",
-		"d_use_hamiltonian",
-		"d_cov",
-		"simplex_cutoff",
-		"use_cliques",
-		"use_twr",
-		"m2_d",
-		"straight_VB",
-		"dimension_cutoff",
-	)
-	param_data = np.array([[key, filt_params[key]] for key in display_params])
-	param_table = subplot.table(
-		cellText=param_data,
-		colWidths=[1.5, .5],
-		bbox=[0, 0, 1, 1],  # x0, y0, width, height
-	)
-	param_table.auto_set_font_size(False)
-	param_table.set_fontsize(6)
-
 
 
 
@@ -153,6 +108,7 @@ def make_PD(filt, out_filename):
 	add_persistence_plot(plot_ax, filt)
 	add_filename_table(fname_ax, filt.filename)
 	add_params_table(params_ax, filt.params)
+
 	# IDA paper figures #
 	# title_block.tick_params(labelsize=23)
 	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
@@ -171,13 +127,6 @@ def make_PD(filt, out_filename):
 def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None):
 	print "\nplotting PRF... \n"
 
-	if isinstance(filt, Filtration):
-		func = filt.get_PRF(PRF_res)
-		in_filename = filt.filename
-		params = filt.params
-	else:
-		func = filt
-
 	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
 	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)
@@ -186,24 +135,35 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 	cbar_ax = 		pyplot.subplot2grid((6, 10), (0, 9), rowspan=6)
 
 
-	x, y, z, max_lim = func
-	# z = np.log10(z + 1)
+	if isinstance(filt, Filtration):
+		func = filt.get_PRF(PRF_res)
+		in_filename = filt.filename
+		params = filt.params
+	else:
+		func = filt
 
+	x, y, z, max_lim = func
 	if not max_lim:
 		x, y = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
 		z = np.zeros((10, 10))
 		max_lim = 1
-
 	plot_ax.set_xlim([0, max_lim])
 	plot_ax.set_ylim([0, max_lim])
 	plot_ax.set_aspect('equal')
 
-	cm = plot_ax.contourf(x, y, z)
-	fig.colorbar(cm, cax=cbar_ax)
+	import matplotlib.colorbar as colorbar
+
+
+	# bounds = np.concatenate([np.arange(0,10),[50]])
+	bounds = np.arange(0, 10)
+
+	plot_ax.contourf(x, y, z, bounds)
+
+	colorbar.ColorbarBase(cbar_ax, boundaries=bounds)
+
 
 	add_filename_table(fname_ax, in_filename)
 	add_params_table(params_ax, params)
-
 
 	fig.savefig(out_filename)
 

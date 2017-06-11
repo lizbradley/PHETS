@@ -2,20 +2,14 @@ import os
 import sys
 import subprocess
 import numpy as np
-import itertools
-
-
-# import matplotlib
-# matplotlib.rcParams['gray'] = True
-
 from matplotlib import collections
 import matplotlib.pyplot as pyplot
 import matplotlib.markers
 
 from matplotlib import animation
 
-from Plots import add_params_table, add_filename_table
-
+import Utilities
+from TitleBox import add_filename_table, add_params_table, update_epsilon, add_movie_params_table
 
 
 def remove_old_frames():
@@ -49,35 +43,6 @@ def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_tim
 		print 'error:', scheme, 'is not a valid color scheme'
 	return facecolor, edgecolor
 
-
-
-def update_epsilon(ax, i, filtration):
-	ax.axis('off')
-	epsilons = filtration.epsilons
-	e = epsilons[i]
-	time_table = ax.table(
-		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
-		bbox=[0, 0, 1, 1],    # x0, y0, width, height
-		colWidths=[.5, 1],
-		cellLoc='center',
-
-		animated=True,
-	)
-	# time_table.auto_set_font_size(False)
-	# time_table.set_fontsize(8)
-
-	return time_table,
-
-def add_movie_params_table(ax, params):
-	ax.axis('off')
-
-	table = ax.table(
-		cellText=[
-			['color scheme',params[0]],
-			['alpha', params[1]],
-			# ['camera angle',params[2]],
-		]
-	)
 
 def make_frames_2D(filtration, color_scheme, alpha, save_frames):
 	def plot_witnesses(subplot, attractor_data):
@@ -154,70 +119,6 @@ def make_frames_2D(filtration, color_scheme, alpha, save_frames):
 		return ret_list
 
 	return init, animate
-
-import Utilities
-
-def make_movie(
-		filtration,
-		out_filename,
-		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
-		camera_angle=(135, 55),  		# for 3D mode. [azimuthal, elevation]
-		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
-		dpi=150,  						# dots per inch (resolution)
-		max_frames=None,  				# cut off frame (for testing or when only interested in the beginning of a movie)
-		hide_1simplexes=False,			# i need to find a way to optimize the plotting of 1-simplexes(lines) 3D plotting, as of now they slow mayavi significantly.
-		save_frames=False,  			# save frames to /frames/ dir
-		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
-
-):
-
-	# remove_old_frames()
-
-	# Utilities.check_overwrite(out_filename)
-
-
-	movie_info = [color_scheme, camera_angle, alpha]
-
-	fnames = [filtration.filename, out_filename]
-
-
-	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
-
-	if filtration.ambient_dim == 2:
-		print 'building movie...'
-		init, animate = make_frames_2D(filtration, color_scheme, alpha, save_frames=save_frames)
-		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div, blit=True, repeat=False)
-
-		# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
-		# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
-		# As a workaround, ani.save(fps=10) is used and then ffmpeg is called to reduce the speed of the video by a 10x
-
-		# FuncAnimation.save() offers blitting, which should improve performance even further, but despite my best efforts
-		# to configure it correctly, it doesn't make much any(?) difference in time-to-run. However, this may be a
-		# consequence of all simplexes being hidden in the init function.
-
-		print 'saving...'
-		ani.save('output/PH/temp.mp4', fps=10)
-		print 'correcting framerate...'
-
-		subprocess.call(['ffmpeg', '-y', '-i',
-						 'output/PH/temp.mp4',
-						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
-						 out_filename])
-
-		os.remove('output/PH/temp.mp4')
-
-	elif ambient_dim == 3:
-		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."
-		print "Response times may be impossibly long, especially for large 'max_filtration_param'."
-		filt_data[2] = unpack_complex_data_3D(filt_data[2])
-		make_frames_3D(filt_data, fnames, color_scheme, alpha, camera_angle, hide_1simplexes)
-		TestingFunctions.frames_to_movie(out_file_name, framerate)
-	else:
-		print "ERROR: ambient_dim = {:d}. Check input filtration file."
-		sys.exit()
-
-
 
 
 def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angle, hide_1simplexes):
@@ -299,6 +200,72 @@ def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angl
 		print 'frame', i
 		make_frame(filt_plot, title_plot, i)
 		pyplot.savefig('frames/image%03d.png' % i)
+
+
+
+
+def make_movie(
+		filtration,
+		out_filename,
+		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
+		camera_angle=(135, 55),  		# for 3D mode. [azimuthal, elevation]
+		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
+		dpi=150,  						# dots per inch (resolution)
+		max_frames=None,  				# cut off frame (for testing or when only interested in the beginning of a movie)
+		hide_1simplexes=False,			# i need to find a way to optimize the plotting of 1-simplexes(lines) 3D plotting, as of now they slow mayavi significantly.
+		save_frames=False,  			# save frames to /frames/ dir
+		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
+
+):
+
+	# remove_old_frames()
+
+	# Utilities.check_overwrite(out_filename)
+
+
+	movie_info = [color_scheme, camera_angle, alpha]
+
+	fnames = [filtration.filename, out_filename]
+
+
+	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
+
+	if filtration.ambient_dim == 2:
+		print 'building movie...'
+		init, animate = make_frames_2D(filtration, color_scheme, alpha, save_frames=save_frames)
+		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div, blit=True, repeat=False)
+
+		# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
+		# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
+		# As a workaround, ani.save(fps=10) is used and then ffmpeg is called to reduce the speed of the video by a 10x
+
+		# FuncAnimation.save() offers blitting, which should improve performance even further, but despite my best efforts
+		# to configure it correctly, it doesn't make much any(?) difference in time-to-run. However, this may be a
+		# consequence of all simplexes being hidden in the init function.
+
+		print 'saving...'
+		ani.save('output/PH/temp.mp4', fps=10)
+		print 'correcting framerate...'
+
+		subprocess.call(['ffmpeg', '-y', '-i',
+						 'output/PH/temp.mp4',
+						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
+						 out_filename])
+
+		os.remove('output/PH/temp.mp4')
+
+	elif ambient_dim == 3:
+		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."
+		print "Response times may be impossibly long, especially for large 'max_filtration_param'."
+		filt_data[2] = unpack_complex_data_3D(filt_data[2])
+		make_frames_3D(filt_data, fnames, color_scheme, alpha, camera_angle, hide_1simplexes)
+		TestingFunctions.frames_to_movie(out_file_name, framerate)
+	else:
+		print "ERROR: ambient_dim = {:d}. Check input filtration file."
+		sys.exit()
+
+
+
 
 
 def make_frame_3D(birth_time, camera_angle=(135, 55), hide_1simplexes=False, alpha=.7, color_scheme='none'):
