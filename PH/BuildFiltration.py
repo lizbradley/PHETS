@@ -1,4 +1,8 @@
 '''
+original author: Jamie
+'''
+
+'''
 Samantha Molnar
 Began edits 10/24/16
 '''
