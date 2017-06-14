@@ -249,7 +249,6 @@ def dists_compare(
 			print 'ERROR: mean_samp_num may not exceed num_windows'
 			sys.exit()
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
-		print 'window start points', start_pts
 		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
 
 		return windows
@@ -495,8 +494,8 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 
 	base_filename_1 = filename_1.split('/')[-1].split('.')[0]
 	base_filename_2 = filename_2.split('/')[-1].split('.')[0]
-	out_fname_1 = 'output/PRFCompare/mean/' + base_filename_1 + '.png'
-	out_fname_2 = 'output/PRFCompare/mean/' + base_filename_2 + '.png'
+	out_fname_1 = 'output/PRFCompare/mean/' + base_filename_1 + '_mean_PRF.png'
+	out_fname_2 = 'output/PRFCompare/mean/' + base_filename_2 + '_mean_PRF.png'
 	ref_func_1, ref_func_2 = refs
 	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params, in_filename='MEAN: ' + base_filename_1)
 	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params, in_filename='MEAN: ' + base_filename_2)
@@ -515,12 +514,17 @@ def plot_clusters(*args, **kwargs):
 		def add_filename_table(ax, filenames):
 			ax.axis('off')
 			filenames = [f.split('/')[-1] for f in filenames]  # remove leading "datasets/"
-			arr = np.array(np.matrix(filenames).T)
+			arr = [
+				['A', filenames[0]],
+				['B', filenames[1]]
+			]
 
 			title_table = ax.table(
 				cellText=arr,
 				bbox=[0, 0, 1, 1],
-				cellLoc='center'
+				cellLoc='center',
+				rowColours=['C0', 'C1'],
+				# colWidths=[.5, 1]
 			)
 
 		print 'plotting clusters...'

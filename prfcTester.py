@@ -7,7 +7,7 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 # test = int(sys.argv[1])
-test = 14
+test = 13
 
 if test == 1:
 	params = parameter_set
@@ -127,7 +127,7 @@ if test == 4:
 	)
 
 
-	plot_dists_vs_ref(
+	plot_dists_vs_ref(			# previously PRF_dist_plot()
 		'datasets/embedded/test_cases',						# input directory
 		'L63_x_m2_tau',										# input base filename
 		'base i',											# input filename format: 'base i or 'i base'
@@ -303,7 +303,7 @@ if test == 11:
 		}
 	)
 
-	plot_dists_vs_means(
+	plot_dists_vs_means(		# renamed from mean_PRF_dists_plot()
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L.png',  # out filename
@@ -393,18 +393,29 @@ if test == 13:
 		}
 	)
 
+	params = parameter_set
+	params.update(
+		{
+			'ds_rate': 75,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
 	plot_clusters(
+		'datasets/time_series/viol/49-viol.txt',
 		'datasets/time_series/C134C/49-C134C.txt',
-		'datasets/time_series/C135B/49-C135B.txt',
-		'output/PRFCompare/cluster/C134C_C134B.png',  		# out filename
+		'output/PRFCompare/cluster/viol_C134C.png',  		# out filename
 		params,
 
 		load_saved_filtrations=True,
 
 		time_units='seconds',
 
-		crop_1='auto',  # time_units or 'auto'
-		crop_2='auto',  # time_units or 'auto'
+		crop_1=(2, 2.5),  # time_units or 'auto'
+		crop_2=(2, 2.5),  # time_units or 'auto'
 		auto_crop_length=1,
 
 		window_size=.1,  # time_units
@@ -440,17 +451,17 @@ if test == 14:
 		}
 	)
 	plot_dists_vs_means(
+		'datasets/time_series/viol/49-viol.txt',
 		'datasets/time_series/C134C/49-C134C.txt',
-		'datasets/time_series/C135B/49-C135B.txt',
-		'output/PRFCompare/mean/C134C_C134B_time.png',  		# out filename
+		'output/PRFCompare/mean/viol_C134C.png',  		# out filename
 		params,
 
 		load_saved_filtrations=True,
 
 		time_units='seconds',
 
-		crop_1='auto',  # time_units or 'auto'
-		crop_2='auto',  # time_units or 'auto'
+		crop_1=(2, 2.5),  # time_units or 'auto'
+		crop_2=(2, 2.5),  # time_units or 'auto'
 		auto_crop_length=1,
 
 		window_size=.1,  # time_units
