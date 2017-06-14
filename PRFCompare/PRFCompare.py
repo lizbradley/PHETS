@@ -41,15 +41,16 @@ def clear_old_files(path, PD_movie_int):
 def get_scaled_dists(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_res):
 	box_area = (1 / PRF_res) ** 2
 	norm_x, norm_y = np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res))
-	weighting_func_arr = weighting_func(norm_x, norm_y)
-
-	def get_dists(funcs_z, ref_func_z):
-		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
-		diffs_weighted = np.asarray([np.multiply(diff, weighting_func_arr) for diff in diffs])
+	weighting_func_arr = weighting_func(norm_x, norm_y)												# TODO: plots of pointwise variance function, functional coefficient of variation
+																									# TODO: make sure immortal holes are counted in PRF !!!
+																									# TODO: PRF color bar 0 bin
+	def get_dists(funcs_z, ref_func_z):																# TODO: normalize PRF axes to sqrt(2)
+		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])					# TODO: add PRF to PD_movie_int !!
+		diffs_weighted = np.asarray([np.multiply(diff, weighting_func_arr) for diff in diffs])		# TODO: weight within sum, NOT squared
 		if metric == 'L1':
 			dists = np.asarray([(np.nansum(np.abs(diff))) * box_area for diff in diffs_weighted])
 		elif metric == 'L2':
-			dists = np.asarray([np.nansum(np.sqrt(np.power(diff, 2))) * box_area for diff in diffs_weighted])
+			dists = np.asarray([np.sqrt(np.nansum(np.power(diff, 2))) * box_area for diff in diffs_weighted])
 		else:
 			print "ERROR: metric not recognized. Use 'L1' or 'L2'."
 			sys.exit()
@@ -156,7 +157,7 @@ def plot_dists_vs_ref(
 		return np.asarray(funcs)
 
 	# ===================================================== #
-	# 				MAIN:	PRF_dist_plots()				#
+	# 				MAIN:	plot_dists_vs_ref()				#
 	# ===================================================== #
 
 	clear_old_files('output/PRFCompare/ref/PDs_and_movies/', PD_movie_int)
@@ -523,7 +524,7 @@ def plot_clusters(*args, **kwargs):
 				cellText=arr,
 				bbox=[0, 0, 1, 1],
 				cellLoc='center',
-				rowColours=['C0', 'C1'],
+				# rowColours=['C0', 'C1'],
 				# colWidths=[.5, 1]
 			)
 
@@ -538,13 +539,21 @@ def plot_clusters(*args, **kwargs):
 		add_filename_table(fname_ax, [filename_1, filename_2])
 		add_filt_params_table(params_ax, filt_params)
 
+		plot_ax.set_aspect('equal')
 		plot_ax.set_xlabel('distance to A')
 		plot_ax.set_ylabel('distance to B')
 
 		A = [d_1_vs_1, d_1_vs_2]
 		B = [d_2_vs_1, d_2_vs_2]
-		plot_ax.scatter(*A, c='C0')
-		plot_ax.scatter(*B, c='C1')
+		plot_ax.scatter(*A, c='C0', label='A')
+		plot_ax.scatter(*B, c='C1', label='B')
+
+		plot_ax.legend()
+
+		max_lim = np.max([plot_ax.get_xlim()[1], plot_ax.get_ylim()[1]])
+
+		plot_ax.set_xlim([0, max_lim])
+		plot_ax.set_ylim([0, max_lim])
 
 		fig.savefig(out_filename)
 
