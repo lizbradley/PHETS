@@ -13,7 +13,8 @@ def add_filename_table(ax, filenames):
 	# title_table.auto_set_font_size(8)
 
 
-def add_params_table(subplot, filt_params):
+
+def add_filt_params_table(subplot, filt_params):
 	subplot.axis('off')
 	subplot.set_xlim([0,1])
 	subplot.set_ylim([0,1])

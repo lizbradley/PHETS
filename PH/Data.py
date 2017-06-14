@@ -156,8 +156,6 @@ class Filtration:
 		return filt_ID_array
 
 	def _get_intervals(self):
-		if self.intervals is not None:
-			return
 
 		def build_perseus_in_file(filt_array):
 			print 'building perseus_in.txt...'
@@ -194,15 +192,15 @@ class Filtration:
 		def load_perseus_out_file():
 			self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
 			if len(self.intervals) == 0:
-				print 'WARNING: no homology for', self.filename
+				print 'WARNING: no homology for this window!'
 				self.intervals = 'empty'
 
-		caller_dir = os.getcwd()
-		os.chdir(SCRIPT_DIR)
+		if self.intervals is not None:
+			return
+
 		build_perseus_in_file(self.complexes)
 		call_perseus()
 		load_perseus_out_file()
-		os.chdir(caller_dir)
 
 	def _build_PD_data(self):
 		""" formats perseus output """
@@ -232,8 +230,6 @@ class Filtration:
 		if isinstance(self.intervals, basestring):
 			if self.intervals == 'empty':
 				self.PD_data = 'empty'
-				print('WARNING: no homology for a window in', self.filename)
-
 				return
 
 		epsilons = self.epsilons
@@ -244,15 +240,30 @@ class Filtration:
 
 		birth_e_imm = []
 
+		def t_to_eps(t):
+			return epsilons[int(t - 1)]
+
+		if len(self.intervals.shape) == 1:		# one interval
+			birth_t, death_t = self.intervals
+			if death_t == -1:
+				immortal = [t_to_eps(birth_t), 1]
+				mortal = []
+			else:
+				immortal = []
+				mortal = [t_to_eps(birth_t), t_to_eps(death_t), 1]
+
+			data = PDData(mortal, immortal, lim)
+			self.PD_data = data
+			return
 
 		birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
 
 		for interval in zip(birth_t, death_t):
 			if interval[1] == -1:				# immortal
-				birth_e_imm.append(epsilons[int(interval[0] - 1)])
+				birth_e_imm.append(t_to_eps(interval[0]))
 			else:
-				birth_e_mor.append(epsilons[int(interval[0] - 1)])
-				death_e_mor.append(epsilons[int(interval[1] - 1)])
+				birth_e_mor.append(t_to_eps(interval[0]))
+				death_e_mor.append(t_to_eps(interval[1]))
 
 		count_mor = get_multiplicity(birth_e_mor, death_e_mor)
 		mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
@@ -284,7 +295,11 @@ class Filtration:
 		x_ = y_ = np.linspace(min_lim, max_lim, num_div)
 		xx, yy = np.meshgrid(x_, y_)
 
-		pts = zip(x, y, z)
+		try:
+			pts = zip(x, y, z)
+		except TypeError: 	# one interval:
+			pts = [[x, y, z]]
+
 		grid_pts = zip(np.nditer(xx), np.nditer(yy))
 		grid_vals = np.zeros(len(grid_pts))
 		for i, grid_pt in enumerate(grid_pts):
@@ -365,13 +380,19 @@ class Filtration:
 		return separate_by_k(self.complexes)
 
 	def get_PD_data(self):
+		caller_dir = os.getcwd()
+		os.chdir(SCRIPT_DIR)
 		self._get_intervals()		# calls perseus, sets self.intervals
 		self._build_PD_data()		# sets self.PD_data, returns PD_data
+		os.chdir(caller_dir)
 		return self.PD_data
 
 	def get_PRF(self, num_div):
+		caller_dir = os.getcwd()
+		os.chdir(SCRIPT_DIR)
 		self._get_intervals()
 		self._build_PD_data()
 		self._build_PRF(num_div)
+		os.chdir(caller_dir)
 		return self.PRF
 

@@ -9,7 +9,7 @@ import matplotlib.markers
 from matplotlib import animation
 
 import Utilities
-from TitleBox import add_filename_table, add_params_table, update_epsilon, add_movie_params_table
+from TitleBox import add_filename_table, add_filt_params_table, update_epsilon, add_movie_params_table
 
 
 def remove_old_frames():
@@ -87,7 +87,7 @@ def make_frames_2D(filtration, color_scheme, alpha, save_frames):
 	add_filename_table(fname_ax, filtration.filename)
 
 	add_movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
-	add_params_table(filt_params_ax, filtration.params)
+	add_filt_params_table(filt_params_ax, filtration.params)
 
 
 	# IDA paper formatting #
@@ -191,7 +191,7 @@ def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angl
 
 
 	title_plot = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3, colspan=1)
-	add_params_table(title_plot, title_block_info, 0)
+	add_filt_params_table(title_plot, title_block_info, 0)
 
 	filt_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
 	filt_plot.set_aspect('equal')

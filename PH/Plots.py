@@ -9,7 +9,7 @@ from sys import platform
 
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
-from TitleBox import add_filename_table, add_params_table
+from TitleBox import add_filename_table, add_filt_params_table
 
 
 # from Utilities import mem_profile
@@ -107,7 +107,7 @@ def make_PD(filt, out_filename):
 
 	add_persistence_plot(plot_ax, filt)
 	add_filename_table(fname_ax, filt.filename)
-	add_params_table(params_ax, filt.params)
+	add_filt_params_table(params_ax, filt.params)
 
 	# IDA paper figures #
 	# title_block.tick_params(labelsize=23)
@@ -125,7 +125,7 @@ def make_PD(filt, out_filename):
 
 
 def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None):
-	print "\nplotting PRF... \n"
+	print "plotting PRF..."
 
 	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
 	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
@@ -154,16 +154,16 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 	import matplotlib.colorbar as colorbar
 
 
-	# bounds = np.concatenate([np.arange(0,10),[50]])
-	bounds = np.arange(0, 10)
+	# bins = np.concatenate([np.arange(0,10),[50]])
+	bins = np.arange(0, 10)
 
-	plot_ax.contourf(x, y, z, bounds)
+	plot_ax.contourf(x, y, z, bins, extend='max')
 
-	colorbar.ColorbarBase(cbar_ax, boundaries=bounds)
+	colorbar.ColorbarBase(cbar_ax, boundaries=bins)
 
 
 	add_filename_table(fname_ax, in_filename)
-	add_params_table(params_ax, params)
+	add_filt_params_table(params_ax, params)
 
 	fig.savefig(out_filename)
 

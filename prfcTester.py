@@ -1,12 +1,13 @@
 import sys
 import numpy as np
 from config import default_filtration_params as parameter_set
-from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
+# from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
+from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_clusters
 
 
 
 # test = int(sys.argv[1])
-test = 7
+test = 14
 
 if test == 1:
 	params = parameter_set
@@ -21,7 +22,7 @@ if test == 1:
 		}
 	)
 
-	PRF_dist_plot(
+	plot_dists_vs_ref(
 		'datasets/embedded/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
@@ -54,7 +55,7 @@ if test == 2:
 		}
 	)
 
-	mean_PRF_dist_plots(
+	plot_dists_vs_means(
 		'datasets/time_series/C134C/40-C134C.txt',  # input (left)
 		'datasets/time_series/C135B/40-C135B.txt',  # input (right)
 		'output/PRFCompare/40_C134C_vs_C135B.png',  # out filename
@@ -91,7 +92,7 @@ if test == 3:
 		}
 	)
 
-	mean_PRF_dist_plots(
+	plot_dists_vs_means(
 		'datasets/time_series/C134C/40-C134C.txt',  # input (left)
 		'datasets/time_series/C135B/40-C135B.txt',  # input (right)
 		'output/PRFCompare/40_C134C_vs_C135B.png',  # out filename
@@ -126,11 +127,11 @@ if test == 4:
 	)
 
 
-	PRF_dist_plot(
+	plot_dists_vs_ref(
 		'datasets/embedded/test_cases',						# input directory
 		'L63_x_m2_tau',										# input base filename
 		'base i',											# input filename format: 'base i or 'i base'
-		'output/PRFCompare/ref_PRFC/test4_L1.png',			# output filename
+		'output/PRFCompare/ref/test4_L1.png',			# output filename
 		params,
 
 		i_ref=15,
@@ -161,10 +162,10 @@ if test == 5:
 		}
 	)
 
-	mean_PRF_dist_plots(
+	plot_dists_vs_means(
 		'datasets/time_series/C134C/49-C134C.txt',  # input (left)
 		'datasets/time_series/C135B/49-C135B.txt',  # input (right)
-		'output/PRFCompare/mean_PRFC/test_5.png',  		# out filename
+		'output/PRFCompare/mean/test_5.png',  		# out filename
 		params,
 
 		load_saved_filtrations=False,
@@ -210,10 +211,10 @@ if test == 6:
 		}
 	)
 
-	mean_PRF_dist_plots(
+	plot_dists_vs_means(
 		'datasets/embedded/L63_x_m2/L63_x_m2_tau18.txt',
 		'datasets/embedded/L63_x_m2/L63_x_m2_tau35.txt',
-		'output/PRFCompare/mean_PRFC/L63_tau18v35_W1000dsr50.png',  		# out filename
+		'output/PRFCompare/mean/L63_tau18v35_W1000dsr50.png',  		# out filename
 		params,
 
 		load_saved_filtrations=False,
@@ -253,12 +254,12 @@ if test == 7:
 		'use_cliques': True,
 		})
 
-	mean_PRF_dist_plots(
+	plot_dists_vs_means(
 		# 'datasets/time_series/C134C/49-C134C.txt',  # input (left)
 		# 'datasets/time_series/C135B/49-C135B.txt',  # input (right)
 		'datasets/embedded/L63_x_m2/L63_x_m2_tau18.txt',
 		'datasets/embedded/L63_x_m2/L63_x_m2_tau30.txt',
-		'output/PRFCompare/mean_PRFC/L63_x_m2_tau18_v_tau30.png',  		# out filename
+		'output/PRFCompare/mean/L63_x_m2_tau18_v_tau30.png',  		# out filename
 		params,
 
 		load_saved_filtrations=True,
@@ -302,10 +303,10 @@ if test == 11:
 		}
 	)
 
-	mean_PRF_dist_plots(
+	plot_dists_vs_means(
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/mean_PRFC/L63_2000W100L.png',  # out filename
+		'output/PRFCompare/mean/L63_2000W100L.png',  # out filename
 		params,
 
 		load_saved_filtrations=False,
@@ -331,5 +332,142 @@ if test == 11:
 		normalize_volume=True,
 
 		PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+if test == 12:
+
+	params = parameter_set
+	params.update(
+		{
+			'ds_rate': 75,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_2000W100L.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 50000),  # time_units or 'auto'
+		crop_2=(1000, 50000),  # time_units or 'auto'
+
+		window_size=5000,  # time_units
+		num_windows=7,  # evenly spaced
+		mean_samp_num=7,  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		PD_movie_int=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+
+if test == 13:
+
+	params = parameter_set
+	params.update(
+		{
+			'ds_rate': 75,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_clusters(
+		'datasets/time_series/C134C/49-C134C.txt',
+		'datasets/time_series/C135B/49-C135B.txt',
+		'output/PRFCompare/cluster/C134C_C134B.png',  		# out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='seconds',
+
+		crop_1='auto',  # time_units or 'auto'
+		crop_2='auto',  # time_units or 'auto'
+		auto_crop_length=1,
+
+		window_size=.1,  # time_units
+		num_windows=10,  # evenly spaced
+		mean_samp_num=10,  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		PD_movie_int=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+
+if test == 14:
+
+	params = parameter_set
+	params.update(
+		{
+			'ds_rate': 75,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+	plot_dists_vs_means(
+		'datasets/time_series/C134C/49-C134C.txt',
+		'datasets/time_series/C135B/49-C135B.txt',
+		'output/PRFCompare/mean/C134C_C134B_time.png',  		# out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='seconds',
+
+		crop_1='auto',  # time_units or 'auto'
+		crop_2='auto',  # time_units or 'auto'
+		auto_crop_length=1,
+
+		window_size=.1,  # time_units
+		num_windows=10,  # evenly spaced
+		mean_samp_num=10,  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		PD_movie_int=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
