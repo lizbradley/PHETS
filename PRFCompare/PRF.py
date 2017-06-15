@@ -143,8 +143,8 @@ def PRF_dist_plot(
 		base_name = base_filename.split('/')[-1].split('.')[0]
 		comp_name = '{:s}_{:d}_'.format(base_name, i)
 		if ref: comp_name += '_REFERENCE_'
-		PD_filename = 'output/PRFCompare/ref/PDs_and_movies/' + comp_name + 'PD.png'
-		movie_filename = 'output/PRFCompare/ref/PDs_and_movies/' + comp_name + 'movie.mp4'
+		PD_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PD.png'
+		movie_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'movie.mp4'
 
 		make_PD(filt, PD_filename)
 		make_movie(filt, movie_filename)
@@ -171,7 +171,7 @@ def PRF_dist_plot(
 	# 				MAIN:	PRF_dist_plots()				#
 	# ===================================================== #
 
-	clear_old_files('output/PRFCompare/ref/PDs_and_movies/', PD_movie_int)
+	clear_old_files('output/PRFCompare/ref/see_samples/', PD_movie_int)
 	ref_filename = get_in_filename(i_ref)
 	ref_filt = Filtration(ref_filename, filt_params)
 	ref_func = ref_filt.get_PRF(PRF_res)
@@ -243,8 +243,8 @@ def mean_PRF_dist_plots(
 	def make_movie_and_PD(filt, i, filename):
 		base_name = filename.split('/')[-1].split('.')[0]
 		comp_name = '{:s}_{:d}_'.format(base_name, i)
-		PD_filename = 'output/PRFCompare/mean/PDs_and_movies/' + comp_name + 'PD.png'
-		movie_filename = 'output/PRFCompare/mean/PDs_and_movies/' + comp_name + 'movie.mp4'
+		PD_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'PD.png'
+		movie_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'movie.mp4'
 
 		make_PD(filt, PD_filename)
 		make_movie(filt, movie_filename)
@@ -417,7 +417,7 @@ def mean_PRF_dist_plots(
 	# 		mean_PRF_dist_plots()
 	# ===========================================================================
 
-	clear_old_files('output/PRFCompare/mean/PDs_and_movies/', PD_movie_int)
+	clear_old_files('output/PRFCompare/mean/see_samples/', PD_movie_int)
 	if time_units == 'seconds':
 		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
 	elif time_units == 'samples':

@@ -288,7 +288,6 @@ class Filtration:
 		if self.PD_data == 'empty':
 			self.PRF = [None, None, np.zeros([num_div, num_div]), None]
 			return
-		x, y, z = self.get_PD_data().mortal
 		max_lim = self.PD_data.lim
 		min_lim = 0
 
@@ -296,9 +295,23 @@ class Filtration:
 		xx, yy = np.meshgrid(x_, y_)
 
 		try:
-			pts = zip(x, y, z)
-		except TypeError: 	# one interval:
-			pts = [[x, y, z]]
+			x, y, z = self.get_PD_data().mortal
+			try:
+				pts = zip(x, y, z)
+			except TypeError: 			# one interval
+				pts = [[x, y, z]]
+		except ValueError:				# no intervals
+			pts = []
+
+		try:
+			x_imm, z_imm = self.get_PD_data().immortal
+			try:
+				pts_imm = zip(x_imm, z_imm)
+			except TypeError:
+				pts_imm = [[x_imm, z_imm]]
+		except ValueError:
+			pts_imm = []
+
 
 		grid_pts = zip(np.nditer(xx), np.nditer(yy))
 		grid_vals = np.zeros(len(grid_pts))
@@ -307,6 +320,9 @@ class Filtration:
 				for pt in pts:
 					if pt[0] <= grid_pt[0] and pt[1] >= grid_pt[1]:
 						grid_vals[i] += pt[2]
+				for pt in pts_imm:
+					if pt[0] <= grid_pt[0]:
+						grid_vals[i] += pt[1]
 			else:
 				grid_vals[i] = np.nan
 		grid_vals = np.reshape(grid_vals, xx.shape)

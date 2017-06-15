@@ -155,7 +155,7 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 
 
 	# bins = np.concatenate([np.arange(0,10),[50]])
-	bins = np.arange(0, 10)
+	bins = np.arange(-1, 10)
 
 	plot_ax.contourf(x, y, z, bins, extend='max')
 

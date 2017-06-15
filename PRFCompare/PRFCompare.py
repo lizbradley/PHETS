@@ -39,18 +39,17 @@ def clear_old_files(path, PD_movie_int):
 
 
 def get_scaled_dists(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_res):
-	box_area = (1 / PRF_res) ** 2
+	box_area = 2. / (PRF_res ** 2)
 	norm_x, norm_y = np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res))
 	weighting_func_arr = weighting_func(norm_x, norm_y)												# TODO: plots of pointwise variance function, functional coefficient of variation
-																									# TODO: make sure immortal holes are counted in PRF !!!
-																									# TODO: PRF color bar 0 bin
-	def get_dists(funcs_z, ref_func_z):																# TODO: normalize PRF axes to sqrt(2)
-		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])					# TODO: add PRF to PD_movie_int !!
-		diffs_weighted = np.asarray([np.multiply(diff, weighting_func_arr) for diff in diffs])		# TODO: weight within sum, NOT squared
+																									# TODO: make sure immortal holes are counted in PRF !!!		done
+																									# TODO: PRF color bar 0 bin									done
+	def get_dists(funcs_z, ref_func_z):																# TODO: normalize PRF axes to sqrt(2)						done
+		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])					# TODO: add PRF to PD_movie_int !!							done
 		if metric == 'L1':
-			dists = np.asarray([(np.nansum(np.abs(diff))) * box_area for diff in diffs_weighted])
+			dists = np.asarray([(np.nansum(np.multiply(np.abs(diff), weighting_func_arr))) * box_area for diff in diffs])
 		elif metric == 'L2':
-			dists = np.asarray([np.sqrt(np.nansum(np.power(diff, 2))) * box_area for diff in diffs_weighted])
+			dists = np.asarray([np.sqrt(np.nansum(np.multiply(np.power(diff, 2), weighting_func_arr))) * box_area for diff in diffs])
 		else:
 			print "ERROR: metric not recognized. Use 'L1' or 'L2'."
 			sys.exit()
@@ -133,8 +132,8 @@ def plot_dists_vs_ref(
 		base_name = base_filename.split('/')[-1].split('.')[0]
 		comp_name = '{:s}_{:d}_'.format(base_name, i)
 		if ref: comp_name += '_REFERENCE_'
-		PD_filename = 'output/PRFCompare/ref/PDs_and_movies/' + comp_name + 'PD.png'
-		movie_filename = 'output/PRFCompare/ref/PDs_and_movies/' + comp_name + 'movie.mp4'
+		PD_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PD.png'
+		movie_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'movie.mp4'
 
 		make_PD(filt, PD_filename)
 		make_movie(filt, movie_filename)
@@ -160,7 +159,7 @@ def plot_dists_vs_ref(
 	# 				MAIN:	plot_dists_vs_ref()				#
 	# ===================================================== #
 
-	clear_old_files('output/PRFCompare/ref/PDs_and_movies/', PD_movie_int)
+	clear_old_files('output/PRFCompare/ref/see_samples/', PD_movie_int)
 	ref_filename = get_in_filename(i_ref)
 	ref_filt = Filtration(ref_filename, filt_params)
 	ref_func = ref_filt.get_PRF(PRF_res)
@@ -224,17 +223,20 @@ def dists_compare(
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		weight_func=lambda i, j: 1,
 
-		PD_movie_int=5
+		see_samples=5
 
 ):
-	def make_movie_and_PD(filt, i, filename):
+	def show_samples(filt, i, filename):
 		base_name = filename.split('/')[-1].split('.')[0]
 		comp_name = '{:s}_{:d}_'.format(base_name, i)
-		PD_filename = 'output/PRFCompare/mean/PDs_and_movies/' + comp_name + 'PD.png'
-		movie_filename = 'output/PRFCompare/mean/PDs_and_movies/' + comp_name + 'movie.mp4'
+		PD_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'PD.png'
+		PRF_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'PRF.png'
+		movie_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'movie.mp4'
 
 		make_PD(filt, PD_filename)
+		make_PRF_plot(filt, PRF_filename)
 		make_movie(filt, movie_filename)
+
 
 	def crop_sig(sig_full, crop_cmd, auto_crop_len):
 
@@ -278,10 +280,10 @@ def dists_compare(
 
 			filts.append(filt)
 
-			if PD_movie_int:
-				if i % PD_movie_int == 0:
+			if see_samples:
+				if i % see_samples == 0:
 					pass
-					make_movie_and_PD(filt, i, filename)
+					show_samples(filt, i, filename)
 
 		return filts
 
@@ -331,7 +333,7 @@ def dists_compare(
 	# 		MAIN: dists_compare()
 	# ===========================================================================
 
-	clear_old_files('output/PRFCompare/mean/PDs_and_movies/', PD_movie_int)
+	clear_old_files('output/PRFCompare/mean/see_samples/', see_samples)
 	if time_units == 'seconds':
 		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
 	elif time_units == 'samples':
@@ -525,13 +527,13 @@ def plot_clusters(*args, **kwargs):
 				bbox=[0, 0, 1, 1],
 				cellLoc='center',
 				# rowColours=['C0', 'C1'],
-				# colWidths=[.5, 1]
+				colWidths=[.5, 1]
 			)
 
 		print 'plotting clusters...'
 		d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
 
-		fig = plt.figure(figsize=(10, 6))
+		fig = plt.figure(figsize=(10, 6), tight_layout=True)
 		fname_ax = plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 		params_ax = plt.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
 		plot_ax = plt.subplot2grid((6, 10), (0, 4), rowspan=6, colspan=6)

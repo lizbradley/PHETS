@@ -7,7 +7,7 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 # test = int(sys.argv[1])
-test = 13
+test = 14
 
 if test == 1:
 	params = parameter_set
@@ -410,7 +410,7 @@ if test == 13:
 		'output/PRFCompare/cluster/viol_C134C.png',  		# out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		time_units='seconds',
 
@@ -456,7 +456,7 @@ if test == 14:
 		'output/PRFCompare/mean/viol_C134C.png',  		# out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		time_units='seconds',
 
@@ -479,6 +479,6 @@ if test == 14:
 
 		normalize_volume=True,
 
-		PD_movie_int=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
