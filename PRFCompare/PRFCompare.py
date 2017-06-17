@@ -241,7 +241,7 @@ def dists_compare(
 
 		make_PD(filt, PD_filename)
 		make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
-		# make_movie(filt, movie_filename)
+		make_movie(filt, movie_filename)
 
 
 	def crop_sig(sig_full, crop_cmd, auto_crop_len):
