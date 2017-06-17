@@ -147,23 +147,34 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 		x, y = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
 		z = np.zeros((10, 10))
 		max_lim = 1
-	plot_ax.set_xlim([0, max_lim])
-	plot_ax.set_ylim([0, max_lim])
+
 	plot_ax.set_aspect('equal')
 
+	import matplotlib
 	import matplotlib.colorbar as colorbar
 
 
-	# bins = np.concatenate([np.arange(0,10),[50]])
-	bins = np.arange(-1, 10)
+	viridis = matplotlib.cm.get_cmap('viridis')
+	colors = [viridis(i) for i in np.linspace(0, 1, 11)]
 
-	plot_ax.contourf(x, y, z, bins, extend='max')
+	levels = np.concatenate([np.arange(0, 10), [50, 100]])
+	cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors)
 
-	colorbar.ColorbarBase(cbar_ax, boundaries=bins)
+	# plot_ax.set_xlim([0, max_lim])
+	# plot_ax.set_ylim([0, max_lim])
+	# plot_ax.contourf(x, y, z, cmap=cmap, norm=norm, interpolation='nearest')
+
+	import numpy.ma as ma
+	zm = ma.masked_where(np.isnan(z), z)
+	plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm)
+	# plot_ax.grid(which=u'major')
+
+	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels)
 
 
 	add_filename_table(fname_ax, in_filename)
 	add_filt_params_table(params_ax, params)
+
 
 	fig.savefig(out_filename)
 

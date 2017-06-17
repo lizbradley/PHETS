@@ -202,6 +202,7 @@ class Filtration:
 		call_perseus()
 		load_perseus_out_file()
 
+
 	def _build_PD_data(self):
 		""" formats perseus output """
 		class PDData:
@@ -279,6 +280,7 @@ class Filtration:
 		data = PDData(mortal, immortal, lim)
 
 		self.PD_data = data
+
 
 	def _build_PRF(self, num_div):
 

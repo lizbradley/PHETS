@@ -38,7 +38,7 @@ if test == 1:
 		dist_scale='none',							# 'none', 'a', or 'a + b'
 		PRF_res=20,  								# num divisions
 
-		PD_movie_int=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -145,7 +145,7 @@ if test == 4:
 
 		PRF_res=20,									# num divisions
 
-		PD_movie_int=0,								# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,								# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -471,7 +471,7 @@ if test == 14:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+		PRF_res=50,  # num divisions
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -479,6 +479,6 @@ if test == 14:
 
 		normalize_volume=True,
 
-		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=1,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)

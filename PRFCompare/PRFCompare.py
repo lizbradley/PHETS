@@ -26,14 +26,17 @@ from DCE.Tools import auto_crop
 WAV_SAMPLE_RATE = 44100.
 
 
-def clear_old_files(path, PD_movie_int):
+def clear_old_files(path, see_samples):
 	old_files = os.listdir(path)
-	if old_files and PD_movie_int:
-		ans = raw_input('Clear old files in ' + path + '? (y/n) \n')
+	if old_files and see_samples:
+		ans = raw_input('Clear old files in ' + path + '? (y/n/q) \n')
 		if ans == 'y':
 			for f in old_files:
 				if f != '.gitkeep':
 					os.remove(path + f)
+		if ans == 'q':
+			print 'goodbye'
+			sys.exit()
 		else:
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
@@ -98,7 +101,7 @@ def plot_dists_vs_ref(
 		PRF_res=50,  # number of divisions used for PRF
 
 
-		PD_movie_int=5,
+		see_samples=5,
 ):
 	""" plots distance from reference rank function over a range of embedded input files"""
 
@@ -134,9 +137,12 @@ def plot_dists_vs_ref(
 		if ref: comp_name += '_REFERENCE_'
 		PD_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PD.png'
 		movie_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'movie.mp4'
+		PRF_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PRF.mp4'
 
 		make_PD(filt, PD_filename)
 		make_movie(filt, movie_filename)
+		make_PRF_plot(filt, PRF_filename)
+
 
 	def get_PRFs():
 		funcs = []
@@ -149,8 +155,8 @@ def plot_dists_vs_ref(
 			func = filt.get_PRF(PRF_res)
 			funcs.append(func)
 
-			if PD_movie_int:
-				if i % PD_movie_int == 0:
+			if see_samples:
+				if i % see_samples == 0:
 					make_movie_and_PD(filt, i)
 
 		return np.asarray(funcs)
@@ -159,13 +165,13 @@ def plot_dists_vs_ref(
 	# 				MAIN:	plot_dists_vs_ref()				#
 	# ===================================================== #
 
-	clear_old_files('output/PRFCompare/ref/see_samples/', PD_movie_int)
+	clear_old_files('output/PRFCompare/ref/see_samples/', see_samples)
 	ref_filename = get_in_filename(i_ref)
 	ref_filt = Filtration(ref_filename, filt_params)
 	ref_func = ref_filt.get_PRF(PRF_res)
 
-	if PD_movie_int: make_movie_and_PD(ref_filt, i_ref,
-									   ref=True)  # call after get_PRF for reference (loads saved filtration)
+	if see_samples: make_movie_and_PD(ref_filt, i_ref,
+									  ref=True)  # call after get_PRF for reference (loads saved filtration)
 
 	funcs = get_PRFs()  # also makes PDs and movies
 
@@ -234,8 +240,8 @@ def dists_compare(
 		movie_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'movie.mp4'
 
 		make_PD(filt, PD_filename)
-		make_PRF_plot(filt, PRF_filename)
-		make_movie(filt, movie_filename)
+		make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
+		# make_movie(filt, movie_filename)
 
 
 	def crop_sig(sig_full, crop_cmd, auto_crop_len):
@@ -282,7 +288,6 @@ def dists_compare(
 
 			if see_samples:
 				if i % see_samples == 0:
-					pass
 					show_samples(filt, i, filename)
 
 		return filts
@@ -490,6 +495,7 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 	filename_1, filename_2, out_filename, filt_params = args
 	time_units = kwargs['time_units']
 	num_windows = kwargs['num_windows']
+	PRF_res = kwargs['PRF_res']
 
 	sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
 
@@ -500,8 +506,8 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 	out_fname_1 = 'output/PRFCompare/mean/' + base_filename_1 + '_mean_PRF.png'
 	out_fname_2 = 'output/PRFCompare/mean/' + base_filename_2 + '_mean_PRF.png'
 	ref_func_1, ref_func_2 = refs
-	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params, in_filename='MEAN: ' + base_filename_1)
-	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params, in_filename='MEAN: ' + base_filename_2)
+	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params, in_filename='MEAN: ' + base_filename_1, PRF_res=PRF_res)
+	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params, in_filename='MEAN: ' + base_filename_2, PRF_res=PRF_res)
 
 
 def plot_clusters(*args, **kwargs):
