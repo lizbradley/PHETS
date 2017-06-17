@@ -155,9 +155,9 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 
 
 	viridis = matplotlib.cm.get_cmap('viridis')
-	colors = [viridis(i) for i in np.linspace(0, 1, 11)]
+	colors = [viridis(i) for i in np.linspace(0, 1, 12)]
 
-	levels = np.concatenate([np.arange(0, 10), [50, 100]])
+	levels = np.concatenate([[0, .001], np.arange(1, 10), [50, 100]])
 	cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors)
 
 	# plot_ax.set_xlim([0, max_lim])

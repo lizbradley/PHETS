@@ -456,7 +456,7 @@ if test == 14:
 		'output/PRFCompare/mean/viol_C134C.png',  		# out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_filtrations=True,
 
 		time_units='seconds',
 
