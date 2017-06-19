@@ -7,7 +7,7 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 # test = int(sys.argv[1])
-test = 4
+test = 1001
 
 if test == 1:
 	params = parameter_set
@@ -1904,16 +1904,16 @@ if test == 1001:
 		'datasets/embedded/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
-		'output/PRFCompare/L63_vary_tau_Euclidean_none.png', 		 # output filename
+		'output/PRFCompare/ref/L63_vary_tau_Euclidean_none.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=False,
+		load_saved_filtrations=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
-		weight_func=lambda i, j: 1, 						# linear, k = .1
+		weight_func=lambda i, j: 1, 									# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions

@@ -132,7 +132,7 @@ def plot_dists_vs_ref(
 			sys.exit()
 		return filename
 
-	def make_movie_and_PD(filt, i, ref=False):
+	def show_samples(filt, i, ref=False):
 		base_name = base_filename.split('/')[-1].split('.')[0]
 		comp_name = '{:s}_{:d}_'.format(base_name, i)
 		if ref: comp_name += '_REFERENCE_'
@@ -158,9 +158,12 @@ def plot_dists_vs_ref(
 
 			if see_samples:
 				if i % see_samples == 0:
-					make_movie_and_PD(filt, i)
+					show_samples(filt, i)
 
 		return np.asarray(funcs)
+
+
+
 
 	# ===================================================== #
 	# 				MAIN:	plot_dists_vs_ref()				#
@@ -168,25 +171,18 @@ def plot_dists_vs_ref(
 
 	clear_old_files('output/PRFCompare/ref/see_samples/', see_samples)
 
-
-
 	if load_saved_filtrations:
 		print 'WARNING: loading saved filtration'
 		funcs = np.load('PRFCompare/funcs.npy')
 		ref_func = np.load('PRFCompare/ref_func.npy')
 	else:
 		funcs = get_PRFs()  # also makes PDs and movies
-		ref_filename = get_in_filename(i_ref)
-		ref_filt = Filtration(ref_filename, filt_params)
+		ref_filt = Filtration(get_in_filename(i_ref), filt_params)
+		if see_samples: show_samples(ref_filt, i_ref, ref=True)
 		ref_func = ref_filt.get_PRF(PRF_res)
 		np.save('PRFCompare/funcs.npy', funcs)
 		np.save('PRFCompare/ref_func.npy', ref_func)
 
-	if see_samples: make_movie_and_PD(ref_filt, i_ref, ref=True)  # call after get_PRF for reference (loads saved filtration)
-
-
-
-	## plot ref PRF ##
 
 	make_PRF_plot(
 		ref_func,
@@ -194,12 +190,6 @@ def plot_dists_vs_ref(
 		params=filt_params,
 		in_filename='REF'
 	)
-
-	## debugging ##
-	# np.save('ref_func_debug.npy', ref_func)
-	# np.save('funcs_debug.npy', np.asarray(funcs))
-	# ref_func = np.load('ref_func_debug.npy')
-	# funcs = np.load('funcs_debug.npy')
 
 	funcs_z = funcs[:, 2]
 
