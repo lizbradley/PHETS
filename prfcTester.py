@@ -488,7 +488,7 @@ if test == 14:
 ############ ACTUAL TEST EXPLORATION TIME  !!! #########
 
 
-### using 1000 witnesses, 100 landmarks: looking at normalization by magnitude of none, sample norm, mean norm, and mean + sample norm
+### using 1000 witnesses, 100 landmarks: looking at normalization of variance by magnitude of mean
 	
 if test == 50:
 	params = parameter_set
@@ -506,7 +506,7 @@ if test == 50:
 	plot_dists_vs_means(
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/mean_PRFC/L63_1000W100L_no_weight.png',  # out filename
+		'output/PRFCompare/mean/L63_1000W100L_no_weight.png',  # out filename
 		params,
 
 		load_saved_filtrations=False,
@@ -517,8 +517,8 @@ if test == 50:
 		crop_2=(1000, 2001000),  # time_units or 'auto'
 
 		window_size=1000,		  # time_units
-		num_windows=10,			  # evenly spaced
-		mean_samp_num=10,  		  # number of windows to use for mean
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
 
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
@@ -532,7 +532,7 @@ if test == 50:
 		normalize_volume=True,
 
 		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
-		see_samples = 1,
+		see_samples = 0,
 
 	)
 	
@@ -552,7 +552,7 @@ if test == 51:
 	plot_dists_vs_means(
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/mean_PRFC/L63_1000W100L_no_weight_scaled.png',  # out filename
+		'output/PRFCompare/mean/L63_1000W100L_no_weight_scaled.png',  # out filename
 		params,
 
 		load_saved_filtrations=True,
@@ -580,11 +580,8 @@ if test == 51:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-	
-	
+		
 ######## Now to explore linear weight function with k = 5 ... 
-
 if test == 60:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -601,7 +598,7 @@ if test == 60:
 	plot_dists_vs_means(
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/mean_PRFC/L63_1000W100L_lin.png',  # out filename
+		'output/PRFCompare/mean/L63_1000W100L_lin.png',  # out filename
 		params,
 
 		load_saved_filtrations=False,
@@ -646,10 +643,10 @@ if test == 61:
 	plot_dists_vs_means(
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/mean_PRFC/L63_1000W100L_lin_scaled.png',  # out filename
+		'output/PRFCompare/mean/L63_1000W100L_lin_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		time_units='samples',
 
@@ -661,7 +658,7 @@ if test == 61:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * np.sqrt(j - i),  
+		weight_func=lambda i, j: 5 * (j - i),  
 
 		PRF_res=20,  # num divisions
 
@@ -675,11 +672,8 @@ if test == 61:
 
 	)
 
-
 ###### Now to explore exponential weight function ...
 
-
-	
 if test == 70:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -696,10 +690,10 @@ if test == 70:
 	plot_dists_vs_means(
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/mean_PRFC/L63_1000W100L_exp.png',  # out filename
+		'output/PRFCompare/mean/L63_1000W100L_exp.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_filtrations=True,
 
 		time_units='samples',
 
@@ -741,7 +735,7 @@ if test == 71:
 	plot_dists_vs_means(
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/mean_PRFC/L63_1000W100L_exp_scaled.png',  # out filename
+		'output/PRFCompare/mean/L63_1000W100L_exp_scaled.png',  # out filename
 		params,
 
 		load_saved_filtrations=True,
@@ -770,4 +764,1777 @@ if test == 71:
 
 	)
 	
+######### 2000 witnesses, 100 landmarks:
 
+	
+if test == 150:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 20,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_2000W100L_no_weight.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=2000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples = 1,
+
+	)
+	
+if test == 151:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 20,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_2000W100L_no_weight_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=2000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+	
+######## Now to explore linear weight function with k = 5 ... 
+
+if test == 160:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 20,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_2000W100L_lin.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=2000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 5 * (j - i),  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 161:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 20,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_2000W100L_lin_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=2000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 5 * (j - i),  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+###### Now to explore exponential weight function ...
+	
+if test == 170:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 20,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_2000W100L_exp.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=2000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 171:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 20,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_2000W100L_exp_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=2000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+
+######## 5000 W, 100 L:
+	
+if test == 250:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_5000W100L_no_weight.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=5000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples = 1,
+
+	)
+	
+if test == 251:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_5000W100L_no_weight_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=5000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+	
+######## Now to explore linear weight function with k = 5 ... 
+
+if test == 260:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_5000W100L_lin.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=5000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 5 * (j - i),  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 261:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_5000W100L_lin_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=5000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 5 * (j - i),  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+###### Now to explore exponential weight function ...
+
+if test == 270:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_5000W100L_exp.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=5000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 271:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_5000W100L_exp_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=5000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+	
+######### 10,000 W and 100 L: 
+
+if test == 350:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 100,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_10000W100L_no_weight.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=10000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples = 1,
+
+	)
+	
+if test == 351:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 100,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_10000W100L_no_weight_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=10000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+	
+######## Now to explore linear weight function with k = 5 ... 
+
+if test == 360:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 100,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_10000W100L_lin.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=10000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 5 * (j - i),  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 361:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 100,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_10000W100L_lin_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=10000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 5 * (j - i),  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+
+###### Now to explore exponential weight function ...
+
+if test == 370:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 100,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_10000W100L_exp.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=10000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 371:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 100,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_10000W100L_exp_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=10000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+############# 20000 W , 100 L
+
+if test == 450:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 200,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_20000W100L_no_weight.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=20000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples = 1,
+
+	)
+	
+if test == 451:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 200,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_20000W100L_no_weight_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=20000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+######## Now to explore linear weight function with k = 5 ... 
+
+if test == 460:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 200,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_20000W100L_lin.png',  # out filename
+		params,
+
+		load_saved_filtrations=False,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=20000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 5 * (j - i),  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 461:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 200,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_20000W100L_lin_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=20000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 5 *(j - i),  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+###### Now to explore exponential weight function ...
+
+if test == 470:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 200,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_20000W100L_exp.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=20000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 471:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 200,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_20000W100L_exp_scaled.png',  # out filename
+		params,
+
+		load_saved_filtrations=True,
+
+		time_units='samples',
+
+		crop_1=(1000, 2001000),  # time_units or 'auto'
+		crop_2=(1000, 2001000),  # time_units or 'auto'
+
+		window_size=20000,		  # time_units
+		num_windows=20,			  # evenly spaced
+		mean_samp_num=20,  		  # number of windows to use for mean
+
+
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
+#######  BACK to L63 and varying delay tau, Euclidean vs. Normalized Hamiltonian vs. Orientation:
+
+####### Eulidean, scaled and not scaled for no weight, linear weight, and exponential weight
+
+
+if test == 1001:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+	
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_Euclidean_none.png', 		 # output filename
+		params,
+		
+		#load_saved_filtrations=False,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 1, 						# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1011:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+	
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_Euclidean_none_scaled.png', 		 # output filename
+		params,
+		
+		#load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 1, 						# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1101:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+	
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_Euclidean_lin.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 5 * (j - i), 						# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1111:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+	
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_Euclidean_lin_scaled.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 5 * (j - i), 						# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+if test == 1201:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+	
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_Euclidean_exp.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)), 						# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1211:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+	
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_Euclidean_exp_scaled.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) , 						# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+####### L63 vary tau with Normalized Hamiltonian 10, scaled and not scaled for no weight, linear weight, and exponential weight
+
+if test == 1002:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_use_hamiltonian': -10
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_nH10_none.png', 		 # output filename
+		params,
+		
+		#load_saved_filtrations=False,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 1, 						# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1012:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_use_hamiltonian': -10
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_nH10_none_scaled.png', 		 # output filename
+		params,
+		
+		#load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 1, 						# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+
+if test == 1102:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_use_hamiltonian': -10
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_nH10_lin.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=False,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 5 * (j - i), 							# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1112:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_use_hamiltonian': -10
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_nH10_lin_scaled.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 5 * (j - i), 							# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1202:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_use_hamiltonian': -10
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_nH10_exp.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=False,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)), 							# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1212:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_use_hamiltonian': -10
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_nH10_exp_scaled.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)), 							# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+####### L63 vary tau with Orientation 20, scaled and not scaled for no weight, linear weight, and exponential weight	
+	
+if test == 1003:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_orientation_amplify': 20
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_O20_none.png', 		 # output filename
+		params,
+		
+		#load_saved_filtrations=False,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 1,  						# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+	
+if test == 1013:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_orientation_amplify': 20
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_O20_none_scaled.png', 		 # output filename
+		params,
+		
+		#load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 1,  						# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1103:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_orientation_amplify': 20
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_O20_lin.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=False,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 5 * (j - i),   						# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+	
+if test == 1113:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_orientation_amplify': 20
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_O20_lin_scaled.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func=lambda i, j: 5 * (j - i), 						# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+if test == 1203:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_orientation_amplify': 20
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_O20_exp.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=False,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) , 	  						# linear, k = .1
+
+		dist_scale='none',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+	
+	
+if test == 1213:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 50,
+			'worm_length': 5000,
+			'max_filtration_param':-10,
+			'num_divisions': 25,
+			'use_cliques': True,
+			'd_orientation_amplify': 20
+		}
+	)
+
+	plot_dists_vs_ref(
+		'datasets/embedded/test_cases', 		 # input directory
+		'L63_x_m2_tau', 						 # input base filename
+		'base i', 								 # input filename format: 'base i or 'i base'
+		'output/PRFCompare/L63_vary_tau_O20_exp_scaled.png', 		 # output filename
+		params,
+		
+		load_saved_filtrations=True,
+
+		i_ref=18,
+		i_arr=np.arange(2, 40, 1),
+
+		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) , 						# linear, k = .1
+
+		dist_scale='b',							# 'none', 'a', or 'a + b'
+		PRF_res=25,  								# num divisions
+
+		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
