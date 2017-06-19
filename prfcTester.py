@@ -7,7 +7,7 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 # test = int(sys.argv[1])
-test = 14
+test = 4
 
 if test == 1:
 	params = parameter_set
@@ -133,6 +133,8 @@ if test == 4:
 		'base i',											# input filename format: 'base i or 'i base'
 		'output/PRFCompare/ref/test4_L1.png',			# output filename
 		params,
+
+		load_saved_filtration=False,
 
 		i_ref=15,
 		i_arr=np.arange(10, 20, 2),

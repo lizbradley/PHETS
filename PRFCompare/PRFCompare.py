@@ -100,6 +100,7 @@ def plot_dists_vs_ref(
 
 		PRF_res=50,  # number of divisions used for PRF
 
+		load_saved_filtration=False,
 
 		see_samples=5,
 ):
@@ -166,14 +167,24 @@ def plot_dists_vs_ref(
 	# ===================================================== #
 
 	clear_old_files('output/PRFCompare/ref/see_samples/', see_samples)
-	ref_filename = get_in_filename(i_ref)
-	ref_filt = Filtration(ref_filename, filt_params)
-	ref_func = ref_filt.get_PRF(PRF_res)
 
-	if see_samples: make_movie_and_PD(ref_filt, i_ref,
-									  ref=True)  # call after get_PRF for reference (loads saved filtration)
 
-	funcs = get_PRFs()  # also makes PDs and movies
+
+	if load_saved_filtration:
+		print 'WARNING: loading saved filtration'
+		funcs = np.load('PRFCompare/funcs.npy')
+		ref_func = np.load('PRFCompare/ref_func.npy')
+	else:
+		funcs = get_PRFs()  # also makes PDs and movies
+		ref_filename = get_in_filename(i_ref)
+		ref_filt = Filtration(ref_filename, filt_params)
+		ref_func = ref_filt.get_PRF(PRF_res)
+		np.save('PRFCompare/funcs.npy', funcs)
+		np.save('PRFCompare/ref_func.npy', ref_func)
+
+	if see_samples: make_movie_and_PD(ref_filt, i_ref, ref=True)  # call after get_PRF for reference (loads saved filtration)
+
+
 
 	## plot ref PRF ##
 
