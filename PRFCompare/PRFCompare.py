@@ -100,7 +100,7 @@ def plot_dists_vs_ref(
 
 		PRF_res=50,  # number of divisions used for PRF
 
-		load_saved_filtration=False,
+		load_saved_filtrations=False,
 
 		see_samples=5,
 ):
@@ -170,7 +170,7 @@ def plot_dists_vs_ref(
 
 
 
-	if load_saved_filtration:
+	if load_saved_filtrations:
 		print 'WARNING: loading saved filtration'
 		funcs = np.load('PRFCompare/funcs.npy')
 		ref_func = np.load('PRFCompare/ref_func.npy')
