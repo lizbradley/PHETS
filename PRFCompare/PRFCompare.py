@@ -34,7 +34,7 @@ def clear_old_files(path, see_samples):
 			for f in old_files:
 				if f != '.gitkeep':
 					os.remove(path + f)
-		if ans == 'q':
+		elif ans == 'q':
 			print 'goodbye'
 			sys.exit()
 		else:
@@ -138,11 +138,11 @@ def plot_dists_vs_ref(
 		if ref: comp_name += '_REFERENCE_'
 		PD_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PD.png'
 		movie_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'movie.mp4'
-		PRF_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PRF.mp4'
+		PRF_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PRF.png'
 
 		make_PD(filt, PD_filename)
-		make_movie(filt, movie_filename)
 		make_PRF_plot(filt, PRF_filename)
+		make_movie(filt, movie_filename)
 
 
 	def get_PRFs():

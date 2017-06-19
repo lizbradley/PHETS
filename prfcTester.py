@@ -1907,7 +1907,7 @@ if test == 1001:
 		'output/PRFCompare/ref/L63_vary_tau_Euclidean_none.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -1918,7 +1918,7 @@ if test == 1001:
 		dist_scale='none',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
 
-		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 	
