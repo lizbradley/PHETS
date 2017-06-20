@@ -323,8 +323,6 @@ def dists_compare(
 			worms = embed_sigs(sigs, tau)
 
 		filts = get_filtrations(worms, filename)
-		funcs = []
-
 		funcs = get_funcs(filts, filename)
 
 		print '\n============================================='
@@ -354,7 +352,6 @@ def dists_compare(
 
 	if load_saved_filtrations:
 		print 'WARNING: loading saved filtration'
-		debug = np.load('PRFCompare/funcs_1.npy')
 		crop_1, sig_1_full, sig_1, funcs_1 = np.load('PRFCompare/funcs_1.npy')
 		crop_2, sig_2_full, sig_2, funcs_2 = np.load('PRFCompare/funcs_2.npy')
 	else:
