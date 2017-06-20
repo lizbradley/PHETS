@@ -84,6 +84,232 @@ def get_scaled_dists(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_res
 	return scaled_dists
 
 
+
+def get_PRFs(
+		filename, filt_params, crop_cmd, tau_cmd,
+		PRF_res,
+		auto_crop_length,
+		time_units,
+		normalize_volume,
+		mean_samp_num,
+		num_windows,
+		window_size_samp,
+		see_samples,
+		note_index,
+		tau_T
+		):
+
+	def show_samples(filt, i, filename):
+		base_name = filename.split('/')[-1].split('.')[0]
+		comp_name = '{:s}_{:d}_'.format(base_name, i)
+		PD_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'PD.png'
+		PRF_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'PRF.png'
+		movie_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'movie.mp4'
+
+		make_PD(filt, PD_filename)
+		make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
+		make_movie(filt, movie_filename)
+
+
+	def crop_sig(sig_full, crop_cmd, auto_crop_len):
+
+		crop = auto_crop(crop_cmd, sig_full, auto_crop_length, time_units=time_units)  # returns crop in seconds
+
+		sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE): int(crop[1] * WAV_SAMPLE_RATE)]
+
+		if normalize_volume: sig = sig / np.max(sig)
+		return crop, sig_full, sig
+
+
+	def slice_sig(sig):
+		if mean_samp_num > num_windows:
+			print 'ERROR: mean_samp_num may not exceed num_windows'
+			sys.exit()
+		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
+		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
+
+		return windows
+
+
+	def embed_sigs(windows, tau):
+		worms = []
+		for window in windows:
+			embed(window, 'PRFCompare/temp_data/temp_worm.txt', False, tau, 2)
+			worm = np.loadtxt('PRFCompare/temp_data/temp_worm.txt')
+			worms.append(worm)
+		return worms
+
+
+	def get_filtrations(worms, filename):
+		print 'building filtrations'
+		filts = []
+		for i, worm in enumerate(worms):
+			print '\n============================================='
+			print filename.split('/')[-1], 'worm #', i
+			print '=============================================\n'
+			try:
+				filt = (Filtration(worm, filt_params, filename=filename))
+			except IndexError:
+				print 'WARNING: Window slicing error, dropping last window. (TODO: improve slicing methodology.)'
+				os.chdir('..')
+				return filts
+
+			filts.append(filt)
+
+			if see_samples:
+				if i % see_samples == 0:
+					show_samples(filt, i, filename)
+
+		return filts
+
+
+	def get_funcs(filts, filename):
+		funcs = []
+		for i, filt in enumerate(filts):
+			print '\n============================================='
+			print filename.split('/')[-1], 'worm #', i
+			print '=============================================\n'
+			funcs.append(filt.get_PRF(PRF_res))
+		return np.asarray(funcs)
+
+
+	# ===========================================================================
+	# 		MAIN: get_PRFs()
+	# ===========================================================================
+
+	print 'loading', filename, '...'
+	sig = np.loadtxt(filename)
+	print 'cropping...'
+	crop, sig_full, sig = crop_sig(sig, crop_cmd, auto_crop_length)
+	print 'tauing...'
+	f_ideal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, None, filename)
+
+	sigs = slice_sig(sig)
+	if type(sig[0]) is np.ndarray:
+		dim = len(sig[0])
+		print 'Input dimension: ' + str(dim) + '. Skipping embedding, dropping coords for time series.'
+		worms = sigs
+		sig_full = sig_full[:, 0]
+	elif type(sig[0] is np.float64):
+		dim = 1
+		print 'Input dimension: ' + str(dim) + '. Embedding signals...'
+		worms = embed_sigs(sigs, tau)
+
+	filts = get_filtrations(worms, filename)
+	funcs = get_funcs(filts, filename)
+
+	print '\n============================================='
+	print '============================================='
+	print filename, 'processing complete'
+	print '============================================='
+	print '=============================================\n'
+	return crop, sig_full, sig, np.asarray(funcs)
+
+
+
+def dists_compare(
+		filename_1,
+		filename_2,
+		out_filename,
+		filt_params,
+
+		load_saved_filtrations=False,
+
+		time_units='seconds',
+
+		crop_1='auto',  # sec or 'auto'
+		crop_2='auto',
+		auto_crop_length=.3,  # sec
+
+		window_size=.05,  # sec
+		num_windows=10,  # per file
+		mean_samp_num=5,  # per file
+
+		tau_1=.001,  # sec or 'auto ideal' or 'auto detect'
+		tau_2=.001,
+		tau_T=np.pi,
+		note_index=None,  #
+
+		normalize_volume=True,
+
+		PRF_res=50,  # number of divisions used for PRF
+		dist_scale='none',  # 'none', 'a', or 'a + b'
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		weight_func=lambda i, j: 1,
+
+		see_samples=5
+
+):
+
+	clear_old_files('output/PRFCompare/mean/see_samples/', see_samples)
+	if time_units == 'seconds':
+		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
+	elif time_units == 'samples':
+		window_size_samp = int(window_size)
+	else:
+		print 'ERROR: invalid time_units.'
+		sys.exit()
+	filt_params.update({'worm_length': window_size_samp})
+	print 'using worm_length:', filt_params['worm_length']
+	crop_1_cmd, crop_2_cmd = crop_1, crop_2
+	tau_1_cmd, tau_2_cmd = tau_1, tau_2
+
+	if load_saved_filtrations:
+		print 'WARNING: loading saved filtration'
+		crop_1, sig_1_full, sig_1, funcs_1 = np.load('PRFCompare/funcs_1.npy')
+		crop_2, sig_2_full, sig_2, funcs_2 = np.load('PRFCompare/funcs_2.npy')
+	else:
+		options = [
+			PRF_res,
+			auto_crop_length,
+			time_units,
+			normalize_volume,
+			mean_samp_num,
+			num_windows,
+			window_size_samp,
+			see_samples,
+			note_index,
+			tau_T
+		]
+		crop_1, sig_1_full, sig_1, funcs_1 = get_PRFs(filename_1, filt_params, crop_1_cmd, tau_1_cmd, *options)
+		crop_2, sig_2_full, sig_2, funcs_2 = get_PRFs(filename_2, filt_params, crop_2_cmd, tau_2_cmd, *options)
+		np.save('PRFCompare/funcs_1.npy', (crop_1, sig_1_full, sig_1, funcs_1))
+		np.save('PRFCompare/funcs_2.npy', (crop_2, sig_2_full, sig_2, funcs_2))
+
+	funcs_1_z = funcs_1[:, 2]
+	funcs_2_z = funcs_2[:, 2]
+
+	mean_1_funcs_z = funcs_1_z[::int(ceil(num_windows / mean_samp_num))]
+	mean_2_funcs_z = funcs_2_z[::int(ceil(num_windows / mean_samp_num))]
+
+	funcs_1_avg_z = np.mean(mean_1_funcs_z, axis=0)
+	funcs_2_avg_z = np.mean(mean_2_funcs_z, axis=0)
+
+	dists_1_vs_1 = get_scaled_dists(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_2_vs_1 = get_scaled_dists(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_1_vs_2 = get_scaled_dists(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_2_vs_2 = get_scaled_dists(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
+
+
+	# plot ref PRFs #d
+	ref_func_1 = funcs_1[0]  # get xx, yy
+	ref_func_2 = funcs_2[0]  # get xx, yy
+	ref_func_1[2] = funcs_1_avg_z
+	ref_func_2[2] = funcs_2_avg_z
+
+
+	arr = [
+		[sig_1_full, sig_2_full],
+		[crop_1, crop_2],
+		[sig_1, sig_2],
+		[ref_func_1, ref_func_2],
+		[dists_1_vs_1, dists_2_vs_1, dists_1_vs_2, dists_2_vs_2]
+	]
+
+	return arr
+
+
+
 def plot_dists_vs_ref(
 		dir, base_filename,
 		fname_format,
@@ -162,9 +388,6 @@ def plot_dists_vs_ref(
 
 		return np.asarray(funcs)
 
-
-
-
 	# ===================================================== #
 	# 				MAIN:	plot_dists_vs_ref()				#
 	# ===================================================== #
@@ -183,7 +406,6 @@ def plot_dists_vs_ref(
 		np.save('PRFCompare/funcs.npy', funcs)
 		np.save('PRFCompare/ref_func.npy', ref_func)
 
-
 	make_PRF_plot(
 		ref_func,
 		'output/PRFCompare/ref/PRF_REFERENCE.png',
@@ -192,205 +414,10 @@ def plot_dists_vs_ref(
 	)
 
 	funcs_z = funcs[:, 2]
-
 	ref_func_z = ref_func[2]
-
 	dists = get_scaled_dists(funcs_z, ref_func_z, weight_func, metric, dist_scale, PRF_res)
-
 	plot_distances(i_ref, i_arr, dists, out_filename)
 
-
-def dists_compare(
-		filename_1,
-		filename_2,
-		out_filename,
-		filt_params,
-
-		load_saved_filtrations=False,
-
-		time_units='seconds',
-
-		crop_1='auto',  # sec or 'auto'
-		crop_2='auto',
-		auto_crop_length=.3,  # sec
-
-		window_size=.05,  # sec
-		num_windows=10,  # per file
-		mean_samp_num=5,  # per file
-
-		tau_1=.001,  # sec or 'auto ideal' or 'auto detect'
-		tau_2=.001,
-		tau_T=np.pi,
-		note_index=None,  #
-
-		normalize_volume=True,
-
-		PRF_res=50,  # number of divisions used for PRF
-		dist_scale='none',  # 'none', 'a', or 'a + b'
-		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
-		weight_func=lambda i, j: 1,
-
-		see_samples=5
-
-):
-	def show_samples(filt, i, filename):
-		base_name = filename.split('/')[-1].split('.')[0]
-		comp_name = '{:s}_{:d}_'.format(base_name, i)
-		PD_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'PD.png'
-		PRF_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'PRF.png'
-		movie_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'movie.mp4'
-
-		make_PD(filt, PD_filename)
-		make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
-		make_movie(filt, movie_filename)
-
-
-	def crop_sig(sig_full, crop_cmd, auto_crop_len):
-
-		crop = auto_crop(crop_cmd, sig_full, auto_crop_length, time_units=time_units)  # returns crop in seconds
-
-		sig = sig_full[int(crop[0] * WAV_SAMPLE_RATE): int(crop[1] * WAV_SAMPLE_RATE)]
-
-		if normalize_volume: sig = sig / np.max(sig)
-		return crop, sig_full, sig
-
-	def slice_sig(sig):
-		if mean_samp_num > num_windows:
-			print 'ERROR: mean_samp_num may not exceed num_windows'
-			sys.exit()
-		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
-		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
-
-		return windows
-
-	def embed_sigs(windows, tau):
-		worms = []
-		for window in windows:
-			embed(window, 'PRFCompare/temp_data/temp_worm.txt', False, tau, 2)
-			worm = np.loadtxt('PRFCompare/temp_data/temp_worm.txt')
-			worms.append(worm)
-		return worms
-
-	def get_filtrations(worms, filename):
-		print 'building filtrations'
-		filts = []
-		for i, worm in enumerate(worms):
-			print '\n============================================='
-			print filename.split('/')[-1], 'worm #', i
-			print '=============================================\n'
-			try:
-				filt = (Filtration(worm, filt_params, filename=filename))
-			except IndexError:
-				print 'WARNING: Window slicing error, dropping last window. (TODO: improve slicing methodology.)'
-				os.chdir('..')
-				return filts
-
-			filts.append(filt)
-
-			if see_samples:
-				if i % see_samples == 0:
-					show_samples(filt, i, filename)
-
-		return filts
-
-	def get_funcs(filts, filename):
-		funcs = []
-		for i, filt in enumerate(filts):
-			print '\n============================================='
-			print filename.split('/')[-1], 'worm #', i
-			print '=============================================\n'
-			funcs.append(filt.get_PRF(PRF_res))
-		return np.asarray(funcs)
-
-	def get_PRFs(filename, crop_cmd, tau_cmd):
-		print 'loading', filename, '...'
-		sig = np.loadtxt(filename)
-		print 'cropping...'
-		crop, sig_full, sig = crop_sig(sig, crop_cmd, auto_crop_length)
-		print 'tauing...'
-		f_ideal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, None, filename)
-
-		sigs = slice_sig(sig)
-
-		if type(sig[0]) is np.ndarray:
-			dim = len(sig[0])
-			print 'Input dimension: ' + str(dim) + '. Skipping embedding, dropping coords for time series.'
-			worms = sigs
-			sig_full = sig_full[:, 0]
-		elif type(sig[0] is np.float64):
-			dim = 1
-			print 'Input dimension: ' + str(dim) + '. Embedding signals...'
-			worms = embed_sigs(sigs, tau)
-
-		filts = get_filtrations(worms, filename)
-		funcs = get_funcs(filts, filename)
-
-		print '\n============================================='
-		print '============================================='
-		print '=============================================\n'
-
-		return crop, sig_full, sig, np.asarray(funcs)
-
-
-
-	# ===========================================================================
-	# 		MAIN: dists_compare()
-	# ===========================================================================
-
-	clear_old_files('output/PRFCompare/mean/see_samples/', see_samples)
-	if time_units == 'seconds':
-		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
-	elif time_units == 'samples':
-		window_size_samp = int(window_size)
-	else:
-		print 'ERROR: invalid time_units.'
-		sys.exit()
-	filt_params.update({'worm_length': window_size_samp})
-	print 'using worm_length:', filt_params['worm_length']
-	crop_1_cmd, crop_2_cmd = crop_1, crop_2
-	tau_1_cmd, tau_2_cmd = tau_1, tau_2
-
-	if load_saved_filtrations:
-		print 'WARNING: loading saved filtration'
-		crop_1, sig_1_full, sig_1, funcs_1 = np.load('PRFCompare/funcs_1.npy')
-		crop_2, sig_2_full, sig_2, funcs_2 = np.load('PRFCompare/funcs_2.npy')
-	else:
-		crop_1, sig_1_full, sig_1, funcs_1 = get_PRFs(filename_1, crop_1_cmd, tau_1_cmd)
-		crop_2, sig_2_full, sig_2, funcs_2 = get_PRFs(filename_2, crop_2_cmd, tau_2_cmd)
-		np.save('PRFCompare/funcs_1.npy', (crop_1, sig_1_full, sig_1, funcs_1))
-		np.save('PRFCompare/funcs_2.npy', (crop_2, sig_2_full, sig_2, funcs_2))
-
-	funcs_1_z = funcs_1[:, 2]
-	funcs_2_z = funcs_2[:, 2]
-
-	mean_1_funcs_z = funcs_1_z[::int(ceil(num_windows / mean_samp_num))]
-	mean_2_funcs_z = funcs_2_z[::int(ceil(num_windows / mean_samp_num))]
-
-	funcs_1_avg_z = np.mean(mean_1_funcs_z, axis=0)
-	funcs_2_avg_z = np.mean(mean_2_funcs_z, axis=0)
-
-	dists_1_vs_1 = get_scaled_dists(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_2_vs_1 = get_scaled_dists(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_1_vs_2 = get_scaled_dists(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_2_vs_2 = get_scaled_dists(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
-
-
-	# plot ref PRFs #d
-	ref_func_1 = funcs_1[0]  # get xx, yy
-	ref_func_2 = funcs_2[0]  # get xx, yy
-	ref_func_1[2] = funcs_1_avg_z
-	ref_func_2[2] = funcs_2_avg_z
-
-
-	ret =  [
-		[sig_1_full, sig_2_full],
-		[crop_1, crop_2],
-		[sig_1, sig_2],
-		[ref_func_1, ref_func_2],
-		[dists_1_vs_1, dists_2_vs_1, dists_1_vs_2, dists_2_vs_2]
-	]
-
-	return ret
 
 
 def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
@@ -506,6 +533,7 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 	ref_func_1, ref_func_2 = refs
 	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params, in_filename='MEAN: ' + base_filename_1, PRF_res=PRF_res)
 	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params, in_filename='MEAN: ' + base_filename_2, PRF_res=PRF_res)
+
 
 
 def plot_clusters(*args, **kwargs):

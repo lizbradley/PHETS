@@ -7,7 +7,7 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 # test = int(sys.argv[1])
-test = 1001
+test = 12
 
 if test == 1:
 	params = parameter_set
@@ -355,7 +355,7 @@ if test == 12:
 		'output/PRFCompare/mean/L63_2000W100L.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		time_units='samples',
 
@@ -377,7 +377,7 @@ if test == 12:
 
 		normalize_volume=True,
 
-		PD_movie_int=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
