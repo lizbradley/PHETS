@@ -41,14 +41,14 @@ def clear_old_files(path, see_samples):
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
 
-def get_scaled_dists(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_res):
+def get_dists_from_mean(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_res):
 	box_area = 2. / (PRF_res ** 2)
 	norm_x, norm_y = np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res))
-	weighting_func_arr = weighting_func(norm_x, norm_y)												# TODO: plots of pointwise variance function, functional coefficient of variation
-																									# TODO: make sure immortal holes are counted in PRF !!!		done
-																									# TODO: PRF color bar 0 bin									done
-	def get_dists(funcs_z, ref_func_z):																# TODO: normalize PRF axes to sqrt(2)						done
-		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])					# TODO: add PRF to PD_movie_int !!							done
+	weighting_func_arr = weighting_func(norm_x, norm_y)
+
+
+	def get_dists(funcs_z, ref_func_z):
+		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
 		if metric == 'L1':
 			dists = np.asarray([(np.nansum(np.multiply(np.abs(diff), weighting_func_arr))) * box_area for diff in diffs])
 		elif metric == 'L2':
@@ -93,10 +93,11 @@ def get_PRFs(
 		normalize_volume,
 		mean_samp_num,
 		num_windows,
-		window_size_samp,
+		window_size,
 		see_samples,
 		note_index,
-		tau_T
+		tau_T,
+		fname=None
 		):
 
 	def show_samples(filt, i, filename):
@@ -177,8 +178,23 @@ def get_PRFs(
 	# 		MAIN: get_PRFs()
 	# ===========================================================================
 
-	print 'loading', filename, '...'
-	sig = np.loadtxt(filename)
+	if time_units == 'seconds':
+		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
+	elif time_units == 'samples':
+		window_size_samp = int(window_size)
+	else:
+		print 'ERROR: invalid time_units.'
+		sys.exit()
+	filt_params.update({'worm_length': window_size_samp})
+	print 'using worm_length:', filt_params['worm_length']
+
+	if isinstance(filename, basestring):
+		print 'loading', filename, '...'
+		sig = np.loadtxt(filename)
+	else:
+		sig = filename
+		filename=fname
+
 	print 'cropping...'
 	crop, sig_full, sig = crop_sig(sig, crop_cmd, auto_crop_length)
 	print 'tauing...'
@@ -200,7 +216,8 @@ def get_PRFs(
 
 	print '\n============================================='
 	print '============================================='
-	print filename, 'processing complete'
+	print filename
+	print 'processing complete'
 	print '============================================='
 	print '=============================================\n'
 	return crop, sig_full, sig, np.asarray(funcs)
@@ -213,19 +230,19 @@ def dists_compare(
 		out_filename,
 		filt_params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='seconds',
 
-		crop_1='auto',  # sec or 'auto'
+		crop_1='auto',
 		crop_2='auto',
-		auto_crop_length=.3,  # sec
+		auto_crop_length=.3,
 
-		window_size=.05,  # sec
+		window_size=.05,
 		num_windows=10,  # per file
 		mean_samp_num=5,  # per file
 
-		tau_1=.001,  # sec or 'auto ideal' or 'auto detect'
+		tau_1=.001,
 		tau_2=.001,
 		tau_T=np.pi,
 		note_index=None,  #
@@ -242,19 +259,11 @@ def dists_compare(
 ):
 
 	clear_old_files('output/PRFCompare/mean/see_samples/', see_samples)
-	if time_units == 'seconds':
-		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
-	elif time_units == 'samples':
-		window_size_samp = int(window_size)
-	else:
-		print 'ERROR: invalid time_units.'
-		sys.exit()
-	filt_params.update({'worm_length': window_size_samp})
-	print 'using worm_length:', filt_params['worm_length']
+
 	crop_1_cmd, crop_2_cmd = crop_1, crop_2
 	tau_1_cmd, tau_2_cmd = tau_1, tau_2
 
-	if load_saved_filtrations:
+	if load_saved_PRFs:
 		print 'WARNING: loading saved filtration'
 		crop_1, sig_1_full, sig_1, funcs_1 = np.load('PRFCompare/funcs_1.npy')
 		crop_2, sig_2_full, sig_2, funcs_2 = np.load('PRFCompare/funcs_2.npy')
@@ -266,7 +275,7 @@ def dists_compare(
 			normalize_volume,
 			mean_samp_num,
 			num_windows,
-			window_size_samp,
+			window_size,
 			see_samples,
 			note_index,
 			tau_T
@@ -285,10 +294,10 @@ def dists_compare(
 	funcs_1_avg_z = np.mean(mean_1_funcs_z, axis=0)
 	funcs_2_avg_z = np.mean(mean_2_funcs_z, axis=0)
 
-	dists_1_vs_1 = get_scaled_dists(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_2_vs_1 = get_scaled_dists(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_1_vs_2 = get_scaled_dists(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_2_vs_2 = get_scaled_dists(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_1_vs_1 = get_dists_from_mean(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_2_vs_1 = get_dists_from_mean(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_1_vs_2 = get_dists_from_mean(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_2_vs_2 = get_dists_from_mean(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
 
 
 	# plot ref PRFs #d
@@ -326,7 +335,7 @@ def plot_dists_vs_ref(
 
 		PRF_res=50,  # number of divisions used for PRF
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		see_samples=5,
 ):
@@ -394,7 +403,7 @@ def plot_dists_vs_ref(
 
 	clear_old_files('output/PRFCompare/ref/see_samples/', see_samples)
 
-	if load_saved_filtrations:
+	if load_saved_PRFs:
 		print 'WARNING: loading saved filtration'
 		funcs = np.load('PRFCompare/funcs.npy')
 		ref_func = np.load('PRFCompare/ref_func.npy')
@@ -415,7 +424,7 @@ def plot_dists_vs_ref(
 
 	funcs_z = funcs[:, 2]
 	ref_func_z = ref_func[2]
-	dists = get_scaled_dists(funcs_z, ref_func_z, weight_func, metric, dist_scale, PRF_res)
+	dists = get_dists_from_mean(funcs_z, ref_func_z, weight_func, metric, dist_scale, PRF_res)
 	plot_distances(i_ref, i_arr, dists, out_filename)
 
 
@@ -593,4 +602,60 @@ def plot_clusters(*args, **kwargs):
 
 	plot()
 
+
+def plot_variance(
+		filename,
+		out_filename,
+		filt_params,
+
+		load_saved_PRFs=False,
+
+		time_units='seconds',
+
+		crop=(100, 1100),
+		auto_crop_length=.3,
+
+		window_size=1000,
+		num_windows=5,  # per file
+		mean_samp_num=5,  # per file
+
+		tau=.001,
+		tau_T=np.pi,
+		note_index=None,  #
+
+		normalize_volume=True,
+
+		PRF_res=50,  # number of divisions used for PRF
+		dist_scale='none',  # 'none', 'a', or 'a + b'
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		weight_func=lambda i, j: 1,
+
+		see_samples=5
+):
+	options = [
+		PRF_res,
+		auto_crop_length,
+		time_units,
+		normalize_volume,
+		mean_samp_num,
+		num_windows,
+		window_size,
+		see_samples,
+		note_index,
+		tau_T
+	]
+
+
+
+	def get_variance(sig_full, vary_param):
+
+		ret_crop, sig_full, sig, PRFs = get_PRFs(sig_full, filt_params, crop, tau, *options, fname=filename)
+		PRFs_z = PRFs[:, 2]
+		mean_PRF_z = np.mean(PRFs_z, axis=0)
+		dists = get_dists_from_mean(PRFs_z, mean_PRF_z, weight_func, metric, dist_scale, PRF_res)
+		variance = np.mean(dists)
+		return variance
+
+	sig_full = np.loadtxt(filename)
+	get_variance(sig_full, 'x')
 

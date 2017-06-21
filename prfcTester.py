@@ -7,7 +7,7 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 # test = int(sys.argv[1])
-test = 12
+test = 1111
 
 if test == 1:
 	params = parameter_set
@@ -134,7 +134,7 @@ if test == 4:
 		'output/PRFCompare/ref/test4_L1.png',			# output filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		i_ref=15,
 		i_arr=np.arange(10, 20, 2),
@@ -170,7 +170,7 @@ if test == 5:
 		'output/PRFCompare/mean/test_5.png',  		# out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		crop_1='auto',					# seconds or 'auto'
 		crop_2='auto',					# seconds or 'auto'
@@ -219,7 +219,7 @@ if test == 6:
 		'output/PRFCompare/mean/L63_tau18v35_W1000dsr50.png',  		# out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -264,7 +264,7 @@ if test == 7:
 		'output/PRFCompare/mean/L63_x_m2_tau18_v_tau30.png',  		# out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 		time_units='seconds',
 
 		crop_1=(.1, .2),				# seconds or 'auto'
@@ -311,7 +311,7 @@ if test == 11:
 		'output/PRFCompare/mean/L63_2000W100L.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -355,7 +355,7 @@ if test == 12:
 		'output/PRFCompare/mean/L63_2000W100L.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -412,7 +412,7 @@ if test == 13:
 		'output/PRFCompare/cluster/viol_C134C.png',  		# out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='seconds',
 
@@ -458,7 +458,7 @@ if test == 14:
 		'output/PRFCompare/mean/viol_C134C.png',  		# out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='seconds',
 
@@ -485,7 +485,50 @@ if test == 14:
 
 	)
 
-	
+if test == 15:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 10,
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+		}
+	)
+
+	from PRFCompare.PRFCompare import plot_variance
+
+	plot_variance(
+		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/mean/L63_1000W100L_no_weight_scaled.png',  # out filename
+		params,
+
+		load_saved_PRFs=True,
+
+		time_units='samples',
+
+		crop=(1000, 2001000),     # time_units or 'auto'
+
+		window_size=1000,		  # time_units
+		num_windows=5,			  # evenly spaced
+		mean_samp_num=5,  		  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
 	
 ############ ACTUAL TEST EXPLORATION TIME  !!! #########
 
@@ -511,7 +554,7 @@ if test == 50:
 		'output/PRFCompare/mean/L63_1000W100L_no_weight.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -557,7 +600,7 @@ if test == 51:
 		'output/PRFCompare/mean/L63_1000W100L_no_weight_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -603,7 +646,7 @@ if test == 60:
 		'output/PRFCompare/mean/L63_1000W100L_lin.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -648,7 +691,7 @@ if test == 61:
 		'output/PRFCompare/mean/L63_1000W100L_lin_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -695,7 +738,7 @@ if test == 70:
 		'output/PRFCompare/mean/L63_1000W100L_exp.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -740,7 +783,7 @@ if test == 71:
 		'output/PRFCompare/mean/L63_1000W100L_exp_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -788,7 +831,7 @@ if test == 150:
 		'output/PRFCompare/mean/L63_2000W100L_no_weight.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -834,7 +877,7 @@ if test == 151:
 		'output/PRFCompare/mean/L63_2000W100L_no_weight_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -882,7 +925,7 @@ if test == 160:
 		'output/PRFCompare/mean/L63_2000W100L_lin.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -927,7 +970,7 @@ if test == 161:
 		'output/PRFCompare/mean/L63_2000W100L_lin_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -974,7 +1017,7 @@ if test == 170:
 		'output/PRFCompare/mean/L63_2000W100L_exp.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1019,7 +1062,7 @@ if test == 171:
 		'output/PRFCompare/mean/L63_2000W100L_exp_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1067,7 +1110,7 @@ if test == 250:
 		'output/PRFCompare/mean/L63_5000W100L_no_weight.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -1113,7 +1156,7 @@ if test == 251:
 		'output/PRFCompare/mean/L63_5000W100L_no_weight_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1161,7 +1204,7 @@ if test == 260:
 		'output/PRFCompare/mean/L63_5000W100L_lin.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -1206,7 +1249,7 @@ if test == 261:
 		'output/PRFCompare/mean/L63_5000W100L_lin_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -1253,7 +1296,7 @@ if test == 270:
 		'output/PRFCompare/mean/L63_5000W100L_exp.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1298,7 +1341,7 @@ if test == 271:
 		'output/PRFCompare/mean/L63_5000W100L_exp_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1346,7 +1389,7 @@ if test == 350:
 		'output/PRFCompare/mean/L63_10000W100L_no_weight.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -1392,7 +1435,7 @@ if test == 351:
 		'output/PRFCompare/mean/L63_10000W100L_no_weight_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1440,7 +1483,7 @@ if test == 360:
 		'output/PRFCompare/mean/L63_10000W100L_lin.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -1485,7 +1528,7 @@ if test == 361:
 		'output/PRFCompare/mean/L63_10000W100L_lin_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -1533,7 +1576,7 @@ if test == 370:
 		'output/PRFCompare/mean/L63_10000W100L_exp.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1578,7 +1621,7 @@ if test == 371:
 		'output/PRFCompare/mean/L63_10000W100L_exp_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1625,7 +1668,7 @@ if test == 450:
 		'output/PRFCompare/mean/L63_20000W100L_no_weight.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -1671,7 +1714,7 @@ if test == 451:
 		'output/PRFCompare/mean/L63_20000W100L_no_weight_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1718,7 +1761,7 @@ if test == 460:
 		'output/PRFCompare/mean/L63_20000W100L_lin.png',  # out filename
 		params,
 
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
@@ -1763,7 +1806,7 @@ if test == 461:
 		'output/PRFCompare/mean/L63_20000W100L_lin_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1810,7 +1853,7 @@ if test == 470:
 		'output/PRFCompare/mean/L63_20000W100L_exp.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1855,7 +1898,7 @@ if test == 471:
 		'output/PRFCompare/mean/L63_20000W100L_exp_scaled.png',  # out filename
 		params,
 
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -1907,7 +1950,7 @@ if test == 1001:
 		'output/PRFCompare/ref/L63_vary_tau_Euclidean_none.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -1943,7 +1986,7 @@ if test == 1011:
 		'output/PRFCompare/L63_vary_tau_Euclidean_none_scaled.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=True,
+		#load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -1979,7 +2022,7 @@ if test == 1101:
 		'output/PRFCompare/L63_vary_tau_Euclidean_lin.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2015,7 +2058,7 @@ if test == 1111:
 		'output/PRFCompare/L63_vary_tau_Euclidean_lin_scaled.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2050,7 +2093,7 @@ if test == 1201:
 		'output/PRFCompare/L63_vary_tau_Euclidean_exp.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2086,7 +2129,7 @@ if test == 1211:
 		'output/PRFCompare/L63_vary_tau_Euclidean_exp_scaled.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2124,7 +2167,7 @@ if test == 1002:
 		'output/PRFCompare/L63_vary_tau_nH10_none.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=False,
+		#load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2160,7 +2203,7 @@ if test == 1012:
 		'output/PRFCompare/L63_vary_tau_nH10_none_scaled.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=True,
+		#load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2197,7 +2240,7 @@ if test == 1102:
 		'output/PRFCompare/L63_vary_tau_nH10_lin.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2233,7 +2276,7 @@ if test == 1112:
 		'output/PRFCompare/L63_vary_tau_nH10_lin_scaled.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2269,7 +2312,7 @@ if test == 1202:
 		'output/PRFCompare/L63_vary_tau_nH10_exp.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2305,7 +2348,7 @@ if test == 1212:
 		'output/PRFCompare/L63_vary_tau_nH10_exp_scaled.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2343,7 +2386,7 @@ if test == 1003:
 		'output/PRFCompare/L63_vary_tau_O20_none.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=False,
+		#load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2380,7 +2423,7 @@ if test == 1013:
 		'output/PRFCompare/L63_vary_tau_O20_none_scaled.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=True,
+		#load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2416,7 +2459,7 @@ if test == 1103:
 		'output/PRFCompare/L63_vary_tau_O20_lin.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2453,7 +2496,7 @@ if test == 1113:
 		'output/PRFCompare/L63_vary_tau_O20_lin_scaled.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2489,7 +2532,7 @@ if test == 1203:
 		'output/PRFCompare/L63_vary_tau_O20_exp.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2526,7 +2569,7 @@ if test == 1213:
 		'output/PRFCompare/L63_vary_tau_O20_exp_scaled.png', 		 # output filename
 		params,
 		
-		load_saved_filtrations=True,
+		load_saved_PRFs=True,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
