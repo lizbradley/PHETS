@@ -6,8 +6,8 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 
-# test = int(sys.argv[1])
-test = 1001
+test = int(sys.argv[1])
+#test = 1001
 
 if test == 1:
 	params = parameter_set
@@ -42,7 +42,6 @@ if test == 1:
 
 	)
 
-
 if test == 2:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -76,7 +75,6 @@ if test == 2:
 
 
 	)
-
 
 if test == 3:
 	params = parameter_set
@@ -198,7 +196,6 @@ if test == 5:
 		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-
 
 if test == 6:
 	params = parameter_set
@@ -381,7 +378,6 @@ if test == 12:
 
 	)
 
-
 if test == 13:
 
 	params = parameter_set
@@ -439,7 +435,6 @@ if test == 13:
 
 	)
 
-
 if test == 14:
 
 	params = parameter_set
@@ -485,8 +480,6 @@ if test == 14:
 
 	)
 
-	
-	
 ############ ACTUAL TEST EXPLORATION TIME  !!! #########
 
 
@@ -766,7 +759,7 @@ if test == 71:
 
 	)
 	
-######### 2000 witnesses, 100 landmarks:
+######### 2000 witnesses, 100 landmarks #################
 
 	
 if test == 150:
@@ -1046,7 +1039,7 @@ if test == 171:
 	)
 	
 
-######## 5000 W, 100 L:
+######## 5000 W, 100 L ##############
 	
 if test == 250:
 	params = parameter_set
@@ -1325,7 +1318,7 @@ if test == 271:
 	)
 	
 	
-######### 10,000 W and 100 L: 
+######### 10,000 W and 100 L #################
 
 if test == 350:
 	params = parameter_set
@@ -1604,7 +1597,7 @@ if test == 371:
 
 	)
 
-############# 20000 W , 100 L
+############# 20000 W , 100 L ##############
 
 if test == 450:
 	params = parameter_set
@@ -1943,10 +1936,10 @@ if test == 1011:
 		'output/PRFCompare/L63_vary_tau_Euclidean_none_scaled.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
 		weight_func=lambda i, j: 1, 						# linear, k = .1
@@ -1954,7 +1947,7 @@ if test == 1011:
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
 
-		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 	
@@ -2012,16 +2005,16 @@ if test == 1111:
 		'datasets/embedded/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
-		'output/PRFCompare/L63_vary_tau_Euclidean_lin_scaled.png', 		 # output filename
+		'output/PRFCompare/L63_vary_tau_Euclidean_SMALL_lin_scaled.png', 		 # output filename
 		params,
 		
 		load_saved_filtrations=True,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
-		weight_func=lambda i, j: 5 * (j - i), 						# linear, k = .1
+		weight_func=lambda i, j: np.divide(1, 5 * (j - i)), 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
@@ -2083,16 +2076,16 @@ if test == 1211:
 		'datasets/embedded/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
-		'output/PRFCompare/L63_vary_tau_Euclidean_exp_scaled.png', 		 # output filename
+		'output/PRFCompare/L63_vary_tau_Euclidean_SMALL_exp_scaled.png', 		 # output filename
 		params,
 		
 		load_saved_filtrations=True,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) , 						# linear, k = .1
+		weight_func= lambda i, j: np.power(np.e, -5 * (j - i)) , 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
@@ -2124,7 +2117,7 @@ if test == 1002:
 		'output/PRFCompare/L63_vary_tau_nH10_none.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=False,
+		load_saved_filtrations=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2160,10 +2153,10 @@ if test == 1012:
 		'output/PRFCompare/L63_vary_tau_nH10_none_scaled.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
 		weight_func=lambda i, j: 1, 						# linear, k = .1
@@ -2171,7 +2164,7 @@ if test == 1012:
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
 
-		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 	
@@ -2230,16 +2223,16 @@ if test == 1112:
 		'datasets/embedded/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
-		'output/PRFCompare/L63_vary_tau_nH10_lin_scaled.png', 		 # output filename
+		'output/PRFCompare/L63_vary_tau_nH10_SMALL_lin_scaled.png', 		 # output filename
 		params,
 		
 		load_saved_filtrations=True,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
-		weight_func=lambda i, j: 5 * (j - i), 							# linear, k = .1
+		weight_func=lambda i, j: np.divide(1,5 * (j - i)), 							# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
@@ -2302,16 +2295,16 @@ if test == 1212:
 		'datasets/embedded/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
-		'output/PRFCompare/L63_vary_tau_nH10_exp_scaled.png', 		 # output filename
+		'output/PRFCompare/L63_vary_tau_nH10_SMALL_exp_scaled.png', 		 # output filename
 		params,
 		
 		load_saved_filtrations=True,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)), 							# linear, k = .1
+		weight_func= lambda i, j: np.power(np.e, -5 * (j - i)), 							# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
@@ -2346,7 +2339,7 @@ if test == 1003:
 		#load_saved_filtrations=False,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
 		weight_func=lambda i, j: 1,  						# linear, k = .1
@@ -2354,7 +2347,7 @@ if test == 1003:
 		dist_scale='none',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
 
-		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 	
@@ -2380,10 +2373,10 @@ if test == 1013:
 		'output/PRFCompare/L63_vary_tau_O20_none_scaled.png', 		 # output filename
 		params,
 		
-		#load_saved_filtrations=True,
+		load_saved_filtrations=False,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
 		weight_func=lambda i, j: 1,  						# linear, k = .1
@@ -2391,7 +2384,7 @@ if test == 1013:
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
 
-		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 	
@@ -2450,16 +2443,16 @@ if test == 1113:
 		'datasets/embedded/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
-		'output/PRFCompare/L63_vary_tau_O20_lin_scaled.png', 		 # output filename
+		'output/PRFCompare/L63_vary_tau_O20_SMALL_lin_scaled.png', 		 # output filename
 		params,
 		
 		load_saved_filtrations=True,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
-		weight_func=lambda i, j: 5 * (j - i), 						# linear, k = .1
+		weight_func=lambda i, j: np.divide(1,5 * (j - i)), 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
@@ -2523,16 +2516,16 @@ if test == 1213:
 		'datasets/embedded/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
-		'output/PRFCompare/L63_vary_tau_O20_exp_scaled.png', 		 # output filename
+		'output/PRFCompare/L63_vary_tau_O20_SMALL_exp_scaled.png', 		 # output filename
 		params,
 		
 		load_saved_filtrations=True,
 
 		i_ref=18,
-		i_arr=np.arange(2, 40, 1),
+		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) , 						# linear, k = .1
+		weight_func= lambda i, j: np.power(np.e, -5 * (j - i)) , 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions
