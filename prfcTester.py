@@ -6,13 +6,8 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 
-<<<<<<< HEAD
 # test = int(sys.argv[1])
 test = 1111
-=======
-test = int(sys.argv[1])
-#test = 1001
->>>>>>> fb2e60d927467dbc44a1c449ef2ce5cc579d9d29
 
 if test == 1:
 	params = parameter_set
@@ -485,7 +480,6 @@ if test == 14:
 
 	)
 
-<<<<<<< HEAD
 if test == 15:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -531,8 +525,6 @@ if test == 15:
 
 	)
 	
-=======
->>>>>>> fb2e60d927467dbc44a1c449ef2ce5cc579d9d29
 ############ ACTUAL TEST EXPLORATION TIME  !!! #########
 
 
@@ -1989,11 +1981,8 @@ if test == 1011:
 		'output/PRFCompare/L63_vary_tau_Euclidean_none_scaled.png', 		 # output filename
 		params,
 		
-<<<<<<< HEAD
 		#load_saved_PRFs=True,
-=======
 		load_saved_filtrations=False,
->>>>>>> fb2e60d927467dbc44a1c449ef2ce5cc579d9d29
 
 		i_ref=18,
 		i_arr=np.arange(2, 50, 1),
@@ -2174,11 +2163,7 @@ if test == 1002:
 		'output/PRFCompare/L63_vary_tau_nH10_none.png', 		 # output filename
 		params,
 		
-<<<<<<< HEAD
 		#load_saved_PRFs=False,
-=======
-		load_saved_filtrations=False,
->>>>>>> fb2e60d927467dbc44a1c449ef2ce5cc579d9d29
 
 		i_ref=18,
 		i_arr=np.arange(2, 40, 1),
@@ -2214,11 +2199,7 @@ if test == 1012:
 		'output/PRFCompare/L63_vary_tau_nH10_none_scaled.png', 		 # output filename
 		params,
 		
-<<<<<<< HEAD
 		#load_saved_PRFs=True,
-=======
-		load_saved_filtrations=False,
->>>>>>> fb2e60d927467dbc44a1c449ef2ce5cc579d9d29
 
 		i_ref=18,
 		i_arr=np.arange(2, 50, 1),
@@ -2438,11 +2419,7 @@ if test == 1013:
 		'output/PRFCompare/L63_vary_tau_O20_none_scaled.png', 		 # output filename
 		params,
 		
-<<<<<<< HEAD
 		#load_saved_PRFs=True,
-=======
-		load_saved_filtrations=False,
->>>>>>> fb2e60d927467dbc44a1c449ef2ce5cc579d9d29
 
 		i_ref=18,
 		i_arr=np.arange(2, 50, 1),
