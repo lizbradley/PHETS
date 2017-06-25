@@ -1,6 +1,6 @@
 WAV_SAMPLE_RATE = 44100.
 
-MEMORY_PROFILE_ON = True
+MEMORY_PROFILE_ON = False
 
 find_landmarks_c_compile_str = {
 	'linux': '/usr/bin/gcc-5 -fopenmp -lpopt find_landmarks.c -o find_landmarks -lm -lpopt',

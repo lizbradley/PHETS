@@ -7,7 +7,7 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 # test = int(sys.argv[1])
-test = 1111
+test = 15
 
 if test == 1:
 	params = parameter_set
@@ -132,7 +132,7 @@ if test == 4:
 		'output/PRFCompare/ref/test4_L1.png',			# output filename
 		params,
 
-		load_saved_PRFs=False,
+		load_saved_PRFs=True,
 
 		i_ref=15,
 		i_arr=np.arange(10, 20, 2),
@@ -461,9 +461,9 @@ if test == 14:
 		crop_2=(2, 2.5),  # time_units or 'auto'
 		auto_crop_length=1,
 
-		window_size=.1,  # time_units
-		num_windows=10,  # evenly spaced
-		mean_samp_num=10,  # number of windows to use for mean
+		window_size=.2,  # time_units
+		num_windows=5,  # evenly spaced
+		mean_samp_num=5,  # number of windows to use for mean
 
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
@@ -476,7 +476,7 @@ if test == 14:
 
 		normalize_volume=True,
 
-		see_samples=1,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -485,7 +485,6 @@ if test == 15:
 	# params = standard_parameter_set
 	params.update(
 		{
-			'ds_rate': 10,
 			'max_filtration_param': -10,
 			'num_divisions': 20,
 			'use_cliques': True,
@@ -497,8 +496,10 @@ if test == 15:
 
 	plot_variance(
 		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/mean/L63_1000W100L_no_weight_scaled.png',  # out filename
+		'output/PRFCompare/variance/L63.png',  # out filename
 		params,
+
+		('ds_rate', np.arange(100, 200, 10)),
 
 		load_saved_PRFs=True,
 
@@ -506,9 +507,8 @@ if test == 15:
 
 		crop=(1000, 2001000),     # time_units or 'auto'
 
-		window_size=1000,		  # time_units
-		num_windows=5,			  # evenly spaced
-		mean_samp_num=5,  		  # number of windows to use for mean
+		window_size=3000,		  # time_units
+		num_windows=10,			  # evenly spaced
 
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
@@ -516,7 +516,7 @@ if test == 15:
 		PRF_res=20,  # num divisions
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
-		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
+		dist_scale='a + b',  # 'none', 'a', 'b', or 'a + b'
 		# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,
@@ -2571,7 +2571,7 @@ if test == 1213:
 		i_arr=np.arange(2, 50, 1),
 
 		# weight_func= lambda i, j: np.power(np.e, .1 * (j - i)) 		# exponential k = .1
-		weight_func= lambda i, j: np.power(np.e, -5 * (j - i)) , 						# linear, k = .1
+		weight_func= lambda i, j: np.power(np.e, -5 * (j - i)), 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
 		PRF_res=25,  								# num divisions

@@ -1,0 +1,69 @@
+functional variance thing
+
+sample PRF, mean PRF
+
+diff_i = PRF_i - mean_PRF 		(pointwise)
+
+
+variance = sum(square(diff)) / n	('variance func')
+
+functional COV = variance / mean	('scaled variance func')
+
+
+integrate(functional COV)		
+
+
+
+new plot function:	(statistics)
+
+	like PRFCompare, except:
+
+	one input
+
+
+	plots:
+		mean PRF
+		dists squiggle
+		variance PRF
+		funcitonal covariance
+
+
+	computes statistics:
+		norm of mean
+		norm of each sample
+		norm of variance func
+		norm of functional COV
+		variance
+		scaled variance		(only scaled with norm of mean ('a' ?)
+
+
+
+
+new plot function:
+	parameter curves (last weeks notes)
+	
+	pane for each:
+
+		norm of mean
+		variance
+
+		norm of variance func
+		norm of functional COV
+		scaled variance
+
+
+0: clean l2 norm				done
+
+1: check immortal holes to PRF			done
+
+2: make sample PRF				done
+
+3: new functions (above)
+
+
+	
+
+
+
+
+

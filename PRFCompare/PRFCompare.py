@@ -50,7 +50,7 @@ def get_dists_from_mean(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_
 	def get_dists(funcs_z, ref_func_z):
 		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
 		if metric == 'L1':
-			dists = np.asarray([(np.nansum(np.multiply(np.abs(diff), weighting_func_arr))) * box_area for diff in diffs])
+			dists = np.asarray([np.nansum(np.multiply(np.abs(diff), weighting_func_arr)) * box_area for diff in diffs])
 		elif metric == 'L2':
 			dists = np.asarray([np.sqrt(np.nansum(np.multiply(np.power(diff, 2), weighting_func_arr))) * box_area for diff in diffs])
 		else:
@@ -126,7 +126,7 @@ def get_PRFs(
 		if mean_samp_num > num_windows:
 			print 'ERROR: mean_samp_num may not exceed num_windows'
 			sys.exit()
-		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
+		start_pts = np.floor(np.linspace(0, len(sig) - 1, num_windows, endpoint=False)).astype(int)
 		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
 
 		return windows
@@ -148,12 +148,9 @@ def get_PRFs(
 			print '\n============================================='
 			print filename.split('/')[-1], 'worm #', i
 			print '=============================================\n'
-			try:
-				filt = (Filtration(worm, filt_params, filename=filename))
-			except IndexError:
-				print 'WARNING: Window slicing error, dropping last window. (TODO: improve slicing methodology.)'
-				os.chdir('..')
-				return filts
+
+			filt = (Filtration(worm, filt_params, filename=filename))
+
 
 			filts.append(filt)
 
@@ -214,12 +211,6 @@ def get_PRFs(
 	filts = get_filtrations(worms, filename)
 	funcs = get_funcs(filts, filename)
 
-	print '\n============================================='
-	print '============================================='
-	print filename
-	print 'processing complete'
-	print '============================================='
-	print '=============================================\n'
 	return crop, sig_full, sig, np.asarray(funcs)
 
 
@@ -607,6 +598,7 @@ def plot_variance(
 		filename,
 		out_filename,
 		filt_params,
+		vary_param,
 
 		load_saved_PRFs=False,
 
@@ -617,7 +609,6 @@ def plot_variance(
 
 		window_size=1000,
 		num_windows=5,  # per file
-		mean_samp_num=5,  # per file
 
 		tau=.001,
 		tau_T=np.pi,
@@ -632,30 +623,87 @@ def plot_variance(
 
 		see_samples=5
 ):
-	options = [
-		PRF_res,
-		auto_crop_length,
-		time_units,
-		normalize_volume,
-		mean_samp_num,
-		num_windows,
-		window_size,
-		see_samples,
-		note_index,
-		tau_T
-	]
+	mean_samp_num = num_windows
+	options = [PRF_res, auto_crop_length, time_units, normalize_volume, mean_samp_num, num_windows, window_size,
+			   see_samples, note_index, tau_T]
+
+	def get_varied_PRFs(sig_full, filt_params, vary_param):
+		varied_PRFs = []
+		for val in vary_param[1]:
+			print '============================================='
+			print '============================================='
+			print vary_param[0] + ':', val
+			print '============================================='
+			print '=============================================\n'
+
+			filt_params.update({vary_param[0]: val})
+			ret_crop, sig_full, sig, PRFs = get_PRFs(sig_full, filt_params, crop, tau, *options, fname=filename)
+			varied_PRFs.append(PRFs)
+		return varied_PRFs
+
+
+	def l2_norm(arr):
+		box_area = 2. / (PRF_res ** 2)
+		norm = np.sqrt(np.nansum(np.power(arr, 2))) * box_area
+		return norm
 
 
 
-	def get_variance(sig_full, vary_param):
+	def get_variance(PRFs, mean):
+		dists = get_dists_from_mean(PRFs, mean, weight_func, metric, dist_scale, PRF_res)
+		var = np.mean(dists)
+		return var
 
-		ret_crop, sig_full, sig, PRFs = get_PRFs(sig_full, filt_params, crop, tau, *options, fname=filename)
-		PRFs_z = PRFs[:, 2]
-		mean_PRF_z = np.mean(PRFs_z, axis=0)
-		dists = get_dists_from_mean(PRFs_z, mean_PRF_z, weight_func, metric, dist_scale, PRF_res)
-		variance = np.mean(dists)
-		return variance
 
-	sig_full = np.loadtxt(filename)
-	get_variance(sig_full, 'x')
+
+
+
+
+	if load_saved_PRFs:
+		print 'WARNING: loading saved data'
+		PRFs = np.load('PRFCompare/PRFs.npy')
+	else:
+		print 'loading', filename, '...'
+		sig_full = np.loadtxt(filename)
+		PRFs = get_varied_PRFs(sig_full, filt_params, vary_param)
+		np.save('PRFCompare/PRFs.npy', PRFs)
+
+	PRFs = PRFs[:, 2]
+	means = [np.mean(PRFs_at_val, axis=0) for PRFs_at_val in PRFs]
+	mean_norms = map(l2_norm, means)
+	variances = map(get_variance, PRFs)
+	ptws_variances = [np.var(PRFs_at_val, axis=0) for PRFs_at_val in PRFs]
+	ptws_var_norms = map(l2_norm, ptws_variances)
+	FCOV = np.true_divide(ptws_var_norms, means)
+
+	fig = plt.figure(figsize=(10, 7), tight_layout=True)
+
+	ax1 = fig.add_subplot(511)
+	ax1.plot(vary_param[1], mean_norms)
+	ax1.set_xlabel(vary_param[0])
+	ax1.set_ylabel('norm of mean')
+	ax1.set_ylim(bottom=0)
+
+	ax2 = fig.add_subplot(512)
+	ax2.plot(vary_param[1], vars)
+	ax2.set_xlabel(vary_param[0])
+	ax2.set_ylabel('variance')
+	ax2.set_ylim(bottom=0)
+
+
+	ax3 = fig.add_subplot(513)
+	ax3.plot(vary_param[1], ptws_var_norms)
+	ax3.set_xlabel(vary_param[0])
+	ax3.set_ylabel('pointwise variance')
+	ax3.set_ylim(bottom=0)
+
+	ax4 = fig.add_subplot(514)
+	ax4.plot(vary_param[1], FCOV)
+	ax4.set_xlabel(vary_param[0])
+	ax4.set_ylabel('FCOV')
+	ax4.set_ylim(bottom=0)
+
+
+
+	fig.savefig(out_filename)
 

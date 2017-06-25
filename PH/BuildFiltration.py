@@ -113,6 +113,11 @@ def build_filtration(input_file_name, parameter_set):
 	num_coordinates = len(witnesses[0])
 	stop = start + counter
 
+	if max_filtration_param < 0:
+		if float(number_of_vertices) < abs(max_filtration_param) + 1:
+			print "ERROR: 'max_filtration_param' ({}) and number of landmarks ({}) are incompatible.Reduce 'ds_rate'.".format(max_filtration_param, number_of_vertices)
+			sys.exit()
+
 	num_threads = 2
 	# for more information about these parameters type ./find_landmarks --help in the terminal
 	# the distance calculations are calculated and outputted to a file called find_landmarks.txt
@@ -499,15 +504,13 @@ def build_filtration(input_file_name, parameter_set):
 			depth = int(-max_filtration_param)
 			min_distance = None
 			for w in xrange(number_of_datapoints):
-
 				new_distance = d[w][depth].distance - (0 if absolute else d[w][0].distance)
 				if min_distance is None or new_distance < min_distance:
-
 					min_distance = new_distance
 					if min_distance ==0:
 						print "witness ",w
-
 			max_filtration_param = min_distance
+
 		step = float(max_filtration_param - min_filtration_param)/float(num_divisions) # Change in epsilon at each step.
 		progress_index = [0]*number_of_datapoints
 		done = False
