@@ -2,15 +2,35 @@ functional variance thing
 
 sample PRF, mean PRF
 
-diff_i = PRF_i - mean_PRF 		(pointwise)
+
+norm(mean_PRF, metric, weight_func='none')      # plot
 
 
-variance = sum(square(diff)) / n	('variance func')
-
-functional COV = variance / mean	('scaled variance func')
+# HOMEGROWN VARIANCE #
 
 
-integrate(functional COV)		
+	dists = [norm(np.subtract(f, func_ref), metric, func_weight) for f in funcs]
+
+    variance = mean(dists)      # plot
+
+    scaled_dists = get_dists_from_ref(funcs, ref_func, weight_func, scale)
+
+    scaled_variance = mean(scaled_dists)        # plot
+
+
+
+# POINTWISE VARIANCE #
+
+    diffs = [PRF - mean_PRF for PRF in PRFs]
+
+    variance = sum(square(diffs)) / n
+
+    norm(variance, metric, weight_func='none')       # plot
+
+    functional_COV = variance / mean_PRF
+
+    norm(functional_COV, metric, weight_func='none')     # plot
+
 
 
 
@@ -25,7 +45,7 @@ new plot function:	(statistics)
 		mean PRF
 		dists squiggle
 		variance PRF
-		funcitonal covariance
+		functional covariance
 
 
 	computes statistics:
@@ -46,10 +66,11 @@ new plot function:
 
 		norm of mean
 		variance
+	    scaled variance
+
 
 		norm of variance func
 		norm of functional COV
-		scaled variance
 
 
 0: clean l2 norm				done

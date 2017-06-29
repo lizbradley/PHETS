@@ -23,6 +23,8 @@ from PH.FiltrationMovie import make_movie
 
 from DCE.Tools import auto_crop
 
+from PH.TitleBox import add_filt_params_table, add_filenames_table
+
 WAV_SAMPLE_RATE = 44100.
 
 
@@ -41,47 +43,48 @@ def clear_old_files(path, see_samples):
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
 
-def get_scaled_dists_from_ref(funcs_z, ref_func_z, weighting_func, metric, scale, PRF_res):
-	box_area = 2. / (PRF_res ** 2)
-	norm_x, norm_y = np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res))
-	weighting_func_arr = weighting_func(norm_x, norm_y)
+def norm(f, metric, f_weight):
+
+	PRF_res = len(f)
+	dA = 2. / (PRF_res ** 2)		# normalize such that area of PRF domain is 1
+	f_weight = f_weight(*np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res)))
+
+	if metric == 'L1':
+		return np.nansum(np.multiply(np.abs(f), f_weight)) * dA
+
+	elif metric == 'L2':
+		return np.sqrt(np.nansum(np.multiply(np.power(f, 2), f_weight))) * dA
+
+	else:
+		print "ERROR: metric not recognized. Use 'L1' or 'L2'."
+		sys.exit()
 
 
-	def get_dists(funcs_z, ref_func_z):
-		diffs = np.asarray([np.subtract(func_z, ref_func_z) for func_z in funcs_z])
-		if metric == 'L1':
-			dists = np.asarray([np.nansum(np.multiply(np.abs(diff), weighting_func_arr)) * box_area for diff in diffs])
-		elif metric == 'L2':
-			dists = np.asarray([np.sqrt(np.nansum(np.multiply(np.power(diff, 2), weighting_func_arr))) * box_area for diff in diffs])
-		else:
-			print "ERROR: metric not recognized. Use 'L1' or 'L2'."
-			sys.exit()
+
+def scale_dists(dists, norms, norm_ref, scale):
+	if scale == 'none':
 		return dists
 
-	dists = get_dists(funcs_z, ref_func_z)
-
-	dists_0 = get_dists(funcs_z, np.zeros_like(ref_func_z))
-
-	dist_ref_0 = get_dists([ref_func_z], np.zeros_like(ref_func_z))
-
-	dists_ref_0 = [dist_ref_0[0] for i in dists]
-
-	if scale == 'none':
-		scaled_dists = dists
-
 	elif scale == 'a':
-		scaled_dists = np.true_divide(dists, dists_0)
+		return np.true_divide(dists, norms)
 
 	elif scale == 'b':
-		scaled_dists = np.true_divide(dists, dists_ref_0)
+		return np.true_divide(dists, norm_ref)
 
 	elif scale == 'a + b':
-		scaled_dists = np.true_divide(dists, np.add(dists_0, dists_ref_0))
+		return np.true_divide(dists, np.add(norms, norm_ref))
 
 	else:
 		print "ERROR: dist_scale '" + scale + "' is not recognized. Use 'none', 'a', 'b', or 'a + b'."
+		sys.exit()
 
-	return scaled_dists
+
+
+def get_dists_from_ref(funcs, ref_func, weight_func, metric, scale):
+	dists = [norm(np.subtract(f, ref_func), metric, weight_func) for f in funcs]
+	norms = [norm(f, metric, lambda i, j: 1) for f in funcs]
+	norm_ref = [norm(ref_func, metric, lambda i, j: 1)] * len(dists)
+	return scale_dists(dists, norms, norm_ref, scale)
 
 
 
@@ -285,13 +288,13 @@ def dists_compare(
 	funcs_1_avg_z = np.mean(mean_1_funcs_z, axis=0)
 	funcs_2_avg_z = np.mean(mean_2_funcs_z, axis=0)
 
-	dists_1_vs_1 = get_scaled_dists_from_ref(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_2_vs_1 = get_scaled_dists_from_ref(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_1_vs_2 = get_scaled_dists_from_ref(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
-	dists_2_vs_2 = get_scaled_dists_from_ref(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale, PRF_res)
+	dists_1_vs_1 = get_dists_from_ref(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale)
+	dists_2_vs_1 = get_dists_from_ref(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale)
+	dists_1_vs_2 = get_dists_from_ref(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale)
+	dists_2_vs_2 = get_dists_from_ref(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale)
 
 
-	# plot ref PRFs #d
+	# for plotting ref PRFs #
 	ref_func_1 = funcs_1[0]  # get xx, yy
 	ref_func_2 = funcs_2[0]  # get xx, yy
 	ref_func_1[2] = funcs_1_avg_z
@@ -415,7 +418,7 @@ def plot_dists_vs_ref(
 
 	funcs_z = funcs[:, 2]
 	ref_func_z = ref_func[2]
-	dists = get_scaled_dists_from_ref(funcs_z, ref_func_z, weight_func, metric, dist_scale, PRF_res)
+	dists = get_dists_from_ref(funcs_z, ref_func_z, weight_func, metric, dist_scale)
 	plot_distances(i_ref, i_arr, dists, out_filename)
 
 
@@ -542,7 +545,6 @@ def plot_clusters(*args, **kwargs):
 
 	sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
 
-	from PH.TitleBox import add_filt_params_table
 
 	def plot():
 
@@ -598,7 +600,8 @@ def plot_variance(
 		filename,
 		out_filename,
 		filt_params,
-		vary_param,
+		vary_param_1,
+		vary_param_2,
 
 		load_saved_PRFs=False,
 
@@ -624,99 +627,148 @@ def plot_variance(
 		see_samples=5
 ):
 	mean_samp_num = num_windows
+	filt_params.update({'worm_length': window_size if time_units=='samples' else int(window_size * WAV_SAMPLE_RATE)})
 	options = [PRF_res, auto_crop_length, time_units, normalize_volume, mean_samp_num, num_windows, window_size,
 			   see_samples, note_index, tau_T]
 
-	def get_varied_PRFs(sig_full, filt_params, vary_param):
-		varied_PRFs = []
-		for val in vary_param[1]:
-			print '============================================='
-			print '============================================='
-			print vary_param[0] + ':', val
-			print '============================================='
-			print '=============================================\n'
+	class VarianceData:  # all data for a fixed value of vary_param_2 -- one curve per plot
+		def __init__(self):
+			self.mean_PRF_norm = []
+			self.variance = []
+			self.scaled_variance = []
+			self.pointwise_variance_norm = []
+			self.functional_COV_norm = []
 
-			filt_params.update({vary_param[0]: val})
-			ret_crop, sig_full, sig, PRFs = get_PRFs(sig_full, filt_params, crop, tau, *options, fname=filename)
-			varied_PRFs.append(PRFs)
-		return np.asarray(varied_PRFs)
+	def get_data():
 
+		if load_saved_PRFs:
+			print 'WARNING: loading saved data'
+			return np.load('PRFCompare/PRFs.npy')
 
-	def l2_norm(arr, weight_function=1):
-		box_area = 2. / (PRF_res ** 2)
-		norm = np.sqrt(np.nansum(np.power(arr, 2))) * box_area
-		return norm
+		if vary_param_2[0] in filt_params:
+			print 'loading', filename, '...'
+			sig_full = np.loadtxt(filename)
+			arr_2 = []
+			for val_2 in vary_param_2[1]:
+				filt_params.update({vary_param_2[0]: val_2})
+				arr_1 = []
+				for val_1 in vary_param_1[1]:
+					print '============================================='
+					print '============================================='
+					print vary_param_1[0] + ':', val_1
+					print vary_param_2[0] + ':', val_2
+					print '============================================='
+					print '=============================================\n'
 
+					filt_params.update({vary_param_1[0]: val_1})
+					ret_crop, sig_full, sig, prf_evo = get_PRFs(sig_full, filt_params, crop, tau, *options, fname=filename)
+					arr_1.append(prf_evo[:, 2])		# take z component only
+				arr_2.append(arr_1)
 
+			prf_evos = np.asarray(arr_2)
+			# array with shape (len(vary_param_2[1], len(vary_param_1[1])
+			# each element corresponds to a curve in one of the five subplots
+			# each element is a 1D list of PRFs from regular samples of the input
+			np.save('PRFCompare/PRFs.npy', prf_evos)
+			return prf_evos
 
-	def get_variance(PRFs, mean, dist_scale=dist_scale):
-		dists = get_scaled_dists_from_ref(PRFs, mean, weight_func, metric, dist_scale, PRF_res)
-		var = np.mean(dists)
-		return var
+		else:
+			print 'ERROR: currently vary_param_2 must be a filtration parameter'
+			sys.exit()
 
+	def process_data(prf_evo_array):
+		data_list = []
+		for row in prf_evo_array:  # loop through PRFs for vary_param_2
 
+			data_val_2 = VarianceData()
 
-	if load_saved_PRFs:
-		print 'WARNING: loading saved data'
-		PRFs = np.load('PRFCompare/PRFs.npy')
-	else:
-		print 'loading', filename, '...'
-		sig_full = np.loadtxt(filename)
-		PRFs = get_varied_PRFs(sig_full, filt_params, vary_param)
-		np.save('PRFCompare/PRFs.npy', PRFs)
+			for sample_prfs in row:
+				null_weight_func = lambda i, j: 1
+				mean_PRF = np.mean(sample_prfs, axis=0)
+				mean_PRF_norm = norm(mean_PRF, metric, null_weight_func)  # plot this
+				data_val_2.mean_PRF_norm.append(mean_PRF_norm)
 
-	PRFs = PRFs[:, 2]
+				# HOMEGROWN VARIANCE #
 
-	means = [np.mean(prfs_at_val, axis=0) for prfs_at_val in PRFs]
-	mean_norms = map(l2_norm, means)
+				dists = [norm(np.subtract(PRF, mean_PRF), metric, weight_func) for PRF in sample_prfs]
+				variance = np.mean(dists)  # plot this
+				data_val_2.variance.append(variance)
 
-	variances = [get_variance(prfs_at_val, mean, dist_scale='none') for prfs_at_val, mean in zip(PRFs, means)]
-	scaled_variance = [get_variance(prfs_at_val, mean, dist_scale=dist_scale) for prfs_at_val, mean in zip(PRFs, means)]
+				scaled_dists = get_dists_from_ref(sample_prfs, mean_PRF, weight_func, metric, dist_scale)
+				scaled_variance = np.mean(scaled_dists)  # plot this
+				data_val_2.scaled_variance.append(scaled_variance)
 
-	ptws_variance = [np.var(prfs_at_val, axis=0) for prfs_at_val in PRFs]
-	ptws_var_norms = map(l2_norm, ptws_variance)
+				# POINTWISE VARIANCE #
 
-	FCOV = np.true_divide(ptws_variance, means)
-	FCOV_norms = map(l2_norm, FCOV)
+				diffs = [PRF - mean_PRF for PRF in sample_prfs]
 
-	fig = plt.figure(figsize=(13, 7), tight_layout=True)
+				pointwise_variance = np.var(diffs, axis=0)
+				pvn = norm(pointwise_variance, metric, null_weight_func)  # plot this
+				data_val_2.pointwise_variance_norm.append(pvn)
 
+				functional_COV = pointwise_variance / mean_PRF
+				fcovn = norm(functional_COV, metric, null_weight_func)  # plot this
+				data_val_2.functional_COV_norm.append(fcovn)
 
-	label_kwargs = {
-		'rotation': 0,
-		'ha': 'left',
-		'va': 'center',
-		'labelpad': 80,
-	}
+			data_list.append(data_val_2)
 
-	ax1 = fig.add_subplot(511)
-	ax1.plot(vary_param[1], mean_norms)
-	ax1.set_ylabel('norm \nof mean', **label_kwargs)
+		return data_list
 
-	ax2 = fig.add_subplot(512, sharex=ax1, sharey=ax1)
-	ax2.plot(vary_param[1], scaled_variance)
-	ax2.set_ylabel('scaled  \nvariance', **label_kwargs)
+	def plot(data_list, out_filename):
+		print 'plotting...'
+		fig = plt.figure(figsize=(12, 8), tight_layout=True)
 
-	ax3 = fig.add_subplot(513, sharex=ax1, sharey=ax1)
-	ax3.plot(vary_param[1], ptws_var_norms)
-	ax3.set_ylabel('pointwise \nvariance', **label_kwargs)
+		label_kwargs = {
+			'rotation': 0,
+			'ha': 'right',
+			'va': 'center',
+			'labelpad': 10,
+		}
 
-	ax4 = fig.add_subplot(514, sharex=ax1, sharey=ax1)
-	ax4.plot(vary_param[1], FCOV_norms)
-	ax4.set_ylabel('FCOV', **label_kwargs)
+		fname_ax = plt.subplot2grid((5, 10), (0, 0), rowspan=1, colspan=3)
+		params_ax = plt.subplot2grid((5, 10), (1, 0), rowspan=4, colspan=3)
 
-	ax5 = fig.add_subplot(515, sharex=ax1, sharey=ax1)
-	ax5.plot(vary_param[1], variances)
-	ax5.set_xlabel(vary_param[0])
-	ax5.set_ylabel('variance', **label_kwargs)
+		ax1 = plt.subplot2grid((5, 10), (0, 3), colspan=6)
+		ax2 = plt.subplot2grid((5, 10), (1, 3), colspan=6, sharex=ax1)
+		ax3 = plt.subplot2grid((5, 10), (2, 3), colspan=6, sharex=ax1)
+		ax4 = plt.subplot2grid((5, 10), (3, 3), colspan=6, sharex=ax1)
+		ax5 = plt.subplot2grid((5, 10), (4, 3), colspan=6, sharex=ax1)
 
-	for ax in [ax1, ax2, ax3, ax4, ax5]:
-		ax.grid()
-		ax.set_ylim(bottom=0)
+		add_filenames_table(fname_ax, [filename, out_filename])
+		add_filt_params_table(params_ax, filt_params)
 
-		if ax is not ax5:
-			plt.setp(ax.get_xticklabels(), visible=False)
-			plt.setp(ax.get_xticklines(), visible=False)
+		ax1.set_ylabel('norm of mean', **label_kwargs)
+		ax2.set_ylabel('variance', **label_kwargs)
+		ax3.set_ylabel('scaled \nvariance', **label_kwargs)
+		ax4.set_ylabel('norm of \npointwise \nvariance', **label_kwargs)
+		ax5.set_ylabel('norm of \nfunctional COV', **label_kwargs)
 
-	fig.savefig(out_filename)
+		ax5.set_xlabel(vary_param_1[0])
+
+		label_list = [vary_param_2[0] + ' = ' + str(val) for val in vary_param_2[1]]
+
+		for i, val_2_data in enumerate(data_list):
+			label = label_list[i]
+			x = vary_param_1[1]
+			ax1.plot(x, val_2_data.mean_PRF_norm, label=label)
+			ax1.legend(loc=1)
+			ax2.plot(x, val_2_data.variance)
+			ax3.plot(x, val_2_data.scaled_variance)
+			ax4.plot(x, val_2_data.pointwise_variance_norm)
+			ax5.plot(x, val_2_data.functional_COV_norm)
+
+		for ax in [ax1, ax2, ax3, ax4, ax5]:
+			ax.grid()
+			ax.set_ylim(bottom=0)
+
+			if ax is not ax5:
+				plt.setp(ax.get_xticklabels(), visible=False)
+				plt.setp(ax.get_xticklines(), visible=False)
+
+		fig.savefig(out_filename)
+
+	prf_evo_array = get_data()
+	variance_data = process_data(prf_evo_array)
+	plot(variance_data, out_filename)
+
 

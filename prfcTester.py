@@ -461,7 +461,7 @@ if test == 14:
 		crop_2=(2, 2.5),  # time_units or 'auto'
 		auto_crop_length=1,
 
-		window_size=.2,  # time_units
+		window_size=.15,  # time_units
 		num_windows=5,  # evenly spaced
 		mean_samp_num=5,  # number of windows to use for mean
 
@@ -476,7 +476,7 @@ if test == 14:
 
 		normalize_volume=True,
 
-		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=1,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -499,16 +499,21 @@ if test == 15:
 		'output/PRFCompare/variance/L63.png',  # out filename
 		params,
 
-		('ds_rate', np.arange(100, 200, 10)),
+		('ds_rate', np.arange(100, 180, 10)),		# vary param 1
+		('use_cliques', (True,)),					# vary param 2
+													# for now, if you do not want to use second vary param, set this like
+													# the line above: one a list with one element and the trailing comma
+		# ('use_cliques', (True, False)),			# for now, both vary params must be filtration params. working on
+													# getting it to work for other params like weight_func
 
-		load_saved_PRFs=True,
+		load_saved_PRFs=False,
 
 		time_units='samples',
 
 		crop=(1000, 2001000),     # time_units or 'auto'
 
 		window_size=3000,		  # time_units
-		num_windows=10,			  # evenly spaced
+		num_windows=5,			  # evenly spaced
 
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples

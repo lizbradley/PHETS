@@ -1,10 +1,10 @@
 import numpy as np
 
-def add_filename_table(ax, filenames):
+def add_filename_table(ax, filename):
 	ax.axis('off')
 	title_table = ax.table(
 		cellText=[
-			[filenames.split('/')[-1]],   # remove leading "datasets/"
+			[filename.split('/')[-1]],   # remove leading "datasets/"
 		],
 		bbox=[0, 0, 1, 1],
 		cellLoc='center'
@@ -12,6 +12,18 @@ def add_filename_table(ax, filenames):
 	# title_table.auto_set_font_size(False)
 	# title_table.auto_set_font_size(8)
 
+def add_filenames_table(ax, filenames):
+	ax.axis('off')
+	title_table = ax.table(
+		cellText=[
+			[filenames[0].split('/')[-1]],   # remove leading "datasets/"
+			[filenames[1].split('/')[-1]]   # remove leading "datasets/"
+		],
+		bbox=[0, 0, 1, 1],
+		cellLoc='center'
+	)
+	# title_table.auto_set_font_size(False)
+	# title_table.auto_set_font_size(8)
 
 
 def add_filt_params_table(subplot, filt_params):
