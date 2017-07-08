@@ -1,0 +1,327 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Reference &#8212; PHETS 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-PHETS.PH">
+<span id="reference"></span><h1>Reference<a class="headerlink" href="#module-PHETS.PH" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="PHETS.PH.Filtration">
+<em class="property">class </em><code class="descclassname">PHETS.PH.</code><code class="descname">Filtration</code><span class="sig-paren">(</span><em>sig</em>, <em>params</em><span class="optional">[</span>, <em>filename='none'</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PH.Filtration" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sig</strong> (<em>ndarray</em><em> or </em><em>str</em>) – Input trajectory as numpy array or path to .txt file.</li>
+<li><strong>params</strong> (<em>dict</em>) – Options for computation of filtration.</li>
+<li><strong>filename</strong> (<em>str</em>) – If sig is an ndarray, a filename may be provided for labelling in visualizations.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.PH.make_movie">
+<code class="descclassname">PHETS.PH.</code><code class="descname">make_movie</code><span class="sig-paren">(</span><em>filtration</em>, <em>out_filename</em><span class="optional">[</span>, <em>color_scheme='none'</em>, <em>camera_angle=(135</em>, <em>55)</em>, <em>alpha=1</em>, <em>dpi=150</em>, <em>save_frames=False</em>, <em>framerate=1</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PH.make_movie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make filtration movie.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filtration</strong> (<a class="reference internal" href="#PHETS.PH.Filtration" title="PHETS.PH.Filtration"><em>Filtration</em></a>) – </li>
+<li><strong>out_filename</strong> (<em>str</em>) – Movie path and filename. Should end in “.mp4” or other video format.</li>
+<li><strong>color_scheme</strong> (<em>str</em>) – ‘none’, ‘highlight new’, or ‘birth_time gradient’</li>
+<li><strong>camera_angle</strong> (<em>tuple</em>) – for 3D mode. (azimuthal, elevation) in degrees.</li>
+<li><strong>alpha</strong> (<em>float</em>) – opacity of simplexes. 0…1 : transparent…opaque</li>
+<li><strong>dpi</strong> (<em>int</em>) – dots per inch (resolution)</li>
+<li><strong>save_frames</strong> (<em>bool</em>) – save frames to PH/frames/frame*.png for debugging</li>
+<li><strong>framerate</strong> (<em>int</em>) – frames per second</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.PH.make_PD">
+<code class="descclassname">PHETS.PH.</code><code class="descname">make_PD</code><span class="sig-paren">(</span><em>filtration</em>, <em>out_filename</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PH.make_PD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot persistence diagram.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filtration</strong> (<a class="reference internal" href="#PHETS.PH.Filtration" title="PHETS.PH.Filtration"><em>Filtration</em></a>) – </li>
+<li><strong>out_filename</strong> (<em>str</em>) – Image path and filename. Should end in “.png” or other image format.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.PH.make_PRF_plot">
+<code class="descclassname">PHETS.PH.</code><code class="descname">make_PRF_plot</code><span class="sig-paren">(</span><em>filt</em>, <em>out_filename</em><span class="optional">[</span>, <em>PRF_res=50</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PH.make_PRF_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot persistent rank function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filtration</strong> (<a class="reference internal" href="#PHETS.PH.Filtration" title="PHETS.PH.Filtration"><em>Filtration</em></a>) – </li>
+<li><strong>out_filename</strong> (<em>str</em>) – Image path and filename. Should end in “.png” or other image format.</li>
+<li><strong>PRF_res</strong> (<em>int</em>) – number of divisions per epsilon axis</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">a function for a single frame of the filtration (i.e. fixed epsilon) as an image. (For now, a single frame movie can be used.)</p>
+</div>
+<span class="target" id="module-PHETS.DCE.Movies"></span><dl class="function">
+<dt id="PHETS.DCE.Movies.slide_window">
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">slide_window</code><span class="sig-paren">(</span><em>in_filename</em>, <em>out_filename</em>, <em>window_size=.5</em>, <em>step_size=.1</em>, <em>tau=10</em>, <em>ds_rate=1</em>, <em>max_frames=0</em>, <em>save_worms=True</em>, <em>save_movie=True</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.slide_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show embedding of in_filename with window start point varied over time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>window_size</strong> (<em>float</em>) – seconds</li>
+<li><strong>step_size</strong> – window start point step size (seconds)</li>
+<li><strong>tau</strong> (<em>float</em>) – seconds ?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.DCE.Movies.vary_tau">
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">vary_tau</code><span class="sig-paren">(</span><em>in_filename</em>, <em>out_filename</em>, <em>tau_lims=(1</em>, <em>15)</em>, <em>tau_inc=1</em>, <em>embed_crop=(1</em>, <em>2)</em>, <em>ds_rate=1</em>, <em>save_worms=True</em>, <em>save_movie=True</em>, <em>m=2</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.vary_tau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show embedding of in_filename with tau varied over time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>in_filename</strong> (<em>str</em>) – Path/filename for text file time series.</li>
+<li><strong>out_filename</strong> (<em>str</em>) – Path/filename for movie. Should end in “.mp4” or other video format.</li>
+<li><strong>tau_lims</strong> (<em>tuple</em>) – tau range (seconds)</li>
+<li><strong>tau_inc</strong> (<em>int</em>) – tau stepsize (seconds)</li>
+<li><strong>embed_crop</strong> (<em>tuple</em>) – Limits for window from input time series (seconds)</li>
+<li><strong>ds_rate</strong> (<em>int</em>) – time series downsample rate</li>
+<li><strong>save_worms</strong> (<em>bool</em>) – save embeddings to text files in output/DCE/saved_worms</li>
+<li><strong>save_movie</strong> (<em>bool</em>) – If False, no movie will be created. Useful for saving embeddings quickly.</li>
+<li><strong>m</strong> (<em>int</em>) – target embedding dimension</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.DCE.Movies.compare_vary_tau">
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_vary_tau</code><span class="sig-paren">(</span><em>in_filename_1</em>, <em>in_filename_2</em>, <em>out_filename</em>, <em>tau_lims</em>, <em>tau_inc=1</em>, <em>embed_crop=(1</em>, <em>2)</em>, <em>ds_rate=1</em>, <em>m=2</em>, <em>save_worms=True</em>, <em>save_movie=True</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_vary_tau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like vary_tau(), but shows embeddings for two time series side by side.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.DCE.Movies.compare_multi">
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_multi</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two directories of (eg one with piano notes, another with range of viol notes), and generates a movie over a range note indexes (pitch). Tau and crop may be set explicity or automatically.</p>
+<p>args:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dir1</strong> (<em>str</em>) – Path of first directory to be iterated over</li>
+<li><strong>dir1_base</strong> (<em>str</em>) – Base filename for files in dir1</li>
+<li><strong>dir2</strong> (<em>str</em>) – </li>
+<li><strong>dir2_base</strong> (<em>str</em>) – </li>
+<li><strong>out_filename</strong> (<em>str</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>kwargs:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>i_lims</strong> (<em>tuple</em>) – (start, stop) index. Default is (1, 89).</li>
+<li><strong>embed_crop_1</strong> (<em>tuple</em><em> or </em><em>str</em>) – (start, stop) in seconds or ‘auto’</li>
+<li><strong>embed_crop_2</strong> (<em>tuple</em><em> or </em><em>str</em>) – </li>
+<li><strong>auto_crop_length=.3</strong> (<em>float</em>) – seconds</li>
+<li><strong>tau_1</strong> (<em>str</em>) – explicit (seconds) or ‘auto detect’ or ‘auto ideal’</li>
+<li><strong>tau_2</strong> (<em>str</em>) – </li>
+<li><strong>tau_T</strong> (<em>float</em>) – For use with auto tau: tau = period * tau_T</li>
+<li><strong>save_worms</strong> (<em>bool</em>) – </li>
+<li><strong>save_movie</strong> (<em>bool</em>) – </li>
+<li><strong>normalize_volume</strong> (<em>bool</em>) – </li>
+<li><strong>waveform_zoom</strong> – </li>
+<li><strong>ds_rate</strong> (<em>int</em>) – </li>
+<li><strong>dpi</strong> (<em>int</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">function for plotting embeddings without varying a parameter or input, as an image. (For now, a single frame movies can be used.)</p>
+</div>
+<span class="target" id="module-PHETS.PRFCompare"></span><dl class="function">
+<dt id="PHETS.PRFCompare.plot_dists_vs_ref">
+<code class="descclassname">PHETS.PRFCompare.</code><code class="descname">plot_dists_vs_ref</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PRFCompare.plot_dists_vs_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>args:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dir</strong> (<em>str</em>) – input directory</li>
+<li><strong>base_filename</strong> (<em>str</em>) – input base filename</li>
+<li><strong>fname_format</strong> (<em>str</em>) – input filename format: ‘base i or ‘i base’</li>
+<li><strong>out_filename</strong> (<em>str</em>) – output filename</li>
+<li><strong>filt_params</strong> – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>kwargs:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>i_ref</strong> (<em>int</em>) – </li>
+<li><strong>i_arr</strong> (<em>arr</em>) – </li>
+<li><strong>weight_func</strong> (<em>lambda</em>) – Default is lambda i, j: 1</li>
+<li><strong>metric</strong> (<em>str</em>) – ‘L1’ (abs) or ‘L2’ (euclidean). Default is ‘L2’.</li>
+<li><strong>dist_scale</strong> (<em>str</em>) – ‘none’, ‘a’, or ‘a + b’. Default is ‘none’.</li>
+<li><strong>PRF_res</strong> (<em>int</em>) – number of divisions used for PRF. Default is 50.</li>
+<li><strong>load_saved_PRFs</strong> (<em>bool</em>) – reuse previously computed PRF set. Default is False.</li>
+<li><strong>see_samples</strong> (<em>int</em>) – interval to generate PRF plots, PDs, and filtration movies when generating PRF set. 0 is none, 1 is all samples, 2 is every other sample, etc.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">PHETS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Documentation</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/reference.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
