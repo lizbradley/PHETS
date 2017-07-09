@@ -59,7 +59,6 @@ Reference
 .. module:: PHETS.DCE.Movies
    :synopsis: Generate and visualize delay coordinate embeddings time series
 
-
 .. function:: slide_window(in_filename, out_filename, window_size=.5, step_size=.1, tau=10, ds_rate=1, max_frames=0, save_worms=True, save_movie=True)
 
    Show embedding of in_filename with window start point varied over time.
@@ -96,30 +95,20 @@ Reference
 
    Takes two directories of (eg one with piano notes, another with range of viol notes), and generates a movie over a range note indexes (pitch). Tau and crop may be set explicity or automatically.
 
-   args:
-
    :param str dir1: Path of first directory to be iterated over
    :param str dir1_base: Base filename for files in dir1
    :param str dir2:
    :param str dir2_base:
-
    :param str out_filename:
-
-   kwargs:
-
    :param tuple i_lims: (start, stop) index. Default is (1, 89).
-
    :param embed_crop_1: (start, stop) in seconds or 'auto'
    :type embed_crop_1: tuple or str
-
    :param embed_crop_2:
    :type embed_crop_2: tuple or str
    :param float auto_crop_length=.3: seconds
-
    :param str tau_1: explicit (seconds) or 'auto detect' or 'auto ideal'
    :param str tau_2:
    :param float tau_T: For use with auto tau: tau = period * tau_T
-
    :param bool save_worms:
    :param bool save_movie:
    :param bool normalize_volume:

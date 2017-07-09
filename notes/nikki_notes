@@ -1,0 +1,90 @@
+functional variance thing
+
+sample PRF, mean PRF
+
+
+norm(mean_PRF, metric, weight_func='none')      # plot
+
+
+# HOMEGROWN VARIANCE #
+
+
+	dists = [norm(np.subtract(f, func_ref), metric, func_weight) for f in funcs]
+
+    variance = mean(dists)      # plot
+
+    scaled_dists = get_dists_from_ref(funcs, ref_func, weight_func, scale)
+
+    scaled_variance = mean(scaled_dists)        # plot
+
+
+
+# POINTWISE VARIANCE #
+
+    diffs = [PRF - mean_PRF for PRF in PRFs]
+
+    variance = sum(square(diffs)) / n
+
+    norm(variance, metric, weight_func='none')       # plot
+
+    functional_COV = variance / mean_PRF
+
+    norm(functional_COV, metric, weight_func='none')     # plot
+
+
+
+
+new plot function:	(statistics)
+
+	like PRFCompare, except:
+
+	one input
+
+
+	plots:
+		mean PRF
+		dists squiggle
+		variance PRF
+		functional covariance
+
+
+	computes statistics:
+		norm of mean
+		norm of each sample
+		norm of variance func
+		norm of functional COV
+		variance
+		scaled variance		(only scaled with norm of mean ('a' ?)
+
+
+
+
+new plot function:
+	parameter curves (last weeks notes)
+	
+	pane for each:
+
+		norm of mean
+		variance
+	    scaled variance
+
+
+		norm of variance func
+		norm of functional COV
+
+
+0: clean l2 norm				done
+
+1: check immortal holes to PRF			done
+
+2: make sample PRF				done
+
+3: new functions (above)
+
+
+	
+
+
+
+
+

@@ -178,7 +178,6 @@
 <dt id="PHETS.DCE.Movies.compare_multi">
 <code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_multi</code><span class="sig-paren">(</span><em>dir1</em>, <em>dir1_base</em>, <em>dir2</em>, <em>dir2_base</em>, <em>out_filename</em>, <em>i_lims=(1</em>, <em>89)</em>, <em>embed_crop_1='auto'</em>, <em>embed_crop_2='auto'</em>, <em>auto_crop_length=.3</em>, <em>tau_1='auto ideal'</em>, <em>tau_2='auto ideal'</em>, <em>tau_T=1/np.pi</em>, <em>save_worms=True</em>, <em>save_movie=True</em>, <em>normalize_volume=True</em>, <em>waveform_zoom=None</em>, <em>ds_rate=1</em>, <em>dpi=200</em>, <em>m=2</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_multi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes two directories of (eg one with piano notes, another with range of viol notes), and generates a movie over a range note indexes (pitch). Tau and crop may be set explicity or automatically.</p>
-<p>args:</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -189,17 +188,6 @@
 <li><strong>dir2</strong> (<em>str</em>) – </li>
 <li><strong>dir2_base</strong> (<em>str</em>) – </li>
 <li><strong>out_filename</strong> (<em>str</em>) – </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>kwargs:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>i_lims</strong> (<em>tuple</em>) – (start, stop) index. Default is (1, 89).</li>
 <li><strong>embed_crop_1</strong> (<em>tuple</em><em> or </em><em>str</em>) – (start, stop) in seconds or ‘auto’</li>
 <li><strong>embed_crop_2</strong> (<em>tuple</em><em> or </em><em>str</em>) – </li>
