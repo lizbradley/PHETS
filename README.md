@@ -25,13 +25,33 @@ higher dimensional trajectories in .txt.
 
 
 ### Setup
+
+#### Install Dependencies
+
+
+###### Popt
+```bash
+wget http://rpm5.org/files/popt/popt-1.16.tar.gz
+tar -xvzf popt-1.16.tar.gz
+cd popt-1.16
+./configure --prefix=/usr --disable-static &&
+make
+sudo make install
+export LD_RUN_PATH="/usr/lib"
+```
+
+###### ffmpeg
+```bash
+sudo apt-get install ffmpeg
+```
+
+#### Install PHETS
+
 ```bash
 git clone https://github.com/eeshugerman/PHETS.git
 cd PHETS
 pip install -r requirements.txt
 ```
-
-Ensure gcc can link popt.
 
 
 
