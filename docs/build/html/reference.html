@@ -69,7 +69,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>filtration</strong> (<a class="reference internal" href="#PHETS.PH.Filtration" title="PHETS.PH.Filtration"><em>Filtration</em></a>) – </li>
-<li><strong>out_filename</strong> (<em>str</em>) – Movie path and filename. Should end in “.mp4” or other video format.</li>
+<li><strong>out_filename</strong> (<em>str</em>) – Path/filename for movie. Should end in “.mp4” or other video format.</li>
 <li><strong>color_scheme</strong> (<em>str</em>) – ‘none’, ‘highlight new’, or ‘birth_time gradient’</li>
 <li><strong>camera_angle</strong> (<em>tuple</em>) – for 3D mode. (azimuthal, elevation) in degrees.</li>
 <li><strong>alpha</strong> (<em>float</em>) – opacity of simplexes. 0…1 : transparent…opaque</li>
@@ -176,7 +176,7 @@
 
 <dl class="function">
 <dt id="PHETS.DCE.Movies.compare_multi">
-<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_multi</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_multi" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_multi</code><span class="sig-paren">(</span><em>dir1</em>, <em>dir1_base</em>, <em>dir2</em>, <em>dir2_base</em>, <em>out_filename</em>, <em>i_lims=(1</em>, <em>89)</em>, <em>embed_crop_1='auto'</em>, <em>embed_crop_2='auto'</em>, <em>auto_crop_length=.3</em>, <em>tau_1='auto ideal'</em>, <em>tau_2='auto ideal'</em>, <em>tau_T=1/np.pi</em>, <em>save_worms=True</em>, <em>save_movie=True</em>, <em>normalize_volume=True</em>, <em>waveform_zoom=None</em>, <em>ds_rate=1</em>, <em>dpi=200</em>, <em>m=2</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_multi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes two directories of (eg one with piano notes, another with range of viol notes), and generates a movie over a range note indexes (pitch). Tau and crop may be set explicity or automatically.</p>
 <p>args:</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -226,8 +226,8 @@
 </div>
 <span class="target" id="module-PHETS.PRFCompare"></span><dl class="function">
 <dt id="PHETS.PRFCompare.plot_dists_vs_ref">
-<code class="descclassname">PHETS.PRFCompare.</code><code class="descname">plot_dists_vs_ref</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PRFCompare.plot_dists_vs_ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>args:</p>
+<code class="descclassname">PHETS.PRFCompare.</code><code class="descname">plot_dists_vs_ref</code><span class="sig-paren">(</span><em>dir</em>, <em>base_filename</em>, <em>fname_format</em>, <em>out_filename</em>, <em>filt_params</em>, <em>i_ref=15</em>, <em>i_arr=np.arange(10</em>, <em>20</em>, <em>1)</em>, <em>weight_func=lambda i</em>, <em>j: 1</em>, <em>metric='L2'</em>, <em>dist_scale='none'</em>, <em>PRF_res=50</em>, <em>load_saved_PRFs=False</em>, <em>see_samples=5</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PRFCompare.plot_dists_vs_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes range of time-series files and a reference file. Generates PRF for each, and finds distances to reference PRF, plots distance vs index.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -238,17 +238,6 @@
 <li><strong>fname_format</strong> (<em>str</em>) – input filename format: ‘base i or ‘i base’</li>
 <li><strong>out_filename</strong> (<em>str</em>) – output filename</li>
 <li><strong>filt_params</strong> – </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>kwargs:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>i_ref</strong> (<em>int</em>) – </li>
 <li><strong>i_arr</strong> (<em>arr</em>) – </li>
 <li><strong>weight_func</strong> (<em>lambda</em>) – Default is lambda i, j: 1</li>
@@ -257,6 +246,85 @@
 <li><strong>PRF_res</strong> (<em>int</em>) – number of divisions used for PRF. Default is 50.</li>
 <li><strong>load_saved_PRFs</strong> (<em>bool</em>) – reuse previously computed PRF set. Default is False.</li>
 <li><strong>see_samples</strong> (<em>int</em>) – interval to generate PRF plots, PDs, and filtration movies when generating PRF set. 0 is none, 1 is all samples, 2 is every other sample, etc.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.PRFCompare.plot_dists_vs_mean">
+<code class="descclassname">PHETS.PRFCompare.</code><code class="descname">plot_dists_vs_mean</code><span class="sig-paren">(</span><em>filename_1</em>, <em>filename_2</em>, <em>out_filename</em>, <em>filt_params</em>, <em>load_saved_PRFs=False</em>, <em>time_units='seconds'</em>, <em>crop_1='auto'</em>, <em>crop_2='auto'</em>, <em>auto_crop_length=.3</em>, <em>window_size=.05</em>, <em>num_windows=10</em>, <em>mean_samp_num=5</em>, <em>tau_1=.001</em>, <em>tau_2=.001</em>, <em>tau_T=np.pi</em>, <em>note_index=None</em>, <em>normalize_volume=True</em>, <em>PRF_res=50</em>, <em>dist_scale='none'</em>, <em>metric='L2'</em>, <em>weight_func=lambda i</em>, <em>j: 1</em>, <em>see_samples=5</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PRFCompare.plot_dists_vs_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two time-series or 2D trajectory files. For each input, slices each into a number of windows. If inputs are time-series, embeds each window. Generates PRF for each window. selects subset of window PRFs, computes their mean, plots distance to mean PRF vs time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename_1</strong> (<em>str</em>) – </li>
+<li><strong>filename_2</strong> (<em>str</em>) – </li>
+<li><strong>out_filename</strong> (<em>str</em>) – </li>
+<li><strong>filt_params</strong> (<em>dict</em>) – </li>
+<li><strong>load_saved_PRFs</strong> (<em>bool</em>) – </li>
+<li><strong>time_units</strong> (<em>str</em>) – </li>
+<li><strong>crop_1</strong> (<em>str</em><em> or </em><em>tuple</em>) – </li>
+<li><strong>crop_2</strong> (<em>str</em><em> or </em><em>tuple</em>) – </li>
+<li><strong>auto_crop_length</strong> (<em>float</em>) – </li>
+<li><strong>window_size</strong> (<em>float</em>) – (time units)</li>
+<li><strong>num_windows</strong> (<em>int</em>) – per file</li>
+<li><strong>mean_samp_num</strong> (<em>int</em>) – per file</li>
+<li><strong>tau_1</strong> (<em>str</em><em> or </em><em>float</em>) – </li>
+<li><strong>tau_2</strong> (<em>str</em><em> or </em><em>float</em>) – </li>
+<li><strong>tau_T</strong> (<em>float</em>) – </li>
+<li><strong>note_index</strong> (<em>int</em>) – </li>
+<li><strong>normalize_volume</strong> (<em>bool</em>) – </li>
+<li><strong>PRF_res</strong> (<em>int</em>) – number of divisions used for PRF</li>
+<li><strong>dist_scale</strong> (<em>str</em>) – ‘none’, ‘a’, or ‘a + b’</li>
+<li><strong>metric</strong> (<em>str</em>) – ‘L1’ (abs) or ‘L2’ (euclidean)</li>
+<li><strong>weight_func</strong> (<em>lambda</em>) – </li>
+<li><strong>see_samples</strong> (<em>int</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.PRFCompare.plot_clusters">
+<code class="descclassname">PHETS.PRFCompare.</code><code class="descname">plot_clusters</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PRFCompare.plot_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>See plot_dists_vs_mean for call signature.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PHETS.PRFCompare.plot_variances">
+<code class="descclassname">PHETS.PRFCompare.</code><code class="descname">plot_variances</code><span class="sig-paren">(</span><em>filename</em>, <em>out_filename</em>, <em>filt_params</em>, <em>vary_param_1</em>, <em>vary_param_2</em>, <em>load_saved_PRFs=False</em>, <em>time_units='seconds'</em>, <em>crop=(100</em>, <em>1100)</em>, <em>auto_crop_length=.3</em>, <em>window_size=1000</em>, <em>num_windows=5</em>, <em>tau=.001</em>, <em>tau_T=np.pi</em>, <em>note_index=None</em>, <em>normalize_volume=True</em>, <em>PRF_res=50</em>, <em>dist_scale='none'</em>, <em>metric='L2'</em>, <em>weight_func=lambda i</em>, <em>j: 1</em>, <em>see_samples=5</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.PRFCompare.plot_variances" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<em>str</em>) – </li>
+<li><strong>out_filename</strong> (<em>str</em>) – </li>
+<li><strong>filt_params</strong> (<em>dict</em>) – </li>
+<li><strong>vary_param_1</strong> (<em>str</em>) – </li>
+<li><strong>vary_param_2</strong> (<em>str</em>) – </li>
+<li><strong>load_saved_PRFs</strong> (<em>bool</em>) – </li>
+<li><strong>time_units='seconds'</strong> (<em>str</em>) – </li>
+<li><strong>crop=</strong><strong>(</strong><strong>100</strong><strong>, </strong><strong>1100</strong><strong>)</strong> (<em>tuple</em>) – </li>
+<li><strong>auto_crop_length=.3</strong> (<em>float</em>) – </li>
+<li><strong>window_size=1000</strong> – </li>
+<li><strong>num_windows</strong> (<em>int</em>) – </li>
+<li><strong>tau</strong> (<em>float</em>) – </li>
+<li><strong>tau_T</strong> (<em>float</em>) – </li>
+<li><strong>note_index</strong> (<em>int</em>) – </li>
+<li><strong>normalize_volume</strong> (<em>bool</em>) – </li>
+<li><strong>PRF_res</strong> (<em>int</em>) – </li>
+<li><strong>dist_scale</strong> (<em>str</em>) – ‘none’, ‘a’, or ‘a + b’</li>
+<li><strong>metric</strong> (<em>str</em>) – ‘L1’ (abs) or ‘L2’ (euclidean)</li>
+<li><strong>weight_func</strong> (<em>lambda</em>) – </li>
+<li><strong>see_samples</strong> (<em>bool</em>) – </li>
 </ul>
 </td>
 </tr>

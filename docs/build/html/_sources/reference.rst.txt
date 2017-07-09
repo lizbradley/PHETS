@@ -20,7 +20,7 @@ Reference
    Make filtration movie.
 
    :param Filtration filtration:
-   :param str out_filename: Movie path and filename. Should end in ".mp4" or other video format.
+   :param str out_filename: Path/filename for movie. Should end in ".mp4" or other video format.
    :param str color_scheme: 'none', 'highlight new', or 'birth_time gradient'
    :param tuple camera_angle: for 3D mode. (azimuthal, elevation) in degrees.
    :param float alpha: opacity of simplexes. 0...1 : transparent...opaque
@@ -92,7 +92,7 @@ Reference
 
 
 
-.. function:: compare_multi(*args, **kwargs)
+.. function:: compare_multi(dir1, dir1_base, dir2, dir2_base, out_filename, i_lims=(1, 89), embed_crop_1='auto', embed_crop_2='auto', auto_crop_length=.3, tau_1='auto ideal', tau_2='auto ideal', tau_T=1/np.pi, save_worms=True, save_movie=True, normalize_volume=True, waveform_zoom=None, ds_rate=1, dpi=200, m=2)
 
    Takes two directories of (eg one with piano notes, another with range of viol notes), and generates a movie over a range note indexes (pitch). Tau and crop may be set explicity or automatically.
 
@@ -138,18 +138,15 @@ Reference
    :synopsis: Generation, statistical analysis, and visualization of sets of persistent rank functions.
 
 
-.. function:: plot_dists_vs_ref(*args, **kwargs)
+.. function:: plot_dists_vs_ref(dir, base_filename, fname_format, out_filename, filt_params, i_ref=15, i_arr=np.arange(10, 20, 1), weight_func=lambda i, j: 1, metric='L2', dist_scale='none', PRF_res=50, load_saved_PRFs=False, see_samples=5)
 
-   args:
+   Takes range of time-series files and a reference file. Generates PRF for each, and finds distances to reference PRF, plots distance vs index.
 
    :param str dir: input directory
    :param str base_filename: input base filename
    :param str fname_format: input filename format: 'base i or 'i base'
    :param str out_filename: output filename
    :param filt_params:
-
-   kwargs:
-
    :param int i_ref:
    :param arr i_arr:
    :param lambda weight_func: Default is lambda i, j: 1
@@ -158,4 +155,69 @@ Reference
    :param int PRF_res: number of divisions used for PRF. Default is 50.
    :param bool load_saved_PRFs: reuse previously computed PRF set. Default is False.
    :param int see_samples: interval to generate PRF plots, PDs, and filtration movies when generating PRF set. 0 is none, 1 is all samples, 2 is every other sample, etc.
+
+
+.. function:: plot_dists_vs_mean(filename_1, filename_2, out_filename, filt_params, load_saved_PRFs=False, time_units='seconds', crop_1='auto', crop_2='auto', auto_crop_length=.3, window_size=.05, num_windows=10, mean_samp_num=5, tau_1=.001, tau_2=.001, tau_T=np.pi, note_index=None, normalize_volume=True, PRF_res=50, dist_scale='none', metric='L2', weight_func=lambda i, j: 1, see_samples=5)
+
+   Takes two time-series or 2D trajectory files. For each input, slices each into a number of windows. If inputs are time-series, embeds each window. Generates PRF for each window. selects subset of window PRFs, computes their mean, plots distance to mean PRF vs time.
+
+   :param str filename_1:
+   :param str filename_2:
+   :param str out_filename:
+   :param dict filt_params:
+   :param bool load_saved_PRFs:
+   :param str time_units:
+   :param crop_1:
+   :param crop_2:
+   :type crop_1: str or tuple
+   :type crop_2: str or tuple
+   :param float auto_crop_length:
+   :param float window_size: (time units)
+   :param int num_windows: per file
+   :param int mean_samp_num: per file
+   :param tau_1:
+   :param tau_2:
+   :type tau_1: str or float
+   :type tau_2: str or float
+   :param float tau_T:
+   :param int note_index:
+   :param bool normalize_volume:
+   :param int PRF_res: number of divisions used for PRF
+   :param str dist_scale: 'none', 'a', or 'a + b'
+   :param str metric: 'L1' (abs) or 'L2' (euclidean)
+   :param lambda weight_func:
+   :param int see_samples:
+
+
+
+.. function:: plot_clusters(*args, **kwargs)
+
+   See plot_dists_vs_mean for call signature.
+
+
+
+.. function:: plot_variances(filename, out_filename, filt_params, vary_param_1, vary_param_2, load_saved_PRFs=False, time_units='seconds', crop=(100, 1100), auto_crop_length=.3, window_size=1000, num_windows=5, tau=.001, tau_T=np.pi, note_index=None, normalize_volume=True, PRF_res=50, dist_scale='none', metric='L2', weight_func=lambda i, j: 1, see_samples=5)
+
+   :param str filename:
+   :param str out_filename:
+   :param dict filt_params:
+   :param str vary_param_1:
+   :param str vary_param_2:
+   :param bool load_saved_PRFs:
+   :param str time_units='seconds':
+   :param tuple crop=(100, 1100):
+   :param float auto_crop_length=.3:
+   :param window_size=1000:
+   :param int num_windows:
+   :param float tau:
+   :param float tau_T:
+   :param int note_index:
+   :param bool normalize_volume:
+   :param int PRF_res:
+   :param str dist_scale: 'none', 'a', or 'a + b'
+   :param str metric: 'L1' (abs) or 'L2' (euclidean)
+   :param lambda weight_func:
+   :param bool see_samples:
+
+
 
