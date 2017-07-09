@@ -7,7 +7,7 @@ from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_c
 
 
 # test = int(sys.argv[1])
-test = 15
+test = 14
 
 if test == 1:
 	params = parameter_set

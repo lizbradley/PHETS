@@ -25,7 +25,7 @@ import subprocess
 from config import find_landmarks_c_compile_str
 class Filtration:
 
-	def __init__(self, sig, params, filename=None):
+	def __init__(self, sig, params, filename='none'):
 		caller_dir = os.getcwd()
 
 		if isinstance(sig, basestring):			# is filename

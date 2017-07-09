@@ -1,12 +1,10 @@
 import sys
 import numpy as np
-# from PH.TestingFunctions import build_and_save_filtration, make_filtration_movie, make_persistence_diagram
-# from PH.FiltrationMovie import make_frame_3D
-# from PH.TestingFunctions import parameter_set
+
 from config import default_filtration_params as parameter_set
-from PH.Data import Filtration, load_saved_filtration
-from PH.FiltrationMovie import make_movie
-from PH.Plots import make_PD, make_PRF_plot
+
+from PH import Filtration, load_saved_filtration
+from PH import make_movie, make_PD, make_PRF_plot
 
 import time
 

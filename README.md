@@ -31,78 +31,14 @@ cd PHETS
 pip install -r requirements.txt
 ```
 
+Ensure gcc can link popt.
 
 
-## Usage/Reference
 
-Presently, functionality is split into three modules. Each module offers a handful 
-of related functions and is driven by its own tester file. Each tester contains many 
-tests which have accumulated over time. Many older tests are not kept up to date 
-and will no longer run, but are kept for record keeping purposes.
+## Usage
 
-Tests may be run by either setting the test variable at the top of the tester script, 
-or by uncommenting the following line (`test = int(sys.argv[1])
-`) and providing the test number as a command line 
-argument.
+[examples coming soon]
 
 
-#### DCE: delay coordinate embedding
-
-DCE provides three main functions which each generate a different type of movie:
-
-* **vary_tau()**  
-example: test 4  
-takes one input file shows embedding over range of tau
-
-* **slide_window()**  
-example: test 5  
-takes one input file, shows embedding over a range of windows
-
-* **compare_vary_tau()**  
-example: test 6  
-like vary_tau(), but takes two input files and shows their embeddings side by side.
-
-* **compare_multi()**  
-example: test 9    
-takes two directories of (eg one with piano notes, another with range of viol 
-notes), and generates a movie over a range note indexes (pitch). Tau and crop may be 
-set explicity or automatically.  
-The `save_worms` option will save all embedded trajectories which are generated for 
-the movie to text files in`output/DCE/saved_worms`. These may then be passed as input
-to the functions in `PH`.
-
-TODO: function for plotting embeddings without varying a parameter or input, as an image.
-(For now, a single frame movies can be used.)
-
-
-#### PH: persistent homology
-examples: test 16
-* **make_movie()**    
-make filtration movie
-
-* **make_PD()**   
-make persistence diagram
-
-* **make_PRF_plot()**  
-plot persistent rank function
-
-TODO: a function for a single frame of the filtration (i.e. fixed epsilon) as an image.
-(For now, a single frame movie can be used.)
-
-#### PRFC: persistent rank function comparision
-
-
-* **PRF_dist_plot()**  
-example: test 4  
-takes range of time-series files and a reference file. Generates PRF for each, and 
-finds distances to reference PRF,
-plots distance vs index. 
-
-* **mean_PRF_dist_plot()**  
-example (1D input): test 6  
-example (2D input): test 7  
-takes two time-series or 2D trajectory files. for each input, slices each into a 
-number of windows. if inputs are time-series, embeds each window. gets PRF for each 
-window. selects subset of window PRFs, computes their mean, plots distance to mean 
-PRF vs time.
+see reference.pdf
 

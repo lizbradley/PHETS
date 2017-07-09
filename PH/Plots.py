@@ -124,7 +124,7 @@ def make_PD(filt, out_filename):
 	pyplot.clf()
 
 
-def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None):
+def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename=None):
 	print "plotting PRF..."
 
 	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
@@ -135,12 +135,12 @@ def make_PRF_plot(filt, out_filename, PRF_res=50, params=None, in_filename=None)
 	cbar_ax = 		pyplot.subplot2grid((6, 10), (0, 9), rowspan=6)
 
 
-	if isinstance(filt, Filtration):
-		func = filt.get_PRF(PRF_res)
-		in_filename = filt.filename
-		params = filt.params
+	if isinstance(filtration, Filtration):
+		func = filtration.get_PRF(PRF_res)
+		in_filename = filtration.filename
+		params = filtration.params
 	else:
-		func = filt
+		func = filtration
 
 	x, y, z, max_lim = func
 	if not max_lim:
