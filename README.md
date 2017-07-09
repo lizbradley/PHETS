@@ -60,5 +60,5 @@ pip install -r requirements.txt
 [examples coming soon]
 
 
-see reference.pdf
+see reference.pdf and *Tester.py files.
 
