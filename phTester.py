@@ -11,7 +11,7 @@ import time
 start = time.time()
 
 
-test = 17
+test = 16
 # test = int(sys.argv[1])
 
 
@@ -447,7 +447,7 @@ if test == 15:
 	)
 
 ########################################################################################################################
-#	test format changed May 2017, all tests above will not run
+#	test format changed May 2017, all preceding tests will not run
 ########################################################################################################################
 
 
@@ -456,13 +456,13 @@ if test == 16:
 	filt_params = parameter_set
 	filt_params.update(
 		{
-			'ds_rate': 20,
+			'ds_rate': 50,
 			'worm_length': 2000,
 			# 'min_filtration_param': .001,
 			# 'max_filtration_param': .015,
-			'max_filtration_param': -5,
+			'max_filtration_param': 2,
 			'num_divisions': 20,
-			'use_cliques': True
+			'graph_induced': True
 		})
 
 
@@ -473,19 +473,21 @@ if test == 16:
 		filtration,
 		'output/PH/49-C135B_PD.png',
 	)
-
-	make_PRF_plot(
-		filtration,
-		'output/PH/49-C135B_PRF.png',
-		PRF_res=50
-
-	)
+	#
+	# make_PRF_plot(
+	# 	filtration,
+	# 	'output/PH/49-C135B_PRF.png',
+	# 	PRF_res=50
+	#
+	# )
+	#
 
 	make_movie(
 		filtration,
 		'output/PH/49-C135B_movie.mp4',
 		color_scheme='highlight new'
 	)
+
 
 
 
@@ -500,6 +502,7 @@ if test == 17:
 			'max_filtration_param': -10,
 			'num_divisions': 20,
 			'use_cliques': True,
+			'graph_induced': True,
 
 		}
 	)
@@ -513,10 +516,10 @@ if test == 17:
 		'output/PH/realdeal.png'
 	)
 
-	make_movie(
-		filtration,
-		'output/PH/realdeal.mp4'
-	)
+	# make_movie(
+	# 	filtration,
+	# 	'output/PH/realdeal.mp4'
+	# )
 
 
 

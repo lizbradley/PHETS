@@ -346,14 +346,12 @@ def build_filtration(input_file_name, parameter_set):
 
 	# p=multiprocessing.Pool(processes=4)   # commented out by Elliott 4/25
 
-
 	inputs=[]
 	for w in range(0,len(witnesses)):
 		inputs.append(w)
 		d[w].sort()
 
 	# p.map(sort,inputs)  # was commented out as of 4/25
-
 	# p.terminate()       # added by Elliott 4/25
 
 	sys.stdout.write("done\n")
@@ -361,6 +359,40 @@ def build_filtration(input_file_name, parameter_set):
 	assert len(landmarks) == number_of_vertices
 
 	'''=============== End code written by Sam ======================'''
+
+	'''============= Start code written by Elliott =================='''
+	if graph_induced:
+		import matplotlib.pyplot as plt
+		import pandas as pd
+
+		g = nx.read_edgelist('edgelist.txt')
+
+		closest_wits = np.loadtxt('closest_wits.txt', dtype='int')	# witness, landmark
+		wit_coords = np.array(witnesses)
+		land_coords = np.array(landmarks)
+
+		# land = np.unique(closest_wits[:,1])
+
+		# closest_wits = pd.DataFrame(closest_wits, columns=('witness', 'landmark'))
+		# print closest_wits
+		# closest_wits = closest_wits.sort_values(by='landmark')
+		# print closest_wits
+		#
+		# closest_wits = closest_wits.values
+		# print closest_wits
+
+
+
+		fig = plt.figure(figsize=(8, 8))
+		ax = fig.add_subplot(111)
+		ax.scatter(wit_coords[:, 0], wit_coords[:, 1], s=.1)
+		ax.scatter(land_coords[:, 0], land_coords[:, 1])
+		fig.savefig('veronoi_test.png')
+
+	'''=============== End code written by Elliott =================='''
+
+
+
 
 	print("Building filtration...")
 	## Build filtration
