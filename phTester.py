@@ -466,13 +466,13 @@ if test == 16:
 		})
 
 
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()		# reuses previous filtration
+	# filtration = Filtration(in_filename, filt_params)
+	filtration = load_saved_filtration()		# reuses previous filtration
 
-	make_PD(
-		filtration,
-		'output/PH/49-C135B_PD.png',
-	)
+	# make_PD(
+	# 	filtration,
+	# 	'output/PH/49-C135B_PD.png',
+	# )
 	#
 	# make_PRF_plot(
 	# 	filtration,
