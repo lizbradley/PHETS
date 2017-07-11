@@ -335,24 +335,9 @@ class Filtration:
 	# public #
 	def get_complexes_mpl(self):
 
-		# old version, for simplexes are not flattened #
-		# def IDs_to_coords(ID_array):
-		# 	"""Replaces each landmark_ID with corresponding coordinates"""
-		# 	for row in ID_array:
-		# 		for parent_simplex in row:
-		# 			new_parent_simplex = []
-		# 			for child in parent_simplex:
-		# 				new_parent_simplex.append(list(child))
-		# 			for child in new_parent_simplex:
-		# 				new_child = []
-		# 				for landmark_ID in child:
-		# 					landmark_coords = self.landmark_coords[landmark_ID]
-		# 					new_child.append(landmark_coords)
-		# 				child[:] = new_child
-		# 			parent_simplex[:] = new_parent_simplex
-
 		def IDs_to_coords(ID_array):
 			"""Replaces each landmark_ID with corresponding coordinates"""
+			coords_array = []
 			for row in ID_array:
 				new_row = []
 				for simplex in row:
@@ -361,21 +346,14 @@ class Filtration:
 						landmark_coords = self.landmark_coords[landmark_ID]
 						simplex_coords.append(landmark_coords)
 					new_row.append(simplex_coords)
-				row[:] = new_row
+				coords_array.append(new_row)
+			return np.asarray(coords_array)
 
 
-		def flatten_rows(ID_array):
-			for row in ID_array:
-				new_row = []
-				for parent in row:
-					for child in parent:
-						new_row.append(child)
-				row[:] = new_row
 
-		data = self.complexes
-		IDs_to_coords(data)
-		# flatten_rows(data)		# if grouped by parent simplex
-		return data
+		ID_array = self.complexes
+		coords_array = IDs_to_coords(ID_array)
+		return coords_array
 
 
 	def get_complexes_mayavi(self):

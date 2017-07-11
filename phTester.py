@@ -460,7 +460,7 @@ if test == 16:
 			'worm_length': 2000,
 			# 'min_filtration_param': .001,
 			# 'max_filtration_param': .015,
-			'max_filtration_param': 2,
+			'max_filtration_param': -15,
 			'num_divisions': 20,
 			'graph_induced': True
 		})
@@ -482,11 +482,15 @@ if test == 16:
 	# )
 	#
 
-	make_movie(
-		filtration,
-		'output/PH/49-C135B_movie.mp4',
-		color_scheme='highlight new'
-	)
+	import PH.FiltrationMovie_GNUPlot as gnup
+
+	gnup.make_movie(filtration, 'output.png')
+	#
+	# make_movie(
+	# 	filtration,
+	# 	'output/PH/49-C135B_movie.mp4',
+	# 	color_scheme='highlight new'
+	# )
 
 
 
