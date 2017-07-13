@@ -1,12 +1,12 @@
-import os
-import sys
-import subprocess
+import os, sys, subprocess, time, io
 import numpy as np
 from matplotlib import collections
 import matplotlib.pyplot as pyplot
 import matplotlib.markers
 
 from matplotlib import animation
+import matplotlib.image as mpimg
+
 
 import Utilities
 from TitleBox import add_filename_table, add_filt_params_table, update_epsilon, add_movie_params_table
@@ -41,42 +41,243 @@ def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_tim
 
 	else:
 		print 'error:', scheme, 'is not a valid color scheme'
+
 	return facecolor, edgecolor
 
 
-def make_frames_2D(filtration, color_scheme, alpha, save_frames):
-	def plot_witnesses(subplot, attractor_data):
-		attractor_data = np.array(attractor_data)
-		x = attractor_data[:, 0]
-		y = attractor_data[:, 1]
-		return subplot.scatter(x, y, color='black', marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'), facecolor='black', s=.1)
+def make_frames(filtration, color_scheme, alpha, save_frames):
 
-	def plot_landmarks(subplot, landmark_data):
-		landmark_data = np.array(landmark_data)
-		x = landmark_data[:, 0]
-		y = landmark_data[:, 1]
-		return subplot.scatter(x, y, color='darkblue', s=35)
+	def plot_2D_init(subplot, attractor_data, landmark_data):
 
-	def plot_complex(subplot, i):
-		"""plots all complexes for full filtration"""
-		patches = []
-		for j, simplexes_coords in enumerate(complex_data[:i + 1]):
+		def plot_witnesses(subplot, attractor_data):
+			attractor_data = np.array(attractor_data)
+			x = attractor_data[:, 0]
+			y = attractor_data[:, 1]
+			return subplot.scatter(x, y, color='black', marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'), facecolor='black', s=.1)
 
-			f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
 
-			simplexes = collections.PolyCollection(
-				simplexes_coords,
-				edgecolors=e_color,
-				facecolors=f_color,
-				lw=1,
-				alpha=alpha,
-				zorder=0,
-				animated=True,
-				antialiased=True)
+		def plot_landmarks(subplot, landmark_data):
+			landmark_data = np.array(landmark_data)
+			x = landmark_data[:, 0]
+			y = landmark_data[:, 1]
+			return subplot.scatter(x, y, color='darkblue', s=35)
 
-			patches.append(subplot.add_collection(simplexes))
+		subplot.set_aspect('equal')
+		return [plot_witnesses(subplot, attractor_data), plot_landmarks(subplot, landmark_data)]
 
-		return patches
+
+	def plot_2D_update(subplot, filtration, i):
+
+		def plot_complex(subplot, i, complex_data):
+			"""plots all complexes for full filtration"""
+			patches = []
+
+			triangle_count = 0
+			for j, simplexes_coords in enumerate(complex_data[:i]):
+
+				f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
+
+				simplexes = collections.PolyCollection(
+					simplexes_coords,
+					edgecolors=e_color,
+					facecolors=f_color,
+					lw=1,
+					alpha=alpha,
+					zorder=0,
+					animated=True,
+					antialiased=True)
+
+				patches.append(subplot.add_collection(simplexes))
+				triangle_count += len(simplexes_coords)
+
+			with open('output/run_info/num_triangles.txt', 'a') as f:
+				f.write('frame {}: {}\n'.format(i, triangle_count))
+
+			return patches
+
+		return plot_complex(subplot, i, filtration.get_complex_plot_data())
+
+
+	def plot_2D_update_gnuplot(subplot, filtration, i):
+
+		def add_arrow(simplex, cmds):
+			set_arrow = ' '.join([
+				'set arrow from',
+				'{}, {} to'.format(*simplex[0]),
+				'{}, {}'.format(*simplex[1]),
+				# 'nohead lc "red"'
+				'nohead lw 1'
+			])
+			cmds.append(set_arrow)
+
+		def add_poly(simplex, cmds, poly_count):
+			set_poly = '\n'.join([
+				'set object {} polygon from \\'.format(poly_count),
+				'{}, {} to \\'.format(*simplex[0]),
+				'{}, {} to \\'.format(*simplex[1]),
+				'{}, {} to \\'.format(*simplex[2]),
+				'{}, {}'.format(*simplex[0]),
+			])
+
+			style_poly = ' '.join([
+				'set object {} fc rgb "#999999"'.format(poly_count),
+				'fillstyle solid',
+				'lw 1'
+			])
+
+			cmds.append(set_poly)
+			cmds.append(style_poly)
+
+
+
+		def write_gnup_script():
+			witness_data = filtration.witness_coords
+			landmark_data = filtration.landmark_coords
+			complex_data = filtration.get_complex_plot_data()
+
+			np.savetxt('witnesses.txt', witness_data)
+			np.savetxt('landmarks.txt', landmark_data)
+
+			complex_data = complex_data[:i]
+
+			cmds = ['set terminal pngcairo size 500, 500',
+					# 'set output "PH/frames/frame{:02d}.png"'.format(i),
+					# 'set size ratio - 1',
+					# 'unset border',
+					# 'unset tics'
+					]
+
+			triangle_count = 1
+			for complex in complex_data:
+				for simplex in complex:
+					if len(simplex) == 1:
+						# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
+						pass
+					elif len(simplex) == 2:
+						add_arrow(simplex, cmds)
+					else:
+						add_poly(simplex, cmds, triangle_count)
+						triangle_count += 1
+
+			with open('output/run_info/num_triangles.txt', 'a') as f:
+				f.write('frame {}: {}\n'.format(i, triangle_count))
+
+			# plot witnesses and landmarks
+			cmds.append('''plot \
+						"witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
+						"landmarks.txt" with points pt 7 ps 1 notitle''')
+
+			cmds.append('q')
+
+
+			with open('PH/temp_data/gnuplot_cmds.txt', 'w') as f:
+				f.write('\n'.join(cmds))
+
+
+		write_gnup_script()
+		p = subprocess.Popen(['gnuplot-x11', 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+
+		out, err = p.communicate()
+		f = io.BytesIO(out)
+		img = mpimg.imread(f, format='png')
+
+
+		subplot.axis('off')
+		return subplot.imshow(img),
+
+
+	def plot_3D_update(subplot, filtration, i):
+		def add_arrow(simplex, cmds):
+			set_arrow = ' '.join([
+				'set arrow from',
+				'{}, {}, {} to'.format(*simplex[0]),
+				'{}, {}, {}'.format(*simplex[1]),
+				# 'nohead lc "red"'
+				'nohead lw 1'
+			])
+			cmds.append(set_arrow)
+
+		def add_poly(simplex, cmds, poly_count):
+			set_poly = '\n'.join([
+				'set object {} polygon from \\'.format(poly_count),
+				'{}, {}, {} to \\'.format(*simplex[0]),
+				'{}, {}, {} to \\'.format(*simplex[1]),
+				'{}, {}, {} to \\'.format(*simplex[2]),
+				'{}, {}, {}'.format(*simplex[0]),
+			])
+
+			style_poly = ' '.join([
+				'set object {} fc rgb "#999999"'.format(poly_count),
+				'fillstyle solid',
+				'lw 1'
+			])
+
+			cmds.append(set_poly)
+			cmds.append(style_poly)
+
+		def write_gnup_script():
+			witness_data = filtration.witness_coords
+			landmark_data = filtration.landmark_coords
+			complex_data = filtration.get_complex_plot_data()
+
+			np.savetxt('witnesses.txt', witness_data)
+			np.savetxt('landmarks.txt', landmark_data)
+
+			complex_data = complex_data[:i]
+
+			cmds = ['set terminal pngcairo size 700, 700',
+					# 'set output "PH/frames/frame{:02d}.png"'.format(i),
+					# 'set size ratio - 1',
+					# 'unset border',
+					# 'unset tics'
+					]
+
+			triangle_count = 1
+			for complex in complex_data:
+				for simplex in complex:
+					if len(simplex) == 1:
+						# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
+						pass
+					elif len(simplex) == 2:
+						add_arrow(simplex, cmds)
+					else:
+						add_poly(simplex, cmds, triangle_count)
+						triangle_count += 1
+
+			with open('output/run_info/num_triangles.txt', 'a') as f:
+				f.write('frame {}: {}\n'.format(i, triangle_count))
+
+			# plot witnesses and landmarks
+			cmds.append('''splot \
+							"witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
+							"landmarks.txt" with points pt 7 ps 1 notitle''')
+
+			cmds.append('q')
+
+			with open('PH/temp_data/gnuplot_cmds.txt', 'w') as f:
+				f.write('\n'.join(cmds))
+
+		write_gnup_script()
+		p = subprocess.Popen(['gnuplot-x11', 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+
+		out, err = p.communicate()
+		f = io.BytesIO(out)
+		img = mpimg.imread(f, format='png')
+
+		# debugging
+		# if i ==3:
+		# 	fig = pyplot.figure(figsize=(6, 6), tight_layout=True, dpi=300)
+		# 	ax = fig.add_subplot(111)
+		# 	ax.axis('off')
+		# 	ax.imshow(img, interpolation='none')
+		# 	fig.savefig('test.png')
+		# 	sys.exit()
+
+		subplot.axis('off')
+		return subplot.imshow(img),
+
+
+
 
 	fname_ax = 			pyplot.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
 	epsilon_ax = 		pyplot.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
@@ -85,121 +286,44 @@ def make_frames_2D(filtration, color_scheme, alpha, save_frames):
 	plot_ax = 			pyplot.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
 
 	add_filename_table(fname_ax, filtration.filename)
-
 	add_movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
 	add_filt_params_table(filt_params_ax, filtration.params)
 
-
-	# IDA paper formatting #
-	# plot_ax.tick_params(labelsize=23)
-	# plot_ax.xaxis.major.locator.set_params(nbins=5)
-	# plot_ax.yaxis.major.locator.set_params(nbins=5)
-
 	witness_data = filtration.witness_coords
 	landmark_data = filtration.landmark_coords
-	complex_data = filtration.get_complexes_mpl()
+
+	amb_dim = filtration.ambient_dim
+	if amb_dim not in (2, 3):
+		print 'ERROR: invalid ambient dimension {}, must be 2 or 3'.format(amb_dim)
+		sys.exit()
+
+	with open('output/run_info/num_triangles.txt', 'rw+') as f:
+		f.truncate(0)
+
 
 	def init():
-		print 'initializing...'
-		plot_ax.set_aspect('equal')
-		witnesses = plot_witnesses(plot_ax, witness_data)
-		landmarks = plot_landmarks(plot_ax, landmark_data)
-		ret_list = [witnesses, landmarks]
-		return ret_list
+		if amb_dim == 2:
+			return plot_2D_init(plot_ax, witness_data, landmark_data)
+		else:
+			return plot_ax.plot([])		# FuncAnimation wants an artist object
 
 	def animate(i):
-		print 'frame', i
-		ret_comp = plot_complex(plot_ax, i)
-		ret_eps = update_epsilon(epsilon_ax, i, filtration)
-		ret_list = list(ret_comp)
-		ret_list.extend(ret_eps)
+		sys.stdout.write('\rplotting frame {} of {}'.format(i, filtration.num_div))
+		sys.stdout.flush()
+
+		if amb_dim == 2:
+			comp_plot = plot_2D_update(plot_ax, filtration, i)
+			# comp_plot = plot_2D_update_gnuplot(plot_ax, filtration, i)
+		else:
+			comp_plot = plot_3D_update(plot_ax, filtration, i)
+
+		eps = update_epsilon(epsilon_ax, i, filtration.epsilons)
 
 		if save_frames: pyplot.savefig('frames/image%03d.png' % i)
 
-		return ret_list
+		return list(comp_plot) + list(eps)
 
 	return init, animate
-
-
-def make_frames_3D(filt_data, title_block_info, color_scheme, alpha, camera_angle, hide_1simplexes):
-	from mayavi import mlab
-	# TODO: Call via funcanimation() to improve performance, fix 1simplexes
-
-	def plot_witnesses(witness_data):
-		x = witness_data[:, 0]
-		y = witness_data[:, 1]
-		z = witness_data[:, 2]
-		mlab.points3d(x, y, z, mode='point', color=(0, 0, 0))
-
-	def plot_landmarks(landmark_data):
-		x = landmark_data[:, 0]
-		y = landmark_data[:, 1]
-		z = landmark_data[:, 2]
-		mlab.points3d(x, y, z, scale_factor=.02, color=(0, .7, 0))
-
-	def plot_complex(complex_data, current_birth_time, landmark_data):  # how to specify color per simplex??
-		"""plots plots all simplices with birth time =< birth_time"""
-		max_birth_time = len(complex_data) - 1
-		birth_time = 0
-		while birth_time < current_birth_time:
-			# color = get_simplex_color_3D(color_scheme, birth_time, current_birth_time, max_birth_time, landmark_data)
-			# color = ((<float> for id in triangle_ID) for triangle_ID in triangle_IDs)
-			# then, in triangular_mesh(...., scalers=color)
-
-			color = get_simplex_color(color_scheme, birth_time, current_birth_time, max_birth_time)
-
-			triangle_IDs =  complex_data[1][birth_time]
-			x = landmark_data[:, 0]
-			y = landmark_data[:, 1]
-			z = landmark_data[:, 2]
-			mlab.triangular_mesh(x, y, z, triangle_IDs, color=color, opacity=alpha, representation='surface')
-			mlab.triangular_mesh(x, y, z, triangle_IDs, color=(0, 0, 0), representation='wireframe')
-
-			if hide_1simplexes == False:
-				lines = complex_data[0][birth_time]
-				for simplex_IDs in lines:
-					ID_coords = np.array([landmark_data[simplex_IDs[0]], landmark_data[simplex_IDs[1]]])
-					x = ID_coords[:, 0]
-					y = ID_coords[:, 1]
-					z = ID_coords[:, 2]
-					mlab.plot3d(x, y, z, tube_radius=None, color=(0,0,0))
-					# mlab.pipeline.line_source(x, y, z, figure=fig)
-
-			birth_time += 1
-
-	if sys.platform != 'darwin':
-		mlab.options.offscreen = True
-
-	def make_frame(filt_plot, title_plot,birth_time):
-		mlab.figure(bgcolor=(1, 1, 1), size=(800, 800))
-		mlab.view(azimuth=camera_angle[0], elevation=camera_angle[1],focalpoint='auto', distance='auto')
-
-		update_epsilon(title_plot, i)
-
-		plot_witnesses(filt_data[0])
-		plot_landmarks(filt_data[1])
-		plot_complex(filt_data[2], birth_time, filt_data[1])
-
-		# mlab.savefig(filename='frames/sub_img%03d.png' % i)
-		screenshot = mlab.screenshot(antialiased=True)
-
-		filt_plot.imshow(screenshot)
-		filt_plot.xaxis.set_ticks([])
-		filt_plot.yaxis.set_ticks([])
-
-		mlab.close()
-
-
-	title_plot = pyplot.subplot2grid((3, 4), (0, 0), rowspan=3, colspan=1)
-	add_filt_params_table(title_plot, title_block_info, 0)
-
-	filt_plot = pyplot.subplot2grid((3, 4), (0, 1), rowspan=3, colspan=3)
-	filt_plot.set_aspect('equal')
-
-	for i in xrange(len(filt_data[2][1])):
-		print 'frame', i
-		make_frame(filt_plot, title_plot, i)
-		pyplot.savefig('frames/image%03d.png' % i)
 
 
 
@@ -216,134 +340,40 @@ def make_movie(
 		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
 
 ):
-
-	# remove_old_frames()
-
-	# Utilities.check_overwrite(out_filename)
-
+	start = time.time()
 
 	movie_info = [color_scheme, camera_angle, alpha]
-
 	fnames = [filtration.filename, out_filename]
-
 
 	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
 
-	if filtration.ambient_dim == 2:
-		print 'building movie...'
-		init, animate = make_frames_2D(filtration, color_scheme, alpha, save_frames=save_frames)
-		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div, blit=True, repeat=False)
+	print 'building movie...'
+	init, animate = make_frames(filtration, color_scheme, alpha, save_frames=save_frames)
+	ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div + 1,
+								  blit=True, repeat=False)
 
-		# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
-		# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
-		# As a workaround, ani.save(fps=10) is used and then ffmpeg is called to reduce the speed of the video by a 10x
-
-		# FuncAnimation.save() offers blitting, which should improve performance even further, but despite my best efforts
-		# to configure it correctly, it doesn't make much any(?) difference in time-to-run. However, this may be a
-		# consequence of all simplexes being hidden in the init function.
-
-		print 'saving...'
-		ani.save('output/PH/temp.mp4', fps=10)
-		print 'correcting framerate...'
-
-		subprocess.call(['ffmpeg', '-y', '-i',
-						 'output/PH/temp.mp4',
-						 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
-						 out_filename])
-
-		os.remove('output/PH/temp.mp4')
-
-	elif ambient_dim == 3:
-		print "WARNING: 3D filtration movies have not yet been ported to matplotlib's FuncAnimation for performance."
-		print "Response times may be impossibly long, especially for large 'max_filtration_param'."
-		filt_data[2] = unpack_complex_data_3D(filt_data[2])
-		make_frames_3D(filt_data, fnames, color_scheme, alpha, camera_angle, hide_1simplexes)
-		TestingFunctions.frames_to_movie(out_file_name, framerate)
-	else:
-		print "ERROR: ambient_dim = {:d}. Check input filtration file."
-		sys.exit()
+	# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
+	# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
+	# As a workaround, ani.save(fps=10) is used and then ffmpeg is called to reduce the speed of the video by a 10x
+	# Another option would be to stream to FFMPEG ourselves: http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
 
 
+	ani.save('output/PH/temp.mp4', fps=10)
+
+	print '... done.'
+
+	# correct framerate
+	subprocess.call(['ffmpeg',
+					 '-loglevel', 'panic', '-y',
+					 '-i', 'output/PH/temp.mp4',
+					 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
+					 out_filename])
+
+	os.remove('output/PH/temp.mp4')
 
 
+	print 'time elapsed: {} s'.format(time.time() - start)
 
-def make_frame_3D(birth_time, camera_angle=(135, 55), hide_1simplexes=False, alpha=.7, color_scheme='none'):
-	from mayavi import mlab
-	ambient_dim, filt_data = load_data()
-
-	def get_simplex_color(scheme, birth_time, current_birth_time, max_birth_time):
-		"""helper for plot_complex()"""
-		if scheme == 'none':
-			color = (.4, .6, .8)
-		elif scheme == 'highlight new':
-			color = (1, 0, 0) if birth_time == current_birth_time - 1 else (0, 0, 1)
-		elif scheme == 'birth_time gradient':
-			prog = birth_time / float(max_birth_time)
-			color = (0, prog, 1 - prog)
-		else:
-			print 'error:', scheme, 'is not a valid color scheme'
-		return color
-
-	def plot_witnesses(witness_data):
-		x = witness_data[:, 0]
-		y = witness_data[:, 1]
-		z = witness_data[:, 2]
-		s = np.ones(len(x)) * .005
-		# mlab.points3d(x, y, z, mode='point', color=(0, 0, 0))
-		mlab.points3d(x, y, z, s, mode='sphere', color=(0, 0, 0), scale_factor=1)
-
-
-	def plot_landmarks(landmark_data):
-		x = landmark_data[:, 0]
-		y = landmark_data[:, 1]
-		z = landmark_data[:, 2]
-		mlab.points3d(x, y, z, scale_factor=.02, color=(0, 0, 1))
-
-	def plot_complex(complex_data, current_birth_time, landmark_data):  # how to specify color per simplex??
-		"""plots plots all simplices with birth time =< birth_time"""
-		max_birth_time = len(complex_data) - 1
-		birth_time = 0
-		while birth_time < current_birth_time:
-			# color = get_simplex_color_3D(color_scheme, birth_time, current_birth_time, max_birth_time, landmark_data)
-			# color = ((<float> for id in triangle_ID) for triangle_ID in triangle_IDs)
-			# then, in triangular_mesh(...., scalers=color)
-
-			color = get_simplex_color(color_scheme, birth_time, current_birth_time, max_birth_time)
-
-			triangle_IDs =  complex_data[1][birth_time]
-			x = landmark_data[:, 0]
-			y = landmark_data[:, 1]
-			z = landmark_data[:, 2]
-
-
-			mlab.triangular_mesh(x, y, z, triangle_IDs, color=color, opacity=alpha, representation='surface')
-			mlab.triangular_mesh(x, y, z, triangle_IDs, color=(0, 0, 0), representation='wireframe')
-
-			if hide_1simplexes == False:
-				lines = complex_data[0][birth_time]
-				for simplex_IDs in lines:
-					ID_coords = np.array([landmark_data[simplex_IDs[0]], landmark_data[simplex_IDs[1]]])
-					x = ID_coords[:, 0]
-					y = ID_coords[:, 1]
-					z = ID_coords[:, 2]
-					mlab.plot3d(x, y, z, tube_radius=None, color=(0,0,0))
-					# mlab.pipeline.line_source(x, y, z, figure=fig)
-
-			birth_time += 1
-
-	mlab.figure(bgcolor=(1, 1, 1), size=(1000, 1000))
-	mlab.view(azimuth=camera_angle[0], elevation=camera_angle[1], focalpoint='auto', distance='auto')
-
-
-	filt_data[2] = unpack_complex_data_3D(filt_data[2])
-
-	plot_witnesses(filt_data[0])
-	plot_landmarks(filt_data[1])
-	plot_complex(filt_data[2], birth_time, filt_data[1])
-
-
-	# mlab.savefig(filename='frames/sub_img%03d.png' % i)   # for debugging
-	mlab.show()
 
 
 

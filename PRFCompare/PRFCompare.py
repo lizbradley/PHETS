@@ -333,7 +333,7 @@ def plot_dists_vs_ref(
 
 		see_samples=5,
 ):
-	""" plots distance from reference rank function over a range of embedded input files"""
+	""" plots distance from reference rank function over a range of trajectories input files"""
 
 	def plot_distances(i_ref, i_arr, dists, out_filename):
 		fig = plt.figure(figsize=(10, 5))

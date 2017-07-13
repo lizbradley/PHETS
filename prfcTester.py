@@ -1,13 +1,19 @@
-import sys
+import sys, time
 import numpy as np
 from config import default_filtration_params as parameter_set
 # from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
 from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_clusters
 
 
+set_test = 14		# set here or with command line argument
 
-# test = int(sys.argv[1])
-test = 14
+
+
+if len(sys.argv) > 1: test = int(sys.argv[1])
+else: test = set_test
+print 'running test %d...' % test
+start_time = time.time()
+
 
 if test == 1:
 	params = parameter_set
@@ -23,7 +29,7 @@ if test == 1:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/test_1.png', 		 # output filename
@@ -126,7 +132,7 @@ if test == 4:
 
 
 	plot_dists_vs_ref(			# previously PRF_dist_plot()
-		'datasets/embedded/test_cases',						# input directory
+		'datasets/trajectories/test_cases',						# input directory
 		'L63_x_m2_tau',										# input base filename
 		'base i',											# input filename format: 'base i or 'i base'
 		'output/PRFCompare/ref/test4_L1.png',			# output filename
@@ -211,8 +217,8 @@ if test == 6:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/L63_x_m2/L63_x_m2_tau18.txt',
-		'datasets/embedded/L63_x_m2/L63_x_m2_tau35.txt',
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau18.txt',
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau35.txt',
 		'output/PRFCompare/mean/L63_tau18v35_W1000dsr50.png',  		# out filename
 		params,
 
@@ -256,8 +262,8 @@ if test == 7:
 	plot_dists_vs_means(
 		# 'datasets/time_series/C134C/49-C134C.txt',  # input (left)
 		# 'datasets/time_series/C135B/49-C135B.txt',  # input (right)
-		'datasets/embedded/L63_x_m2/L63_x_m2_tau18.txt',
-		'datasets/embedded/L63_x_m2/L63_x_m2_tau30.txt',
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau18.txt',
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau30.txt',
 		'output/PRFCompare/mean/L63_x_m2_tau18_v_tau30.png',  		# out filename
 		params,
 
@@ -303,8 +309,8 @@ if test == 11:
 	)
 
 	plot_dists_vs_means(		# renamed from mean_PRF_dists_plot()
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L.png',  # out filename
 		params,
 
@@ -347,8 +353,8 @@ if test == 12:
 		}
 	)
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L.png',  # out filename
 		params,
 
@@ -495,7 +501,7 @@ if test == 15:
 	from PRFCompare.PRFCompare import plot_variance
 
 	plot_variance(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/variance/L63.png',  # out filename
 		params,
 
@@ -549,8 +555,8 @@ if test == 50:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_1000W100L_no_weight.png',  # out filename
 		params,
 
@@ -595,8 +601,8 @@ if test == 51:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_1000W100L_no_weight_scaled.png',  # out filename
 		params,
 
@@ -641,8 +647,8 @@ if test == 60:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_1000W100L_lin.png',  # out filename
 		params,
 
@@ -686,8 +692,8 @@ if test == 61:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_1000W100L_lin_scaled.png',  # out filename
 		params,
 
@@ -733,8 +739,8 @@ if test == 70:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_1000W100L_exp.png',  # out filename
 		params,
 
@@ -778,8 +784,8 @@ if test == 71:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_1000W100L_exp_scaled.png',  # out filename
 		params,
 
@@ -826,8 +832,8 @@ if test == 150:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L_no_weight.png',  # out filename
 		params,
 
@@ -872,8 +878,8 @@ if test == 151:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L_no_weight_scaled.png',  # out filename
 		params,
 
@@ -920,8 +926,8 @@ if test == 160:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L_lin.png',  # out filename
 		params,
 
@@ -965,8 +971,8 @@ if test == 161:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L_lin_scaled.png',  # out filename
 		params,
 
@@ -1012,8 +1018,8 @@ if test == 170:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L_exp.png',  # out filename
 		params,
 
@@ -1057,8 +1063,8 @@ if test == 171:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_2000W100L_exp_scaled.png',  # out filename
 		params,
 
@@ -1105,8 +1111,8 @@ if test == 250:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_5000W100L_no_weight.png',  # out filename
 		params,
 
@@ -1151,8 +1157,8 @@ if test == 251:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_5000W100L_no_weight_scaled.png',  # out filename
 		params,
 
@@ -1199,8 +1205,8 @@ if test == 260:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_5000W100L_lin.png',  # out filename
 		params,
 
@@ -1244,8 +1250,8 @@ if test == 261:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_5000W100L_lin_scaled.png',  # out filename
 		params,
 
@@ -1291,8 +1297,8 @@ if test == 270:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_5000W100L_exp.png',  # out filename
 		params,
 
@@ -1336,8 +1342,8 @@ if test == 271:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_5000W100L_exp_scaled.png',  # out filename
 		params,
 
@@ -1384,8 +1390,8 @@ if test == 350:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_10000W100L_no_weight.png',  # out filename
 		params,
 
@@ -1430,8 +1436,8 @@ if test == 351:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_10000W100L_no_weight_scaled.png',  # out filename
 		params,
 
@@ -1478,8 +1484,8 @@ if test == 360:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_10000W100L_lin.png',  # out filename
 		params,
 
@@ -1523,8 +1529,8 @@ if test == 361:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_10000W100L_lin_scaled.png',  # out filename
 		params,
 
@@ -1571,8 +1577,8 @@ if test == 370:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_10000W100L_exp.png',  # out filename
 		params,
 
@@ -1616,8 +1622,8 @@ if test == 371:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_10000W100L_exp_scaled.png',  # out filename
 		params,
 
@@ -1663,8 +1669,8 @@ if test == 450:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_20000W100L_no_weight.png',  # out filename
 		params,
 
@@ -1709,8 +1715,8 @@ if test == 451:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_20000W100L_no_weight_scaled.png',  # out filename
 		params,
 
@@ -1756,8 +1762,8 @@ if test == 460:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_20000W100L_lin.png',  # out filename
 		params,
 
@@ -1801,8 +1807,8 @@ if test == 461:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_20000W100L_lin_scaled.png',  # out filename
 		params,
 
@@ -1848,8 +1854,8 @@ if test == 470:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_20000W100L_exp.png',  # out filename
 		params,
 
@@ -1893,8 +1899,8 @@ if test == 471:
 	)
 
 	plot_dists_vs_means(
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
-		'datasets/embedded/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
 		'output/PRFCompare/mean/L63_20000W100L_exp_scaled.png',  # out filename
 		params,
 
@@ -1944,7 +1950,7 @@ if test == 1001:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/ref/L63_vary_tau_Euclidean_none.png', 		 # output filename
@@ -1980,7 +1986,7 @@ if test == 1011:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_none_scaled.png', 		 # output filename
@@ -2017,7 +2023,7 @@ if test == 1101:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_lin.png', 		 # output filename
@@ -2053,7 +2059,7 @@ if test == 1111:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_SMALL_lin_scaled.png', 		 # output filename
@@ -2088,7 +2094,7 @@ if test == 1201:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_exp.png', 		 # output filename
@@ -2124,7 +2130,7 @@ if test == 1211:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_SMALL_exp_scaled.png', 		 # output filename
@@ -2162,7 +2168,7 @@ if test == 1002:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_none.png', 		 # output filename
@@ -2198,7 +2204,7 @@ if test == 1012:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_none_scaled.png', 		 # output filename
@@ -2235,7 +2241,7 @@ if test == 1102:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_lin.png', 		 # output filename
@@ -2271,7 +2277,7 @@ if test == 1112:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_SMALL_lin_scaled.png', 		 # output filename
@@ -2307,7 +2313,7 @@ if test == 1202:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_exp.png', 		 # output filename
@@ -2343,7 +2349,7 @@ if test == 1212:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_SMALL_exp_scaled.png', 		 # output filename
@@ -2381,7 +2387,7 @@ if test == 1003:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_none.png', 		 # output filename
@@ -2418,7 +2424,7 @@ if test == 1013:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_none_scaled.png', 		 # output filename
@@ -2454,7 +2460,7 @@ if test == 1103:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_lin.png', 		 # output filename
@@ -2491,7 +2497,7 @@ if test == 1113:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_SMALL_lin_scaled.png', 		 # output filename
@@ -2527,7 +2533,7 @@ if test == 1203:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
+		'datasets/trajectories/test_cases', 		 # input directory
 		'L63_x_m2_tau', 						 # input base filename
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_exp.png', 		 # output filename
@@ -2564,9 +2570,9 @@ if test == 1213:
 	)
 
 	plot_dists_vs_ref(
-		'datasets/embedded/test_cases', 		 # input directory
-		'L63_x_m2_tau', 						 # input base filename
-		'base i', 								 # input filename format: 'base i or 'i base'
+		'datasets/trajectories/test_cases', 		 # input directory
+		'L63_x_m2_tau', 							 # input base filename
+		'base i', 								 	# input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_SMALL_exp_scaled.png', 		 # output filename
 		params,
 		
@@ -2584,3 +2590,5 @@ if test == 1213:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
+
+print("time elapsed: %d seconds" % (time.time() - start_time))

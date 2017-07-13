@@ -47,7 +47,7 @@ def build_filtration(input_file_name, parameter_set):
 	def get_param(key):
 		return parameter_set.get(key)
 
-	# 	input_file = open("datasets/embedded/test_cases/"+input_file_name+'.txt')
+	# 	input_file = open("datasets/trajectories/test_cases/"+input_file_name+'.txt')
 	input_file = open(input_file_name)
 	speed_amplify = float(get_param("d_speed_amplify"))
 	orientation_amplify = float(get_param("d_orientation_amplify"))
@@ -362,7 +362,7 @@ def build_filtration(input_file_name, parameter_set):
 
 	'''============= Start code written by Elliott =================='''
 	if graph_induced:
-		import matplotlib.pyplot as plt
+		# import matplotlib.pyplot as plt
 		import pandas as pd
 
 		g = nx.read_edgelist('edgelist.txt')
@@ -383,11 +383,11 @@ def build_filtration(input_file_name, parameter_set):
 
 
 
-		fig = plt.figure(figsize=(8, 8))
-		ax = fig.add_subplot(111)
-		ax.scatter(wit_coords[:, 0], wit_coords[:, 1], s=.1)
-		ax.scatter(land_coords[:, 0], land_coords[:, 1])
-		fig.savefig('veronoi_test.png')
+		# fig = plt.figure(figsize=(8, 8))
+		# ax = fig.add_subplot(111)
+		# ax.scatter(wit_coords[:, 0], wit_coords[:, 1], s=.1)
+		# ax.scatter(land_coords[:, 0], land_coords[:, 1])
+		# fig.savefig('veronoi_test.png')
 
 	'''=============== End code written by Elliott =================='''
 

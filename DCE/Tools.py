@@ -145,7 +145,7 @@ def auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename):
 
 
 
-	print 'auto tau: {:.5f} (sec), {:d} (samples)'.format(tau, int(tau * WAV_SAMPLE_RATE))
+	print 'tau: {:.5f} (sec), {:d} (samples)'.format(tau, int(tau * WAV_SAMPLE_RATE))
 	return ideal_freq, f_disp, tau
 
 

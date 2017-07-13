@@ -120,6 +120,7 @@ class Filtration:
 					time += 1
 			return ID_array
 
+
 		def expand_to_2simplexes(ID_array):
 			"""for each k-simplex in filtration array, if k > 2, replaces with the
 			component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
@@ -135,24 +136,10 @@ class Filtration:
 				row[:] = expanded_row
 
 
-			def count_triangles():
-				print 'counting triangles...'
-				num_tris=0
-				count =0
-				triangles=[]
-				for i in ID_array:
-					for j in i:
-						if len(j)==3:
-							tri=set(j)
-							if tri not in triangles:
-								triangles.append(tri)
-
-
-				with open("output/run_info/num_triangles.txt","wb") as f:
-					f.write("Number of triangles: "+str(len(triangles)))
-
 		filt_ID_array = group_by_birth_time(filt_ID_list)	# 1d list -> 2d array
 		expand_to_2simplexes(filt_ID_array)
+		# add _remove_duplicates() here IFF we want to process data before going in to perseus
+		# might run faster if we don't give perseus a filtration where simplexes are reborn
 		return filt_ID_array
 
 	def _get_intervals(self):
@@ -333,7 +320,7 @@ class Filtration:
 
 
 	# public #
-	def get_complexes_mpl(self):
+	def get_complex_plot_data(self, remove_dups=False):
 
 		def IDs_to_coords(ID_array):
 			"""Replaces each landmark_ID with corresponding coordinates"""
@@ -352,28 +339,11 @@ class Filtration:
 
 
 		ID_array = self.complexes
+		# if remove_dups: ID_array = remove_duplicates(ID_array)
 		coords_array = IDs_to_coords(ID_array)
 		return coords_array
 
 
-	def get_complexes_mayavi(self):
-
-		def separate_by_k(array):
-			lines = []
-			triangles = []
-			for row in array:
-				lines_row = []
-				triangles_row = []
-				for simplex in row:
-					if len(simplex) == 2:
-						lines_row.append(simplex)
-					else:  # if len(simplex) == 3:
-						triangles_row.append(simplex)
-				triangles.append(triangles_row)
-				lines.append(lines_row)
-			return [lines, triangles]
-
-		return separate_by_k(self.complexes)
 
 	def get_PD_data(self):
 		caller_dir = os.getcwd()

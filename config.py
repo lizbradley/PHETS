@@ -29,7 +29,7 @@ default_filtration_params = {
 	"absolute": False,
 	"use_cliques": False,
 	"use_twr": False,
-	"m2_d": 0, 					 #Set to anything but 0 to run, set 'time_order_landmarks' = TRUE (don't think i need last part anymore - CHECK)
+	"m2_d": 0, 					 # Set to anything but 0 to run, set 'time_order_landmarks' = TRUE (don't think i need last part anymore - CHECK)
 	"straight_VB": 0,
 	"out": None,
 	"program": "Perseus",

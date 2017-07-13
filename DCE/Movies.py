@@ -13,6 +13,10 @@ from MovieTools import prep_save_worms_single, save_worms_single, prep_save_worm
 
 WAV_SAMPLE_RATE = 44100
 
+# TODO: restructure so that in_file_name isn't loaded each frame
+# TODO: normalize volumes per window
+
+
 def slide_window(
 		in_filename,
 		out_filename,
@@ -20,13 +24,12 @@ def slide_window(
 		step_size=.1,      # seconds
 		tau=10,
 		ds_rate=1,
-		max_frames=0,      # 0 for disabled
-		save_worms=True,
+		m=2,  # embed dimension
+		save_trajectories=True,
 		save_movie=True
 	):
 
-	if save_worms: prep_save_worms_single()
-
+	if save_trajectories: prep_save_worms_single()
 
 	remove_old_frames()
 
@@ -38,12 +41,12 @@ def slide_window(
 
 		embed_crop = [start, start + window_size]
 		sig = np.loadtxt(in_filename)
-		DCE.embed(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, 2, ds_rate=ds_rate)
+		DCE.embed(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m, ds_rate=ds_rate)
 
-		if save_worms: save_worms_single('{:d}-{}'.format(i, in_filename), i, tau, embed_crop)
+		if save_trajectories: save_worms_single('{:d}-{}'.format(i, in_filename), i, tau, embed_crop)
 
 		if save_movie:
-			Plotter.make_window_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
+			Plotter.make_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)
@@ -55,23 +58,23 @@ def vary_tau(
 		tau_inc=1,
 		embed_crop=(1, 2),
 		ds_rate=1,
-		save_worms=True,
+		m=2,  # embed dimension
+		save_trajectories=True,
 		save_movie=True,
-		m=2,
 	):
 
 	remove_old_frames()
 
-	if save_worms: prep_save_worms_single()
+	if save_trajectories: prep_save_worms_single()
 
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
 		sig = np.loadtxt(in_filename)
 		DCE.embed(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m,  ds_rate=ds_rate)
 
-		if save_worms: save_worms_single('{:d}-{}'.format(i, in_filename), i, int(tau), embed_crop)
+		if save_trajectories: save_worms_single('{:d}-{}'.format(i, in_filename), i, int(tau), embed_crop)
 
-		if save_movie: Plotter.make_window_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, i)
+		if save_movie: Plotter.make_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)
@@ -86,13 +89,13 @@ def compare_vary_tau(
 		embed_crop=(1, 2),
 		ds_rate=1,
 		m=2,
-		save_worms=True,
+		save_trajectories=True,
 		save_movie=True
 	):
 
 	remove_old_frames()
 
-	if save_worms: prep_save_worms_double()
+	if save_trajectories: prep_save_worms_double()
 
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
@@ -100,10 +103,10 @@ def compare_vary_tau(
 		DCE.embed(sig_1, 'DCE/temp_data/embedded_coords_comp1.txt', embed_crop, tau, m, ds_rate=ds_rate)
 		DCE.embed(sig_2, 'DCE/temp_data/embedded_coords_comp2.txt', embed_crop, tau, m, ds_rate=ds_rate)
 
-		if save_worms: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop, embed_crop)
+		if save_trajectories: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop, embed_crop)
 
 		if save_movie:
-			Plotter.compare_vary_tau_frame('DCE/frames/frame%03d.png' % i, in_filename_1, in_filename_2, i, tau, embed_crop)
+			Plotter.compare_vary_tau_frame('DCE/frames/frame%03d.png' % i, in_filename_1, in_filename_2, i, tau, embed_crop, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)
@@ -119,7 +122,7 @@ def get_params_table(args_dict):
 		['tau_2', args_dict['tau_2']],
 		['tau_T', '{:.5f}'.format(args_dict['tau_T'])],
 		['normalize_volume', args_dict['normalize_volume']],
-		['save_worms', args_dict['save_worms']],
+		['save_trajectories', args_dict['save_trajectories']],
 		['save_movie', args_dict['save_movie']],
 	]
 
@@ -173,7 +176,7 @@ def compare_multi(
 		tau_2='auto ideal',
 		tau_T=1/np.pi,          # tau_sec = period * tau_T
 
-		save_worms=True,
+		save_trajectories=True,
 		save_movie=True,
 
 		normalize_volume=True,
@@ -187,7 +190,7 @@ def compare_multi(
 
 	tau_1_cmd, tau_2_cmd = tau_1, tau_2
 
-	if save_worms: prep_save_worms_double()
+	if save_trajectories: prep_save_worms_double()
 
 	remove_old_frames()
 	frame_idx = 0
@@ -223,11 +226,11 @@ def compare_multi(
 		DCE.embed(sig_1, 'DCE/temp_data/embedded_coords_comp1.txt', crop_1, tau_1, m, ds_rate=ds_rate)
 		DCE.embed(sig_2, 'DCE/temp_data/embedded_coords_comp2.txt', crop_2, tau_2, m, ds_rate=ds_rate)
 
-		if save_worms: save_worms_double(filename_1, filename_2, i, tau_1, tau_2, crop_1, crop_2)
+		if save_trajectories: save_worms_double(filename_1, filename_2, i, tau_1, tau_2, crop_1, crop_2)
 
 		title_tables = [params_table, computed_tables]
 		if save_movie:
-			Plotter.compare_multi_frame(frame_idx, sig_1, sig_2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables)
+			Plotter.compare_multi_frame(frame_idx, sig_1, sig_2, crop_1, crop_2, dpi, title_tables, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)

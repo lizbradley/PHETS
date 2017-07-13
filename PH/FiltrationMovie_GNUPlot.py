@@ -9,11 +9,18 @@ from TitleBox import add_filename_table, add_filt_params_table, update_epsilon, 
 from FiltrationMovie import remove_old_frames, get_simplex_color
 
 
+import sys
+# import matplotlib
+# matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+
+
 def plot_frame_2D(filtration, i):
 
 	def add_arrow(simplex, cmds):
 		set_arrow = ' '.join([
-			'set arrow from'.format(simp_count),
+			'set arrow from',
 			'{}, {} to'.format(*simplex[0]),
 			'{}, {}'.format(*simplex[1]),
 			# 'nohead lc "red"'
@@ -22,9 +29,9 @@ def plot_frame_2D(filtration, i):
 		cmds.append(set_arrow)
 
 
-	def add_poly(simplex, cmds):
+	def add_poly(simplex, cmds, poly_count):
 		set_poly = '\n'.join([
-			'set object {} polygon from \\'.format(simp_count),
+			'set object {} polygon from \\'.format(poly_count),
 			'{}, {} to \\'.format(*simplex[0]),
 			'{}, {} to \\'.format(*simplex[1]),
 			'{}, {} to \\'.format(*simplex[2]),
@@ -32,7 +39,7 @@ def plot_frame_2D(filtration, i):
 		])
 
 		style_poly = ' '.join([
-			'set object {} fc rgb "#999999"'.format(simp_count),
+			'set object {} fc rgb "#999999"'.format(poly_count),
 			'fillstyle solid',
 			'lw 1'
 		])
@@ -44,7 +51,7 @@ def plot_frame_2D(filtration, i):
 
 	witness_data = filtration.witness_coords
 	landmark_data = filtration.landmark_coords
-	complex_data = filtration.get_complexes_mpl()
+	complex_data = filtration.get_complex_plot_data()
 
 	np.savetxt('witnesses.txt', witness_data)
 	np.savetxt('landmarks.txt', landmark_data)
@@ -53,20 +60,25 @@ def plot_frame_2D(filtration, i):
 	complex_data = complex_data[:i]
 
 	cmds = ['set terminal pngcairo size 500, 500',
-			 'set output "PH/frames/frame{:02d}.png"'.format(i)]
+			'set output "PH/frames/frame{:02d}.png"'.format(i),
+			# 'set size ratio - 1',
+			# 'unset border',
+			# 'unset tics'
+			]
 
 
-	simp_count = 1
+
+	poly_count = 1
 	for complex in complex_data:
 		for simplex in complex:
 			if len(simplex) == 2:
 				add_arrow(simplex, cmds)
 			else:
-				add_poly(simplex, cmds)
+				add_poly(simplex, cmds, poly_count)
+				poly_count += 1
+			
 
-			simp_count += 1
-			
-			
+	print 'number of polygons: ', poly_count
 	# plot witnesses and landmarks
 	cmds.append('''plot \
 				"witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
@@ -75,13 +87,36 @@ def plot_frame_2D(filtration, i):
 	cmds.append('q')
 
 
-	print 'writing file...'
+	import matplotlib.image as mpimg
+	import os
+
 	with open('gnuplot_cmds.txt', 'w') as f:
 		f.write('\n'.join(cmds))
 
-	print 'plotting...'
-	subprocess.call(['gnuplot-x11', 'gnuplot_cmds.txt'])
+	p = subprocess.Popen(['gnuplot-x11', 'gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+	# subprocess.call(['gnuplot-x11', 'gnuplot_cmds.txt'])
+	# os.system('gnuplot-x11 gnuplot_cmds.txt')
 
+	import io
+
+	# for 3D movies, stream to matplotlib rather than writing to file
+
+
+	# out, err = p.communicate()
+	# f = io.BytesIO(out)
+	# img = mpimg.imread(f, format='png')
+	#
+	# print 'saving...'
+	#
+	# fig = plt.figure(figsize=(6, 6), tight_layout=True, dpi=300)
+	# ax = fig.add_subplot(111)
+	# ax.axis('off')
+	# ax.imshow(img, interpolation='none')
+	#
+	# fig.savefig('test.png')
+	#
+	#
+	#
 
 def make_frame(filtration, i):
 

@@ -61,10 +61,9 @@ def add_filt_params_table(subplot, filt_params):
 
 
 
-def update_epsilon(ax, i, filtration):
+def update_epsilon(ax, i, epsilons):
 	ax.axis('off')
-	epsilons = filtration.epsilons
-	e = epsilons[i]
+	e = ([0] + epsilons)[i]
 	time_table = ax.table(
 		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
 		bbox=[0, 0, 1, 1],    # x0, y0, width, height

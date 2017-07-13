@@ -3,7 +3,7 @@ import time
 import math
 from DCE.Utilities import wav_to_txt, batch_wav_to_txt
 from DCE.Tools import plot_power_spectrum
-from DCE.Plotter import make_window_frame
+from DCE.Plotter import make_frame
 from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
 from DCE.Plotter import plot_waveform_zoom_only
 
@@ -11,14 +11,15 @@ from DCE.Plotter import plot_waveform_zoom_only
 # compare_multi: tau is in seconds; has all options for tau and crop *****
 
 
+set_test = 5		# set here or with command line argument
 
 
-test = 10
-# test = int(sys.argv[1])
 
+if len(sys.argv) > 1: test = int(sys.argv[1])
+else: test = set_test
 print 'running test %d...' % test
-
 start_time = time.time()
+
 
 if test == 0:
 	batch_wav_to_txt('datasets/time_series/piano_revisit/C134C/scale')
@@ -72,7 +73,7 @@ if test == 4:
 		tau_lims=(.001, .008),
 		tau_inc=.001,  # seconds
 		embed_crop=(1, 2),  # aka window position, in seconds
-		ds_rate=1
+		ds_rate=1,
 	)  # downsample rate (takes every third sample)
 
 
@@ -82,7 +83,9 @@ if test == 5:
 		'output/DCE/test_5.mp4',
 		window_size=.1,    	# seconds
 		tau=.001,			# seconds
-		step_size=1)      	# how much to move window each frame
+		step_size=1,      	# how much to move window each frame
+	)
+
 
 
 if test == 6:
@@ -129,7 +132,7 @@ if test == 9:
 		tau_2='auto ideal',
 		tau_T=math.pi, 		 	 # for auto tau. tau = period * tau_T
 
-		save_worms=True,		 # to output/DCE/saved_worms
+		save_trajectories=True,		 # to output/DCE/trajectories
 		save_movie=True,			 # False for faster worm creation
 
 		ds_rate=1
@@ -154,15 +157,17 @@ if test == 10:
 
 		i_lims=(40, 45), 		 # specify note range
 
-		embed_crop_1='auto',	 # seconds or 'auto'
-		embed_crop_2='auto',	 # seconds or 'auto'
-		auto_crop_length=.05,  	 	 # seconds for when embed_crop = 'auto'
+		embed_crop_1=(1, 1.3),	 # seconds or 'auto'
+		embed_crop_2=(1, 1.3),	 # seconds or 'auto'
+		auto_crop_length=.05,  	 # seconds for when embed_crop = 'auto'
 
-		tau_1='auto detect',  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
-		tau_2='auto ideal',  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_1= .001,  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_2= .001,  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_T=math.pi, 		 	 # for auto tau. tau = period * tau_T
 
-		save_worms=True,		 # to output/DCE/saved_worms
+		m=2,
+
+		save_trajectories=True,	 # to output/DCE/trajectories
 		save_movie=True			 # False for faster worm creation
 		
 	)
@@ -190,8 +195,8 @@ if test == 11:
 
 		normalize_volume=True,
 
-		save_worms=True,  				# to output/DCE/saved_worms
-		save_movie=True,  				# False for faster worm creation
+		save_trajectories=True,  		# to output/DCE/trajectories
+		save_movie=True,
 
 		waveform_zoom = out_filename
 

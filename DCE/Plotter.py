@@ -1,36 +1,49 @@
-import math
+import math, sys
 import numpy as np
 import matplotlib.pyplot as pyplot
-from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
 from matplotlib.ticker import FormatStrFormatter
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.image as mpimg
+
+from Tools import auto_crop
+
 
 WAV_SAMPLE_RATE = 44100.
 
-# noinspection PyTypeChecker
+
+
 def plot_dce(ax, in_file_name):
 	# print 'plotting dce...'
 	dce_data = np.loadtxt(in_file_name)
-	x = dce_data[:,0]
-	y = dce_data[:,1]
-	ax.scatter(x, y, color='black', s=.1)
-	# subplot.set_aspect('equal')
-	ax.set(adjustable='box-forced', aspect='equal')
 
-	# x0,x1 = ax.get_xlim()
-	# y0,y1 = ax.get_ylim()
-	# ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+	amb_dim = dce_data.shape[1]
 
-	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-	ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	if amb_dim == 2:
 
-	ax.tick_params(axis='both', which='major', labelsize=26)
+		x = dce_data[:,0]
+		y = dce_data[:,1]
+		ax.scatter(x, y, color='black', s=.1)
+		# subplot.set_aspect('equal')
+		ax.set(adjustable='box-forced', aspect='equal')
 
-	xlims = ax.get_xlim()
-	ax.set_xticks([xlims[0], 0, xlims[1]])
+		ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+		ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
-	ylims = ax.get_ylim()
-	ax.set_yticks([0, ylims[1]])
 
+	elif amb_dim == 3:
+		x = dce_data[:, 0]
+		y = dce_data[:, 1]
+		z = dce_data[:, 2]
+
+		ax.scatter(x, y, z, color='black', s=.1)
+		# subplot.set_aspect('equal')
+		ax.set(adjustable='box-forced', aspect='equal')
+		# ax.axis('off')
+
+
+	else:
+		print 'ERROR: invalid amb_dim (m)'
+		sys.exit()
 
 
 def plot_waveform(subplot, waveform_data, crop, time_units='seconds'):
@@ -90,25 +103,6 @@ def plot_waveform_zoom(ax, full_sig, crop, time_units='seconds', sig=None):
 	# subplot.set_ylim(-1.1, 1.1)
 	# subplot.set_yticks([-1, 0, 1])
 
-def plot_waveform_zoom_only(ax, full_sig, crop, fname):
-
-	crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
-	y = full_sig[crop[0]:crop[1]]
-	x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
-
-	# x0,x1 = ax.get_xlim()
-	# y0,y1 = ax.get_ylim()
-	# ax.set_aspect(abs(x1-x0)/abs(y1-y0))
-
-	ax.plot(x, y, color='k', zorder=0, lw=.5)
-
-	ax.axis('tight')
-
-	ax.set_xlabel('time (s)')
-
-# subplot.set_ylim(-1.1, 1.1)
-# subplot.set_yticks([-1, 0, 1])
-
 
 
 def plot_title(subplot, in_file_name, tau):
@@ -126,15 +120,19 @@ def plot_title(subplot, in_file_name, tau):
 				 )
 
 
-
-
-def make_window_frame(coords_file_name, wave_file_name, out_file_name, embed_crop, tau, frame_num):
+def make_frame(coords_file_name, wave_file_name, out_file_name, embed_crop, tau, m):
 	fig = pyplot.figure(figsize=(9, 9), tight_layout=False)
 	fig.subplots_adjust(hspace=.5)
 	fig.suptitle(wave_file_name)
-	title_subplot = pyplot.subplot2grid((4, 4), (0, 3), rowspan=3)
-	dce_subplot = pyplot.subplot2grid((4, 4), (0, 0), colspan=3, rowspan=3)
-	wavform_subplot = pyplot.subplot2grid((4, 4), (3, 0), colspan=4)
+	title_subplot = 	pyplot.subplot2grid((4, 4), (0, 3), rowspan=3)
+	if m == 2:
+		dce_subplot =	pyplot.subplot2grid((4, 4), (0, 0), colspan=3, rowspan=3)
+	elif m == 3:
+		dce_subplot = 	pyplot.subplot2grid((4, 4), (0, 0), colspan=3, rowspan=3, projection='3d')
+	else:
+		print 'ERROR: m must be 2 or 3'
+		sys.exit()
+	wavform_subplot = 	pyplot.subplot2grid((4, 4), (3, 0), colspan=4)
 
 	wave_data = np.loadtxt(wave_file_name)
 
@@ -145,10 +143,19 @@ def make_window_frame(coords_file_name, wave_file_name, out_file_name, embed_cro
 	pyplot.close(fig)
 
 
-def compare_vary_tau_frame(out_file_name, wave_file_name1, wave_file_name2, frame_num, tau, embed_crop):
+
+def compare_vary_tau_frame(out_file_name, wave_file_name1, wave_file_name2, frame_num, tau, embed_crop, m):
 	fig = pyplot.figure(figsize=(12, 9), tight_layout=True)
-	subplot1 = pyplot.subplot2grid((5, 2), (0,0), rowspan=4)
-	subplot2 = pyplot.subplot2grid((5, 2), (0,1), rowspan=4)
+	if m == 2:
+		subplot1 = pyplot.subplot2grid((5, 2), (0, 0), rowspan=4)
+		subplot2 = pyplot.subplot2grid((5, 2), (0, 1), rowspan=4)
+	elif m == 3:
+		subplot1 = pyplot.subplot2grid((5, 2), (0, 0), rowspan=4, projection='3d')
+		subplot2 = pyplot.subplot2grid((5, 2), (0, 1), rowspan=4, projection='3d')
+	else:
+		print 'ERROR: m must be 2 or 3'
+		sys.exit()
+
 	subplot3 = pyplot.subplot2grid((5, 2), (4,0))
 	subplot4 = pyplot.subplot2grid((5, 2), (4, 1), sharey=subplot3)
 	pyplot.setp(subplot4.get_yticklabels(), visible=False)
@@ -211,7 +218,7 @@ def plot_titlebox(subplots, table_arr):
 
 
 
-def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, crop_2, dpi, title_tables):
+def compare_multi_frame(frame_idx, sig1, sig2, crop_1, crop_2, dpi, title_tables, m):
 	fig = pyplot.figure(figsize=(16, 9), tight_layout=True, dpi=dpi)
 
 
@@ -220,9 +227,15 @@ def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, c
 	comp_title_2 = 		pyplot.subplot2grid((9, 16), (6, 0), rowspan=2, colspan=3)
 	ideal_f_title = 	pyplot.subplot2grid((9, 16), (8, 0), rowspan=1, colspan=3)
 
-
-	ax1 = 				pyplot.subplot2grid((9, 16), (0, 4), rowspan=5, colspan=5)					# dce 1
-	ax2 = 				pyplot.subplot2grid((9, 16), (0, 10), rowspan=5, colspan=5)					# dce 2
+	if m == 2:
+		ax1 = 			pyplot.subplot2grid((9, 16), (0, 4), rowspan=5, colspan=5)								# dce 1
+		ax2 = 			pyplot.subplot2grid((9, 16), (0, 10), rowspan=5, colspan=5)								# dce 2
+	elif m == 3:
+		ax1 = 			pyplot.subplot2grid((9, 16), (0, 4), rowspan=5, colspan=5, projection='3d')				# dce 1
+		ax2 = 			pyplot.subplot2grid((9, 16), (0, 10), rowspan=5, colspan=5, projection='3d')			# dce 2
+	else:
+		print 'ERROR: m must be 2 or 3'
+		sys.exit()
 
 	ax3 = 				pyplot.subplot2grid((9, 16), (5, 4), colspan=5, rowspan=2)					# waveform full 1
 	ax4 = 				pyplot.subplot2grid((9, 16), (5, 10), colspan=5, rowspan=2, sharey=ax3)		# waveform full 2
@@ -230,12 +243,8 @@ def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, c
 	ax5 = 				pyplot.subplot2grid((9, 16), (7, 4), colspan=5, rowspan=2)					# waveform zoom 1
 	ax6 = 				pyplot.subplot2grid((9, 16), (7, 10), colspan=5, rowspan=2, sharey=ax5)		# waveform zoom 2
 
-	# ax1.set_position([0, 0, 1, 1])
-	# ax2.set_position([0, 0, 1, 1])
-
 
 	title_plots = [param_title, ideal_f_title, comp_title_1, comp_title_2]
-
 
 	plot_titlebox(title_plots, title_tables)
 
@@ -248,17 +257,11 @@ def compare_multi_frame(frame_idx, sig1, sig2, filename_1, filename_2, crop_1, c
 	plot_waveform_zoom(ax5, sig1, crop_1)
 	plot_waveform_zoom(ax6, sig2, crop_2)
 
-
-
-	# ax1.set_title(filename_1.split('/')[-1])
-	# ax2.set_title(filename_2.split('/')[-1])
-
 	out_filename = 'DCE/frames/frame%03d.png' % frame_idx
 	pyplot.savefig(out_filename)
 	pyplot.close(fig)
 
 
-from Tools import auto_crop
 
 def plot_waveform_zoom_only(
 		in_filename,
@@ -268,19 +271,13 @@ def plot_waveform_zoom_only(
 		normalize_volume=True,
 
 	):
-	
-	
+
 	sig = np.loadtxt(in_filename)
-
 	if normalize_volume: sig = sig / np.max(np.abs(sig))
-
 	crop = auto_crop(embed_crop, sig, auto_crop_length)
-
 	fig = pyplot.figure(figsize=(5, 3), dpi=300, tight_layout=False)
 	ax = fig.add_subplot(1, 1, 1)
 	ax.set_title(in_filename.split('/')[-1])
 	ax.set_position([.2, .3, .6, .4])
 	plot_waveform_zoom(ax, sig, crop)
-
-
 	pyplot.savefig(out_filename)
