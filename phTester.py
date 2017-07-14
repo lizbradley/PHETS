@@ -9,7 +9,7 @@ from PH import make_movie, make_PD, make_PRF_plot
 
 import time
 
-set_test = 16		# set here or with command line argument
+set_test = 17		# set test number here or with command line argument
 
 
 
@@ -506,9 +506,8 @@ if test == 17:
 		{
 			'ds_rate': 50,
 			'worm_length': 2000,
-			'max_filtration_param': -10,
+			'max_filtration_param': 0,
 			'num_divisions': 20,
-			'use_cliques': True,
 			'graph_induced': True,
 
 		})

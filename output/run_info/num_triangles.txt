@@ -1,11 +1,5 @@
 frame 0: 0
-frame 1: 97
-frame 2: 133
-frame 3: 168
-frame 4: 198
-frame 5: 244
-frame 6: 299
-frame 7: 335
-frame 8: 389
-frame 9: 520
-frame 10: 722
+frame 1: 91
+frame 2: 119
+frame 3: 145
+frame 4: 173

@@ -43,7 +43,7 @@ if test == 1:
 		dist_scale='none',							# 'none', 'a', or 'a + b'
 		PRF_res=20,  								# num divisions
 
-		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 

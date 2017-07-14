@@ -124,6 +124,11 @@ def make_PD(filt, out_filename):
 	pyplot.clf()
 
 
+import matplotlib
+import matplotlib.colorbar as colorbar
+import numpy.ma as ma
+
+
 def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename=None):
 	print "plotting PRF..."
 
@@ -148,30 +153,8 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 		z = np.zeros((10, 10))
 		max_lim = 1
 
-	plot_ax.set_aspect('equal')
 
-	import matplotlib
-	import matplotlib.colorbar as colorbar
-
-
-	viridis = matplotlib.cm.get_cmap('viridis')
-	colors = [viridis(i) for i in np.linspace(0, 1, 12)]
-
-	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
-	cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors)
-
-	# plot_ax.set_xlim([0, max_lim])
-	# plot_ax.set_ylim([0, max_lim])
-	# plot_ax.contourf(x, y, z, cmap=cmap, norm=norm, interpolation='nearest')
-
-	import numpy.ma as ma
-	zm = ma.masked_where(np.isnan(z), z)
-	plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm)
-	# plot_ax.grid(which=u'major')
-
-	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels)
-
-
+	plot_heatmap(plot_ax, cbar_ax, x, y, z)
 	add_filename_table(fname_ax, in_filename)
 	add_filt_params_table(params_ax, params)
 
@@ -179,6 +162,18 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 	fig.savefig(out_filename)
 
 
+def plot_heatmap(plot_ax, cbar_ax, x, y, z):
+	plot_ax.set_aspect('equal')
+
+	viridis = matplotlib.cm.get_cmap('viridis')
+	colors = [viridis(i) for i in np.linspace(0, 1, 12)]
+
+	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
+	cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors)
+
+	zm = ma.masked_where(np.isnan(z), z)
+	plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm)
+	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels)
 
 
 if __name__ == '__main__':

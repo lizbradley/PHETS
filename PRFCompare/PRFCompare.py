@@ -699,32 +699,44 @@ def plot_variance(
 
 				# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
 
+
 				null_weight_func = lambda i, j: 1
-				mean_PRF = np.mean(sample_prfs, axis=0)
-				mean_PRF_norm = norm(mean_PRF, metric, null_weight_func) 		# plot this
-				data_val_2.mean_PRF_norm.append(mean_PRF_norm)
+				pointwise_mean = np.mean(sample_prfs, axis=0)					# plot as heatmap
+				pmn = norm(pointwise_mean, metric, null_weight_func) 			# plot as data point
+				data_val_2.mean_PRF_norm.append(pmn)
 
 				# HOMEGROWN VARIANCE #
 
-				dists = [norm(np.subtract(PRF, mean_PRF), metric, weight_func) for PRF in sample_prfs]
-				variance = np.mean(dists)										# plot this
+				dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in sample_prfs]
+				variance = np.mean(dists)										# plot as data point
 				data_val_2.variance.append(variance)
 
-				scaled_dists = get_dists_from_ref(sample_prfs, mean_PRF, weight_func, metric, dist_scale)
-				scaled_variance = np.mean(scaled_dists)							# plot this
+				scaled_dists = get_dists_from_ref(sample_prfs, pointwise_mean, weight_func, metric, dist_scale)
+				scaled_variance = np.mean(scaled_dists)							# plot as data point
 				data_val_2.scaled_variance.append(scaled_variance)
 
 				# POINTWISE VARIANCE #
 
-				diffs = [PRF - mean_PRF for PRF in sample_prfs]
+				diffs = [PRF - pointwise_mean for PRF in sample_prfs]
 
-				pointwise_variance = np.var(diffs, axis=0)
-				pvn = norm(pointwise_variance, metric, null_weight_func)		# plot this
+				pointwise_variance = np.var(diffs, axis=0)						# plot as heatmap
+				pvn = norm(pointwise_variance, metric, null_weight_func)		# plot as data point
 				data_val_2.pointwise_variance_norm.append(pvn)
 
-				functional_COV = pointwise_variance / mean_PRF
-				fcovn = norm(functional_COV, metric, null_weight_func)			# plot this
+				functional_COV = pointwise_variance / pointwise_mean			# plot as heatmap
+				fcovn = norm(functional_COV, metric, null_weight_func)			# plot as data point
 				data_val_2.functional_COV_norm.append(fcovn)
+
+
+				from PH.Plots import plot_heatmap
+
+				fig = plt.figure()
+				ax1 = fig.add_subplot(311)
+				ax2 = fig.add_subplot(312)
+				ax1 = fig.add_subplot(313)
+
+
+
 
 			data_list.append(data_val_2)
 
