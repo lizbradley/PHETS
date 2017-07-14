@@ -297,18 +297,18 @@
 <li><strong>filt_params</strong> (<em>dict</em>) – </li>
 <li><strong>vary_param_1</strong> (<em>(</em><em>str</em><em>, </em><em>tuple</em><em>)</em>) – filtration parameter to vary over x axis</li>
 <li><strong>vary_param_2</strong> (<em>None</em><em> or </em><em>(</em><em>str</em><em>, </em><em>tuple</em><em>)</em>) – filtration parameter to vary over line colors</li>
-<li><strong>load_saved_PRFs</strong> (<em>bool</em>) – reuse saved</li>
-<li><strong>time_units='seconds'</strong> (<em>str</em>) – </li>
+<li><strong>load_saved_PRFs</strong> (<em>bool</em>) – reuse previous PRF dataset</li>
+<li><strong>time_units</strong> (<em>str</em>) – ‘samples’ or ‘seconds’</li>
 <li><strong>crop=</strong><strong>(</strong><strong>100</strong><strong>, </strong><strong>1100</strong><strong>)</strong> (<em>tuple</em>) – (start, stop) in time units</li>
-<li><strong>num_windows</strong> (<em>int</em>) – Number of windows to select from crop, evenly spaced. Window length is  chosen with the ‘worm_length’ filtration parameter. Windows may or may not overlap</li>
+<li><strong>num_windows</strong> (<em>int</em>) – Number of windows to select from crop, evenly spaced. Window length is chosen with the ‘worm_length’ filtration parameter. Windows may or may not overlap</li>
 <li><strong>tau</strong> (<em>int</em><em> or </em><em>float</em>) – time units</li>
 <li><strong>normalize_volume</strong> (<em>bool</em>) – normalize volume (per crop)</li>
 <li><strong>normalize_sub_volume</strong> (<em>bool</em>) – normalize volume (per window) [coming soon]</li>
-<li><strong>PRF_res</strong> (<em>int</em>) – </li>
+<li><strong>PRF_res</strong> (<em>int</em>) – number of divisions used for PRF</li>
 <li><strong>dist_scale</strong> (<em>str</em>) – ‘none’, ‘a’, or ‘a + b’</li>
 <li><strong>metric</strong> (<em>str</em>) – ‘L1’ (abs) or ‘L2’ (euclidean)</li>
 <li><strong>weight_func</strong> (<em>lambda</em>) – </li>
-<li><strong>see_samples</strong> (<em>bool</em>) – </li>
+<li><strong>see_samples</strong> (<em>bool</em>) – interval to generate PRF plots, PDs, and filtration movies when generating PRF set. 0 is none, 1 is all samples, 2 is every other sample, etc.</li>
 </ul>
 </td>
 </tr>

@@ -193,19 +193,20 @@ Reference
    :param vary_param_2: filtration parameter to vary over line colors
    :type vary_param_1: (str, tuple)
    :type vary_param_2: None or (str, tuple)
-   :param bool load_saved_PRFs: reuse saved
-   :param str time_units='seconds':
+   :param bool load_saved_PRFs: reuse previous PRF dataset
+   :param str time_units: 'samples' or 'seconds'
    :param tuple crop=(100, 1100): (start, stop) in time units
-   :param int num_windows: Number of windows to select from crop, evenly spaced. Window length is  chosen with the 'worm_length' filtration parameter. Windows may or may not overlap
+   :param int num_windows: Number of windows to select from crop, evenly spaced. Window length is chosen with the 'worm_length' filtration parameter. Windows may or may not overlap
    :param tau: time units
    :type tau: int or float
    :param bool normalize_volume: normalize volume (per crop)
    :param bool normalize_sub_volume: normalize volume (per window) [coming soon]
-   :param int PRF_res:
+   :param int PRF_res: number of divisions used for PRF
    :param str dist_scale: 'none', 'a', or 'a + b'
    :param str metric: 'L1' (abs) or 'L2' (euclidean)
    :param lambda weight_func:
-   :param bool see_samples:
+   :param bool see_samples: interval to generate PRF plots, PDs, and filtration movies when generating PRF set. 0 is none, 1 is all samples, 2 is every other sample, etc.
+
 
 
 

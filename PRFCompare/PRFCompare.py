@@ -697,22 +697,22 @@ def plot_variance(
 
 			for sample_prfs in row:
 
-				# see definitions for norm() and get_dists_from_ref() on ~ line 45
+				# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
 
 
 				null_weight_func = lambda i, j: 1
 				mean_PRF = np.mean(sample_prfs, axis=0)
-				mean_PRF_norm = norm(mean_PRF, metric, null_weight_func)  # plot this
+				mean_PRF_norm = norm(mean_PRF, metric, null_weight_func) 	 # plot this
 				data_val_2.mean_PRF_norm.append(mean_PRF_norm)
 
 				# HOMEGROWN VARIANCE #
 
 				dists = [norm(np.subtract(PRF, mean_PRF), metric, weight_func) for PRF in sample_prfs]
-				variance = np.mean(dists)  # plot this
+				variance = np.mean(dists)		# plot this
 				data_val_2.variance.append(variance)
 
 				scaled_dists = get_dists_from_ref(sample_prfs, mean_PRF, weight_func, metric, dist_scale)
-				scaled_variance = np.mean(scaled_dists)  # plot this
+				scaled_variance = np.mean(scaled_dists)		# plot this
 				data_val_2.scaled_variance.append(scaled_variance)
 
 				# POINTWISE VARIANCE #
@@ -720,11 +720,11 @@ def plot_variance(
 				diffs = [PRF - mean_PRF for PRF in sample_prfs]
 
 				pointwise_variance = np.var(diffs, axis=0)
-				pvn = norm(pointwise_variance, metric, null_weight_func)  # plot this
+				pvn = norm(pointwise_variance, metric, null_weight_func)		# plot this
 				data_val_2.pointwise_variance_norm.append(pvn)
 
 				functional_COV = pointwise_variance / mean_PRF
-				fcovn = norm(functional_COV, metric, null_weight_func)  # plot this
+				fcovn = norm(functional_COV, metric, null_weight_func)		# plot this
 				data_val_2.functional_COV_norm.append(fcovn)
 
 			data_list.append(data_val_2)

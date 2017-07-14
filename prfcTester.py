@@ -529,8 +529,6 @@ if test == 16:
 
 		})
 
-	# idea for additional output: plot full trajectory, varying color w/ time
-	# phase out window_size_samp, use worm_length instead. this will allow for worm_length as a vary_param.
 
 	plot_variance(
 		'datasets/trajectories/REALDEAL/L63_2mil.txt',
