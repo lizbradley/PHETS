@@ -8,6 +8,7 @@ find_landmarks_c_compile_str = {
 	'macOS': '/usr/local/bin/gcc-5 -fopenmp -lpopt -o find_landmarks find_landmarks.c'
 }
 
+gnuplot_str = 'gnuplot-x11'
 
 default_filtration_params = {
 	"num_divisions": 50,

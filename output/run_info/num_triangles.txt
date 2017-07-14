@@ -9,15 +9,3 @@ frame 7: 335
 frame 8: 389
 frame 9: 520
 frame 10: 722
-frame 11: 984
-frame 12: 1223
-frame 13: 1623
-frame 14: 2120
-frame 15: 2869
-frame 16: 3355
-frame 17: 4376
-frame 18: 5347
-frame 19: 6490
-frame 20: 7443
-frame 21: 9081
-frame 22: 10618

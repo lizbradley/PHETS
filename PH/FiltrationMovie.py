@@ -10,6 +10,7 @@ import matplotlib.image as mpimg
 
 import Utilities
 from TitleBox import add_filename_table, add_filt_params_table, update_epsilon, add_movie_params_table
+from config import gnuplot_str
 
 
 def remove_old_frames():
@@ -175,7 +176,7 @@ def make_frames(filtration, color_scheme, alpha, save_frames):
 
 
 		write_gnup_script()
-		p = subprocess.Popen(['gnuplot-x11', 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+		p = subprocess.Popen([gnuplot_str, 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
 
 		out, err = p.communicate()
 		f = io.BytesIO(out)
