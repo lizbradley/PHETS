@@ -12,6 +12,8 @@ from math import ceil
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 
 from DCE.DCE import embed
 from DCE.Plotter import plot_waveform, plot_waveform_zoom
@@ -24,6 +26,8 @@ from PH.FiltrationMovie import make_movie
 from DCE.Tools import auto_crop
 
 from PH.TitleBox import add_filt_params_table, add_filenames_table
+
+from PH.Plots import plot_heatmap
 
 WAV_SAMPLE_RATE = 44100.
 
@@ -676,7 +680,8 @@ def plot_variance(
 						# get PRFs at evenly spaced intervals along input -- 'prf evolution'
 						ret_crop, sig_full, sig, prf_evo = get_PRFs(sig_full, filt_params, crop, tau, *options, fname=filename)
 						# plot_trajectory(sig)
-						arr_1.append(prf_evo[:, 2])		# take z component only
+						# arr_1.append(prf_evo[:, 2])		# take z component only
+						arr_1.append(prf_evo)
 					arr_2.append(arr_1)
 
 				prf_evos = np.asarray(arr_2)
@@ -690,34 +695,35 @@ def plot_variance(
 				sys.exit()
 
 	def process_data(prf_evo_array):
+		print 'processing...'
 		data_list = []
-		for row in prf_evo_array:  # loop through PRF set for each value of vary_param_2
+		for i, row in enumerate(prf_evo_array):  # for each value of vary_param_2
 
 			data_val_2 = VarianceData()
 
-			for sample_prfs in row:
+			for j, sample_prfs in enumerate(row):	 # for each value of vary_param_1
 
 				# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
 
-
+				sample_prfs_z = sample_prfs[:, 2]		# take z component only
 				null_weight_func = lambda i, j: 1
-				pointwise_mean = np.mean(sample_prfs, axis=0)					# plot as heatmap
+				pointwise_mean = np.mean(sample_prfs_z, axis=0)					# plot as heatmap
 				pmn = norm(pointwise_mean, metric, null_weight_func) 			# plot as data point
 				data_val_2.mean_PRF_norm.append(pmn)
 
 				# HOMEGROWN VARIANCE #
 
-				dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in sample_prfs]
+				dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in sample_prfs_z]
 				variance = np.mean(dists)										# plot as data point
 				data_val_2.variance.append(variance)
 
-				scaled_dists = get_dists_from_ref(sample_prfs, pointwise_mean, weight_func, metric, dist_scale)
+				scaled_dists = get_dists_from_ref(sample_prfs_z, pointwise_mean, weight_func, metric, dist_scale)
 				scaled_variance = np.mean(scaled_dists)							# plot as data point
 				data_val_2.scaled_variance.append(scaled_variance)
 
 				# POINTWISE VARIANCE #
 
-				diffs = [PRF - pointwise_mean for PRF in sample_prfs]
+				diffs = [PRF - pointwise_mean for PRF in sample_prfs_z]
 
 				pointwise_variance = np.var(diffs, axis=0)						# plot as heatmap
 				pvn = norm(pointwise_variance, metric, null_weight_func)		# plot as data point
@@ -728,13 +734,27 @@ def plot_variance(
 				data_val_2.functional_COV_norm.append(fcovn)
 
 
-				from PH.Plots import plot_heatmap
 
-				fig = plt.figure()
-				ax1 = fig.add_subplot(311)
-				ax2 = fig.add_subplot(312)
-				ax1 = fig.add_subplot(313)
+				x, y, z, max_lim = sample_prfs[0]
 
+				fig = plt.figure(figsize=(13, 5), tight_layout=True)
+				ax1 = 		fig.add_subplot(131)
+				ax2 = 		fig.add_subplot(132)
+				ax3 = 		fig.add_subplot(133)
+				divider = make_axes_locatable(ax3)
+				c_ax = divider.append_axes('right', size='10%', pad=.2)
+
+				plot_heatmap(ax1, c_ax, x, y, pointwise_mean)
+				ax1.set_title('pointwise mean')
+				plot_heatmap(ax2, c_ax, x, y, pointwise_variance)
+				ax2.set_title('pointwise variance')
+				plot_heatmap(ax3, c_ax, x, y, functional_COV)
+				ax3.set_title('functional COV')
+
+				fig.suptitle(filename.split('/')[-1])
+				fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], vary_param_2[1][i], vary_param_1[0], vary_param_1[1][j])
+				fig.savefig('output/PRFCompare/variance/heatmaps/' + fname)
+				plt.close(fig)
 
 
 

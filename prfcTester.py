@@ -5,7 +5,7 @@ from config import default_filtration_params as parameter_set
 from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_clusters
 from PRFCompare.PRFCompare import plot_variance
 
-set_test = 1203		# set test number here or with command line argument
+set_test = 16		# set test number here or with command line argument
 
 
 
@@ -538,7 +538,7 @@ if test == 16:
 		('d_orientation_amplify', np.arange(0, 30, 3)),			# vary param 1
 		('use_cliques', (True, False)),							# vary param 2
 
-		load_saved_PRFs=False,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 

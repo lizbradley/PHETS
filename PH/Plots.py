@@ -148,10 +148,10 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 		func = filtration
 
 	x, y, z, max_lim = func
-	if not max_lim:
-		x, y = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
-		z = np.zeros((10, 10))
-		max_lim = 1
+	# if not max_lim:		# what is this for??
+	# 	x, y = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
+	# 	z = np.zeros((10, 10))
+	# 	max_lim = 1
 
 
 	plot_heatmap(plot_ax, cbar_ax, x, y, z)
