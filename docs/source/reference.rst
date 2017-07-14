@@ -59,7 +59,7 @@ Reference
 .. module:: PHETS.DCE.Movies
    :synopsis: Generate and visualize delay coordinate embeddings time series
 
-.. function:: slide_window(in_filename, out_filename, window_size=.5, step_size=.1, tau=10, ds_rate=1, max_frames=0, save_worms=True, save_movie=True)
+.. function:: slide_window(in_filename, out_filename, window_size=.5, step_size=.1, tau=10, ds_rate=1, max_frames=0, save_trajectories=True, save_movie=True)
 
    Show embedding of in_filename with window start point varied over time.
 
@@ -69,7 +69,7 @@ Reference
 
 
 
-.. function:: vary_tau(in_filename, out_filename, tau_lims=(1, 15), tau_inc=1, embed_crop=(1, 2), ds_rate=1, save_worms=True, save_movie=True, m=2)
+.. function:: vary_tau(in_filename, out_filename, tau_lims=(1, 15), tau_inc=1, embed_crop=(1, 2), ds_rate=1, save_trajectories=True, save_movie=True, m=2)
 
    Show embedding of in_filename with tau varied over time.
 
@@ -79,19 +79,19 @@ Reference
    :param int tau_inc: tau stepsize (seconds)
    :param tuple embed_crop: Limits for window from input time series (seconds)
    :param int ds_rate: time series downsample rate
-   :param bool save_worms: save embeddings to text files in output/DCE/saved_worms
+   :param bool save_trajectories: save embeddings to text files in output/DCE/trajectories
    :param bool save_movie: If False, no movie will be created. Useful for saving embeddings quickly.
    :param int m: target embedding dimension
 
 
 
-.. function:: compare_vary_tau(in_filename_1, in_filename_2, out_filename, tau_lims, tau_inc=1,	embed_crop=(1, 2), ds_rate=1, m=2, save_worms=True,	save_movie=True)
+.. function:: compare_vary_tau(in_filename_1, in_filename_2, out_filename, tau_lims, tau_inc=1,	embed_crop=(1, 2), ds_rate=1, m=2, save_trajectories=True,	save_movie=True)
 
    Like vary_tau(), but shows embeddings for two time series side by side.
 
 
 
-.. function:: compare_multi(dir1, dir1_base, dir2, dir2_base, out_filename, i_lims=(1, 89), embed_crop_1='auto', embed_crop_2='auto', auto_crop_length=.3, tau_1='auto ideal', tau_2='auto ideal', tau_T=1/np.pi, save_worms=True, save_movie=True, normalize_volume=True, waveform_zoom=None, ds_rate=1, dpi=200, m=2)
+.. function:: compare_multi(dir1, dir1_base, dir2, dir2_base, out_filename, i_lims=(1, 89), embed_crop_1='auto', embed_crop_2='auto', auto_crop_length=.3, tau_1='auto ideal', tau_2='auto ideal', tau_T=1/np.pi, save_trajectories=True, save_movie=True, normalize_volume=True, waveform_zoom=None, ds_rate=1, dpi=200, m=2)
 
    Takes two directories of (eg one with piano notes, another with range of viol notes), and generates a movie over a range note indexes (pitch). Tau and crop may be set explicity or automatically.
 
@@ -109,7 +109,7 @@ Reference
    :param str tau_1: explicit (seconds) or 'auto detect' or 'auto ideal'
    :param str tau_2:
    :param float tau_T: For use with auto tau: tau = period * tau_T
-   :param bool save_worms:
+   :param bool save_trajectories:
    :param bool save_movie:
    :param bool normalize_volume:
    :param waveform_zoom:

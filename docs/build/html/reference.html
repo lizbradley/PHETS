@@ -126,7 +126,7 @@
 </div>
 <span class="target" id="module-PHETS.DCE.Movies"></span><dl class="function">
 <dt id="PHETS.DCE.Movies.slide_window">
-<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">slide_window</code><span class="sig-paren">(</span><em>in_filename</em>, <em>out_filename</em>, <em>window_size=.5</em>, <em>step_size=.1</em>, <em>tau=10</em>, <em>ds_rate=1</em>, <em>max_frames=0</em>, <em>save_worms=True</em>, <em>save_movie=True</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.slide_window" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">slide_window</code><span class="sig-paren">(</span><em>in_filename</em>, <em>out_filename</em>, <em>window_size=.5</em>, <em>step_size=.1</em>, <em>tau=10</em>, <em>ds_rate=1</em>, <em>max_frames=0</em>, <em>save_trajectories=True</em>, <em>save_movie=True</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.slide_window" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show embedding of in_filename with window start point varied over time.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -145,7 +145,7 @@
 
 <dl class="function">
 <dt id="PHETS.DCE.Movies.vary_tau">
-<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">vary_tau</code><span class="sig-paren">(</span><em>in_filename</em>, <em>out_filename</em>, <em>tau_lims=(1</em>, <em>15)</em>, <em>tau_inc=1</em>, <em>embed_crop=(1</em>, <em>2)</em>, <em>ds_rate=1</em>, <em>save_worms=True</em>, <em>save_movie=True</em>, <em>m=2</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.vary_tau" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">vary_tau</code><span class="sig-paren">(</span><em>in_filename</em>, <em>out_filename</em>, <em>tau_lims=(1</em>, <em>15)</em>, <em>tau_inc=1</em>, <em>embed_crop=(1</em>, <em>2)</em>, <em>ds_rate=1</em>, <em>save_trajectories=True</em>, <em>save_movie=True</em>, <em>m=2</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.vary_tau" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show embedding of in_filename with tau varied over time.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -158,7 +158,7 @@
 <li><strong>tau_inc</strong> (<em>int</em>) – tau stepsize (seconds)</li>
 <li><strong>embed_crop</strong> (<em>tuple</em>) – Limits for window from input time series (seconds)</li>
 <li><strong>ds_rate</strong> (<em>int</em>) – time series downsample rate</li>
-<li><strong>save_worms</strong> (<em>bool</em>) – save embeddings to text files in output/DCE/saved_worms</li>
+<li><strong>save_trajectories</strong> (<em>bool</em>) – save embeddings to text files in output/DCE/trajectories</li>
 <li><strong>save_movie</strong> (<em>bool</em>) – If False, no movie will be created. Useful for saving embeddings quickly.</li>
 <li><strong>m</strong> (<em>int</em>) – target embedding dimension</li>
 </ul>
@@ -170,13 +170,13 @@
 
 <dl class="function">
 <dt id="PHETS.DCE.Movies.compare_vary_tau">
-<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_vary_tau</code><span class="sig-paren">(</span><em>in_filename_1</em>, <em>in_filename_2</em>, <em>out_filename</em>, <em>tau_lims</em>, <em>tau_inc=1</em>, <em>embed_crop=(1</em>, <em>2)</em>, <em>ds_rate=1</em>, <em>m=2</em>, <em>save_worms=True</em>, <em>save_movie=True</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_vary_tau" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_vary_tau</code><span class="sig-paren">(</span><em>in_filename_1</em>, <em>in_filename_2</em>, <em>out_filename</em>, <em>tau_lims</em>, <em>tau_inc=1</em>, <em>embed_crop=(1</em>, <em>2)</em>, <em>ds_rate=1</em>, <em>m=2</em>, <em>save_trajectories=True</em>, <em>save_movie=True</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_vary_tau" title="Permalink to this definition">¶</a></dt>
 <dd><p>Like vary_tau(), but shows embeddings for two time series side by side.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="PHETS.DCE.Movies.compare_multi">
-<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_multi</code><span class="sig-paren">(</span><em>dir1</em>, <em>dir1_base</em>, <em>dir2</em>, <em>dir2_base</em>, <em>out_filename</em>, <em>i_lims=(1</em>, <em>89)</em>, <em>embed_crop_1='auto'</em>, <em>embed_crop_2='auto'</em>, <em>auto_crop_length=.3</em>, <em>tau_1='auto ideal'</em>, <em>tau_2='auto ideal'</em>, <em>tau_T=1/np.pi</em>, <em>save_worms=True</em>, <em>save_movie=True</em>, <em>normalize_volume=True</em>, <em>waveform_zoom=None</em>, <em>ds_rate=1</em>, <em>dpi=200</em>, <em>m=2</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_multi" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">PHETS.DCE.Movies.</code><code class="descname">compare_multi</code><span class="sig-paren">(</span><em>dir1</em>, <em>dir1_base</em>, <em>dir2</em>, <em>dir2_base</em>, <em>out_filename</em>, <em>i_lims=(1</em>, <em>89)</em>, <em>embed_crop_1='auto'</em>, <em>embed_crop_2='auto'</em>, <em>auto_crop_length=.3</em>, <em>tau_1='auto ideal'</em>, <em>tau_2='auto ideal'</em>, <em>tau_T=1/np.pi</em>, <em>save_trajectories=True</em>, <em>save_movie=True</em>, <em>normalize_volume=True</em>, <em>waveform_zoom=None</em>, <em>ds_rate=1</em>, <em>dpi=200</em>, <em>m=2</em><span class="sig-paren">)</span><a class="headerlink" href="#PHETS.DCE.Movies.compare_multi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes two directories of (eg one with piano notes, another with range of viol notes), and generates a movie over a range note indexes (pitch). Tau and crop may be set explicity or automatically.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -195,7 +195,7 @@
 <li><strong>tau_1</strong> (<em>str</em>) – explicit (seconds) or ‘auto detect’ or ‘auto ideal’</li>
 <li><strong>tau_2</strong> (<em>str</em>) – </li>
 <li><strong>tau_T</strong> (<em>float</em>) – For use with auto tau: tau = period * tau_T</li>
-<li><strong>save_worms</strong> (<em>bool</em>) – </li>
+<li><strong>save_trajectories</strong> (<em>bool</em>) – </li>
 <li><strong>save_movie</strong> (<em>bool</em>) – </li>
 <li><strong>normalize_volume</strong> (<em>bool</em>) – </li>
 <li><strong>waveform_zoom</strong> – </li>
