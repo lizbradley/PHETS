@@ -13,9 +13,6 @@ from MovieTools import prep_save_worms_single, save_worms_single, prep_save_worm
 
 WAV_SAMPLE_RATE = 44100
 
-# TODO: restructure so that in_file_name isn't loaded each frame
-# TODO: normalize volumes per window
-
 
 def slide_window(
 		in_filename,

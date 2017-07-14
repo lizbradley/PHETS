@@ -161,7 +161,6 @@ Reference
    :type crop_1: str or tuple
    :type crop_2: str or tuple
    :param float auto_crop_length:
-   :param float window_size: (time units)
    :param int num_windows: per file
    :param int mean_samp_num: per file
    :param tau_1:
@@ -190,18 +189,18 @@ Reference
    :param str filename:
    :param str out_filename:
    :param dict filt_params:
-   :param str vary_param_1:
-   :param str vary_param_2:
-   :param bool load_saved_PRFs:
+   :param  vary_param_1: filtration parameter to vary over x axis
+   :param vary_param_2: filtration parameter to vary over line colors
+   :type vary_param_1: (str, tuple)
+   :type vary_param_2: None or (str, tuple)
+   :param bool load_saved_PRFs: reuse saved
    :param str time_units='seconds':
-   :param tuple crop=(100, 1100):
-   :param float auto_crop_length=.3:
-   :param window_size=1000:
-   :param int num_windows:
-   :param float tau:
-   :param float tau_T:
-   :param int note_index:
-   :param bool normalize_volume:
+   :param tuple crop=(100, 1100): (start, stop) in time units
+   :param int num_windows: Number of windows to select from crop, evenly spaced. Window length is  chosen with the 'worm_length' filtration parameter. Windows may or may not overlap
+   :param tau: time units
+   :type tau: int or float
+   :param bool normalize_volume: normalize volume (per crop)
+   :param bool normalize_sub_volume: normalize volume (per window) [coming soon]
    :param int PRF_res:
    :param str dist_scale: 'none', 'a', or 'a + b'
    :param str metric: 'L1' (abs) or 'L2' (euclidean)

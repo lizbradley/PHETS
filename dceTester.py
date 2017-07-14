@@ -161,8 +161,8 @@ if test == 10:
 		embed_crop_2=(1, 1.3),	 # seconds or 'auto'
 		auto_crop_length=.05,  	 # seconds for when embed_crop = 'auto'
 
-		tau_1= .001,  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
-		tau_2= .001,  	 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_1= .001,  			 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_2= .001,  			 # seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_T=math.pi, 		 	 # for auto tau. tau = period * tau_T
 
 		m=2,
@@ -195,7 +195,7 @@ if test == 11:
 
 		normalize_volume=True,
 
-		save_trajectories=True,  		# to output/DCE/trajectories
+		save_trajectories=False,  		# to output/DCE/trajectories
 		save_movie=True,
 
 		waveform_zoom = out_filename

@@ -259,7 +259,6 @@
 <li><strong>crop_1</strong> (<em>str</em><em> or </em><em>tuple</em>) – </li>
 <li><strong>crop_2</strong> (<em>str</em><em> or </em><em>tuple</em>) – </li>
 <li><strong>auto_crop_length</strong> (<em>float</em>) – </li>
-<li><strong>window_size</strong> (<em>float</em>) – (time units)</li>
 <li><strong>num_windows</strong> (<em>int</em>) – per file</li>
 <li><strong>mean_samp_num</strong> (<em>int</em>) – per file</li>
 <li><strong>tau_1</strong> (<em>str</em><em> or </em><em>float</em>) – </li>
@@ -296,18 +295,15 @@
 <li><strong>filename</strong> (<em>str</em>) – </li>
 <li><strong>out_filename</strong> (<em>str</em>) – </li>
 <li><strong>filt_params</strong> (<em>dict</em>) – </li>
-<li><strong>vary_param_1</strong> (<em>str</em>) – </li>
-<li><strong>vary_param_2</strong> (<em>str</em>) – </li>
-<li><strong>load_saved_PRFs</strong> (<em>bool</em>) – </li>
+<li><strong>vary_param_1</strong> (<em>(</em><em>str</em><em>, </em><em>tuple</em><em>)</em>) – filtration parameter to vary over x axis</li>
+<li><strong>vary_param_2</strong> (<em>None</em><em> or </em><em>(</em><em>str</em><em>, </em><em>tuple</em><em>)</em>) – filtration parameter to vary over line colors</li>
+<li><strong>load_saved_PRFs</strong> (<em>bool</em>) – reuse saved</li>
 <li><strong>time_units='seconds'</strong> (<em>str</em>) – </li>
-<li><strong>crop=</strong><strong>(</strong><strong>100</strong><strong>, </strong><strong>1100</strong><strong>)</strong> (<em>tuple</em>) – </li>
-<li><strong>auto_crop_length=.3</strong> (<em>float</em>) – </li>
-<li><strong>window_size=1000</strong> – </li>
-<li><strong>num_windows</strong> (<em>int</em>) – </li>
-<li><strong>tau</strong> (<em>float</em>) – </li>
-<li><strong>tau_T</strong> (<em>float</em>) – </li>
-<li><strong>note_index</strong> (<em>int</em>) – </li>
-<li><strong>normalize_volume</strong> (<em>bool</em>) – </li>
+<li><strong>crop=</strong><strong>(</strong><strong>100</strong><strong>, </strong><strong>1100</strong><strong>)</strong> (<em>tuple</em>) – (start, stop) in time units</li>
+<li><strong>num_windows</strong> (<em>int</em>) – Number of windows to select from crop, evenly spaced. Window length is  chosen with the ‘worm_length’ filtration parameter. Windows may or may not overlap</li>
+<li><strong>tau</strong> (<em>int</em><em> or </em><em>float</em>) – time units</li>
+<li><strong>normalize_volume</strong> (<em>bool</em>) – normalize volume (per crop)</li>
+<li><strong>normalize_sub_volume</strong> (<em>bool</em>) – normalize volume (per window) [coming soon]</li>
 <li><strong>PRF_res</strong> (<em>int</em>) – </li>
 <li><strong>dist_scale</strong> (<em>str</em>) – ‘none’, ‘a’, or ‘a + b’</li>
 <li><strong>metric</strong> (<em>str</em>) – ‘L1’ (abs) or ‘L2’ (euclidean)</li>

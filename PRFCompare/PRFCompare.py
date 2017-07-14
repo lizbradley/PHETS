@@ -62,6 +62,7 @@ def norm(f, metric, f_weight):
 
 
 def scale_dists(dists, norms, norm_ref, scale):
+	""" helper for get_dists_from_ref """
 	if scale == 'none':
 		return dists
 
@@ -131,7 +132,7 @@ def get_PRFs(
 			sys.exit()
 		start_pts = np.floor(np.linspace(0, len(sig) - 1, num_windows, endpoint=False)).astype(int)
 		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
-
+		# TODO: add normalize sub volume here
 		return windows
 
 
@@ -153,8 +154,6 @@ def get_PRFs(
 			print '=============================================\n'
 
 			filt = (Filtration(worm, filt_params, filename=filename))
-
-
 			filts.append(filt)
 
 			if see_samples:
@@ -174,19 +173,17 @@ def get_PRFs(
 		return np.asarray(funcs)
 
 
+
+
 	# ===========================================================================
 	# 		MAIN: get_PRFs()
 	# ===========================================================================
 
-	if time_units == 'seconds':
-		window_size_samp = int(window_size * WAV_SAMPLE_RATE)
-	elif time_units == 'samples':
-		window_size_samp = int(window_size)
+	if window_size:
+		window_size_samp = window_size if time_units == 'samples' else int(window_size * WAV_SAMPLE_RATE)
+		filt_params.update({'worm_length': window_size_samp})
 	else:
-		print 'ERROR: invalid time_units.'
-		sys.exit()
-	filt_params.update({'worm_length': window_size_samp})
-	print 'using worm_length:', filt_params['worm_length']
+		window_size_samp = filt_params['worm_length']
 
 	if isinstance(filename, basestring):
 		print 'loading', filename, '...'
@@ -199,6 +196,7 @@ def get_PRFs(
 	crop, sig_full, sig = crop_sig(sig, crop_cmd, auto_crop_length)
 	print 'tauing...'
 	f_ideal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, None, filename)
+
 
 	sigs = slice_sig(sig)
 	if type(sig[0]) is np.ndarray:
@@ -232,7 +230,7 @@ def dists_compare(
 		crop_2='auto',
 		auto_crop_length=.3,
 
-		window_size=.05,
+		window_size=None,
 		num_windows=10,  # per file
 		mean_samp_num=5,  # per file
 
@@ -610,8 +608,8 @@ def plot_variance(
 		crop=(100, 1100),
 		auto_crop_length=.3,
 
-		window_size=1000,
 		num_windows=5,  # per file
+		window_size=None,
 
 		tau=.001,
 		tau_T=np.pi,
@@ -619,17 +617,20 @@ def plot_variance(
 
 		normalize_volume=True,
 
-		PRF_res=50,  # number of divisions used for PRF
-		dist_scale='none',  # 'none', 'a', or 'a + b'
-		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		PRF_res=50, 		 # number of divisions used for PRF
+		dist_scale='none',	 # 'none', 'a', or 'a + b'
+		metric='L2', 		 # 'L1' (abs) or 'L2' (euclidean)
 		weight_func=lambda i, j: 1,
 
 		see_samples=5
 ):
 	mean_samp_num = num_windows
-	filt_params.update({'worm_length': window_size if time_units=='samples' else int(window_size * WAV_SAMPLE_RATE)})
+	if window_size:
+		print 'ERROR: this function does not take window_size arg, please use worm_length filtration parameter instead'
+		sys.exit()
 	options = [PRF_res, auto_crop_length, time_units, normalize_volume, mean_samp_num, num_windows, window_size,
 			   see_samples, note_index, tau_T]
+
 
 	class VarianceData:  # all data for a fixed value of vary_param_2 -- one curve per plot
 		def __init__(self):
@@ -639,50 +640,66 @@ def plot_variance(
 			self.pointwise_variance_norm = []
 			self.functional_COV_norm = []
 
+	def plot_trajectory(sig):
+		print 'plotting trajectory...'
+		fig = plt.figure(figsize=(7, 7))
+		ax = fig.add_subplot(111)
+		cbar = ax.scatter(sig[:,0], sig[:,1], s=.05, c=np.arange(sig.shape[0]))
+		fig.colorbar(cbar)
+		fig.savefig('output/PRFCompare/variance/trajectory.png')
+
+
 	def get_data():
 
 		if load_saved_PRFs:
 			print 'WARNING: loading saved data'
 			return np.load('PRFCompare/PRFs.npy')
 
-		if vary_param_2[0] in filt_params:
-			print 'loading', filename, '...'
-			sig_full = np.loadtxt(filename)
-			arr_2 = []
-			for val_2 in vary_param_2[1]:
-				filt_params.update({vary_param_2[0]: val_2})
-				arr_1 = []
-				for val_1 in vary_param_1[1]:
-					print '============================================='
-					print '============================================='
-					print vary_param_1[0] + ':', val_1
-					print vary_param_2[0] + ':', val_2
-					print '============================================='
-					print '=============================================\n'
+		if vary_param_2:
+			if vary_param_2[0] in filt_params:
+				print 'loading', filename, '...'
+				sig_full = np.loadtxt(filename)
+				arr_2 = []
+				for val_2 in vary_param_2[1]:
+					filt_params.update({vary_param_2[0]: val_2})
+					arr_1 = []
+					for val_1 in vary_param_1[1]:
+						print '============================================='
+						print '============================================='
+						print vary_param_1[0] + ':', val_1
+						print vary_param_2[0] + ':', val_2
+						print '============================================='
+						print '=============================================\n'
 
-					filt_params.update({vary_param_1[0]: val_1})
-					ret_crop, sig_full, sig, prf_evo = get_PRFs(sig_full, filt_params, crop, tau, *options, fname=filename)
-					arr_1.append(prf_evo[:, 2])		# take z component only
-				arr_2.append(arr_1)
+						filt_params.update({vary_param_1[0]: val_1})
 
-			prf_evos = np.asarray(arr_2)
-			# array with shape (len(vary_param_2[1], len(vary_param_1[1])
-			# each element corresponds to a curve in one of the five subplots
-			# each element is a 1D list of PRFs from regular samples of the input
-			np.save('PRFCompare/PRFs.npy', prf_evos)
-			return prf_evos
+						# get PRFs at evenly spaced intervals along input -- 'prf evolution'
+						ret_crop, sig_full, sig, prf_evo = get_PRFs(sig_full, filt_params, crop, tau, *options, fname=filename)
+						# plot_trajectory(sig)
+						arr_1.append(prf_evo[:, 2])		# take z component only
+					arr_2.append(arr_1)
 
-		else:
-			print 'ERROR: currently vary_param_2 must be a filtration parameter'
-			sys.exit()
+				prf_evos = np.asarray(arr_2)
+				# array with shape (len(vary_param_2[1], len(vary_param_1[1])
+				# each element is a 1D list of PRFs from regular samples of the input
+				np.save('PRFCompare/PRFs.npy', prf_evos)
+				return prf_evos
+
+			else:
+				print 'ERROR: currently vary_param_2 must be a filtration parameter'
+				sys.exit()
 
 	def process_data(prf_evo_array):
 		data_list = []
-		for row in prf_evo_array:  # loop through PRFs for vary_param_2
+		for row in prf_evo_array:  # loop through PRF set for each value of vary_param_2
 
 			data_val_2 = VarianceData()
 
 			for sample_prfs in row:
+
+				# see definitions for norm() and get_dists_from_ref() on ~ line 45
+
+
 				null_weight_func = lambda i, j: 1
 				mean_PRF = np.mean(sample_prfs, axis=0)
 				mean_PRF_norm = norm(mean_PRF, metric, null_weight_func)  # plot this
@@ -766,6 +783,14 @@ def plot_variance(
 				plt.setp(ax.get_xticklines(), visible=False)
 
 		fig.savefig(out_filename)
+
+
+
+
+	# ===========================================================================
+	# 		MAIN: plot_variance()
+	# ===========================================================================
+
 
 	prf_evo_array = get_data()
 	variance_data = process_data(prf_evo_array)

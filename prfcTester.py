@@ -1,11 +1,11 @@
 import sys, time
 import numpy as np
 from config import default_filtration_params as parameter_set
-# from PRFCompare.PRF import PRF_dist_plot, mean_PRF_dist_plots
+
 from PRFCompare.PRFCompare import plot_dists_vs_means, plot_dists_vs_ref, plot_clusters
+from PRFCompare.PRFCompare import plot_variance
 
-
-set_test = 14		# set here or with command line argument
+set_test = 1203		# set test number here or with command line argument
 
 
 
@@ -17,7 +17,6 @@ start_time = time.time()
 
 if test == 1:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'ds_rate': 50,
@@ -50,7 +49,6 @@ if test == 1:
 
 if test == 2:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'ds_rate': 50,
@@ -67,15 +65,12 @@ if test == 2:
 		params,
 		crop_1=(1, 2),			# seconds or 'auto'
 		crop_2=(1, 2),			# seconds or 'auto'
-		auto_crop_length=.3,	# seconds. length of windows when crop is 'auto'
 
 		window_size=.05, 		# seconds
 		num_windows=10, 		# evenly spaced
 		mean_samp_num=10,  		# number of windows to use for mean
 
 		tau=.0012,		  		# seconds
-		tau_T=np.pi,			# tau_T = tau / period
-		note_index=40,			# required for auto tau
 
 		PD_movie_int=0,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -84,7 +79,6 @@ if test == 2:
 
 if test == 3:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'ds_rate': 50,
@@ -104,7 +98,6 @@ if test == 3:
 
 		crop_1=(1, 1.3),			# seconds or 'auto'
 		crop_2=(1, 1.3),			# seconds or 'auto'
-		auto_crop_length=.3,		# seconds. length of windows when crop is 'auto'
 
 		window_size=.1, 			# seconds
 		num_windows=6, 				# evenly spaced
@@ -119,7 +112,6 @@ if test == 3:
 
 if test == 4:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'ds_rate': 57,
@@ -157,7 +149,6 @@ if test == 4:
 
 if test == 5:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'ds_rate': 30,
@@ -205,7 +196,6 @@ if test == 5:
 
 if test == 6:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'ds_rate': 50,
@@ -247,10 +237,9 @@ if test == 6:
 		PD_movie_int=5,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 7:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update({
 		'worm_length': 2000,
 		'ds_rate': 10,
@@ -272,7 +261,6 @@ if test == 7:
 
 		crop_1=(.1, .2),				# seconds or 'auto'
 		crop_2=(.1, .2),				# seconds or 'auto'
-		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
 
 		window_size=.05, 				# seconds
 		num_windows=10, 					# evenly spaced
@@ -297,7 +285,6 @@ if test == 7:
 
 if test == 11:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'ds_rate': 75,
@@ -341,7 +328,6 @@ if test == 11:
 	)
 
 if test == 12:
-
 	params = parameter_set
 	params.update(
 		{
@@ -385,7 +371,6 @@ if test == 12:
 	)
 
 if test == 13:
-
 	params = parameter_set
 	params.update(
 		{
@@ -420,7 +405,6 @@ if test == 13:
 
 		crop_1=(2, 2.5),  # time_units or 'auto'
 		crop_2=(2, 2.5),  # time_units or 'auto'
-		auto_crop_length=1,
 
 		window_size=.1,  # time_units
 		num_windows=10,  # evenly spaced
@@ -465,9 +449,7 @@ if test == 14:
 
 		crop_1=(2, 2.5),  # time_units or 'auto'
 		crop_2=(2, 2.5),  # time_units or 'auto'
-		auto_crop_length=1,
 
-		window_size=.15,  # time_units
 		num_windows=5,  # evenly spaced
 		mean_samp_num=5,  # number of windows to use for mean
 
@@ -488,17 +470,14 @@ if test == 14:
 
 if test == 15:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'max_filtration_param': -10,
 			'num_divisions': 20,
 			'use_cliques': True,
 
-		}
-	)
+		})
 
-	from PRFCompare.PRFCompare import plot_variance
 
 	plot_variance(
 		'datasets/trajectories/REALDEAL/L63_2mil.txt',
@@ -506,20 +485,21 @@ if test == 15:
 		params,
 
 		('ds_rate', np.arange(100, 180, 10)),		# vary param 1
-		('use_cliques', (True,)),					# vary param 2
-													# for now, if you do not want to use second vary param, set this like
-													# the line above: one a list with one element and the trailing comma
-		# ('use_cliques', (True, False)),			# for now, both vary params must be filtration params. working on
-													# getting it to work for other params like weight_func
+		('use_cliques', (True, False)),				# vary param 2
+		# ('use_cliques', (True,)),					# null vary param 2 example
+
+													# For now, if you do not want to use second vary param, set this like
+													# the line above: a list with one element, note the trailing comma
+													# For now, both vary params must be filtration params. Working on
+													# getting it to work for other params like weight_func.
 
 		load_saved_PRFs=False,
 
 		time_units='samples',
 
-		crop=(1000, 2001000),     # time_units or 'auto'
+		crop=(5000, 2005000),     # (start, stop) in time_units, or 'auto'
 
-		window_size=3000,		  # time_units
-		num_windows=5,			  # evenly spaced
+		num_windows=10,			  # evenly spaced
 
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
@@ -535,15 +515,60 @@ if test == 15:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
+
+if test == 16:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+			'ds_rate': 50,
+			'worm_length': 2000,
+
+		})
+
+	# idea for additional output: plot full trajectory, varying color w/ time
+	# phase out window_size_samp, use worm_length instead. this will allow for worm_length as a vary_param.
+
+	plot_variance(
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/variance/L63_d_or_amp.png',
+		params,
+
+		('d_orientation_amplify', np.arange(0, 30, 3)),			# vary param 1
+		('use_cliques', (True, False)),							# vary param 2
+
+		load_saved_PRFs=False,
+
+		time_units='samples',
+
+		crop=(5000, 25000),		     	  # (start, stop) in time_units, or 'auto'
+		num_windows=10,			 		  # evenly spaced
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
 ############ ACTUAL TEST EXPLORATION TIME  !!! #########
 
 
 ### using 1000 witnesses, 100 landmarks: looking at normalization of variance by magnitude of mean
-	
+
 if test == 50:
 	params = parameter_set
-	# params = standard_parameter_set
 	params.update(
 		{
 			'ds_rate': 10,
@@ -586,7 +611,7 @@ if test == 50:
 		see_samples = 0,
 
 	)
-	
+
 if test == 51:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -631,8 +656,8 @@ if test == 51:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-		
-######## Now to explore linear weight function with k = 5 ... 
+
+######## Now to explore linear weight function with k = 5 ...
 if test == 60:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -664,7 +689,7 @@ if test == 60:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -677,7 +702,7 @@ if test == 60:
 		see_samples=1,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 61:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -709,7 +734,7 @@ if test == 61:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -756,7 +781,7 @@ if test == 70:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -769,7 +794,7 @@ if test == 70:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 71:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -801,7 +826,7 @@ if test == 71:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -814,10 +839,10 @@ if test == 71:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 ######### 2000 witnesses, 100 landmarks #################
 
-	
+
 if test == 150:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -863,7 +888,7 @@ if test == 150:
 		see_samples = 1,
 
 	)
-	
+
 if test == 151:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -908,9 +933,9 @@ if test == 151:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-	
-######## Now to explore linear weight function with k = 5 ... 
+
+
+######## Now to explore linear weight function with k = 5 ...
 
 if test == 160:
 	params = parameter_set
@@ -943,7 +968,7 @@ if test == 160:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -956,7 +981,7 @@ if test == 160:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 161:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -988,7 +1013,7 @@ if test == 161:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -1003,7 +1028,7 @@ if test == 161:
 	)
 
 ###### Now to explore exponential weight function ...
-	
+
 if test == 170:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1035,7 +1060,7 @@ if test == 170:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -1048,7 +1073,7 @@ if test == 170:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 171:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1080,7 +1105,7 @@ if test == 171:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -1093,10 +1118,10 @@ if test == 171:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 
 ######## 5000 W, 100 L ##############
-	
+
 if test == 250:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1142,7 +1167,7 @@ if test == 250:
 		see_samples = 1,
 
 	)
-	
+
 if test == 251:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1187,9 +1212,9 @@ if test == 251:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-	
-######## Now to explore linear weight function with k = 5 ... 
+
+
+######## Now to explore linear weight function with k = 5 ...
 
 if test == 260:
 	params = parameter_set
@@ -1222,7 +1247,7 @@ if test == 260:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -1235,7 +1260,7 @@ if test == 260:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 261:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1267,7 +1292,7 @@ if test == 261:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -1314,7 +1339,7 @@ if test == 270:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -1327,7 +1352,7 @@ if test == 270:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 271:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1359,7 +1384,7 @@ if test == 271:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -1372,8 +1397,8 @@ if test == 271:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-	
+
+
 ######### 10,000 W and 100 L #################
 
 if test == 350:
@@ -1421,7 +1446,7 @@ if test == 350:
 		see_samples = 1,
 
 	)
-	
+
 if test == 351:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1466,9 +1491,9 @@ if test == 351:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-	
-######## Now to explore linear weight function with k = 5 ... 
+
+
+######## Now to explore linear weight function with k = 5 ...
 
 if test == 360:
 	params = parameter_set
@@ -1501,7 +1526,7 @@ if test == 360:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -1514,7 +1539,7 @@ if test == 360:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 361:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1546,7 +1571,7 @@ if test == 361:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -1594,7 +1619,7 @@ if test == 370:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -1607,7 +1632,7 @@ if test == 370:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 371:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1639,7 +1664,7 @@ if test == 371:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -1700,7 +1725,7 @@ if test == 450:
 		see_samples = 1,
 
 	)
-	
+
 if test == 451:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1745,8 +1770,8 @@ if test == 451:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-######## Now to explore linear weight function with k = 5 ... 
+
+######## Now to explore linear weight function with k = 5 ...
 
 if test == 460:
 	params = parameter_set
@@ -1779,7 +1804,7 @@ if test == 460:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 * (j - i),  
+		weight_func=lambda i, j: 5 * (j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -1792,7 +1817,7 @@ if test == 460:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 461:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1824,7 +1849,7 @@ if test == 461:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func=lambda i, j: 5 *(j - i),  
+		weight_func=lambda i, j: 5 *(j - i),
 
 		PRF_res=20,  # num divisions
 
@@ -1871,7 +1896,7 @@ if test == 470:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -1884,7 +1909,7 @@ if test == 470:
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 471:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1916,7 +1941,7 @@ if test == 471:
 		mean_samp_num=20,  		  # number of windows to use for mean
 
 
-		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,  
+		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
 		PRF_res=20,  # num divisions
 
@@ -1945,7 +1970,7 @@ if test == 1001:
 			'max_filtration_param':-10,
 			'num_divisions': 25,
 			'use_cliques': True,
-	
+
 		}
 	)
 
@@ -1955,7 +1980,7 @@ if test == 1001:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/ref/L63_vary_tau_Euclidean_none.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=False,
 
 		i_ref=18,
@@ -1970,7 +1995,7 @@ if test == 1001:
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1011:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -1981,7 +2006,7 @@ if test == 1011:
 			'max_filtration_param':-10,
 			'num_divisions': 25,
 			'use_cliques': True,
-	
+
 		}
 	)
 
@@ -1991,7 +2016,7 @@ if test == 1011:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_none_scaled.png', 		 # output filename
 		params,
-		
+
 		#load_saved_PRFs=True,
 		load_saved_filtrations=False,
 
@@ -2007,7 +2032,7 @@ if test == 1011:
 		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1101:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2018,7 +2043,7 @@ if test == 1101:
 			'max_filtration_param':-10,
 			'num_divisions': 25,
 			'use_cliques': True,
-	
+
 		}
 	)
 
@@ -2028,7 +2053,7 @@ if test == 1101:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_lin.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=True,
 
 		i_ref=18,
@@ -2043,7 +2068,7 @@ if test == 1101:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1111:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2054,7 +2079,7 @@ if test == 1111:
 			'max_filtration_param':-10,
 			'num_divisions': 25,
 			'use_cliques': True,
-	
+
 		}
 	)
 
@@ -2064,7 +2089,7 @@ if test == 1111:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_SMALL_lin_scaled.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=False,
 
 		i_ref=18,
@@ -2089,7 +2114,7 @@ if test == 1201:
 			'max_filtration_param':-10,
 			'num_divisions': 25,
 			'use_cliques': True,
-	
+
 		}
 	)
 
@@ -2099,7 +2124,7 @@ if test == 1201:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_exp.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=True,
 
 		i_ref=18,
@@ -2114,7 +2139,7 @@ if test == 1201:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1211:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2125,7 +2150,7 @@ if test == 1211:
 			'max_filtration_param':-10,
 			'num_divisions': 25,
 			'use_cliques': True,
-	
+
 		}
 	)
 
@@ -2135,7 +2160,7 @@ if test == 1211:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_Euclidean_SMALL_exp_scaled.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=True,
 
 		i_ref=18,
@@ -2150,7 +2175,7 @@ if test == 1211:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 ####### L63 vary tau with Normalized Hamiltonian 10, scaled and not scaled for no weight, linear weight, and exponential weight
 
 if test == 1002:
@@ -2173,7 +2198,7 @@ if test == 1002:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_none.png', 		 # output filename
 		params,
-		
+
 		#load_saved_PRFs=False,
 
 		i_ref=18,
@@ -2188,7 +2213,7 @@ if test == 1002:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1012:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2209,7 +2234,7 @@ if test == 1012:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_none_scaled.png', 		 # output filename
 		params,
-		
+
 		#load_saved_PRFs=True,
 
 		i_ref=18,
@@ -2224,7 +2249,7 @@ if test == 1012:
 		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 
 if test == 1102:
 	params = parameter_set
@@ -2246,7 +2271,7 @@ if test == 1102:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_lin.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=False,
 
 		i_ref=18,
@@ -2261,7 +2286,7 @@ if test == 1102:
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1112:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2282,7 +2307,7 @@ if test == 1112:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_SMALL_lin_scaled.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=True,
 
 		i_ref=18,
@@ -2297,7 +2322,7 @@ if test == 1112:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1202:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2318,7 +2343,7 @@ if test == 1202:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_exp.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=False,
 
 		i_ref=18,
@@ -2333,7 +2358,7 @@ if test == 1202:
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1212:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2354,7 +2379,7 @@ if test == 1212:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_nH10_SMALL_exp_scaled.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=True,
 
 		i_ref=18,
@@ -2369,9 +2394,9 @@ if test == 1212:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-####### L63 vary tau with Orientation 20, scaled and not scaled for no weight, linear weight, and exponential weight	
-	
+
+####### L63 vary tau with Orientation 20, scaled and not scaled for no weight, linear weight, and exponential weight
+
 if test == 1003:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2392,7 +2417,7 @@ if test == 1003:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_none.png', 		 # output filename
 		params,
-		
+
 		#load_saved_PRFs=False,
 
 		i_ref=18,
@@ -2407,8 +2432,8 @@ if test == 1003:
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-	
+
+
 if test == 1013:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2429,7 +2454,7 @@ if test == 1013:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_none_scaled.png', 		 # output filename
 		params,
-		
+
 		#load_saved_PRFs=True,
 
 		i_ref=18,
@@ -2444,7 +2469,7 @@ if test == 1013:
 		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1103:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2465,7 +2490,7 @@ if test == 1103:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_lin.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=False,
 
 		i_ref=18,
@@ -2480,8 +2505,8 @@ if test == 1103:
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-	
+
+
 if test == 1113:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2502,7 +2527,7 @@ if test == 1113:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_SMALL_lin_scaled.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=True,
 
 		i_ref=18,
@@ -2517,7 +2542,7 @@ if test == 1113:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
+
 if test == 1203:
 	params = parameter_set
 	# params = standard_parameter_set
@@ -2538,7 +2563,7 @@ if test == 1203:
 		'base i', 								 # input filename format: 'base i or 'i base'
 		'output/PRFCompare/L63_vary_tau_O20_exp.png', 		 # output filename
 		params,
-		
+
 		load_saved_PRFs=False,
 
 		i_ref=18,
@@ -2553,8 +2578,8 @@ if test == 1203:
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
-	
-	
+
+
 if test == 1213:
 	params = parameter_set
 	# params = standard_parameter_set
