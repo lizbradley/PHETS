@@ -1,5 +1,1 @@
 frame 0: 0
-frame 1: 91
-frame 2: 119
-frame 3: 145
-frame 4: 173

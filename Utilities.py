@@ -21,3 +21,26 @@ def check_overwrite(out_file_name):
 			print 'goodbye'
 			sys.exit()
 	os.chdir('..')
+
+
+def clear_old_files(path, see_samples):
+	old_files = os.listdir(path)
+	if old_files and see_samples:
+		ans = raw_input('Clear files in ' + path + '? (y/n/q) \n')
+		if ans == 'y':
+			for f in old_files:
+				if f != '.gitkeep':
+					os.remove(path + f)
+		elif ans == 'q':
+			print 'goodbye'
+			sys.exit()
+		else:
+			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
+
+
+def blockPrint():
+	sys.stdout = open(os.devnull, 'w')
+
+def enablePrint():
+	sys.stdout = sys.__stdout__
+
