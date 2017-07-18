@@ -15,6 +15,7 @@ from Utilities import clear_old_files, blockPrint, enablePrint
 
 from config import WAV_SAMPLE_RATE
 
+
 def norm(f, metric, f_weight):
 
 	PRF_res = len(f)
@@ -30,7 +31,6 @@ def norm(f, metric, f_weight):
 	else:
 		print "ERROR: metric not recognized. Use 'L1' or 'L2'."
 		sys.exit()
-
 
 
 def scale_dists(dists, norms, norm_ref, scale):
@@ -76,6 +76,8 @@ def get_PRFs(
 		fname=None
 		):
 
+
+	"""helper for dists_compare"""
 	def show_samples(filt, i, filename):
 		base_name = filename.split('/')[-1].split('.')[0]
 		comp_name = '{:s}_{:d}_'.format(base_name, i)
@@ -222,6 +224,7 @@ def dists_compare(
 		see_samples=5
 
 ):
+	'''generates and processes data for plot_dists_vs_ref, plot_dists_vs_means, and plot_clusters'''
 
 	clear_old_files('output/PRFCompare/mean/see_samples/', see_samples)
 
@@ -283,3 +286,133 @@ def dists_compare(
 	return arr
 
 
+
+
+
+###################################################################
+
+
+class VarianceData:  	# all data for a fixed value of vary_param_2 -- one curve per plot
+	def __init__(self):
+		self.mean_PRF_norm = []
+		self.variance = []
+		self.scaled_variance = []
+		self.pointwise_variance_norm = []
+		self.functional_COV_norm = []
+
+def plot_trajectory(sig):
+	print 'plotting trajectory...'
+	fig = plt.figure(figsize=(7, 7))
+	ax = fig.add_subplot(111)
+	cbar = ax.scatter(sig[:,0], sig[:,1], s=.05, c=np.arange(sig.shape[0]))
+	fig.colorbar(cbar)
+	fig.savefig('output/PRFCompare/variance/trajectory.png')
+
+
+def get_variance_data(filename, vary_param_1, vary_param_2, filt_params, crop, tau, load_saved_PRFs=False):
+
+	if load_saved_PRFs:
+		print 'WARNING: loading saved data'
+		return np.load('PRFCompare/PRFs.npy')
+
+	if vary_param_2:
+		if vary_param_2[0] in filt_params:
+			print 'loading', filename, '...'
+			sig_full = np.loadtxt(filename)
+			arr_2 = []
+			for val_2 in vary_param_2[1]:
+				filt_params.update({vary_param_2[0]: val_2})
+				arr_1 = []
+				for val_1 in vary_param_1[1]:
+
+					filt_params.update({vary_param_1[0]: val_1})
+
+					# get PRFs at evenly spaced intervals along input -- 'prf evolution'
+
+					sys.stdout.flush()
+					sys.stdout.write('\rComputing data... vary_param 1: {}, vary_param_2: {}'.format(val_1, val_2))
+					sys.stdout.flush()
+
+
+					# plot_trajectory(sig)
+					# arr_1.append(prf_evo[:, 2])		# take z component only
+					arr_1.append(prf_evo)
+				arr_2.append(arr_1)
+
+			prf_evos = np.asarray(arr_2)
+			# array with shape (len(vary_param_2[1], len(vary_param_1[1])
+			# each element is a 1D list of PRFs from regular samples of the input
+			np.save('PRFCompare/PRFs.npy', prf_evos)
+			return prf_evos
+
+		else:
+			print 'ERROR: currently vary_param_2 must be a filtration parameter'
+			sys.exit()
+
+def process_data(prf_evo_array):
+	print 'processing...'
+	data_list = []
+	for i, row in enumerate(prf_evo_array):  # for each value of vary_param_2
+
+		data_val_2 = VarianceData()
+
+		for j, sample_prfs in enumerate(row):	 # for each value of vary_param_1
+
+			# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
+
+			sample_prfs_z = sample_prfs[:, 2]		# take z component only
+			null_weight_func = lambda i, j: 1
+			pointwise_mean = np.mean(sample_prfs_z, axis=0)					# plot as heatmap
+			pmn = norm(pointwise_mean, metric, null_weight_func) 			# plot as data point
+			data_val_2.mean_PRF_norm.append(pmn)
+
+			# HOMEGROWN VARIANCE #
+
+			dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in sample_prfs_z]
+			variance = np.mean(dists)										# plot as data point
+			data_val_2.variance.append(variance)
+
+			scaled_dists = get_dists_from_ref(sample_prfs_z, pointwise_mean, weight_func, metric, dist_scale)
+			scaled_variance = np.mean(scaled_dists)							# plot as data point
+			data_val_2.scaled_variance.append(scaled_variance)
+
+			# POINTWISE VARIANCE #
+
+			diffs = [PRF - pointwise_mean for PRF in sample_prfs_z]
+
+			pointwise_variance = np.var(diffs, axis=0)						# plot as heatmap
+			pvn = norm(pointwise_variance, metric, null_weight_func)		# plot as data point
+			data_val_2.pointwise_variance_norm.append(pvn)
+
+			functional_COV = pointwise_variance / pointwise_mean			# plot as heatmap
+			fcovn = norm(functional_COV, metric, null_weight_func)			# plot as data point
+			data_val_2.functional_COV_norm.append(fcovn)
+
+
+
+			# x, y, z, max_lim = sample_prfs[0]
+			#
+			# fig = plt.figure(figsize=(13, 5), tight_layout=True)
+			# ax1 = 		fig.add_subplot(131)
+			# ax2 = 		fig.add_subplot(132)
+			# ax3 = 		fig.add_subplot(133)
+			# divider = make_axes_locatable(ax3)
+			# c_ax = divider.append_axes('right', size='10%', pad=.2)
+			#
+			# plot_heatmap(ax1, c_ax, x, y, pointwise_mean)
+			# ax1.set_title('pointwise mean')
+			# plot_heatmap(ax2, c_ax, x, y, pointwise_variance)
+			# ax2.set_title('pointwise variance')
+			# plot_heatmap(ax3, c_ax, x, y, functional_COV)
+			# ax3.set_title('functional COV')
+			#
+			# fig.suptitle(filename.split('/')[-1])
+			# fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], vary_param_2[1][i], vary_param_1[0], vary_param_1[1][j])
+			# fig.savefig('output/PRFCompare/variance/heatmaps/' + fname)
+			# plt.close(fig)
+
+
+
+		data_list.append(data_val_2)
+
+	return data_list
