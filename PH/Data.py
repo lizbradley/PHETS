@@ -25,7 +25,7 @@ import subprocess
 from config import find_landmarks_c_compile_str
 class Filtration:
 
-	def __init__(self, sig, params, filename='none'):
+	def __init__(self, sig, params, filename='none', silent=False):
 		caller_dir = os.getcwd()
 
 		if isinstance(sig, basestring):			# is filename
@@ -39,7 +39,7 @@ class Filtration:
 
 		self.params = params
 
-		arr = self._build(params)
+		arr = self._build(params, silent)
 
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
@@ -59,7 +59,7 @@ class Filtration:
 
 
 	# private #
-	def _build(self, params, start=0):
+	def _build(self, params, silent):
 
 		def compile_find_landmarks_c():
 			if sys.platform == "linux" or sys.platform == "linux2":
@@ -76,12 +76,15 @@ class Filtration:
 			sys.exit()
 
 
-		print "building filtration..."
+		if not silent: print "building filtration..."
 		start_time = time.time()
 		np.savetxt('temp_data/worm_data.txt', self.sig)
 
+		from Utilities import blockPrint, enablePrint
 		try:
-			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params)
+			if silent: blockPrint()
+			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params, silent=silent)
+			if silent: enablePrint()
 		except OSError:
 			print "WARNING: invalid PH/find_landmarks binary. Recompiling..."
 			compile_find_landmarks_c()
@@ -93,7 +96,7 @@ class Filtration:
 		abstract_filtration = sorted(list(filtration[0]))
 		epsilons = filtration[2]		# add to build_filtration return
 
-		print("build_and_save_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
+		if not silent: print("build_and_save_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
 		return [witness_coords, landmark_coords, abstract_filtration, epsilons]
 
 	def _unpack_complexes(self, filt_ID_list):
@@ -142,10 +145,10 @@ class Filtration:
 		# might run faster if we don't give perseus a filtration where simplexes are reborn
 		return filt_ID_array
 
-	def _get_intervals(self):
+	def _get_intervals(self, silent=False):
 
 		def build_perseus_in_file(filt_array):
-			print 'building perseus_in.txt...'
+			if not silent: print 'building perseus_in.txt...'
 			out_file = open('perseus/perseus_in.txt', 'a')
 			out_file.truncate(0)
 			out_file.write('1\n')
@@ -166,13 +169,20 @@ class Filtration:
 					os.remove(f)
 
 			if sys.platform == "linux" or sys.platform == "linux2":
-				subprocess.call("./perseusLin nmfsimtop perseus_in.txt perseus_out", shell=True)
+				perseus_cmd = "./perseusLin nmfsimtop perseus_in.txt perseus_out"
 
 			elif sys.platform == "darwin":  # macOS
-				subprocess.call("./perseusMac nmfsimtop perseus_in.txt perseus_out", shell=True)
+				perseus_cmd = "./perseusMac nmfsimtop perseus_in.txt perseus_out"
 
 			else:  # Windows
-				subprocess.call("perseusWin.exe nmfsimtop perseus_in.txt perseus_out", shell=True)
+				perseus_cmd = "perseusWin.exe nmfsimtop perseus_in.txt perseus_out"
+
+			if silent:
+				p = subprocess.Popen(perseus_cmd, shell=True, stdout=subprocess.PIPE)
+				out, err = p.communicate()
+
+			else:
+				p = subprocess.Popen(perseus_cmd, shell=True)
 
 			os.chdir('..')
 
@@ -353,10 +363,10 @@ class Filtration:
 		os.chdir(caller_dir)
 		return self.PD_data
 
-	def get_PRF(self, num_div):
+	def get_PRF(self, num_div, silent=False):
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
-		self._get_intervals()
+		self._get_intervals(silent=silent)
 		self._build_PD_data()
 		self._build_PRF(num_div)
 		os.chdir(caller_dir)

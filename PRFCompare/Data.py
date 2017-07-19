@@ -292,69 +292,138 @@ def dists_compare(
 ###################################################################
 
 
-class VarianceData:  	# all data for a fixed value of vary_param_2 -- one curve per plot
+
+
+def get_prf_evo(sig, filt_params, num_windows, PRF_res):
+
+	def slice_sig(sig, num_windows, window_len_samp):
+		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
+		windows = [np.asarray(sig[pt : pt + filt_params['worm_length']]) for pt in start_pts]
+		# TODO: add normalize sub volume here
+		return windows
+
+
+	def get_filtrations(worms, filt_params):
+		filts = []
+		for i, worm in enumerate(worms):
+			# filt = (Filtration(worm, filt_params, filename=filename))
+			filt = Filtration(worm, filt_params, silent=True)
+			filts.append(filt)
+		return filts
+
+
+	def get_prfs(filts):
+		funcs = []
+		for i, filt in enumerate(filts):
+			funcs.append(filt.get_PRF(PRF_res, silent=True))
+		return np.asarray(funcs)
+
+
+	sigs = slice_sig(sig, num_windows, filt_params['worm_length'])
+	filts = get_filtrations(sigs, filt_params)
+	prfs = get_prfs(filts)
+	return prfs
+
+
+
+def crop_sig(sig, crop, time_units):
+
+	if crop is None:
+		return sig
+	elif time_units == 'samples':
+		return sig[crop[0]: crop[1]]
+	elif time_units == 'seconds':
+		return sig[int(crop[0] * WAV_SAMPLE_RATE) : int(crop[1] * WAV_SAMPLE_RATE)]
+	else:
+		print "ERROR: invalid 'crop' or 'time_units'"
+		sys.exit()
+
+
+
+def get_variance_data(filename, kwargs):
+
+	# PRF_res, time_units, normalize_volume, num_windows, window_size, see_samples = options
+
+
+	if kwargs['load_saved_PRFs']:
+		print 'WARNING: loading saved data'
+		return np.load('PRFCompare/PRFs.npy')
+
+
+
+	print 'loading', filename, '...'
+	sig_full = np.loadtxt(filename)
+
+	vary_param_1 = kwargs['vary_param_1']
+	vary_param_2 = kwargs['vary_param_2']
+	filt_params = kwargs['filt_params']
+
+
+	if len(sig_full.shape) == 1:
+		print 'Input has shape {}. Embedding...'
+		sig_full = embed(sig_full, None, kwargs['m'], kwargs['tau'])
+
+	sig = crop_sig(sig_full, kwargs['crop'], kwargs['time_units'])
+
+
+	def vary_evos_over_param(sig, vary_param, filt_params):
+		arr = []
+		for val_1 in vary_param[1]:
+			filt_params.update({vary_param[0]: val_1})
+
+			sys.stdout.write('\r		vary_param_1: {}		vary_param_2: {}		'.format(val_1, val_2))
+			sys.stdout.flush()
+
+			# get PRFs at evenly spaced intervals along input -- 'prf evolution'
+			prf_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'])
+
+
+			arr.append(prf_evo)
+
+		return arr
+
+	print 'generating data...'
+	if vary_param_2 is None:
+		prf_evos = vary_evos_over_param(sig, vary_param_1, filt_params)
+
+	elif vary_param_2[0] in filt_params:
+		arr = []
+		for val_2 in vary_param_2[1]:
+			filt_params.update({vary_param_2[0]: val_2})
+			arr.append(vary_evos_over_param(sig, vary_param_1, filt_params))
+		prf_evos = arr
+
+	elif vary_param_2[0] in kwargs:
+		pass
+
+	else:
+		print 'ERROR: invalid vary_param_2'
+		sys.exit()
+
+	prf_evos = np.asarray(prf_evos)
+	np.save('PRFCompare/PRFs.npy', prf_evos)
+	# array with shape (len(vary_param_2[1], len(vary_param_1[1])
+	# each element is a 1D list of PRFs from regular samples of the input
+	return prf_evos
+
+
+class VarianceData:
+	"""all data for a fixed value of vary_param_2 -- one curve per plot"""
 	def __init__(self):
-		self.mean_PRF_norm = []
+		self.pointwise_mean_norm = []
 		self.variance = []
 		self.scaled_variance = []
 		self.pointwise_variance_norm = []
 		self.functional_COV_norm = []
 
-def plot_trajectory(sig):
-	print 'plotting trajectory...'
-	fig = plt.figure(figsize=(7, 7))
-	ax = fig.add_subplot(111)
-	cbar = ax.scatter(sig[:,0], sig[:,1], s=.05, c=np.arange(sig.shape[0]))
-	fig.colorbar(cbar)
-	fig.savefig('output/PRFCompare/variance/trajectory.png')
 
 
-def get_variance_data(filename, vary_param_1, vary_param_2, filt_params, crop, tau, load_saved_PRFs=False):
-
-	if load_saved_PRFs:
-		print 'WARNING: loading saved data'
-		return np.load('PRFCompare/PRFs.npy')
-
-	if vary_param_2:
-		if vary_param_2[0] in filt_params:
-			print 'loading', filename, '...'
-			sig_full = np.loadtxt(filename)
-			arr_2 = []
-			for val_2 in vary_param_2[1]:
-				filt_params.update({vary_param_2[0]: val_2})
-				arr_1 = []
-				for val_1 in vary_param_1[1]:
-
-					filt_params.update({vary_param_1[0]: val_1})
-
-					# get PRFs at evenly spaced intervals along input -- 'prf evolution'
-
-					sys.stdout.flush()
-					sys.stdout.write('\rComputing data... vary_param 1: {}, vary_param_2: {}'.format(val_1, val_2))
-					sys.stdout.flush()
-
-
-					# plot_trajectory(sig)
-					# arr_1.append(prf_evo[:, 2])		# take z component only
-					arr_1.append(prf_evo)
-				arr_2.append(arr_1)
-
-			prf_evos = np.asarray(arr_2)
-			# array with shape (len(vary_param_2[1], len(vary_param_1[1])
-			# each element is a 1D list of PRFs from regular samples of the input
-			np.save('PRFCompare/PRFs.npy', prf_evos)
-			return prf_evos
-
-		else:
-			print 'ERROR: currently vary_param_2 must be a filtration parameter'
-			sys.exit()
-
-def process_data(prf_evo_array):
+def process_variance_data(prf_evo_array, metric, weight_func, dist_scale):
 	print 'processing...'
-	data_list = []
+	arr_2 = []
 	for i, row in enumerate(prf_evo_array):  # for each value of vary_param_2
 
-		data_val_2 = VarianceData()
+		arr_1 = VarianceData()
 
 		for j, sample_prfs in enumerate(row):	 # for each value of vary_param_1
 
@@ -364,17 +433,17 @@ def process_data(prf_evo_array):
 			null_weight_func = lambda i, j: 1
 			pointwise_mean = np.mean(sample_prfs_z, axis=0)					# plot as heatmap
 			pmn = norm(pointwise_mean, metric, null_weight_func) 			# plot as data point
-			data_val_2.mean_PRF_norm.append(pmn)
+			arr_1.pointwise_mean_norm.append(pmn)
 
 			# HOMEGROWN VARIANCE #
 
 			dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in sample_prfs_z]
 			variance = np.mean(dists)										# plot as data point
-			data_val_2.variance.append(variance)
+			arr_1.variance.append(variance)
 
 			scaled_dists = get_dists_from_ref(sample_prfs_z, pointwise_mean, weight_func, metric, dist_scale)
 			scaled_variance = np.mean(scaled_dists)							# plot as data point
-			data_val_2.scaled_variance.append(scaled_variance)
+			arr_1.scaled_variance.append(scaled_variance)
 
 			# POINTWISE VARIANCE #
 
@@ -382,37 +451,12 @@ def process_data(prf_evo_array):
 
 			pointwise_variance = np.var(diffs, axis=0)						# plot as heatmap
 			pvn = norm(pointwise_variance, metric, null_weight_func)		# plot as data point
-			data_val_2.pointwise_variance_norm.append(pvn)
+			arr_1.pointwise_variance_norm.append(pvn)
 
 			functional_COV = pointwise_variance / pointwise_mean			# plot as heatmap
 			fcovn = norm(functional_COV, metric, null_weight_func)			# plot as data point
-			data_val_2.functional_COV_norm.append(fcovn)
+			arr_1.functional_COV_norm.append(fcovn)
 
+		arr_2.append(arr_1)
 
-
-			# x, y, z, max_lim = sample_prfs[0]
-			#
-			# fig = plt.figure(figsize=(13, 5), tight_layout=True)
-			# ax1 = 		fig.add_subplot(131)
-			# ax2 = 		fig.add_subplot(132)
-			# ax3 = 		fig.add_subplot(133)
-			# divider = make_axes_locatable(ax3)
-			# c_ax = divider.append_axes('right', size='10%', pad=.2)
-			#
-			# plot_heatmap(ax1, c_ax, x, y, pointwise_mean)
-			# ax1.set_title('pointwise mean')
-			# plot_heatmap(ax2, c_ax, x, y, pointwise_variance)
-			# ax2.set_title('pointwise variance')
-			# plot_heatmap(ax3, c_ax, x, y, functional_COV)
-			# ax3.set_title('functional COV')
-			#
-			# fig.suptitle(filename.split('/')[-1])
-			# fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], vary_param_2[1][i], vary_param_1[0], vary_param_1[1][j])
-			# fig.savefig('output/PRFCompare/variance/heatmaps/' + fname)
-			# plt.close(fig)
-
-
-
-		data_list.append(data_val_2)
-
-	return data_list
+	return arr_2

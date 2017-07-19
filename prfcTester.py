@@ -582,7 +582,7 @@ if test == 50:
 		'output/PRFCompare/mean/L63_1000W100L_no_weight.png',  # out filename
 		params,
 
-		load_saved_PRFs=False,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 

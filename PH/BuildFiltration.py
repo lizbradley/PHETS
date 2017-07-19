@@ -37,7 +37,7 @@ MEMORY_PROFILE_ON = False
 
 # @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)
-def build_filtration(input_file_name, parameter_set):
+def build_filtration(input_file_name, parameter_set, silent=False):
 	print os.getcwd()
 	num_threads = 2
 	global d
@@ -126,7 +126,7 @@ def build_filtration(input_file_name, parameter_set):
 	if ls=="EST":
 		if always_euclidean:
 			if graph_induced:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -144,9 +144,9 @@ def build_filtration(input_file_name, parameter_set):
 					"-x {}".format(d_cov),
 					"-c",
 					"-f {}".format(max_filtration_param)
-				])
+				]
 			else:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -163,10 +163,10 @@ def build_filtration(input_file_name, parameter_set):
 					"-e {}".format(downsample_rate),
 					"-x {}".format(d_cov),
 					"-c"
-				])
+				]
 		else:
 			if graph_induced:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -183,9 +183,9 @@ def build_filtration(input_file_name, parameter_set):
 					"-x {}".format(d_cov),
 					"-e {}".format(downsample_rate),
 					"-f {}".format(max_filtration_param)
-				])
+				]
 			else:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -201,11 +201,11 @@ def build_filtration(input_file_name, parameter_set):
 					"-s {}".format(stretch),
 					"-x {}".format(d_cov),
 					"-e {}".format(downsample_rate)
-				])
+				]
 	else:
 		if always_euclidean and m2_d!=0:
 			if graph_induced:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -221,9 +221,9 @@ def build_filtration(input_file_name, parameter_set):
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
 					"-f {}".format(max_filtration_param)
-				])
+				]
 			else:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -238,10 +238,10 @@ def build_filtration(input_file_name, parameter_set):
 					"-v {}".format(straight_VB),
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch)
-				])
+				]
 		elif always_euclidean:
 			if graph_induced:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -258,9 +258,9 @@ def build_filtration(input_file_name, parameter_set):
 					"-s {}".format(stretch),
 					"-c",
 					"-f {}".format(max_filtration_param)
-				])
+				]
 			else:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -276,10 +276,10 @@ def build_filtration(input_file_name, parameter_set):
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
 					"-c"
-				])
+				]
 		else:
 			if graph_induced:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -295,9 +295,9 @@ def build_filtration(input_file_name, parameter_set):
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
 					"-f {}".format(max_filtration_param)
-				])
+				]
 			else:
-				subprocess.call([
+				find_landmarks_cmd = [
 					"./find_landmarks",
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
@@ -312,7 +312,13 @@ def build_filtration(input_file_name, parameter_set):
 					"-v {}".format(straight_VB),
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch)
-				])
+				]
+
+	if silent:
+		p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)
+		out, err = p.communicate()
+	else:
+		p = subprocess.Popen(find_landmarks_cmd)
 
 
 	## Build and sort distance matrix.
