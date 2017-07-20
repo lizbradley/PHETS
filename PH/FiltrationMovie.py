@@ -298,7 +298,7 @@ def make_frames(filtration, color_scheme, alpha, save_frames):
 		print 'ERROR: invalid ambient dimension {}, must be 2 or 3'.format(amb_dim)
 		sys.exit()
 
-	with open('output/run_info/num_triangles.txt', 'rw+') as f:
+	with open('output/run_info/num_triangles.txt', 'a') as f:
 		f.truncate(0)
 
 
