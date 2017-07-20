@@ -38,7 +38,6 @@ MEMORY_PROFILE_ON = False
 # @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)
 def build_filtration(input_file_name, parameter_set, silent=False):
-	print os.getcwd()
 	num_threads = 2
 	global d
 	d = []

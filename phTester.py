@@ -9,7 +9,7 @@ from PH import make_movie, make_PD, make_PRF_plot
 
 import time
 
-set_test = 17		# set test number here or with command line argument
+set_test = 17	# set test number here or with command line argument
 
 
 
@@ -508,7 +508,7 @@ if test == 17:
 			'worm_length': 2000,
 			'max_filtration_param': 0,
 			'num_divisions': 20,
-			'graph_induced': True,
+			'graph_induced': False,
 
 		})
 
@@ -516,10 +516,10 @@ if test == 17:
 	# filtration = load_saved_filtration()		# reuse last filtration
 
 
-	make_PD(
-		filtration,
-		'output/PH/realdeal.png'
-	)
+	# make_PD(
+	# 	filtration,
+	# 	'output/PH/realdeal.png'
+	# )
 
 	# use cliques breaks gnuplot stuff -- see FiltrationMovie.py line 144
 	# gnuplot 3D not looks incorrect

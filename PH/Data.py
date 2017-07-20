@@ -197,7 +197,7 @@ class Filtration:
 			os.chdir('..')
 
 		def load_perseus_out_file():
-			print
+			print os.getcwd()
 			self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
 			if len(self.intervals) == 0:
 				print 'WARNING: no homology for this window!'

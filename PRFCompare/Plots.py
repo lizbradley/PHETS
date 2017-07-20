@@ -366,7 +366,7 @@ def plot_variance(
 		print 'plotting filtration movies, PDs and PRFs...'
 		base_name = filename.split('/')[-1].split('.')[0]
 
-		dir = 'output/PRFCompare/mean/see_samples/{}/'.format(base_name)
+		dir = 'output/PRFCompare/variance/see_samples/{}/'.format(base_name)
 
 		if os.path.exists(dir):
 			r = raw_input('Overwrite {} (y/n)?'.format(dir))
@@ -466,4 +466,4 @@ def plot_variance(
 	variance_data_array, hmap_data = process_variance_data(prf_evo_array, metric, weight_func, dist_scale)
 	plot(variance_data_array, out_filename)
 	plot_heatmaps(hmap_data)
-	show_samples(filt_evo_array)
+	if see_samples: show_samples(filt_evo_array)
