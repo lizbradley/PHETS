@@ -2613,5 +2613,55 @@ if test == 1213:
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
+	
+if test == 5000:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+
+		})
+
+
+	plot_variance(
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/variance/L63.png',  # out filename
+		params,
+
+		('ds_rate', np.arange(100, 201, 20)),		# vary param 1
+		('worm_length', (5000, 10000, 20000)),				# vary param 2
+		# ('use_cliques', (True,)),					# null vary param 2 example
+
+													# For now, if you do not want to use second vary param, set this like
+													# the line above: a list with one element, note the trailing comma
+													# For now, both vary params must be filtration params. Working on
+													# getting it to work for other params like weight_func.
+
+		load_saved_PRFs=False,
+
+		time_units='samples',
+
+		crop=(5000, 2005000),     # (start, stop) in time_units, or 'auto'
+
+		num_windows=10,			  # evenly spaced
+
+
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+	)
+
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
