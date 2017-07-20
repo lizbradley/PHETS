@@ -383,16 +383,18 @@ def plot_variance(
 		for i, val_2 in enumerate(vary_param_2[1]):
 			for j, val_1 in enumerate(vary_param_1[1]):
 
-				filt = filt_evo_array[i, j]
+				filt_evo = filt_evo_array[i, j]
 
-				comp_name = '{}_{}__{}_{}'.format(vary_param_1[0], val_1, vary_param_2[0], val_2)
-				PD_filename = dir + comp_name + 'PD.png'
-				PRF_filename = dir + comp_name + 'PRF.png'
-				movie_filename = dir + comp_name + 'movie.mp4'
+				for filt in filt_evo[::see_samples]:
 
-				make_PD(filt, PD_filename)
-				make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
-				make_movie(filt, movie_filename)
+					comp_name = '{}_{}__{}_{}'.format(vary_param_1[0], val_1, vary_param_2[0], val_2)
+					PD_filename = dir + comp_name + 'PD.png'
+					PRF_filename = dir + comp_name + 'PRF.png'
+					movie_filename = dir + comp_name + 'movie.mp4'
+
+					make_PD(filt, PD_filename)
+					make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
+					make_movie(filt, movie_filename)
 
 
 	def plot(data_list, out_filename):

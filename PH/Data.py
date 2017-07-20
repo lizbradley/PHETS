@@ -7,7 +7,9 @@ import subprocess
 import numpy as np
 import itertools
 
+from Utilities import blockPrint, enablePrint
 import BuildFiltration
+
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -90,7 +92,6 @@ class Filtration:
 		start_time = time.time()
 		np.savetxt('temp_data/worm_data.txt', self.sig)
 
-		from Utilities import blockPrint, enablePrint
 		try:
 			if silent: blockPrint()
 			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params, silent=silent)
@@ -197,7 +198,6 @@ class Filtration:
 			os.chdir('..')
 
 		def load_perseus_out_file():
-			print os.getcwd()
 			self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
 			if len(self.intervals) == 0:
 				print 'WARNING: no homology for this window!'

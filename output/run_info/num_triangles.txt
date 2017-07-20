@@ -1,1 +1,10 @@
 frame 0: 0
+frame 1: 62
+frame 2: 86
+frame 3: 95
+frame 4: 107
+frame 5: 130
+frame 6: 162
+frame 7: 197
+frame 8: 272
+frame 9: 338

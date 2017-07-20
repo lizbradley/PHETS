@@ -506,7 +506,7 @@ if test == 17:
 		{
 			'ds_rate': 50,
 			'worm_length': 2000,
-			'max_filtration_param': 0,
+			'max_filtration_param': -10,
 			'num_divisions': 20,
 			'graph_induced': False,
 
