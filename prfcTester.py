@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 16		# set test number here or with command line argument
+set_test = 5001		# set test number here or with command line argument
 
 
 
@@ -522,8 +522,8 @@ if test == 16:
 		{
 			'max_filtration_param': -10,
 			'num_divisions': 20,
-			'use_cliques': True,
-			'ds_rate': 50,
+			# 'use_cliques': True,
+			'ds_rate': 80,
 			'worm_length': 2000,
 
 		})
@@ -534,7 +534,7 @@ if test == 16:
 		'output/PRFCompare/variance/L63_d_or_amp.png',
 		params,
 
-		('d_orientation_amplify', np.arange(0, 30, 3)),			# vary param 1
+		('d_orientation_amplify', np.arange(0, 30, 10)),			# vary param 1
 		('use_cliques', (True, False)),							# vary param 2
 
 		load_saved_PRFs=True,
@@ -2632,7 +2632,7 @@ if test == 5000:
 		params,
 
 		('ds_rate', np.arange(100, 201, 20)),		# vary param 1
-		('worm_length', (5000, 10000, 20000)),				# vary param 2
+		('worm_length', (5000, 10000, 20000)),		# vary param 2 or None
 		# ('use_cliques', (True,)),					# null vary param 2 example
 
 													# For now, if you do not want to use second vary param, set this like
@@ -2648,6 +2648,55 @@ if test == 5000:
 
 		num_windows=10,			  # evenly spaced
 
+		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=20,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
+		quiet=True
+	)
+
+
+if test == 5001:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -10,
+			'num_divisions': 20,
+			'use_cliques': True,
+
+
+		})
+
+
+	plot_variance(
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/variance/L63.png',  # out filename
+		params,
+
+		('ds_rate', np.arange(100, 201, 40)),		# vary param 1
+		('worm_length', (5000, 6000)),				# vary param 2 or None
+		# ('use_cliques', (True,)),					# null vary param 2 example
+
+													# For now, if you do not want to use second vary param, set this like
+													# the line above: a list with one element, note the trailing comma
+													# For now, both vary params must be filtration params. Working on
+													# getting it to work for other params like weight_func.
+
+		load_saved_PRFs=False,
+
+		time_units='samples',
+
+		crop=(5000, 2005000),     # (start, stop) in time_units, or 'auto'
+
+		num_windows=5,			  # evenly spaced
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
@@ -2661,7 +2710,7 @@ if test == 5000:
 
 		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
+		quiet=True
 	)
-
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

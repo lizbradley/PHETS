@@ -369,7 +369,7 @@ def plot_variance(
 		dir = 'output/PRFCompare/variance/see_samples/{}/'.format(base_name)
 
 		if os.path.exists(dir):
-			r = raw_input('Overwrite {} (y/n)?'.format(dir))
+			r = raw_input('Overwrite {} (y/n)? '.format(dir))
 			if r == 'y':
 				pass
 			else:

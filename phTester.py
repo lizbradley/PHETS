@@ -488,11 +488,11 @@ if test == 16:
 	#
 
 
-	make_movie(
-		filtration,
-		'output/PH/49-C135B_movie.mp4',
-		color_scheme='highlight new'
-	)
+	# make_movie(
+	# 	filtration,
+	# 	'output/PH/49-C135B_movie.mp4',
+	# 	color_scheme='highlight new'
+	# )
 
 
 
@@ -512,23 +512,28 @@ if test == 17:
 
 		})
 
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()		# reuse last filtration
+	# filtration = Filtration(in_filename, filt_params)
+	filtration = load_saved_filtration()		# reuse last filtration
 
 
-	# make_PD(
-	# 	filtration,
-	# 	'output/PH/realdeal.png'
-	# )
 
-	# use cliques breaks gnuplot stuff -- see FiltrationMovie.py line 144
-	# gnuplot 3D not looks incorrect
-	# without cliques False, 2D gnuplot is correct (same as mpl)
-
-	make_movie(
+	make_PRF_plot(
 		filtration,
-		'output/PH/test17_cliques_gnu.mp4'
+		'output/PH/49-C135B_PRF.png',
+		PRF_res=50
+
 	)
+
+	make_PD(
+		filtration,
+		'output/PH/realdeal.png'
+	)
+
+
+	# make_movie(
+	# 	filtration,
+	# 	'output/PH/test17_cliques_gnu.mp4'
+	# )
 
 
 

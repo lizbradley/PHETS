@@ -385,15 +385,15 @@ def get_variance_data(filename, kwargs):
 			else:
 				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=False)
 
-
 			filt_arr.append(filt_evo)
 			prf_arr.append(prf_evo)
 
 		return prf_arr, filt_arr
 
-	print 'generating data...'
+	print 'generating data...\n'
 	if vary_param_2 is None:
 		prf_evos = vary_evos_over_param(sig, vary_param_1, filt_params)
+		print '\n'
 
 	elif vary_param_2[0] in filt_params:
 		prf_arr = []
@@ -406,6 +406,7 @@ def get_variance_data(filename, kwargs):
 			filt_arr.append(filt_evo)
 		prf_evos = prf_arr
 		filt_evos = filt_arr
+		print '\n'
 
 	elif vary_param_2[0] in kwargs:
 		pass

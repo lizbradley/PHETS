@@ -194,6 +194,7 @@ class Filtration:
 
 			else:
 				p = subprocess.Popen(perseus_cmd, shell=True)
+				p.communicate()		# wait
 
 			os.chdir('..')
 

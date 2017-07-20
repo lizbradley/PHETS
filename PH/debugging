@@ -1,0 +1,3 @@
+PH.make_movie works when called from phTester
+PH.make_PD and make_PRF_plot break from phTester
+
