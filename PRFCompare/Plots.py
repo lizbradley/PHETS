@@ -1,4 +1,5 @@
-import sys
+import sys, os, shutil
+
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -321,7 +322,8 @@ def plot_variance(
 		metric='L2', 		 # 'L1' (abs) or 'L2' (euclidean)
 		weight_func=lambda i, j: 1,
 
-		see_samples=5
+		see_samples=5,
+		quiet=True
 ):
 
 	def plot_trajectory(sig):
@@ -333,31 +335,68 @@ def plot_variance(
 		fig.savefig('output/PRFCompare/variance/trajectory.png')
 
 
-	def plot_heatmaps():
-		x, y, z, max_lim = sample_prfs[0]
+	def plot_heatmaps(data_arr):
+		print 'plotting heatmaps...'
+		for i, val_2 in enumerate(vary_param_2[1]):
+			for j, val_1 in enumerate(vary_param_1[1]):
+				fig = plt.figure(figsize=(13, 5), tight_layout=True)
+				ax1 = 		fig.add_subplot(131)
+				ax2 = 		fig.add_subplot(132)
+				ax3 = 		fig.add_subplot(133)
+				divider = make_axes_locatable(ax3)
+				c_ax = divider.append_axes('right', size='10%', pad=.2)
 
-		fig = plt.figure(figsize=(13, 5), tight_layout=True)
-		ax1 = 		fig.add_subplot(131)
-		ax2 = 		fig.add_subplot(132)
-		ax3 = 		fig.add_subplot(133)
-		divider = make_axes_locatable(ax3)
-		c_ax = divider.append_axes('right', size='10%', pad=.2)
+				x = y = np.linspace(0, np.power(2, .5), PRF_res)
+				data = data_arr[i, j]
 
-		plot_heatmap(ax1, c_ax, x, y, pointwise_mean)
-		ax1.set_title('pointwise mean')
-		plot_heatmap(ax2, c_ax, x, y, pointwise_variance)
-		ax2.set_title('pointwise variance')
-		plot_heatmap(ax3, c_ax, x, y, functional_COV)
-		ax3.set_title('functional COV')
+				plot_heatmap(ax1, c_ax, x, y, data.pointwise_mean)
+				ax1.set_title('pointwise mean')
+				plot_heatmap(ax2, c_ax, x, y, data.pointwise_var)
+				ax2.set_title('pointwise variance')
+				plot_heatmap(ax3, c_ax, x, y, data.functional_COV)
+				ax3.set_title('functional COV')
 
-		fig.suptitle(filename.split('/')[-1])
-		fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], vary_param_2[1][i], vary_param_1[0], vary_param_1[1][j])
-		fig.savefig('output/PRFCompare/variance/heatmaps/' + fname)
-		plt.close(fig)
+				fig.suptitle(filename.split('/')[-1])
+				fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], val_2, vary_param_1[0], val_1)
+				fig.savefig('output/PRFCompare/variance/heatmaps/' + fname)
+				plt.close(fig)
 
 
-	def plot(data_arr, out_filename):
-		print 'plotting...'
+	def show_samples(filt_evo_array):
+		print 'plotting filtration movies, PDs and PRFs...'
+		base_name = filename.split('/')[-1].split('.')[0]
+
+		dir = 'output/PRFCompare/mean/see_samples/{}/'.format(base_name)
+
+		if os.path.exists(dir):
+			r = raw_input('Overwrite {} (y/n)?'.format(dir))
+			if r == 'y':
+				pass
+			else:
+				print 'goodbye'
+				sys.exit()
+
+			shutil.rmtree(dir)
+		os.makedirs(dir)
+
+
+		for i, val_2 in enumerate(vary_param_2[1]):
+			for j, val_1 in enumerate(vary_param_1[1]):
+
+				filt = filt_evo_array[i, j]
+
+				comp_name = '{}_{}__{}_{}'.format(vary_param_1[0], val_1, vary_param_2[0], val_2)
+				PD_filename = dir + comp_name + 'PD.png'
+				PRF_filename = dir + comp_name + 'PRF.png'
+				movie_filename = dir + comp_name + 'movie.mp4'
+
+				make_PD(filt, PD_filename)
+				make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
+				make_movie(filt, movie_filename)
+
+
+	def plot(data_list, out_filename):
+		print 'plotting variance curves...'
 		fig = plt.figure(figsize=(12, 8), tight_layout=True)
 
 		label_kwargs = {
@@ -389,15 +428,15 @@ def plot_variance(
 
 		label_list = [vary_param_2[0] + ' = ' + str(val) for val in vary_param_2[1]]
 
-		for i, val_2_data in enumerate(data_arr):
+		for i, val_2_data in enumerate(data_list):
 			label = label_list[i]
 			x = vary_param_1[1]
-			ax1.plot(x, val_2_data.pointwise_mean_norm, label=label)
+			ax1.plot(x, val_2_data.pointwise_variance_norm, 'o', label=label)
 			ax1.legend(loc=1)
-			ax2.plot(x, val_2_data.variance)
-			ax3.plot(x, val_2_data.scaled_variance)
-			ax4.plot(x, val_2_data.pointwise_variance_norm)
-			ax5.plot(x, val_2_data.functional_COV_norm)
+			ax2.plot(x, val_2_data.variance, 'o')
+			ax3.plot(x, val_2_data.scaled_variance, 'o')
+			ax4.plot(x, val_2_data.pointwise_variance_norm, 'o')
+			ax5.plot(x, val_2_data.functional_COV_norm, 'o')
 
 		for ax in [ax1, ax2, ax3, ax4, ax5]:
 			ax.grid()
@@ -408,9 +447,6 @@ def plot_variance(
 				plt.setp(ax.get_xticklines(), visible=False)
 
 		fig.savefig(out_filename)
-
-
-
 
 	# ===========================================================================
 	# 		MAIN: plot_variance()
@@ -426,6 +462,8 @@ def plot_variance(
 
 	# plot_trajectory(sig)
 
-	prf_evo_array = get_variance_data(filename, kwargs)
-	variance_data_array = process_variance_data(prf_evo_array, metric, weight_func, dist_scale)
+	prf_evo_array, filt_evo_array = get_variance_data(filename, kwargs)
+	variance_data_array, hmap_data = process_variance_data(prf_evo_array, metric, weight_func, dist_scale)
 	plot(variance_data_array, out_filename)
+	plot_heatmaps(hmap_data)
+	show_samples(filt_evo_array)

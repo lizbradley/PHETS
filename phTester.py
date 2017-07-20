@@ -516,10 +516,10 @@ if test == 17:
 	# filtration = load_saved_filtration()		# reuse last filtration
 
 
-	# make_PD(
-	# 	filtration,
-	# 	'output/PH/realdeal.png'
-	# )
+	make_PD(
+		filtration,
+		'output/PH/realdeal.png'
+	)
 
 	# use cliques breaks gnuplot stuff -- see FiltrationMovie.py line 144
 	# gnuplot 3D not looks incorrect

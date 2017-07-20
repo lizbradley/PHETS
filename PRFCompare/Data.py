@@ -20,13 +20,14 @@ def norm(f, metric, f_weight):
 
 	PRF_res = len(f)
 	dA = 2. / (PRF_res ** 2)		# normalize such that area of PRF domain is 1
-	f_weight = f_weight(*np.meshgrid(np.linspace(0, 1, PRF_res), np.linspace(0, 1, PRF_res)))
+	f_weight = f_weight(*np.meshgrid(np.linspace(0, dA ** .5, PRF_res), np.linspace(0, dA ** .5, PRF_res)))
 
 	if metric == 'L1':
 		return np.nansum(np.multiply(np.abs(f), f_weight)) * dA
 
 	elif metric == 'L2':
-		return np.sqrt(np.nansum(np.multiply(np.power(f, 2), f_weight))) * dA
+
+		return np.sqrt(np.nansum(np.multiply(np.power(f, 2), f_weight)) * dA)
 
 	else:
 		print "ERROR: metric not recognized. Use 'L1' or 'L2'."
@@ -294,7 +295,7 @@ def dists_compare(
 
 
 
-def get_prf_evo(sig, filt_params, num_windows, PRF_res):
+def get_prf_evo(sig, filt_params, num_windows, PRF_res, silent=True):
 
 	def slice_sig(sig, num_windows, window_len_samp):
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
@@ -307,7 +308,7 @@ def get_prf_evo(sig, filt_params, num_windows, PRF_res):
 		filts = []
 		for i, worm in enumerate(worms):
 			# filt = (Filtration(worm, filt_params, filename=filename))
-			filt = Filtration(worm, filt_params, silent=True)
+			filt = Filtration(worm, filt_params, silent=silent)
 			filts.append(filt)
 		return filts
 
@@ -319,10 +320,13 @@ def get_prf_evo(sig, filt_params, num_windows, PRF_res):
 		return np.asarray(funcs)
 
 
+
+
+
 	sigs = slice_sig(sig, num_windows, filt_params['worm_length'])
 	filts = get_filtrations(sigs, filt_params)
 	prfs = get_prfs(filts)
-	return prfs
+	return prfs, filts
 
 
 
@@ -347,7 +351,7 @@ def get_variance_data(filename, kwargs):
 
 	if kwargs['load_saved_PRFs']:
 		print 'WARNING: loading saved data'
-		return np.load('PRFCompare/PRFs.npy')
+		return np.load('PRFCompare/PRFs.npy'), np.load('PRFCompare/filts.npy')
 
 
 
@@ -367,31 +371,41 @@ def get_variance_data(filename, kwargs):
 
 
 	def vary_evos_over_param(sig, vary_param, filt_params):
-		arr = []
+		prf_arr = []
+		filt_arr = []
 		for val_1 in vary_param[1]:
 			filt_params.update({vary_param[0]: val_1})
 
-			sys.stdout.write('\r		vary_param_1: {}		vary_param_2: {}		'.format(val_1, val_2))
-			sys.stdout.flush()
+			if kwargs['quiet']:
+				sys.stdout.write('\r		vary_param_1: {}		vary_param_2: {}		'.format(val_1, val_2))
+				sys.stdout.flush()
 
-			# get PRFs at evenly spaced intervals along input -- 'prf evolution'
-			prf_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'])
+				# get PRFs at evenly spaced intervals along input -- 'prf evolution'
+				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=True)
+			else:
+				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=False)
 
 
-			arr.append(prf_evo)
+			filt_arr.append(filt_evo)
+			prf_arr.append(prf_evo)
 
-		return arr
+		return prf_arr, filt_arr
 
 	print 'generating data...'
 	if vary_param_2 is None:
 		prf_evos = vary_evos_over_param(sig, vary_param_1, filt_params)
 
 	elif vary_param_2[0] in filt_params:
-		arr = []
+		prf_arr = []
+		filt_arr = []
 		for val_2 in vary_param_2[1]:
 			filt_params.update({vary_param_2[0]: val_2})
-			arr.append(vary_evos_over_param(sig, vary_param_1, filt_params))
-		prf_evos = arr
+			prf_evo, filt_evo = vary_evos_over_param(sig, vary_param_1, filt_params)
+
+			prf_arr.append(prf_evo)
+			filt_arr.append(filt_evo)
+		prf_evos = prf_arr
+		filt_evos = filt_arr
 
 	elif vary_param_2[0] in kwargs:
 		pass
@@ -401,10 +415,12 @@ def get_variance_data(filename, kwargs):
 		sys.exit()
 
 	prf_evos = np.asarray(prf_evos)
+	filt_evos = np.asarray(filt_evos)
 	np.save('PRFCompare/PRFs.npy', prf_evos)
+	np.save('PRFCompare/filts.npy', filt_evos)
 	# array with shape (len(vary_param_2[1], len(vary_param_1[1])
 	# each element is a 1D list of PRFs from regular samples of the input
-	return prf_evos
+	return prf_evos, filt_evos
 
 
 class VarianceData:
@@ -416,47 +432,67 @@ class VarianceData:
 		self.pointwise_variance_norm = []
 		self.functional_COV_norm = []
 
+class HeatmapData:
+
+	def __init__(self):
+		self.pointwise_mean = [[]]
+		self.pointwise_var = [[]]
+		self.functional_COV = [[]]
+
 
 
 def process_variance_data(prf_evo_array, metric, weight_func, dist_scale):
-	print 'processing...'
-	arr_2 = []
+	print 'processing data...'
+	frames = []
+
+	hmap_arr_2 = []
 	for i, row in enumerate(prf_evo_array):  # for each value of vary_param_2
 
-		arr_1 = VarianceData()
+		var_data = VarianceData()
+		hmap_arr_1 = []
 
 		for j, sample_prfs in enumerate(row):	 # for each value of vary_param_1
 
+			hmap_data = HeatmapData()
 			# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
 
 			sample_prfs_z = sample_prfs[:, 2]		# take z component only
 			null_weight_func = lambda i, j: 1
 			pointwise_mean = np.mean(sample_prfs_z, axis=0)					# plot as heatmap
+			hmap_data.pointwise_mean = pointwise_mean
+
 			pmn = norm(pointwise_mean, metric, null_weight_func) 			# plot as data point
-			arr_1.pointwise_mean_norm.append(pmn)
+			var_data.pointwise_mean_norm.append(pmn)
 
 			# HOMEGROWN VARIANCE #
 
 			dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in sample_prfs_z]
 			variance = np.mean(dists)										# plot as data point
-			arr_1.variance.append(variance)
+			var_data.variance.append(variance)
 
 			scaled_dists = get_dists_from_ref(sample_prfs_z, pointwise_mean, weight_func, metric, dist_scale)
 			scaled_variance = np.mean(scaled_dists)							# plot as data point
-			arr_1.scaled_variance.append(scaled_variance)
+			var_data.scaled_variance.append(scaled_variance)
 
 			# POINTWISE VARIANCE #
 
 			diffs = [PRF - pointwise_mean for PRF in sample_prfs_z]
 
 			pointwise_variance = np.var(diffs, axis=0)						# plot as heatmap
+			hmap_data.pointwise_var = pointwise_variance
+
 			pvn = norm(pointwise_variance, metric, null_weight_func)		# plot as data point
-			arr_1.pointwise_variance_norm.append(pvn)
+			var_data.pointwise_variance_norm.append(pvn)
 
 			functional_COV = pointwise_variance / pointwise_mean			# plot as heatmap
+			hmap_data.functional_COV = functional_COV
+
 			fcovn = norm(functional_COV, metric, null_weight_func)			# plot as data point
-			arr_1.functional_COV_norm.append(fcovn)
+			var_data.functional_COV_norm.append(fcovn)
 
-		arr_2.append(arr_1)
+			hmap_arr_1.append(hmap_data)
 
-	return arr_2
+		frames.append(var_data)
+		hmap_arr_2.append(hmap_arr_1)
+
+	return np.asarray(frames), np.asarray(hmap_arr_2)

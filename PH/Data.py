@@ -23,6 +23,16 @@ def load_saved_filtration():
 
 import subprocess
 from config import find_landmarks_c_compile_str
+
+
+class PDData:
+	def __init__(self, mortal, immortal, lim):
+		self.mortal = mortal
+		self.immortal = immortal
+		self.lim = lim
+
+
+
 class Filtration:
 
 	def __init__(self, sig, params, filename='none', silent=False):
@@ -187,6 +197,7 @@ class Filtration:
 			os.chdir('..')
 
 		def load_perseus_out_file():
+			print
 			self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
 			if len(self.intervals) == 0:
 				print 'WARNING: no homology for this window!'
@@ -202,11 +213,6 @@ class Filtration:
 
 	def _build_PD_data(self):
 		""" formats perseus output """
-		class PDData:
-			def __init__(self, mortal, immortal, lim):
-				self.mortal = mortal
-				self.immortal = immortal
-				self.lim = lim
 
 		def get_multiplicity(birth_e, death_e):
 			try:
