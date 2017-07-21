@@ -2619,7 +2619,7 @@ if test == 5000:
 	params.update(
 		{
 			'max_filtration_param': -10,
-			'num_divisions': 20,
+			'num_divisions': 5,
 			'use_cliques': True,
 
 
@@ -2628,11 +2628,11 @@ if test == 5000:
 
 	plot_variance(
 		'datasets/trajectories/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/variance/L63.png',  # out filename
+		'output/PRFCompare/variance/L63_dsrVwl.png',  # out filename
 		params,
 
-		('ds_rate', np.arange(100, 201, 20)),		# vary param 1
-		('worm_length', (5000, 10000, 20000)),		# vary param 2 or None
+		('ds_rate', (50, 100, 200)),		# vary param 1
+		('worm_length', (2500,5000, 10000, 20000)),		# vary param 2 or None
 		# ('use_cliques', (True,)),					# null vary param 2 example
 
 													# For now, if you do not want to use second vary param, set this like
@@ -2650,7 +2650,7 @@ if test == 5000:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+		PRF_res=5,  # num divisions
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -2669,8 +2669,9 @@ if test == 5001:
 	params.update(
 		{
 			'max_filtration_param': -10,
-			'num_divisions': 20,
+			'num_divisions': 5,
 			'use_cliques': True,
+			'ds_rate': 100
 
 
 		})
@@ -2681,8 +2682,8 @@ if test == 5001:
 		'output/PRFCompare/variance/L63.png',  # out filename
 		params,
 
-		('ds_rate', np.arange(100, 201, 40)),		# vary param 1
-		('worm_length', (5000, 6000)),				# vary param 2 or None
+		('d_use_hamiltonian', (1,2,5,10,20,50)),		# vary param 1
+		('worm_length', (2500, 20000)),				# vary param 2 or None
 		# ('use_cliques', (True,)),					# null vary param 2 example
 
 													# For now, if you do not want to use second vary param, set this like
@@ -2700,10 +2701,10 @@ if test == 5001:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+		PRF_res=5,  # num divisions
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
-		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
 		# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,

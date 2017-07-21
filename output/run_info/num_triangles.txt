@@ -1,4 +1,5 @@
 frame 0: 0
+<<<<<<< HEAD
 frame 1: 28
 frame 2: 40
 frame 3: 40
@@ -16,3 +17,10 @@ frame 14: 1090
 frame 15: 1379
 frame 16: 1965
 frame 17: 2555
+=======
+frame 1: 371
+frame 2: 864
+frame 3: 1894
+frame 4: 3897
+frame 5: 6944
+>>>>>>> e1fe2b58f4de47655942f131c56c078fd75d4e1b
