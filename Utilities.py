@@ -26,7 +26,7 @@ def check_overwrite(out_file_name):
 def clear_old_files(path, see_samples):
 	old_files = os.listdir(path)
 	if old_files and see_samples:
-		ans = raw_input('Clear files in ' + path + '? (y/n/q) \n')
+		ans = raw_input('Overwrite files in ' + path + '? (y/n/q) \n')
 		if ans == 'y':
 			for f in old_files:
 				if f != '.gitkeep':
@@ -44,3 +44,25 @@ def blockPrint():
 def enablePrint():
 	sys.stdout = sys.__stdout__
 
+
+
+def clear_dir(dir):
+
+	files = os.listdir(dir)
+	if files:
+		r = raw_input('Clear files in {}? (y/n) '.format(dir))
+	else:
+		return
+	if r == 'y':
+		for f in files:
+			os.remove(dir + f)
+	else:
+		print 'Goodbye!'
+		sys.exit()
+
+
+def print_title(str):
+	if str:
+		print '=================================================================='
+		print str
+		print '=================================================================='

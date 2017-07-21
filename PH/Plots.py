@@ -162,7 +162,7 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 	fig.savefig(out_filename)
 
 
-def plot_heatmap(plot_ax, cbar_ax, x, y, z):
+def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 	plot_ax.set_aspect('equal')
 
 	viridis = matplotlib.cm.get_cmap('viridis')
@@ -175,6 +175,19 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z):
 	plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm)
 	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels)
 
+	if annot:
+		offset = (1.41 / (len(x) - 1)) / 2
+		for i, x_ in enumerate(x):
+			for j, y_ in enumerate(y):
+				plot_ax.text(x_ + offset, y_ + offset, '%.3f' % z[j, i],
+						 horizontalalignment='center',
+						 verticalalignment='center',
+						 color='red'
+						 )
+
+
+
+	return cmap
 
 if __name__ == '__main__':
 	make_PD('filt_test.txt')

@@ -318,7 +318,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		out, err = p.communicate()
 	else:
 		p = subprocess.Popen(find_landmarks_cmd)
-
+		p.communicate()
 
 	## Build and sort distance matrix.
 	landmarks_file = open("landmark_outputs.txt","rb")

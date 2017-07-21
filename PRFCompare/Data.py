@@ -11,8 +11,7 @@ from DCE.Tools import auto_tau
 from PH.Data import Filtration
 from PH.FiltrationMovie import make_movie
 from PH.Plots import make_PD, make_PRF_plot
-from Utilities import clear_old_files, blockPrint, enablePrint
-
+from Utilities import clear_old_files, blockPrint, enablePrint, print_title
 from config import WAV_SAMPLE_RATE
 
 
@@ -307,6 +306,8 @@ def get_prf_evo(sig, filt_params, num_windows, PRF_res, silent=True):
 	def get_filtrations(worms, filt_params):
 		filts = []
 		for i, worm in enumerate(worms):
+
+			if not silent: print_title('window # {}'.format(i))
 			# filt = (Filtration(worm, filt_params, filename=filename))
 			filt = Filtration(worm, filt_params, silent=silent)
 			filts.append(filt)
@@ -316,7 +317,12 @@ def get_prf_evo(sig, filt_params, num_windows, PRF_res, silent=True):
 	def get_prfs(filts):
 		funcs = []
 		for i, filt in enumerate(filts):
-			funcs.append(filt.get_PRF(PRF_res, silent=True))
+			if silent:
+				funcs.append(filt.get_PRF(PRF_res, silent=True))
+			else:
+				print_title('window # {}'.format(i))
+				funcs.append(filt.get_PRF(PRF_res, silent=False))
+
 		return np.asarray(funcs)
 
 
@@ -341,7 +347,6 @@ def crop_sig(sig, crop, time_units):
 	else:
 		print "ERROR: invalid 'crop' or 'time_units'"
 		sys.exit()
-
 
 
 def get_variance_data(filename, kwargs):
@@ -370,7 +375,7 @@ def get_variance_data(filename, kwargs):
 	sig = crop_sig(sig_full, kwargs['crop'], kwargs['time_units'])
 
 
-	def vary_evos_over_param(sig, vary_param, filt_params):
+	def vary_evos_over_param(sig, vary_param, filt_params, title_str=None):
 		prf_arr = []
 		filt_arr = []
 		for val_1 in vary_param[1]:
@@ -382,7 +387,12 @@ def get_variance_data(filename, kwargs):
 
 				# get PRFs at evenly spaced intervals along input -- 'prf evolution'
 				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=True)
+
 			else:
+
+				print_title('{}: {}'.format(vary_param_1[0], val_1))
+				if title_str: print_title(title_str)
+
 				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=False)
 
 			filt_arr.append(filt_evo)
@@ -395,12 +405,14 @@ def get_variance_data(filename, kwargs):
 		prf_evos = vary_evos_over_param(sig, vary_param_1, filt_params)
 		print '\n'
 
+
 	elif vary_param_2[0] in filt_params:
 		prf_arr = []
 		filt_arr = []
 		for val_2 in vary_param_2[1]:
 			filt_params.update({vary_param_2[0]: val_2})
-			prf_evo, filt_evo = vary_evos_over_param(sig, vary_param_1, filt_params)
+			t_str = '{}: {}'.format(vary_param_2[0], val_2)
+			prf_evo, filt_evo = vary_evos_over_param(sig, vary_param_1, filt_params, title_str=t_str)
 
 			prf_arr.append(prf_evo)
 			filt_arr.append(filt_evo)

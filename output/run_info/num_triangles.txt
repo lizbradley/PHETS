@@ -1,26 +1,6 @@
 frame 0: 0
-<<<<<<< HEAD
-frame 1: 28
-frame 2: 40
-frame 3: 40
-frame 4: 54
-frame 5: 62
-frame 6: 74
-frame 7: 91
-frame 8: 104
-frame 9: 140
-frame 10: 226
-frame 11: 401
-frame 12: 616
-frame 13: 876
-frame 14: 1090
-frame 15: 1379
-frame 16: 1965
-frame 17: 2555
-=======
-frame 1: 371
-frame 2: 864
-frame 3: 1894
-frame 4: 3897
-frame 5: 6944
->>>>>>> e1fe2b58f4de47655942f131c56c078fd75d4e1b
+frame 1: 30
+frame 2: 77
+frame 3: 265
+frame 4: 818
+frame 5: 1753

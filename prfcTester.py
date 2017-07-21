@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 5001		# set test number here or with command line argument
+set_test = 5000		# set test number here or with command line argument
 
 
 
@@ -2632,15 +2632,10 @@ if test == 5000:
 		params,
 
 		('ds_rate', (50, 100, 200)),		# vary param 1
-		('worm_length', (2500,5000, 10000, 20000)),		# vary param 2 or None
-		# ('use_cliques', (True,)),					# null vary param 2 example
+		('worm_length', (2500, 5000, 10000)),		# vary param 2 or None
 
-													# For now, if you do not want to use second vary param, set this like
-													# the line above: a list with one element, note the trailing comma
-													# For now, both vary params must be filtration params. Working on
-													# getting it to work for other params like weight_func.
 
-		load_saved_PRFs=False,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 
@@ -2660,7 +2655,9 @@ if test == 5000:
 
 		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
-		quiet=True
+		quiet=False,
+
+		annot_hm=True
 	)
 
 
@@ -2684,12 +2681,6 @@ if test == 5001:
 
 		('d_use_hamiltonian', (1,2,5,10,20,50)),		# vary param 1
 		('worm_length', (2500, 20000)),				# vary param 2 or None
-		# ('use_cliques', (True,)),					# null vary param 2 example
-
-													# For now, if you do not want to use second vary param, set this like
-													# the line above: a list with one element, note the trailing comma
-													# For now, both vary params must be filtration params. Working on
-													# getting it to work for other params like weight_func.
 
 		load_saved_PRFs=False,
 
@@ -2711,7 +2702,9 @@ if test == 5001:
 
 		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
-		quiet=True
+		quiet=False,
+
+		annot_hm=True
 	)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

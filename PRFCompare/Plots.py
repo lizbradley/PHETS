@@ -10,7 +10,7 @@ from PH import make_PD, make_PRF_plot, make_movie, Filtration
 from PH.Plots import plot_heatmap
 from PH.TitleBox import add_filenames_table, add_filt_params_table
 from PRFCompare.Data import get_dists_from_ref, dists_compare, get_PRFs, norm
-from Utilities import clear_old_files
+from Utilities import clear_old_files, clear_dir, print_title
 
 
 def plot_dists_vs_ref(
@@ -323,7 +323,9 @@ def plot_variance(
 		weight_func=lambda i, j: 1,
 
 		see_samples=5,
-		quiet=True
+		quiet=True,
+
+		annot_hm=False
 ):
 
 	def plot_trajectory(sig):
@@ -335,7 +337,14 @@ def plot_variance(
 		fig.savefig('output/PRFCompare/variance/trajectory.png')
 
 
+
+	import seaborn as sns
+
 	def plot_heatmaps(data_arr):
+
+		dir = 'output/PRFCompare/variance/heatmaps/'
+		clear_dir(dir)
+
 		print 'plotting heatmaps...'
 		for i, val_2 in enumerate(vary_param_2[1]):
 			for j, val_1 in enumerate(vary_param_1[1]):
@@ -347,7 +356,7 @@ def plot_variance(
 				div1 = make_axes_locatable(ax1)
 				div2 = make_axes_locatable(ax2)
 				div3 = make_axes_locatable(ax3)
-
+				#
 				cax1 = div1.append_axes('right', size='10%', pad=.2)
 				cax2 = div2.append_axes('right', size='10%', pad=.2)
 				cax3 = div3.append_axes('right', size='10%', pad=.2)
@@ -355,16 +364,20 @@ def plot_variance(
 				x = y = np.linspace(0, np.power(2, .5), PRF_res)
 				data = data_arr[i, j]
 
-				plot_heatmap(ax1, cax1, x, y, data.pointwise_mean)
+
+
+				plot_heatmap(ax1, cax1, x, y, data.pointwise_mean, annot=annot_hm)
+				plot_heatmap(ax2, cax2, x, y, data.pointwise_var, annot=annot_hm)
+				plot_heatmap(ax3, cax3, x, y, data.functional_COV, annot=annot_hm)
+
+
 				ax1.set_title('pointwise mean')
-				plot_heatmap(ax2, cax2, x, y, data.pointwise_var)
 				ax2.set_title('pointwise variance')
-				plot_heatmap(ax3, cax3, x, y, data.functional_COV)
 				ax3.set_title('functional COV')
 
 				fig.suptitle(filename.split('/')[-1])
 				fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], val_2, vary_param_1[0], val_1)
-				fig.savefig('output/PRFCompare/variance/heatmaps/' + fname)
+				fig.savefig(dir + fname)
 				plt.close(fig)
 
 
@@ -391,9 +404,12 @@ def plot_variance(
 
 				filt_evo = filt_evo_array[i, j]
 
-				for filt in filt_evo[::see_samples]:
+				print_title('vary_param_1 : {} \t vary_param_2: {}'.format(val_1, val_2))
 
-					comp_name = '{}_{}__{}_{}'.format(vary_param_1[0], val_1, vary_param_2[0], val_2)
+				for i, filt in enumerate(filt_evo[::see_samples]):
+
+					worm_num = i * see_samples
+					comp_name = '{}_{}__{}_{}_#{}'.format(vary_param_1[0], val_1, vary_param_2[0], val_2, worm_num)
 					PD_filename = dir + comp_name + 'PD.png'
 					PRF_filename = dir + comp_name + 'PRF.png'
 					movie_filename = dir + comp_name + 'movie.mp4'
