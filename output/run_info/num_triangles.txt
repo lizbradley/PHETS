@@ -8,3 +8,11 @@ frame 6: 74
 frame 7: 91
 frame 8: 104
 frame 9: 140
+frame 10: 226
+frame 11: 401
+frame 12: 616
+frame 13: 876
+frame 14: 1090
+frame 15: 1379
+frame 16: 1965
+frame 17: 2555

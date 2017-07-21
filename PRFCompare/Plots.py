@@ -343,17 +343,23 @@ def plot_variance(
 				ax1 = 		fig.add_subplot(131)
 				ax2 = 		fig.add_subplot(132)
 				ax3 = 		fig.add_subplot(133)
-				divider = make_axes_locatable(ax3)
-				c_ax = divider.append_axes('right', size='10%', pad=.2)
+
+				div1 = make_axes_locatable(ax1)
+				div2 = make_axes_locatable(ax2)
+				div3 = make_axes_locatable(ax3)
+
+				cax1 = div1.append_axes('right', size='10%', pad=.2)
+				cax2 = div2.append_axes('right', size='10%', pad=.2)
+				cax3 = div3.append_axes('right', size='10%', pad=.2)
 
 				x = y = np.linspace(0, np.power(2, .5), PRF_res)
 				data = data_arr[i, j]
 
-				plot_heatmap(ax1, c_ax, x, y, data.pointwise_mean)
+				plot_heatmap(ax1, cax1, x, y, data.pointwise_mean)
 				ax1.set_title('pointwise mean')
-				plot_heatmap(ax2, c_ax, x, y, data.pointwise_var)
+				plot_heatmap(ax2, cax2, x, y, data.pointwise_var)
 				ax2.set_title('pointwise variance')
-				plot_heatmap(ax3, c_ax, x, y, data.functional_COV)
+				plot_heatmap(ax3, cax3, x, y, data.functional_COV)
 				ax3.set_title('functional COV')
 
 				fig.suptitle(filename.split('/')[-1])
