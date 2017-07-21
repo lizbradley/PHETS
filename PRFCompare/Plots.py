@@ -455,12 +455,12 @@ def plot_variance(
 		for i, val_2_data in enumerate(data_list):
 			label = label_list[i]
 			x = vary_param_1[1]
-			ax1.plot(x, val_2_data.pointwise_mean_norm, 'o', label=label)
+			ax1.plot(x, val_2_data.pointwise_mean_norm, '--o', label=label)
 			ax1.legend(loc=1)
-			ax2.plot(x, val_2_data.variance, 'o')
-			ax3.plot(x, val_2_data.scaled_variance, 'o')
-			ax4.plot(x, val_2_data.pointwise_variance_norm, 'o')
-			ax5.plot(x, val_2_data.functional_COV_norm, 'o')
+			ax2.plot(x, val_2_data.variance, '--o')
+			ax3.plot(x, val_2_data.scaled_variance, '--o')
+			ax4.plot(x, val_2_data.pointwise_variance_norm, '--o')
+			ax5.plot(x, val_2_data.functional_COV_norm, '--o')
 
 		for ax in [ax1, ax2, ax3, ax4, ax5]:
 			ax.grid()
