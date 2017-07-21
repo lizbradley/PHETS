@@ -2634,7 +2634,6 @@ if test == 5000:
 		('ds_rate', (50, 100, 200)),		# vary param 1
 		('worm_length', (2500, 5000, 10000)),		# vary param 2 or None
 
-
 		load_saved_PRFs=True,
 
 		time_units='samples',
@@ -2655,10 +2654,10 @@ if test == 5000:
 
 		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
-		quiet=False,
-
+		quiet=True,
 		annot_hm=True
 	)
+
 
 
 if test == 5001:

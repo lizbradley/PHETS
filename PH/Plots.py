@@ -182,7 +182,7 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 				plot_ax.text(x_ + offset, y_ + offset, '%.3f' % z[j, i],
 						 horizontalalignment='center',
 						 verticalalignment='center',
-						 color='red'
+						 color='salmon'
 						 )
 
 
