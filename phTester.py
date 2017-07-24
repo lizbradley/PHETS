@@ -512,8 +512,8 @@ if test == 17:
 
 		})
 
-	# filtration = Filtration(in_filename, filt_params)
-	filtration = load_saved_filtration()		# reuse last filtration
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuse last filtration
 
 
 

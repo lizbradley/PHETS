@@ -306,11 +306,16 @@ def get_prf_evo(sig, filt_params, num_windows, PRF_res, silent=True):
 	def get_filtrations(worms, filt_params):
 		filts = []
 		for i, worm in enumerate(worms):
+			if silent:
+				blockPrint()
+				filt = Filtration(worm, filt_params, silent=silent)
+				enablePrint()
+			else:
+				print_title('window # {}'.format(i))
+				filt = Filtration(worm, filt_params, silent=silent)
 
-			if not silent: print_title('window # {}'.format(i))
-			# filt = (Filtration(worm, filt_params, filename=filename))
-			filt = Filtration(worm, filt_params, silent=silent)
 			filts.append(filt)
+
 		return filts
 
 
@@ -353,7 +358,6 @@ def get_variance_data(filename, kwargs):
 
 	# PRF_res, time_units, normalize_volume, num_windows, window_size, see_samples = options
 
-
 	if kwargs['load_saved_PRFs']:
 		print 'WARNING: loading saved data'
 		return np.load('PRFCompare/PRFs.npy'), np.load('PRFCompare/filts.npy')
@@ -384,15 +388,12 @@ def get_variance_data(filename, kwargs):
 			if kwargs['quiet']:
 				sys.stdout.write('\r		vary_param_1: {}		vary_param_2: {}		'.format(val_1, val_2))
 				sys.stdout.flush()
-
 				# get PRFs at evenly spaced intervals along input -- 'prf evolution'
 				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=True)
 
 			else:
-
 				print_title('{}: {}'.format(vary_param_1[0], val_1))
 				if title_str: print_title(title_str)
-
 				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=False)
 
 			filt_arr.append(filt_evo)
@@ -400,11 +401,13 @@ def get_variance_data(filename, kwargs):
 
 		return prf_arr, filt_arr
 
-	print 'generating data...\n'
-	if vary_param_2 is None:
-		prf_evos = vary_evos_over_param(sig, vary_param_1, filt_params)
-		print '\n'
 
+	print 'generating data...\n'
+
+	if vary_param_2 is None:
+		val_2='None'
+		prf_evos, filt_evos = vary_evos_over_param(sig, vary_param_1, filt_params)
+		print '\n'
 
 	elif vary_param_2[0] in filt_params:
 		prf_arr = []
@@ -412,10 +415,11 @@ def get_variance_data(filename, kwargs):
 		for val_2 in vary_param_2[1]:
 			filt_params.update({vary_param_2[0]: val_2})
 			t_str = '{}: {}'.format(vary_param_2[0], val_2)
-			prf_evo, filt_evo = vary_evos_over_param(sig, vary_param_1, filt_params, title_str=t_str)
+			prf_evos, filt_evos = vary_evos_over_param(sig, vary_param_1, filt_params, title_str=t_str)
 
-			prf_arr.append(prf_evo)
-			filt_arr.append(filt_evo)
+			prf_arr.append(prf_evos)
+			filt_arr.append(filt_evos)
+
 		prf_evos = prf_arr
 		filt_evos = filt_arr
 		print '\n'
@@ -454,58 +458,77 @@ class HeatmapData:
 
 
 
+
+
 def process_variance_data(prf_evo_array, metric, weight_func, dist_scale):
-	print 'processing data...'
-	frames = []
 
-	hmap_arr_2 = []
-	for i, row in enumerate(prf_evo_array):  # for each value of vary_param_2
-
+	def calculate_curve_data(prf_evos_1d):
 		var_data = VarianceData()
-		hmap_arr_1 = []
+		hmap_data_arr = []
 
-		for j, sample_prfs in enumerate(row):	 # for each value of vary_param_1
+		for prf_evo in prf_evos_1d:  # for each value of vary_param_1
 
 			hmap_data = HeatmapData()
 			# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
 
-			sample_prfs_z = sample_prfs[:, 2]		# take z component only
+			prf_evo = prf_evo[:, 2]  # take z component only
 			null_weight_func = lambda i, j: 1
-			pointwise_mean = np.mean(sample_prfs_z, axis=0)					# plot as heatmap
+			pointwise_mean = np.mean(prf_evo, axis=0)  # plot as heatmap
 			hmap_data.pointwise_mean = pointwise_mean
 
-			pmn = norm(pointwise_mean, metric, null_weight_func) 			# plot as data point
+			pmn = norm(pointwise_mean, metric, null_weight_func)  # plot as data point
 			var_data.pointwise_mean_norm.append(pmn)
 
 			# HOMEGROWN VARIANCE #
 
-			dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in sample_prfs_z]
-			variance = np.mean(dists)										# plot as data point
+			dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in prf_evo]
+			variance = np.mean(dists)  # plot as data point
 			var_data.variance.append(variance)
 
-			scaled_dists = get_dists_from_ref(sample_prfs_z, pointwise_mean, weight_func, metric, dist_scale)
-			scaled_variance = np.mean(scaled_dists)							# plot as data point
+			scaled_dists = get_dists_from_ref(prf_evo, pointwise_mean, weight_func, metric, dist_scale)
+			scaled_variance = np.mean(scaled_dists)  # plot as data point
 			var_data.scaled_variance.append(scaled_variance)
 
 			# POINTWISE VARIANCE #
 
-			diffs = [PRF - pointwise_mean for PRF in sample_prfs_z]
+			diffs = [PRF - pointwise_mean for PRF in prf_evo]
 
-			pointwise_variance = np.var(diffs, axis=0)						# plot as heatmap
+			pointwise_variance = np.var(diffs, axis=0)  # plot as heatmap
 			hmap_data.pointwise_var = pointwise_variance
 
-			pvn = norm(pointwise_variance, metric, null_weight_func)		# plot as data point
+			pvn = norm(pointwise_variance, metric, null_weight_func)  # plot as data point
 			var_data.pointwise_variance_norm.append(pvn)
 
-			functional_COV = pointwise_variance / pointwise_mean			# plot as heatmap
+			functional_COV = pointwise_variance / pointwise_mean  # plot as heatmap
 			hmap_data.functional_COV = functional_COV
 
-			fcovn = norm(functional_COV, metric, null_weight_func)			# plot as data point
+			fcovn = norm(functional_COV, metric, null_weight_func)  # plot as data point
 			var_data.functional_COV_norm.append(fcovn)
 
-			hmap_arr_1.append(hmap_data)
+			hmap_data_arr.append(hmap_data)
 
-		frames.append(var_data)
-		hmap_arr_2.append(hmap_arr_1)
+		return var_data, hmap_data_arr
 
-	return np.asarray(frames), np.asarray(hmap_arr_2)
+	print 'processing data...'
+	frames = []
+	hmap_arr_2 = []
+
+	array_dim = len(prf_evo_array.shape) - 2
+
+	if array_dim == 1:			# vary_param 2 is None
+		frames, hmap_arr_2 = calculate_curve_data(prf_evo_array)
+
+	elif array_dim == 2:
+		for row in prf_evo_array:
+			var_data, hmap_arr_1 = calculate_curve_data(row)
+			frames.append(var_data)
+			hmap_arr_2.append(hmap_arr_1)
+		frames = np.asarray(frames)
+		hmap_arr_2 = np.asarray(np.asarray(hmap_arr_2))
+
+	else:
+		print 'ERROR: invalid prf_evo_array shape'
+		sys.exit()
+
+
+	return frames, hmap_arr_2

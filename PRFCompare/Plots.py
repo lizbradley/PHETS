@@ -346,39 +346,52 @@ def plot_variance(
 		clear_dir(dir)
 
 		print 'plotting heatmaps...'
-		for i, val_2 in enumerate(vary_param_2[1]):
+
+		def make_fig(hmap_data):
+			fig = plt.figure(figsize=(13, 5), tight_layout=True)
+			ax1 = fig.add_subplot(131)
+			ax2 = fig.add_subplot(132)
+			ax3 = fig.add_subplot(133)
+
+			div1 = make_axes_locatable(ax1)
+			div2 = make_axes_locatable(ax2)
+			div3 = make_axes_locatable(ax3)
+			#
+			cax1 = div1.append_axes('right', size='10%', pad=.2)
+			cax2 = div2.append_axes('right', size='10%', pad=.2)
+			cax3 = div3.append_axes('right', size='10%', pad=.2)
+
+			x = y = np.linspace(0, np.power(2, .5), PRF_res)
+
+			plot_heatmap(ax1, cax1, x, y, hmap_data.pointwise_mean, annot=annot_hm)
+			plot_heatmap(ax2, cax2, x, y, hmap_data.pointwise_var, annot=annot_hm)
+			plot_heatmap(ax3, cax3, x, y, hmap_data.functional_COV, annot=annot_hm)
+
+			ax1.set_title('pointwise mean')
+			ax2.set_title('pointwise variance')
+			ax3.set_title('functional COV')
+
+			return fig
+
+		if not vary_param_2:
 			for j, val_1 in enumerate(vary_param_1[1]):
-				fig = plt.figure(figsize=(13, 5), tight_layout=True)
-				ax1 = 		fig.add_subplot(131)
-				ax2 = 		fig.add_subplot(132)
-				ax3 = 		fig.add_subplot(133)
-
-				div1 = make_axes_locatable(ax1)
-				div2 = make_axes_locatable(ax2)
-				div3 = make_axes_locatable(ax3)
-				#
-				cax1 = div1.append_axes('right', size='10%', pad=.2)
-				cax2 = div2.append_axes('right', size='10%', pad=.2)
-				cax3 = div3.append_axes('right', size='10%', pad=.2)
-
-				x = y = np.linspace(0, np.power(2, .5), PRF_res)
-				data = data_arr[i, j]
-
-
-
-				plot_heatmap(ax1, cax1, x, y, data.pointwise_mean, annot=annot_hm)
-				plot_heatmap(ax2, cax2, x, y, data.pointwise_var, annot=annot_hm)
-				plot_heatmap(ax3, cax3, x, y, data.functional_COV, annot=annot_hm)
-
-
-				ax1.set_title('pointwise mean')
-				ax2.set_title('pointwise variance')
-				ax3.set_title('functional COV')
-
+				data = data_arr[j]
+				fig = make_fig(data)
 				fig.suptitle(filename.split('/')[-1])
-				fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], val_2, vary_param_1[0], val_1)
+				fname = '{}_{}.png'.format(vary_param_1[0], val_1)
 				fig.savefig(dir + fname)
 				plt.close(fig)
+
+
+		else:
+			for i, val_2 in enumerate(vary_param_2[1]):
+				for j, val_1 in enumerate(vary_param_1[1]):
+					data = data_arr[i, j]
+					fig = make_fig(data)
+					fig.suptitle(filename.split('/')[-1])
+					fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], val_2, vary_param_1[0], val_1)
+					fig.savefig(dir + fname)
+					plt.close(fig)
 
 
 	def show_samples(filt_evo_array):
@@ -399,17 +412,37 @@ def plot_variance(
 		os.makedirs(dir)
 
 
-		for i, val_2 in enumerate(vary_param_2[1]):
+		if vary_param_2:
+			for i, val_2 in enumerate(vary_param_2[1]):
+				for j, val_1 in enumerate(vary_param_1[1]):
+
+					filt_evo = filt_evo_array[i, j]
+
+					print_title('vary_param_1 : {} \t vary_param_2: {}'.format(val_1, val_2))
+
+					for i, filt in enumerate(filt_evo[::see_samples]):
+
+						worm_num = i * see_samples
+						comp_name = '{}_{}__{}_{}_#{}'.format(vary_param_1[0], val_1, vary_param_2[0], val_2, worm_num)
+						PD_filename = dir + comp_name + 'PD.png'
+						PRF_filename = dir + comp_name + 'PRF.png'
+						movie_filename = dir + comp_name + 'movie.mp4'
+
+						make_PD(filt, PD_filename)
+						make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
+						make_movie(filt, movie_filename)
+
+
+		else:
 			for j, val_1 in enumerate(vary_param_1[1]):
 
-				filt_evo = filt_evo_array[i, j]
+				filt_evo = filt_evo_array[j]
 
-				print_title('vary_param_1 : {} \t vary_param_2: {}'.format(val_1, val_2))
+				print_title('vary_param_1 : {} '.format(val_1))
 
 				for i, filt in enumerate(filt_evo[::see_samples]):
-
 					worm_num = i * see_samples
-					comp_name = '{}_{}__{}_{}_#{}'.format(vary_param_1[0], val_1, vary_param_2[0], val_2, worm_num)
+					comp_name = '{}_{}_#{}'.format(vary_param_1[0], val_1, worm_num)
 					PD_filename = dir + comp_name + 'PD.png'
 					PRF_filename = dir + comp_name + 'PRF.png'
 					movie_filename = dir + comp_name + 'movie.mp4'
@@ -418,8 +451,7 @@ def plot_variance(
 					make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
 					make_movie(filt, movie_filename)
 
-
-	def plot(data_list, out_filename):
+	def make_plots(data, out_filename):
 		print 'plotting variance curves...'
 		fig = plt.figure(figsize=(12, 8), tight_layout=True)
 
@@ -450,17 +482,31 @@ def plot_variance(
 
 		ax5.set_xlabel(vary_param_1[0])
 
-		label_list = [vary_param_2[0] + ' = ' + str(val) for val in vary_param_2[1]]
 
-		for i, val_2_data in enumerate(data_list):
-			label = label_list[i]
+		def plot_stats_curves(var_data):
+
 			x = vary_param_1[1]
-			ax1.plot(x, val_2_data.pointwise_mean_norm, '--o', label=label)
-			ax1.legend(loc=1)
-			ax2.plot(x, val_2_data.variance, '--o')
-			ax3.plot(x, val_2_data.scaled_variance, '--o')
-			ax4.plot(x, val_2_data.pointwise_variance_norm, '--o')
-			ax5.plot(x, val_2_data.functional_COV_norm, '--o')
+			l, = ax1.plot(x, var_data.pointwise_mean_norm, '--o')
+			ax2.plot(x, var_data.variance, '--o')
+			ax3.plot(x, var_data.scaled_variance, '--o')
+			ax4.plot(x, var_data.pointwise_variance_norm, '--o')
+			ax5.plot(x, var_data.functional_COV_norm, '--o')
+
+			return l		# for legend
+
+
+
+		if vary_param_2:
+			label_list = [vary_param_2[0] + ' = ' + str(val) for val in vary_param_2[1]]
+			line_list = []
+			for i, var_data in enumerate(data):
+				l = plot_stats_curves(var_data)
+				line_list.append(l)
+			fig.legend(line_list, label_list)
+
+		else:
+			plot_stats_curves(data)
+
 
 		for ax in [ax1, ax2, ax3, ax4, ax5]:
 			ax.grid()
@@ -487,7 +533,7 @@ def plot_variance(
 	# plot_trajectory(sig)
 
 	prf_evo_array, filt_evo_array = get_variance_data(filename, kwargs)
-	variance_data_array, hmap_data = process_variance_data(prf_evo_array, metric, weight_func, dist_scale)
-	plot(variance_data_array, out_filename)
+	stats_data, hmap_data = process_variance_data(prf_evo_array, metric, weight_func, dist_scale)
+	make_plots(stats_data, out_filename)
 	plot_heatmaps(hmap_data)
 	if see_samples: show_samples(filt_evo_array)
