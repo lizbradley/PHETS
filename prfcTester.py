@@ -2667,7 +2667,7 @@ if test == 5001:
 			'max_filtration_param': -10,
 			'num_divisions': 5,
 			'use_cliques': True,
-			'worm_length': 5000
+			'worm_length': 20000
 
 
 		})
@@ -2675,11 +2675,11 @@ if test == 5001:
 
 	plot_variance(
 		'datasets/trajectories/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/variance/test.png',  # out filename
+		'output/PRFCompare/variance/nHvL.png',  # out filename
 		params,
 
-		('ds_rate', (50, 100, 200)),		# vary param 1
-		('worm_length', (4000, 5000)),								# vary param 2
+		('d_use_hamiltonian', (-1 -2 -5 -10 -20 -50)),		# vary param 1
+		('ds_rate', (100, 200, 400)),								# vary param 2
 
 		load_saved_PRFs=True,
 
@@ -2694,7 +2694,7 @@ if test == 5001:
 		PRF_res=5,  # num divisions
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
-		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
 		# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,
@@ -2702,7 +2702,7 @@ if test == 5001:
 		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 		quiet=True,
-		annot_hm=True
+		annot_hm=True,
 	)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
