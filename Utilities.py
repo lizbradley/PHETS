@@ -10,6 +10,7 @@ def mem_profile(f, flag):
 
 
 
+# consolidate following three functions
 
 def check_overwrite(out_file_name):
 	os.chdir('output')
@@ -18,7 +19,7 @@ def check_overwrite(out_file_name):
 		if overwrite == "y":
 			pass
 		else:
-			print 'goodbye'
+			print 'Goodbye'
 			sys.exit()
 	os.chdir('..')
 
@@ -32,10 +33,32 @@ def clear_old_files(path, see_samples):
 				if f != '.gitkeep':
 					os.remove(path + f)
 		elif ans == 'q':
-			print 'goodbye'
+			print 'Goodbye'
 			sys.exit()
 		else:
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
+
+
+def clear_dir(dir):
+
+	files = os.listdir(dir)
+	if files:
+		r = raw_input('Overwrite files in {}? (y/n/q) '.format(dir))
+	else:
+		return True
+
+	if r == 'y':
+		for f in files:
+			os.remove(dir + f)
+		return True
+
+	elif r == 'n':
+		return False
+
+	else:
+		print 'Goodbye'
+		sys.exit()
+
 
 
 def blockPrint():
@@ -46,23 +69,36 @@ def enablePrint():
 
 
 
-def clear_dir(dir):
-
-	files = os.listdir(dir)
-	if files:
-		r = raw_input('Clear files in {}? (y/n) '.format(dir))
-	else:
-		return
-	if r == 'y':
-		for f in files:
-			os.remove(dir + f)
-	else:
-		print 'Goodbye!'
-		sys.exit()
-
 
 def print_title(str):
 	if str:
 		print '=================================================================='
 		print str
 		print '=================================================================='
+
+
+def count_lines(dir, blanks=True):
+
+	def file_len(fname):
+		count = 0
+		with open(fname) as f:
+			for line in f:
+				if line != '\n' or blanks:
+					count += 1
+		return count
+
+	count_f = 0
+	count_l = 0
+	for root, dirs, files in os.walk(dir, topdown=False):
+		for name in files:
+			if name.endswith('.py'):
+				fname = os.path.join(root, name)
+				length = file_len(fname)
+
+				count_f += 1
+				count_l += length
+
+				print '{}: {}'.format(fname, length)
+
+	print_title('num files: {}\tnum lines: {}'.format(count_f, count_l))
+

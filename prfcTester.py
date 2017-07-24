@@ -2634,7 +2634,7 @@ if test == 5000:
 		('ds_rate', (50, 100, 200)),		# vary param 1
 		('worm_length', (2500, 5000, 10000)),		# vary param 2 or None
 
-		load_saved_PRFs=False,
+		load_saved_PRFs=True,
 
 		time_units='samples',
 

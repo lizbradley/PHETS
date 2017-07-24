@@ -129,6 +129,51 @@ import matplotlib.colorbar as colorbar
 import numpy.ma as ma
 
 
+def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
+	plot_ax.set_aspect('equal')
+
+	viridis = matplotlib.cm.get_cmap('viridis')
+	colors = [viridis(i) for i in np.linspace(0, 1, 12)]
+
+	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
+	cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors)
+
+	zm = ma.masked_where(np.isnan(z), z)
+
+	if annot:		# print values on grid
+		offset = (1.41 / (len(x) - 1)) / 2
+		for i, x_ in enumerate(x):
+			for j, y_ in enumerate(y):
+				plot_ax.text(x_ + offset, y_ + offset, '%.3f' % z[j, i],
+						 horizontalalignment='center',
+						 verticalalignment='center',
+						 color='salmon'
+						 )
+
+	def extend_domain(x, y):
+		'''
+		from pcolormesh() documentation:
+
+		Ideally, the dimensions of X and Y should
+		be one greater than those of C; if the dimensions are the same, then
+		the last row and column of C will be ignored.
+		'''
+
+		d = x[1] - x[0]
+
+		x = np.append(x, x[-1] + d)
+		y = np.append(y, y[-1] + d)
+		return x, y
+
+
+	x, y = extend_domain(x, y)
+
+	plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
+	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels)
+
+	return cmap
+
+
 def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename=None):
 	print "plotting PRF..."
 
@@ -148,10 +193,9 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 		func = filtration
 
 	x, y, z, max_lim = func
-	# if not max_lim:		# what is this for??
-	# 	x, y = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
-	# 	z = np.zeros((10, 10))
-	# 	max_lim = 1
+
+	if len(x.shape) == 2: 			# meshgrid format
+		x, y = x[0], y[:, 0]		# reduce to arange format
 
 
 	plot_heatmap(plot_ax, cbar_ax, x, y, z)
@@ -162,32 +206,7 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 	fig.savefig(out_filename)
 
 
-def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
-	plot_ax.set_aspect('equal')
 
-	viridis = matplotlib.cm.get_cmap('viridis')
-	colors = [viridis(i) for i in np.linspace(0, 1, 12)]
-
-	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
-	cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors)
-
-	zm = ma.masked_where(np.isnan(z), z)
-	plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm)
-	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels)
-
-	if annot:
-		offset = (1.41 / (len(x) - 1)) / 2
-		for i, x_ in enumerate(x):
-			for j, y_ in enumerate(y):
-				plot_ax.text(x_ + offset, y_ + offset, '%.3f' % z[j, i],
-						 horizontalalignment='center',
-						 verticalalignment='center',
-						 color='salmon'
-						 )
-
-
-
-	return cmap
 
 if __name__ == '__main__':
 	make_PD('filt_test.txt')

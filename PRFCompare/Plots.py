@@ -338,20 +338,24 @@ def plot_variance(
 
 
 
-	import seaborn as sns
 
 	def plot_heatmaps(data_arr):
-
-		dir = 'output/PRFCompare/variance/heatmaps/'
-		clear_dir(dir)
-
 		print 'plotting heatmaps...'
+
+		out_dir = 'output/PRFCompare/variance/heatmaps/'
+
+		if not clear_dir(out_dir):
+			print 'skipping heatmaps'
+			return
+
 
 		def make_fig(hmap_data):
 			fig = plt.figure(figsize=(13, 5), tight_layout=True)
+
 			ax1 = fig.add_subplot(131)
 			ax2 = fig.add_subplot(132)
 			ax3 = fig.add_subplot(133)
+
 
 			div1 = make_axes_locatable(ax1)
 			div2 = make_axes_locatable(ax2)
@@ -371,6 +375,15 @@ def plot_variance(
 			ax2.set_title('pointwise variance')
 			ax3.set_title('functional COV')
 
+
+			ticks = np.linspace(0, 1.4, PRF_res, endpoint=True)
+			for ax in [ax1, ax2, ax3]:
+				ax.xaxis.set_ticks(ticks)
+				ax.yaxis.set_ticks(ticks)
+
+
+
+
 			return fig
 
 		if not vary_param_2:
@@ -379,7 +392,7 @@ def plot_variance(
 				fig = make_fig(data)
 				fig.suptitle(filename.split('/')[-1])
 				fname = '{}_{}.png'.format(vary_param_1[0], val_1)
-				fig.savefig(dir + fname)
+				fig.savefig(out_dir + fname)
 				plt.close(fig)
 
 
@@ -390,7 +403,7 @@ def plot_variance(
 					fig = make_fig(data)
 					fig.suptitle(filename.split('/')[-1])
 					fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], val_2, vary_param_1[0], val_1)
-					fig.savefig(dir + fname)
+					fig.savefig(out_dir + fname)
 					plt.close(fig)
 
 
@@ -405,12 +418,11 @@ def plot_variance(
 			if r == 'y':
 				pass
 			else:
-				print 'goodbye'
+				print 'Goodbye'
 				sys.exit()
 
 			shutil.rmtree(dir)
 		os.makedirs(dir)
-
 
 		if vary_param_2:
 			for i, val_2 in enumerate(vary_param_2[1]):
@@ -432,7 +444,6 @@ def plot_variance(
 						make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
 						make_movie(filt, movie_filename)
 
-
 		else:
 			for j, val_1 in enumerate(vary_param_1[1]):
 
@@ -451,9 +462,10 @@ def plot_variance(
 					make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
 					make_movie(filt, movie_filename)
 
+
 	def make_plots(data, out_filename):
 		print 'plotting variance curves...'
-		fig = plt.figure(figsize=(12, 8), tight_layout=True)
+		fig = plt.figure(figsize=(14, 8), tight_layout=True)
 
 		label_kwargs = {
 			'rotation': 0,
@@ -474,11 +486,11 @@ def plot_variance(
 		add_filenames_table(fname_ax, [filename, out_filename])
 		add_filt_params_table(params_ax, filt_params)
 
-		ax1.set_ylabel('norm of mean', **label_kwargs)
+		ax1.set_ylabel('norm of\npointwise\nmean', **label_kwargs)
 		ax2.set_ylabel('variance', **label_kwargs)
-		ax3.set_ylabel('scaled \nvariance', **label_kwargs)
-		ax4.set_ylabel('norm of \npointwise \nvariance', **label_kwargs)
-		ax5.set_ylabel('norm of \nfunctional COV', **label_kwargs)
+		ax3.set_ylabel('scaled\nvariance', **label_kwargs)
+		ax4.set_ylabel('norm of\npointwise\nvariance', **label_kwargs)
+		ax5.set_ylabel('norm of\nfunctional\nCOV', **label_kwargs)
 
 		ax5.set_xlabel(vary_param_1[0])
 
@@ -502,7 +514,7 @@ def plot_variance(
 			for i, var_data in enumerate(data):
 				l = plot_stats_curves(var_data)
 				line_list.append(l)
-			fig.legend(line_list, label_list)
+			fig.legend(line_list, label_list, 'upper right')
 
 		else:
 			plot_stats_curves(data)

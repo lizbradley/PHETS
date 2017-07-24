@@ -2,6 +2,5 @@ networkx
 numpy
 matplotlib
 scipy
-memory_profiler
+# memory_profiler
 
-# pip install http://prdownloads.sourceforge.net/gnuplot-py/gnuplot-py-1.8.tar.gz?download
