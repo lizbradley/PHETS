@@ -2662,63 +2662,44 @@ if test == 5000:
 
 
 
+if test == 5001:
+	params = parameter_set
+	params.update(
+		{
+
+		})
+
+	plot_variance(
+		'datasets/trajectories/REALDEAL/L63_2mil.txt',
+		'output/PRFCompare/variance/test.png',  # out filename
+		params,
 
 
 
 
 
+		load_saved_filts=True,
 
+		time_units='samples',
 
+		crop=(5000, 2005000),     		# (start, stop) in time_units, or 'auto'
 
+		num_windows=10,					# evenly spaced
 
+		weight_func=lambda i, j: 1,  	# no weighting (constant). see test 4 for other examples
 
+		PRF_res=5,  # num divisions
 
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
 
+		normalize_volume=True,
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True,
+		annot_hm=True
+	)
 
 
 if test == 5002:
