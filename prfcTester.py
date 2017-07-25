@@ -2681,10 +2681,10 @@ if test == 5001:
 		'output/PRFCompare/variance/nHvL.png',  # out filename
 		params,
 
-		('d_use_hamiltonian', (-1 -2 -5 -10 -20 -50)),		# vary param 1
+		('d_use_hamiltonian', (-1, -2, -5, -10, -20, -50)),			# vary param 1
 		('ds_rate', (100, 200, 400)),								# vary param 2
 
-		load_saved_PRFs=True,
+		load_saved_filts=False,
 
 		time_units='samples',
 
@@ -2742,7 +2742,7 @@ if test == 5002:
 			# 'weight: linear k=3'
 		),
 
-		load_saved_filts=True,
+		load_saved_filts=False,
 
 		time_units='samples',
 
