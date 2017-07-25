@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys, inspect
 from memory_profiler import profile
 
 
@@ -60,6 +59,8 @@ def clear_dir(dir):
 		sys.exit()
 
 
+def lambda_to_str(f):
+	return inspect.getsourcelines(f)[0][0].split(':')[1]
 
 def blockPrint():
 	sys.stdout = open(os.devnull, 'w')

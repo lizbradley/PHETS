@@ -492,7 +492,7 @@ if test == 15:
 													# For now, both vary params must be filtration params. Working on
 													# getting it to work for other params like weight_func.
 
-		load_saved_PRFs=False,
+		load_saved_filts=False,
 
 		time_units='samples',
 
@@ -537,7 +537,7 @@ if test == 16:
 		('d_orientation_amplify', np.arange(0, 30, 10)),			# vary param 1
 		('use_cliques', (True, False)),							# vary param 2
 
-		load_saved_PRFs=True,
+		load_saved_filts=True,
 
 		time_units='samples',
 
@@ -2634,7 +2634,7 @@ if test == 5000:
 		('ds_rate', (50, 100, 200)),		# vary param 1
 		('worm_length', (2500, 5000, 10000)),		# vary param 2 or None
 
-		load_saved_PRFs=True,
+		load_saved_filts=True,
 
 		time_units='samples',
 
@@ -2660,6 +2660,67 @@ if test == 5000:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if test == 5001:
 	params = parameter_set
 	params.update(
@@ -2668,10 +2729,7 @@ if test == 5001:
 			'num_divisions': 5,
 			'use_cliques': True,
 			'worm_length': 5000
-
-
 		})
-
 
 	plot_variance(
 		'datasets/trajectories/REALDEAL/L63_2mil.txt',
@@ -2679,17 +2737,32 @@ if test == 5001:
 		params,
 
 		('ds_rate', (50, 100, 200)),		# vary param 1
-		('worm_length', (4000, 5000)),								# vary param 2
 
-		load_saved_PRFs=True,
+		# None,								# null vary param 2
+
+		('weight_func',						# vary param 2 as weight function
+			(
+				lambda i, j: 1,
+				lambda i, j: i + j,
+				# lambda i, j: 3 * (i + j)
+			)
+		),
+
+		legend_labels=(						# Needed only when vary param 2 is weight_func. (For legend and filenames.)
+			'weight: none',
+			'weight: linear k=1',
+			# 'weight: linear k=3'
+		),
+
+		load_saved_filts=True,
 
 		time_units='samples',
 
-		crop=(5000, 2005000),     # (start, stop) in time_units, or 'auto'
+		crop=(5000, 2005000),     		# (start, stop) in time_units, or 'auto'
 
-		num_windows=10,			  # evenly spaced
+		num_windows=10,					# evenly spaced
 
-		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
+		weight_func=lambda i, j: 1,  	# no weighting (constant). see test 4 for other examples
 
 		PRF_res=5,  # num divisions
 
@@ -2700,7 +2773,6 @@ if test == 5001:
 		normalize_volume=True,
 
 		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
-
 		quiet=True,
 		annot_hm=True
 	)

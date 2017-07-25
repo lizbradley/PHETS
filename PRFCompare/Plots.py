@@ -1,4 +1,4 @@
-import sys, os, shutil
+import sys, os, shutil, inspect
 
 
 import numpy as np
@@ -9,8 +9,8 @@ from DCE.Plotter import plot_waveform_zoom, plot_waveform
 from PH import make_PD, make_PRF_plot, make_movie, Filtration
 from PH.Plots import plot_heatmap
 from PH.TitleBox import add_filenames_table, add_filt_params_table
-from PRFCompare.Data import get_dists_from_ref, dists_compare, get_PRFs, norm
-from Utilities import clear_old_files, clear_dir, print_title
+from PRFCompare.Data import get_dists_from_ref, dists_compare
+from Utilities import clear_old_files, clear_dir, print_title, lambda_to_str
 
 
 def plot_dists_vs_ref(
@@ -304,7 +304,8 @@ def plot_variance(
 		vary_param_1,
 		vary_param_2,
 
-		load_saved_PRFs=False,
+		legend_labels=None,
+		load_saved_filts=False,
 
 		time_units='seconds',
 
@@ -337,8 +338,6 @@ def plot_variance(
 		fig.savefig('output/PRFCompare/variance/trajectory.png')
 
 
-
-
 	def plot_heatmaps(data_arr):
 		print 'plotting heatmaps...'
 
@@ -349,7 +348,7 @@ def plot_variance(
 			return
 
 
-		def make_fig(hmap_data):
+		def make_hmap_fig(hmap_data):
 			fig = plt.figure(figsize=(13, 5), tight_layout=True)
 
 			ax1 = fig.add_subplot(131)
@@ -375,36 +374,34 @@ def plot_variance(
 			ax2.set_title('pointwise variance')
 			ax3.set_title('functional COV')
 
-
 			ticks = np.linspace(0, 1.4, PRF_res, endpoint=True)
 			for ax in [ax1, ax2, ax3]:
 				ax.xaxis.set_ticks(ticks)
 				ax.yaxis.set_ticks(ticks)
 
-
-
-
 			return fig
 
-		if not vary_param_2:
+
+		if vary_param_2:
+			for i, val_2 in enumerate(vary_param_2[1]):
+				for j, val_1 in enumerate(vary_param_1[1]):
+					data = data_arr[i, j]
+					fig = make_hmap_fig(data)
+					fig.suptitle(filename.split('/')[-1])
+					if legend_labels:
+						val_2 = legend_labels[i]
+					fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], val_2, vary_param_1[0], val_1)
+					fig.savefig(out_dir + fname)
+					plt.close(fig)
+
+		else:
 			for j, val_1 in enumerate(vary_param_1[1]):
 				data = data_arr[j]
-				fig = make_fig(data)
+				fig = make_hmap_fig(data)
 				fig.suptitle(filename.split('/')[-1])
 				fname = '{}_{}.png'.format(vary_param_1[0], val_1)
 				fig.savefig(out_dir + fname)
 				plt.close(fig)
-
-
-		else:
-			for i, val_2 in enumerate(vary_param_2[1]):
-				for j, val_1 in enumerate(vary_param_1[1]):
-					data = data_arr[i, j]
-					fig = make_fig(data)
-					fig.suptitle(filename.split('/')[-1])
-					fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], val_2, vary_param_1[0], val_1)
-					fig.savefig(out_dir + fname)
-					plt.close(fig)
 
 
 	def show_samples(filt_evo_array):
@@ -424,7 +421,7 @@ def plot_variance(
 			shutil.rmtree(dir)
 		os.makedirs(dir)
 
-		if vary_param_2:
+		if vary_param_2 and vary_param_2[0] in filt_params:
 			for i, val_2 in enumerate(vary_param_2[1]):
 				for j, val_1 in enumerate(vary_param_1[1]):
 
@@ -463,7 +460,7 @@ def plot_variance(
 					make_movie(filt, movie_filename)
 
 
-	def make_plots(data, out_filename):
+	def make_main_fig(data, out_filename):
 		print 'plotting variance curves...'
 		fig = plt.figure(figsize=(14, 8), tight_layout=True)
 
@@ -474,14 +471,14 @@ def plot_variance(
 			'labelpad': 10,
 		}
 
-		fname_ax = plt.subplot2grid((5, 10), (0, 0), rowspan=1, colspan=3)
-		params_ax = plt.subplot2grid((5, 10), (1, 0), rowspan=4, colspan=3)
+		fname_ax =  plt.subplot2grid((5, 9), (0, 0), rowspan=1, colspan=2)
+		params_ax = plt.subplot2grid((5, 9), (1, 0), rowspan=3, colspan=2)
 
-		ax1 = plt.subplot2grid((5, 10), (0, 3), colspan=6)
-		ax2 = plt.subplot2grid((5, 10), (1, 3), colspan=6, sharex=ax1)
-		ax3 = plt.subplot2grid((5, 10), (2, 3), colspan=6, sharex=ax1)
-		ax4 = plt.subplot2grid((5, 10), (3, 3), colspan=6, sharex=ax1)
-		ax5 = plt.subplot2grid((5, 10), (4, 3), colspan=6, sharex=ax1)
+		ax1 = plt.subplot2grid((5, 9), (0, 3), colspan=6)
+		ax2 = plt.subplot2grid((5, 9), (1, 3), colspan=6, sharex=ax1)
+		ax3 = plt.subplot2grid((5, 9), (2, 3), colspan=6, sharex=ax1)
+		ax4 = plt.subplot2grid((5, 9), (3, 3), colspan=6, sharex=ax1)
+		ax5 = plt.subplot2grid((5, 9), (4, 3), colspan=6, sharex=ax1)
 
 		add_filenames_table(fname_ax, [filename, out_filename])
 		add_filt_params_table(params_ax, filt_params)
@@ -507,18 +504,17 @@ def plot_variance(
 			return l		# for legend
 
 
-
 		if vary_param_2:
-			label_list = [vary_param_2[0] + ' = ' + str(val) for val in vary_param_2[1]]
+			if legend_labels: label_list = legend_labels
+			else: label_list = [vary_param_2[0] + ' = ' + str(val) for val in vary_param_2[1]]
 			line_list = []
 			for i, var_data in enumerate(data):
 				l = plot_stats_curves(var_data)
 				line_list.append(l)
-			fig.legend(line_list, label_list, 'upper right')
+			fig.legend(line_list, label_list, 'lower left', borderaxespad=3, borderpad=1)
 
 		else:
 			plot_stats_curves(data)
-
 
 		for ax in [ax1, ax2, ax3, ax4, ax5]:
 			ax.grid()
@@ -545,7 +541,7 @@ def plot_variance(
 	# plot_trajectory(sig)
 
 	prf_evo_array, filt_evo_array = get_variance_data(filename, kwargs)
-	stats_data, hmap_data = process_variance_data(prf_evo_array, metric, weight_func, dist_scale)
-	make_plots(stats_data, out_filename)
+	stats_data, hmap_data = process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_param_2)
+	make_main_fig(stats_data, out_filename)
 	plot_heatmaps(hmap_data)
 	if see_samples: show_samples(filt_evo_array)

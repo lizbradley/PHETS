@@ -14,6 +14,34 @@ from PH.Plots import make_PD, make_PRF_plot
 from Utilities import clear_old_files, blockPrint, enablePrint, print_title
 from config import WAV_SAMPLE_RATE
 
+def apply_weight_func(f, f_weight):
+
+	if len(f.shape) == 2:		# untested
+
+		PRF_res = len(f)
+		dA = 2. / (PRF_res ** 2)  # normalize such that area of PRF domain is 1
+		f_weight = f_weight(*np.meshgrid(np.linspace(0, dA ** .5, PRF_res), np.linspace(0, dA ** .5, PRF_res)))
+
+		return np.multiply(f, f_weight)
+
+	elif len(f.shape) == 1 and f.size == 4:		# x, y, max_lim included
+
+		z = f[2]
+		PRF_res = int(z.size ** .5)
+		dA = 2. / (PRF_res ** 2)  # normalize such that area of PRF domain is 1
+		f_weight = f_weight(*np.meshgrid(np.linspace(0, dA ** .5, PRF_res), np.linspace(0, dA ** .5, PRF_res)))
+
+		# print f_weight		# debugging
+		z_weighted = np.multiply(z, f_weight)
+		f[2] = z_weighted
+		return f
+
+	else:
+		print 'ERROR [weight function]: invalid PRF'
+		sys.exit()
+
+
+
 
 def norm(f, metric, f_weight):
 
@@ -358,10 +386,9 @@ def get_variance_data(filename, kwargs):
 
 	# PRF_res, time_units, normalize_volume, num_windows, window_size, see_samples = options
 
-	if kwargs['load_saved_PRFs']:
+	if kwargs['load_saved_filts']:
 		print 'WARNING: loading saved data'
 		return np.load('PRFCompare/PRFs.npy'), np.load('PRFCompare/filts.npy')
-
 
 
 	print 'loading', filename, '...'
@@ -404,10 +431,9 @@ def get_variance_data(filename, kwargs):
 
 	print 'generating data...\n'
 
-	if vary_param_2 is None:
-		val_2='None'
-		prf_evos, filt_evos = vary_evos_over_param(sig, vary_param_1, filt_params)
-		print '\n'
+	if vary_param_2 is None or vary_param_2[0] == 'weight_func':
+		val_2 = ''		# for status indicator
+		prf_evos, filt_evos = vary_evos_over_param(sig, vary_param_1, filt_params); print '\n'
 
 	elif vary_param_2[0] in filt_params:
 		prf_arr = []
@@ -424,20 +450,17 @@ def get_variance_data(filename, kwargs):
 		filt_evos = filt_arr
 		print '\n'
 
-	elif vary_param_2[0] in kwargs:
-		pass
-
 	else:
-		print 'ERROR: invalid vary_param_2'
+		print 'ERROR: invalid vary_param_2 '
 		sys.exit()
 
 	prf_evos = np.asarray(prf_evos)
 	filt_evos = np.asarray(filt_evos)
 	np.save('PRFCompare/PRFs.npy', prf_evos)
 	np.save('PRFCompare/filts.npy', filt_evos)
-	# array with shape (len(vary_param_2[1], len(vary_param_1[1])
-	# each element is a 1D list of PRFs from regular samples of the input
 	return prf_evos, filt_evos
+
+
 
 
 class VarianceData:
@@ -458,9 +481,26 @@ class HeatmapData:
 
 
 
+def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_param_2):
 
+	def vary_evos_over_weight_func(prf_evos_1d):
 
-def process_variance_data(prf_evo_array, metric, weight_func, dist_scale):
+		def apply_weight_to_evo(prf_evo, weight_f):
+			weighted_prf_evo = []
+			for prf in prf_evo:
+				weighted_prf_evo.append(apply_weight_func(prf, weight_f))
+			return np.asarray(weighted_prf_evo)
+
+		prf_evos_2d = []
+		for prf_evo in prf_evos_1d:
+			prf_evo_vary_2 = []
+			for weight_f in vary_param_2[1]:
+				weighted_prf_evo = apply_weight_to_evo(prf_evo, weight_f)
+				prf_evo_vary_2.append(weighted_prf_evo)
+			prf_evos_2d.append(prf_evo_vary_2)
+
+		prf_evos_2d = np.transpose(np.asarray(prf_evos_2d), (1, 0, 2, 3))
+		return prf_evos_2d
 
 	def calculate_curve_data(prf_evos_1d):
 		var_data = VarianceData()
@@ -509,26 +549,26 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale):
 
 		return var_data, hmap_data_arr
 
+
 	print 'processing data...'
-	frames = []
-	hmap_arr_2 = []
 
-	array_dim = len(prf_evo_array.shape) - 2
-
-	if array_dim == 1:			# vary_param 2 is None
-		frames, hmap_arr_2 = calculate_curve_data(prf_evo_array)
-
-	elif array_dim == 2:
-		for row in prf_evo_array:
-			var_data, hmap_arr_1 = calculate_curve_data(row)
-			frames.append(var_data)
-			hmap_arr_2.append(hmap_arr_1)
-		frames = np.asarray(frames)
-		hmap_arr_2 = np.asarray(np.asarray(hmap_arr_2))
+	if vary_param_2 is None:
+		return calculate_curve_data(prf_evo_array)
 
 	else:
-		print 'ERROR: invalid prf_evo_array shape'
-		sys.exit()
+
+		if vary_param_2[0] == 'weight_func':
+			prf_evo_array = vary_evos_over_weight_func(prf_evo_array)
+
+		stats_data = []
+		hmap_data = []
+		for row in prf_evo_array:
+			stats_data_1D, hmap_data_1d = calculate_curve_data(row)
+			stats_data.append(stats_data_1D)
+			hmap_data.append(hmap_data_1d)
+
+		return np.asarray(stats_data), np.asarray(np.asarray(hmap_data))
 
 
-	return frames, hmap_arr_2
+
+
