@@ -111,7 +111,7 @@ dir_2_base = '-viol.txt'
 target_1 = 'C134C'
 target_2 = 'viol'
 
-crop_1 = (.5, 1.5)
+crop_1	 = (.5, 1.5)
 crop_2 = crop_1
 
 normalize_volume=True

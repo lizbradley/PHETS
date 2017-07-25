@@ -66,7 +66,9 @@ def get_spec(sig):
 
 
 def normalize_spec(idx, freqs, spec):
-	freqs_interp = np.linspace(.01, 100, FT_res)
+	# freqs_interp = np.linspace(.01, 100, FT_res)
+	freqs_interp = np.logspace(1, 4, n)
+
 	ff = np.power(2, (40 - float(idx)) / 12) * 440  # Hz, descending index
 	freqs = freqs / ff
 
@@ -189,8 +191,6 @@ for i in xrange(30):
 
 	sigs_1_test = sigs_1[1::2]
 	sigs_2_test = sigs_2[1::2]
-
-
 
 	freqs, mean_spec_1 = get_mean_spec(sigs_1_train)
 	freqs, mean_spec_2 = get_mean_spec(sigs_2_train)
