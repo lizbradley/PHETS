@@ -92,7 +92,7 @@ def count_lines(dir, blanks=True):
 	count_l = 0
 	for root, dirs, files in os.walk(dir, topdown=False):
 		for name in files:
-			if name.endswith('.py'):
+			if name.endswith('.py') and not name.endswith('Tester.py'):
 				fname = os.path.join(root, name)
 				length = file_len(fname)
 

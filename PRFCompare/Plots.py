@@ -149,6 +149,7 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 		mean_3 = np.mean(d_1_vs_2)
 		mean_4 = np.mean(d_2_vs_2)
 
+
 		ax1 = fig.add_subplot(421)
 		plot_dists_pane(ax1, d_1_vs_1, mean_1, crop_1)
 		plt.setp(ax1.get_xticklabels(), visible=False)

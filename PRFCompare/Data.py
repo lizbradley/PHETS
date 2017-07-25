@@ -95,6 +95,7 @@ def get_PRFs(
 		auto_crop_length,
 		time_units,
 		normalize_volume,
+		normalize_win_vol,
 		mean_samp_num,
 		num_windows,
 		window_size,
@@ -134,7 +135,8 @@ def get_PRFs(
 			sys.exit()
 		start_pts = np.floor(np.linspace(0, len(sig) - 1, num_windows, endpoint=False)).astype(int)
 		windows = [np.asarray(sig[pt:pt + window_size_samp]) for pt in start_pts]
-		# TODO: add normalize sub volume here
+		if normalize_win_vol:
+			windows = [np.true_divide(w, np.max(np.abs(w))) for w in windows]
 		return windows
 
 
@@ -155,9 +157,9 @@ def get_PRFs(
 			print filename.split('/')[-1], 'worm #', i
 			print '=============================================\n'
 
-			blockPrint()
+			# blockPrint()
 			filt = (Filtration(worm, filt_params, filename=filename))
-			enablePrint()
+			# enablePrint()
 
 			filts.append(filt)
 
@@ -189,6 +191,9 @@ def get_PRFs(
 		filt_params.update({'worm_length': window_size_samp})
 	else:
 		window_size_samp = filt_params['worm_length']
+		print 'hi'
+
+	print 'using window_size_samp:', window_size_samp
 
 	if isinstance(filename, basestring):
 		print 'loading', filename, '...'
@@ -243,6 +248,7 @@ def dists_compare(
 		note_index=None,  #
 
 		normalize_volume=True,
+		normalize_win_volume=True,
 
 		PRF_res=50,  # number of divisions used for PRF
 		dist_scale='none',  # 'none', 'a', or 'a + b'
@@ -269,12 +275,14 @@ def dists_compare(
 			auto_crop_length,
 			time_units,
 			normalize_volume,
+			normalize_win_volume,
 			mean_samp_num,
 			num_windows,
 			window_size,
 			see_samples,
 			note_index,
-			tau_T
+			tau_T,
+
 		]
 		crop_1, sig_1_full, sig_1, funcs_1 = get_PRFs(filename_1, filt_params, crop_1_cmd, tau_1_cmd, *options)
 		crop_2, sig_2_full, sig_2, funcs_2 = get_PRFs(filename_2, filt_params, crop_2_cmd, tau_2_cmd, *options)
@@ -287,13 +295,26 @@ def dists_compare(
 	mean_1_funcs_z = funcs_1_z[::int(ceil(num_windows / mean_samp_num))]
 	mean_2_funcs_z = funcs_2_z[::int(ceil(num_windows / mean_samp_num))]
 
+
 	funcs_1_avg_z = np.mean(mean_1_funcs_z, axis=0)
 	funcs_2_avg_z = np.mean(mean_2_funcs_z, axis=0)
+
+
+
+	np.savetxt('PRFCompare/text_data/mean_prf_1.txt', funcs_1_avg_z)
+	np.savetxt('PRFCompare/text_data/mean_2.txt', funcs_2_avg_z)
+
 
 	dists_1_vs_1 = get_dists_from_ref(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale)
 	dists_2_vs_1 = get_dists_from_ref(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale)
 	dists_1_vs_2 = get_dists_from_ref(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale)
 	dists_2_vs_2 = get_dists_from_ref(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale)
+
+
+	np.savetxt('PRFCompare/text_data/dist_1_vs_1.txt', dists_1_vs_1)
+	np.savetxt('PRFCompare/text_data/dist_2_vs_1.txt', dists_2_vs_1)
+	np.savetxt('PRFCompare/text_data/dist_1_vs_2.txt', dists_1_vs_2)
+	np.savetxt('PRFCompare/text_data/dist_2_vs_2.txt', dists_2_vs_2)
 
 
 	# for plotting ref PRFs #

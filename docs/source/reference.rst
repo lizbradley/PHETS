@@ -190,10 +190,10 @@ Reference
    :param str out_filename:
    :param dict filt_params:
    :param  vary_param_1: filtration parameter to vary over x axis
-   :param vary_param_2: filtration parameter to vary over line colors
+   :param vary_param_2: filtration parameter or 'weight_func' to vary over line colors
    :type vary_param_1: (str, tuple)
    :type vary_param_2: None or (str, tuple)
-   :param bool load_saved_PRFs: reuse previous PRF dataset
+   :param bool load_saved_filts: reuse previous filtration dataset
    :param str time_units: 'samples' or 'seconds'
    :param tuple crop=(100, 1100): (start, stop) in time units
    :param int num_windows: Number of windows to select from crop, evenly spaced. Window length is chosen with the 'worm_length' filtration parameter. Windows may or may not overlap

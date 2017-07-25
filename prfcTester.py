@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 5001			 # set test number here or with command line argument
+set_test = 14			 # set test number here or with command line argument
 
 
 
@@ -71,7 +71,7 @@ if test == 2:
 
 		tau=.0012,		  		# seconds
 
-		PD_movie_int=0,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  		# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 
 	)
@@ -105,7 +105,7 @@ if test == 3:
 		tau='auto ideal',			# seconds or 'auto ideal' or 'auto detect'
 		tau_T=np.pi,				# tau_T = tau / period
 		note_index=40,				# required for auto tau
-		PD_movie_int=0,  			# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  			# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -189,7 +189,7 @@ if test == 5:
 
 		normalize_volume=True,
 
-		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -233,7 +233,7 @@ if test == 6:
 
 		normalize_volume=True,
 
-		PD_movie_int=5,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=5,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -278,7 +278,7 @@ if test == 7:
 
 		normalize_volume=True,
 
-		PD_movie_int=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -322,7 +322,7 @@ if test == 11:
 
 		normalize_volume=True,
 
-		PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -364,6 +364,7 @@ if test == 12:
 		# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,
+		normalize_win_volume=True,
 
 		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -419,8 +420,9 @@ if test == 13:
 		# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,
+		normalize_win_volume=True,
 
-		PD_movie_int=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -429,9 +431,9 @@ if test == 14:
 	params = parameter_set
 	params.update(
 		{
-			'ds_rate': 75,
+			'ds_rate': 50,
 			'max_filtration_param': -10,
-			'num_divisions': 20,
+			'num_divisions': 10,
 			'use_cliques': True,
 
 		}
@@ -439,31 +441,33 @@ if test == 14:
 	plot_dists_vs_means(
 		'datasets/time_series/viol/49-viol.txt',
 		'datasets/time_series/C134C/49-C134C.txt',
-		'output/PRFCompare/mean/viol_C134C.png',  		# out filename
+		'output/PRFCompare/mean/viol_C134C_true.png',  		# out filename
 		params,
 
 		load_saved_PRFs=False,
 
 		time_units='seconds',
 
-		crop_1=(2, 2.5),  # time_units or 'auto'
-		crop_2=(2, 2.5),  # time_units or 'auto'
+		crop_1=(2, 2.5),  	# time_units or 'auto'
+		crop_2=(2, 2.5),  	# time_units or 'auto'
 
-		num_windows=5,  # evenly spaced
-		mean_samp_num=5,  # number of windows to use for mean
+		num_windows=5, 		 # evenly spaced
+		mean_samp_num=5,  	 # number of windows to use for mean
+		window_size=.05,	 # overrides worm_length
 
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=50,  # num divisions
+		PRF_res=10,  # num divisions
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
 		# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,
+		normalize_win_volume=True,
 
-		see_samples=1,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 
@@ -605,7 +609,7 @@ if test == 50:
 
 		normalize_volume=True,
 
-		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		#see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 		see_samples = 0,
 
 	)
@@ -882,7 +886,7 @@ if test == 150:
 
 		normalize_volume=True,
 
-		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		#see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 		see_samples = 1,
 
 	)
@@ -1161,7 +1165,7 @@ if test == 250:
 
 		normalize_volume=True,
 
-		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		#see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 		see_samples = 1,
 
 	)
@@ -1440,7 +1444,7 @@ if test == 350:
 
 		normalize_volume=True,
 
-		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		#see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 		see_samples = 1,
 
 	)
@@ -1719,7 +1723,7 @@ if test == 450:
 
 		normalize_volume=True,
 
-		#PD_movie_int=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		#see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 		see_samples = 1,
 
 	)
