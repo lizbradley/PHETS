@@ -7,9 +7,8 @@ import subprocess
 import numpy as np
 import itertools
 
-from Utilities import blockPrint, enablePrint
 import BuildFiltration
-
+from Utilities import blockPrint, enablePrint
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -93,7 +92,7 @@ class Filtration:
 		np.savetxt('temp_data/worm_data.txt', self.sig)
 
 		try:
-			# if silent: blockPrint()
+			if silent: blockPrint()
 			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params, silent=silent)
 			if silent: enablePrint()
 		except OSError:

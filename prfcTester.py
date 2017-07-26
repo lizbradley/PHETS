@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 14			 # set test number here or with command line argument
+set_test = 5001			 # set test number here or with command line argument
 
 
 
@@ -2765,7 +2765,7 @@ if test == 5002:
 		normalize_volume=True,
 
 		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
-		quiet=True,
+		quiet=False,
 		annot_hm=True
 	)
 

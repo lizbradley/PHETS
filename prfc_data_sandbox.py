@@ -22,3 +22,5 @@ print mean_prf_1		# prints upside down :/
 means_diff = np.subtract(mean_prf_1, mean_prf_2)
 means_dist = norm(means_diff, 'L2', lambda i, j: 1)					# for that one statistic
 
+
+
