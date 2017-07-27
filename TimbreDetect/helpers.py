@@ -72,9 +72,7 @@ def plot_spec_x(spec, fname):
 	plt.clf()
 
 
-def plot_roc(data, title, fname):
-	fig = plt.figure(figsize=(6,6))
-	ax = fig.add_subplot(111)
+def plot_roc(ax, data, title):
 	fpr, tpr = data
 	ax.plot(fpr, tpr, clip_on=False, lw=2)
 	ax.scatter(fpr, tpr, clip_on=False)
@@ -85,6 +83,4 @@ def plot_roc(data, title, fname):
 	ax.set_aspect('equal')
 	ax.set_xlabel('false positive rate')
 	ax.set_ylabel('true positive rate')
-	fig.suptitle(title)
-	plt.savefig(fname)
-	plt.clf()
+	ax.set_title(title)

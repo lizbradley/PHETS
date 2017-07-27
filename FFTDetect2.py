@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
 from PH import Filtration
-from helpers import plot_spec, plot_spec_x, plot_roc
 from config import default_filtration_params as filt_params
 from Utilities import print_title
+from TimbreDetect.helpers import crop_sig, slice_sig, get_spec, downsample_spec, plot_sig, plot_roc
 
-from helpers import crop_sig, slice_sig, get_spec, downsample_spec, plot_sig
+
 
 fname_1 = 'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt'
 fname_2 = 'datasets/time_series/viol/40-viol.txt'
@@ -17,6 +16,7 @@ label_2 = 'viol'
 crop_length = 70000
 c1 = 50000
 c2 = 100000
+
 crop_1 = (c1, c1 + crop_length)
 crop_2 = (c2, c2 + crop_length )
 
@@ -34,13 +34,14 @@ filt_params.update(
 	}
 )
 
-
 k_min = 0
 k_max = 1
 k_int = .01
 k = np.arange(k_min, k_max, k_int)
 
-# print k
+load_saved_filts=False
+
+
 
 
 
@@ -53,8 +54,7 @@ def norm(f):
 	else:
 		print 'ERROR'
 
-
-	res = len(f)
+	# res = len(f)
 
 	dA = 2. / (res ** 2)		# normalize such that area of PRF domain is 1
 	# dA = 1
@@ -156,52 +156,52 @@ specs_2 = get_specs(windows_2)
 specs_train_1, specs_test_1, mean_spec_1, var_spec_1 = pre_proc_data(specs_1)
 specs_train_2, specs_test_2, mean_spec_2, var_spec_2 = pre_proc_data(specs_2)
 
-data_1 = roc_data(mean_spec_1, var_spec_1, specs_test_1, specs_test_2, k)
-data_2 = roc_data(mean_spec_2, var_spec_2, specs_test_2, specs_test_1, k)
-
-plot_roc(data_1, roc_title(label_1, 'FFT', k_min, k_max, k_int),
-		 'clarinet_ROC_FFT.png')
-
-plot_roc(data_2, roc_title(label_2, 'FFT', k_min, k_max, k_int),
-		 'viol_ROC_FFT.png')
+fft_data_1 = roc_data(mean_spec_1, var_spec_1, specs_test_1, specs_test_2, k)
+fft_data_2 = roc_data(mean_spec_2, var_spec_2, specs_test_2, specs_test_1, k)
 
 
 
+if load_saved_filts:
+	prfs_1 = np.load('prfs_1.npy')
+	prfs_2 = np.load('prfs_2.npy')
 
+else:
+	prfs_1 = get_prfs(windows_1, filt_params)
+	prfs_2 = get_prfs(windows_2, filt_params)
 
+	np.save('prfs_1.npy', prfs_1)
+	np.save('prfs_2.npy', prfs_2)
 
-# prfs_1 = get_prfs(windows_1, filt_params)
-# prfs_2 = get_prfs(windows_2, filt_params)
-#
-# np.save('prfs_1.npy', prfs_1)
-# np.save('prfs_2.npy', prfs_2)
-
-prfs_1 = np.load('prfs_1.npy')
-prfs_2 = np.load('prfs_2.npy')
 
 
 prfs_train_1, prfs_test_1, mean_prf_1, var_prf_1 = pre_proc_data(prfs_1)
 prfs_train_2, prfs_test_2, mean_prf_2, var_prf_2 = pre_proc_data(prfs_2)
 
-data_1 = roc_data(mean_prf_1, var_prf_1, prfs_test_1, prfs_test_2, k)
-data_2 = roc_data(mean_prf_2, var_prf_2, prfs_test_2, prfs_test_1, k)
-
-plot_roc(data_1, roc_title(label_1, 'PRF', k_min, k_max, k_int),
-		 'clarinet_ROC_PRF.png' )
-
-plot_roc(data_2, roc_title(label_2, 'PRF', k_min, k_max, k_int),
-		 'viol_ROC_PRF.png')
+prf_data_1 = roc_data(mean_prf_1, var_prf_1, prfs_test_1, prfs_test_2, k)
+prf_data_2 = roc_data(mean_prf_2, var_prf_2, prfs_test_2, prfs_test_1, k)
 
 
+fig = plt.figure(figsize=(9, 9), tight_layout=True)
 
+ax1 = fig.add_subplot(221)
+ax2 = fig.add_subplot(222)
+ax3 = fig.add_subplot(223)
+ax4 = fig.add_subplot(224)
+
+plot_roc(ax1, fft_data_1, roc_title(label_1, 'FFT', k_min, k_max, k_int))
+plot_roc(ax2, fft_data_2, roc_title(label_2, 'FFT', k_min, k_max, k_int))
+plot_roc(ax3, prf_data_1, roc_title(label_1, 'PRF', k_min, k_max, k_int))
+plot_roc(ax4, prf_data_2, roc_title(label_2, 'PRF', k_min, k_max, k_int))
+
+plt.savefig('ROCs.png')
 
 mean_1 = norm(mean_prf_1)
 mean_2 = norm(mean_prf_2)
 var_1 = norm(var_prf_1)
 var_2 = norm(var_prf_2)
-print 'PRF:'
-print 'norm mean 1: \t {:.3f} \t\t norm mean 2: \t {:.3f}'.format(mean_1, mean_2)
-print 'norm var 1: \t {:.3f} \t\t norm var 2: \t{:.3f}'.format(var_1, var_2)
+print_title('PRF:')
+print 'norm mean 1: \t {: 6.3f} \t\t norm mean 2: \t {: 6.3f}'.format(mean_1, mean_2)
+print 'norm var 1: \t {: 6.3f} \t\t norm var 2: \t {: 6.3f}'.format(var_1, var_2)
 
 
 
@@ -209,8 +209,8 @@ mean_1 = norm(mean_spec_1)
 mean_2 = norm(mean_spec_2)
 var_1 = norm(var_spec_1)
 var_2 = norm(var_spec_2)
-print 'FFT'
-print 'norm mean 1: \t {:.3f} \t\t norm mean 2: \t {:.3f}'.format(mean_1, mean_2)
-print 'norm var 1: \t {:.3f} \t\t norm var 2: \t{:.3f}'.format(var_1, var_2)
+print_title('FFT:')
+print 'norm mean 1: \t {: 6.3f} \t\t norm mean 2: \t {: 6.3f}'.format(mean_1, mean_2)
+print 'norm var 1: \t {: 6.3f} \t\t norm var 2: \t {: 6.3f}'.format(var_1, var_2)
 
 
