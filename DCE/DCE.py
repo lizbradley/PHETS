@@ -8,14 +8,14 @@ WAV_SAMPLE_RATE = 44100
 
 
 
-def embed(
+def embed_v1(
 		signal, output_file_name,
 		embed_crop,		# sec
 		tau,			# sec
 		m,
 		ds_rate=1,
 		channel=0
-	):
+):
 
 	if embed_crop:
 		embed_crop_samp = np.array(embed_crop) * WAV_SAMPLE_RATE
@@ -34,6 +34,44 @@ def embed(
 		if i < end:
 			output_file.write("\n")
 	output_file.close()
+
+
+
+def embed(
+		signal,
+		tau,
+		m,
+		time_units='samples',
+		embed_crop=None,
+		ds_rate=1,
+		channel=0
+):
+
+	if embed_crop:
+		if time_units == 'samples':
+			pass
+		elif time_units == 'seconds':
+			embed_crop = (np.array(embed_crop) * WAV_SAMPLE_RATE).astype(int)
+		else:
+			print 'ERROR: invalid time_units'
+			sys.exit()
+		signal = signal[embed_crop[0] : embed_crop[1]]
+
+	if time_units == 'seconds':
+		tau = int(tau * WAV_SAMPLE_RATE)
+
+
+	end = len(signal) - (tau * (m - 1)) - 1
+	traj = []
+
+	for i in range(end):
+		pt = []
+		for j in range(m):
+			pt.append(signal[i + (j * tau)])
+		traj.append(pt)
+
+	return np.asarray(traj)
+
 
 
 

@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 5001			 # set test number here or with command line argument
+set_test = 5			 # set test number here or with command line argument
 
 
 
@@ -166,8 +166,10 @@ if test == 5:
 
 		load_saved_PRFs=False,
 
-		crop_1='auto',					# seconds or 'auto'
-		crop_2='auto',					# seconds or 'auto'
+		time_units='seconds',
+
+		crop_1=(1, 2),					# seconds or 'auto'
+		crop_2=(1, 2),					# seconds or 'auto'
 		auto_crop_length=.5,			# seconds. length of windows when crop is 'auto'
 
 		window_size=.05, 				# seconds
@@ -189,7 +191,7 @@ if test == 5:
 
 		normalize_volume=True,
 
-		see_samples=0,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=1,  				# interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 

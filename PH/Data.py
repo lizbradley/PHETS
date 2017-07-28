@@ -88,6 +88,10 @@ class Filtration:
 
 
 		if not silent: print "building filtration..."
+
+		if len(self.sig.shape) == 1:
+			print "ERROR: Filtration input 'sig' is one dimensional"
+			sys.exit()
 		start_time = time.time()
 		np.savetxt('temp_data/worm_data.txt', self.sig)
 

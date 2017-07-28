@@ -18,7 +18,10 @@ c1 = 50000
 c2 = 100000
 
 crop_1 = (c1, c1 + crop_length)
-crop_2 = (c2, c2 + crop_length )
+crop_2 = (c2, c2 + crop_length)
+
+tau = 100		# samples
+m = 2
 
 window_length = 5000
 num_windows = 30
@@ -67,6 +70,7 @@ def test_inclusion(mean, var, tests, k):
 	for spec in tests:
 		diff = np.subtract(spec, mean)
 		dist = norm(diff)
+		if dist < 0: print 'aaac dist < 0'
 		pred.append(dist < var_norm * k)
 	return pred
 
@@ -80,9 +84,11 @@ def get_specs(windows):
 	return specs
 
 
+from DCE.DCE import embed
 
 def get_prfs(windows, filt_params):
-	filts = [Filtration(w, filt_params) for w in windows]
+	trajs = [embed(w, tau, m) for w in windows]
+	filts = [Filtration(t, filt_params) for t in trajs]
 	res = filt_params['num_divisions']
 	prfs = [f.get_PRF(res) for f in filts]
 	prfs = [prf[2] for prf in prfs]

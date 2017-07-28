@@ -143,8 +143,9 @@ def get_PRFs(
 	def embed_sigs(windows, tau):
 		worms = []
 		for window in windows:
-			embed(window, 'PRFCompare/temp_data/temp_worm.txt', False, tau, 2)
-			worm = np.loadtxt('PRFCompare/temp_data/temp_worm.txt')
+			# embed(window, 'PRFCompare/temp_data/temp_worm.txt', False, tau, 2)
+			# worm = np.loadtxt('PRFCompare/temp_data/temp_worm.txt')
+			worm = embed(window, tau, 2, time_units='seconds')
 			worms.append(worm)
 		return worms
 
@@ -422,7 +423,8 @@ def get_variance_data(filename, kwargs):
 
 	if len(sig_full.shape) == 1:
 		print 'Input has shape {}. Embedding...'
-		sig_full = embed(sig_full, None, kwargs['m'], kwargs['tau'])
+		# sig_full = embed(sig_full, None, kwargs['m'], kwargs['tau'])
+		sig_full = embed(sig_full, kwargs['tau'], kwargs['m'], time_units=kwargs['time_units'])
 
 	sig = crop_sig(sig_full, kwargs['crop'], kwargs['time_units'])
 
