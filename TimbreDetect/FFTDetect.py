@@ -10,7 +10,7 @@ import scipy.fftpack
 from scipy import interpolate
 
 
-from DCE.Plotter import plot_waveform, plot_waveform_zoom
+from DCE.Plots import plot_waveform, plot_waveform_zoom
 
 WAV_SAMPLE_RATE = 44100.
 

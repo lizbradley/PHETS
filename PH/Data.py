@@ -295,7 +295,8 @@ class Filtration:
 			return
 
 		if self.PD_data == 'empty':
-			self.PRF = [None, None, np.zeros([num_div, num_div]), None]
+			eps = np.asarray(self.epsilons)
+			self.PRF = [eps, eps, np.zeros([num_div, num_div]), eps[-1]]
 			return
 		max_lim = self.PD_data.lim
 		min_lim = 0

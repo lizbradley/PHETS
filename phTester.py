@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 
-
+from PH.Plots import plot_filtration_pub, plot_PD_pub
 from config import default_filtration_params as parameter_set
 
 from PH import Filtration, load_saved_filtration
@@ -9,7 +9,7 @@ from PH import make_movie, make_PD, make_PRF_plot
 
 import time
 
-set_test = 17	# set test number here or with command line argument
+set_test = 21		# set test number here or with command line argument
 
 
 
@@ -23,7 +23,7 @@ start_time = time.time()
 #
 #
 # if test == 1:
-# 	in_data_file_name = "datasets/trajectories/L63_x_m2/L63_x_m2_tau7.txt"
+# 	in_filename = "datasets/trajectories/L63_x_m2/L63_x_m2_tau7.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -36,10 +36,10 @@ start_time = time.time()
 # 		})
 #
 # 	start_pt = 0   # fraction to skip of in data file (primitive sliding window)
-# 	build_and_save_filtration(in_data_file_name, filt_params, start=start_pt) # comment out to reuse filtration
+# 	build_and_save_filtration(in_filename, filt_params, start=start_pt) # comment out to reuse filtration
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,              # used to check if saved filtration is up to date, and in titlebox
+# 		in_filename,              # used to check if saved filtration is up to date, and in titlebox
 # 		"output/PH/L63_x_m2_tau7_movie.mp4",      		# output filename
 # 		filt_params,              # passed to BuildComplex.build_filtration()
 #
@@ -50,7 +50,7 @@ start_time = time.time()
 # 	)
 #
 # 	make_persistence_diagram(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/L63_x_m2_tau7_persistence_new.png",
 # 		filt_params
 # 	)
@@ -58,7 +58,7 @@ start_time = time.time()
 #
 #
 # if test == 2:
-# 	in_data_file_name = "datasets/trajectories/btc2milIC123.txt"
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -67,16 +67,16 @@ start_time = time.time()
 # 			'max_filtration_param': -10,
 # 		})
 #
-# 	build_and_save_filtration(in_data_file_name, filt_params, start=0)
+# 	build_and_save_filtration(in_filename, filt_params, start=0)
 #
 # 	make_persistence_diagram(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/persistence_diagram_test.png",
 # 		filt_params
 # 	)
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/3d_movie_test_start.mp4",
 # 		filt_params,
 # 		color_scheme='none',
@@ -89,7 +89,7 @@ start_time = time.time()
 #
 #
 # if test == 3:
-# 	in_data_file_name = "datasets/trajectories/L96N22F5_x1_m2tau10.txt"
+# 	in_filename = "datasets/trajectories/L96N22F5_x1_m2tau10.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -98,17 +98,17 @@ start_time = time.time()
 # 			'max_filtration_param': -20
 # 		})
 #
-# 	build_and_save_filtration(in_data_file_name, filt_params)
+# 	build_and_save_filtration(in_filename, filt_params)
 #
 # 	make_persistence_diagram(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/persistence_diagram_test.png",
 # 		filt_params
 # 	)
 #
 #
 # if test == 4:
-# 	in_data_file_name = "datasets/trajectories/L96N22F5_x1_m2tau10.txt"
+# 	in_filename = "datasets/trajectories/L96N22F5_x1_m2tau10.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -118,10 +118,10 @@ start_time = time.time()
 # 		})
 #
 # 	start_pt = .5   # skip first half of in data file (primitive sliding window)
-# 	build_and_save_filtration(in_data_file_name, filt_params, start=start_pt) # comment out to reuse filtration
+# 	build_and_save_filtration(in_filename, filt_params, start=start_pt) # comment out to reuse filtration
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,              # used to check if saved filtration is up to date, and in titlebox
+# 		in_filename,              # used to check if saved filtration is up to date, and in titlebox
 # 		"output/PH/test4.mp4",      # output filename
 # 		filt_params,              # passed to BuildComplex.build_filtration()
 #
@@ -134,7 +134,7 @@ start_time = time.time()
 #
 #
 # if test == 5:
-# 	in_data_file_name = "datasets/trajectories/btc2milIC123.txt"
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -143,10 +143,10 @@ start_time = time.time()
 # 			'max_filtration_param': -20
 # 		})
 #
-# 	build_and_save_filtration(in_data_file_name, filt_params, start=0)
+# 	build_and_save_filtration(in_filename, filt_params, start=0)
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/test5.mp4",
 # 		filt_params,
 # 		color_scheme='none',
@@ -157,7 +157,7 @@ start_time = time.time()
 #
 #
 # if test == 6:
-# 	in_data_file_name = "datasets/trajectories/Annulus1_np20r1L5dp1.txt"
+# 	in_filename = "datasets/trajectories/Annulus1_np20r1L5dp1.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -168,10 +168,10 @@ start_time = time.time()
 # 			'landmark_selector': 'EST'
 # 		})
 #
-# 	build_and_save_filtration(in_data_file_name, filt_params, start=0)
+# 	build_and_save_filtration(in_filename, filt_params, start=0)
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/test6.mp4",
 # 		filt_params,
 # 		color_scheme='none',
@@ -183,8 +183,8 @@ start_time = time.time()
 #
 # 	for i in xrange(3):
 # 		print i
-# 		in_data_file_name = "datasets/trajectories/L63_x_m2/L63_x_m2_tau%s.txt" % str(i+2)
-# 		print '%s' % str(in_data_file_name)
+# 		in_filename = "datasets/trajectories/L63_x_m2/L63_x_m2_tau%s.txt" % str(i+2)
+# 		print '%s' % str(in_filename)
 # 		filt_params = parameter_set
 # 		filt_params.update(
 # 			{
@@ -193,11 +193,11 @@ start_time = time.time()
 # 				'max_filtration_param': -20
 # 			})
 #
-# 		build_and_save_filtration(in_data_file_name, filt_params)
+# 		build_and_save_filtration(in_filename, filt_params)
 #
 # 		print 'Making PD %s' % str(i + 2)
 # 		make_persistence_diagram(
-# 			in_data_file_name,
+# 			in_filename,
 # 			"output/PH/PD_L63_x_m2_tau%s.png" % str(i+2),
 # 			filt_params
 # 		)
@@ -207,8 +207,8 @@ start_time = time.time()
 #
 # 	for i in xrange(3):
 # 		print i
-# 		in_data_file_name = "datasets/trajectories/L63_x_m2/L63_x_m2_tau%s.txt" % str(i+2)
-# 		print '%s' % str(in_data_file_name)
+# 		in_filename = "datasets/trajectories/L63_x_m2/L63_x_m2_tau%s.txt" % str(i+2)
+# 		print '%s' % str(in_filename)
 # 		filt_params = parameter_set
 # 		filt_params.update(
 # 			{
@@ -217,11 +217,11 @@ start_time = time.time()
 # 				'max_filtration_param': -20
 # 			})
 #
-# 		build_and_save_filtration(in_data_file_name, filt_params)
+# 		build_and_save_filtration(in_filename, filt_params)
 # 		print 'Making PD %s' % str(i + 2)
 #
 # 		make_filtration_movie(
-# 			in_data_file_name,
+# 			in_filename,
 # 			"output/PH/test8.mp4",
 # 			filt_params,
 # 			color_scheme='none',
@@ -230,7 +230,7 @@ start_time = time.time()
 # 		)
 #
 # if test == 9:
-# 	in_data_file_name = "datasets/trajectories/L63_x_m2/L63_x_m2_tau10.txt"
+# 	in_filename = "datasets/trajectories/L63_x_m2/L63_x_m2_tau10.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -238,9 +238,9 @@ start_time = time.time()
 # 			'worm_length' : 10000,
 # 			'd_cov': -3
 # 		})
-# 	build_and_save_filtration(in_data_file_name, filt_params)
+# 	build_and_save_filtration(in_filename, filt_params)
 # 	make_filtration_movie(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/test9.mp4",
 # 		filt_params,
 # 		color_scheme='none',
@@ -249,7 +249,7 @@ start_time = time.time()
 # 	)
 #
 # if test == 10:
-# 	in_data_file_name = "datasets/trajectories/L63_x_m2/L63_x_m2_tau7.txt"
+# 	in_filename = "datasets/trajectories/L63_x_m2/L63_x_m2_tau7.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -260,10 +260,10 @@ start_time = time.time()
 # 		})
 #
 # 	start_pt = 0   # skip first half of in data file (primitive sliding window)
-# 	build_and_save_filtration(in_data_file_name, filt_params, start=start_pt) # comment out to reuse filtration
+# 	build_and_save_filtration(in_filename, filt_params, start=start_pt) # comment out to reuse filtration
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/L63_x_m2_tau7_movie.mp4",
 # 		filt_params,
 # 		color_scheme='highlight new',
@@ -272,7 +272,7 @@ start_time = time.time()
 # 	)
 #
 # 	make_persistence_diagram(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/L63_x_m2_tau7_persistence.png",
 # 		filt_params
 # 	)
@@ -280,10 +280,10 @@ start_time = time.time()
 # if test == 11:
 # 	for i in xrange(27):
 # 		print i
-# 		in_data_file_name = "datasets/trajectories/test_cases/viol/%s-viol.txt" % str(i + 36)
-# 		print '%s' % in_data_file_name
+# 		in_filename = "datasets/trajectories/test_cases/viol/%s-viol.txt" % str(i + 36)
+# 		print '%s' % in_filename
 # 		filt_params = parameter_set
-# 		print '%s' % in_data_file_name
+# 		print '%s' % in_filename
 # 		filt_params.update(
 # 			{
 # 				'ds_rate' : 50,
@@ -295,20 +295,20 @@ start_time = time.time()
 # 			})
 #
 # 		start_pt = 0   # skip first half of in data file (primitive sliding window)
-# 		print '%s' % in_data_file_name
-# 		build_and_save_filtration(in_data_file_name, filt_params, start=start_pt) # comment out to reuse filtration
-# 		#print '%s' % in_data_file_name
+# 		print '%s' % in_filename
+# 		build_and_save_filtration(in_filename, filt_params, start=start_pt) # comment out to reuse filtration
+# 		#print '%s' % in_filename
 # 		make_filtration_movie(
-# 			in_data_file_name,
+# 			in_filename,
 # 			"output/PH/%s-viol_movie.mp4"  % str(i + 36),
 # 			filt_params,
 # 			color_scheme='highlight new',
 # 			framerate=1,
 # 			save_frames=False
 # 		)
-# 		print '%s' % in_data_file_name
+# 		print '%s' % in_filename
 # 		make_persistence_diagram(
-# 			in_data_file_name,
+# 			in_filename,
 # 			"output/PH/%s-viol_persistence_diagram.png" % str(i + 36) ,
 # 			filt_params
 # 		)
@@ -319,10 +319,10 @@ start_time = time.time()
 # 		print i
 # 		print '=================================================\n'
 #
-# 		in_data_file_name = "datasets/trajectories/test_cases/viol/%s-viol.txt" % str(i)
-# 		print '%s' % in_data_file_name
+# 		in_filename = "datasets/trajectories/test_cases/viol/%s-viol.txt" % str(i)
+# 		print '%s' % in_filename
 # 		filt_params = parameter_set
-# 		print '%s' % in_data_file_name
+# 		print '%s' % in_filename
 # 		filt_params.update(
 # 			{
 # 				'ds_rate': 100,
@@ -334,28 +334,28 @@ start_time = time.time()
 # 			})
 #
 # 		start_pt = 0  # skip first half of in data file (primitive sliding window)
-# 		print '%s' % in_data_file_name
-# 		build_and_save_filtration(in_data_file_name, filt_params,
+# 		print '%s' % in_filename
+# 		build_and_save_filtration(in_filename, filt_params,
 # 								  start=start_pt)  # comment out to reuse filtration
-# 		# print '%s' % in_data_file_name
+# 		# print '%s' % in_filename
 # 		make_filtration_movie(
-# 			in_data_file_name,
+# 			in_filename,
 # 			"output/PH/%s-viol_movie.mp4" % str(i),
 # 			filt_params,
 # 			color_scheme='highlight new',
 # 			framerate=1,
 # 			save_frames=False
 # 		)
-# 		print '%s' % in_data_file_name
+# 		print '%s' % in_filename
 # 		make_persistence_diagram(
-# 			in_data_file_name,
+# 			in_filename,
 # 			"output/PH/%s-viol_persistence_diagram.png" % str(i),
 # 			filt_params
 # 		)
 #
 # if test == 13:
 # 	# figure 3
-# 	in_data_file_name = "output/DCE/trajectories/double/b/49-C135B.txt"
+# 	in_filename = "output/DCE/trajectories/double/b/49-C135B.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -368,16 +368,16 @@ start_time = time.time()
 # 		})
 #
 # 	start_pt = 0   # skip first half of in data file (primitive sliding window)
-# 	build_and_save_filtration(in_data_file_name, filt_params, start=start_pt) # comment out to reuse filtration
+# 	build_and_save_filtration(in_filename, filt_params, start=start_pt) # comment out to reuse filtration
 #
 # 	make_persistence_diagram(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/49-C135B.png",
 # 		filt_params
 # 	)
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,             						# used to check if saved filtration is up to date, and in titlebox
+# 		in_filename,             						# used to check if saved filtration is up to date, and in titlebox
 # 		"output/PH/49-C135B.mp4",      		# output filename
 # 		filt_params,              					# passed to BuildComplex.build_filtration()
 #
@@ -388,7 +388,7 @@ start_time = time.time()
 #
 # if test == 14:
 # 	# figure 4
-# 	in_data_file_name = "output/DCE/trajectories/double/b/49-C135B.txt"
+# 	in_filename = "output/DCE/trajectories/double/b/49-C135B.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -401,16 +401,16 @@ start_time = time.time()
 # 		})
 #
 # 	start_pt = 0   # skip first half of in data file (primitive sliding window)
-# 	# build_and_save_filtration(in_data_file_name, build_filt_params, start=start_pt) # comment out to reuse filtration
+# 	# build_and_save_filtration(in_filename, build_filt_params, start=start_pt) # comment out to reuse filtration
 #
 # 	make_persistence_diagram(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/49_C135B_Cech.png",
 # 		filt_params
 # 	)
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,             				# used to check if saved filtration is up to date, and in titlebox
+# 		in_filename,             				# used to check if saved filtration is up to date, and in titlebox
 # 		"output/PH/49_C135B_Cech.mp4",      		# output filename
 # 		filt_params,              					# passed to BuildComplex.build_filtration()
 #
@@ -420,7 +420,7 @@ start_time = time.time()
 # 	)
 #
 # if test == 15:
-# 	in_data_file_name = "output/DCE/trajectories/double/b/49-C135B.txt"
+# 	in_filename = "output/DCE/trajectories/double/b/49-C135B.txt"
 # 	filt_params = parameter_set
 # 	filt_params.update(
 # 		{
@@ -433,16 +433,16 @@ start_time = time.time()
 # 		})
 #
 # 	start_pt = 0   # skip first half of in data file (primitive sliding window)
-# 	build_and_save_filtration(in_data_file_name, filt_params, start=start_pt) # comment out to reuse filtration
+# 	build_and_save_filtration(in_filename, filt_params, start=start_pt) # comment out to reuse filtration
 #
 # 	make_persistence_diagram(
-# 		in_data_file_name,
+# 		in_filename,
 # 		"output/PH/49-C135B.png",
 # 		filt_params
 # 	)
 #
 # 	make_filtration_movie(
-# 		in_data_file_name,             						# used to check if saved filtration is up to date, and in titlebox
+# 		in_filename,             						# used to check if saved filtration is up to date, and in titlebox
 # 		"output/PH/49-C135B.mp4",      		# output filename
 # 		filt_params,              					# passed to BuildComplex.build_filtration()
 #
@@ -471,8 +471,8 @@ if test == 16:
 		})
 
 
-	# filtration = Filtration(in_filename, filt_params)
-	filtration = load_saved_filtration()		# reuses previous filtration
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
 
 	# make_PD(
 	# 	filtration,
@@ -488,11 +488,11 @@ if test == 16:
 	#
 
 
-	# make_movie(
-	# 	filtration,
-	# 	'output/PH/49-C135B_movie.mp4',
-	# 	color_scheme='highlight new'
-	# )
+	make_movie(
+		filtration,
+		'output/PH/49-C135B_movie.mp4',
+		color_scheme='highlight new'
+	)
 
 
 
@@ -530,13 +530,74 @@ if test == 17:
 	)
 
 
+	make_movie(
+		filtration,
+		'output/PH/test17.mp4'
+	)
+
+
+if test == 21:
+	# figure 3
+	# different landmark selection scheme or ds_rate?
+	in_filename = "datasets/IDA_PAPER/piano_traj.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate' : 15,
+			'worm_length' : 2000,
+			# 'min_filtration_param': .00,
+			'max_filtration_param': .011,
+			'num_divisions': 11,
+			'use_cliques': True
+		})
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()
+
+
 	# make_movie(
 	# 	filtration,
-	# 	'output/PH/test17_cliques_gnu.mp4'
+	# 	"output/IDA_PAPER/49-C135B.mp4",
+	# 	color_scheme='none',
 	# )
 
+	plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3.png')
+
+	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
 
 
+if test == 22:
+	# IDA paper figure 4
+	in_filename = "output/DCE/trajectories/double/b/49-C135B.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate' : 1,
+			'worm_length' : 2000,
+			'min_filtration_param': .001,
+			'max_filtration_param': .005,
+			'num_divisions': 2,
+			#'use_cliques': True
+		})
+
+	start_pt = 0   # skip first half of in data file (primitive sliding window)
+	# build_and_save_filtration(in_filename, build_filt_params, start=start_pt) # comment out to reuse filtration
+
+	make_persistence_diagram(
+		in_filename,
+		"output/PH/49_C135B_Cech.png",
+		filt_params
+	)
+
+	make_filtration_movie(
+		in_filename,             				# used to check if saved filtration is up to date, and in titlebox
+		"output/PH/49_C135B_Cech.mp4",      		# output filename
+		filt_params,              					# passed to BuildComplex.build_filtration()
+
+		color_scheme='none',		# 'none' or 'highlight new' or ('birth time gradient', cycles), where cycles is number
+									# of cycles through color gradient. (ie use larger cycles for faster color changes.)
+		framerate=1,
+	)
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

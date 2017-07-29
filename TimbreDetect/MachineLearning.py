@@ -8,7 +8,7 @@ from sklearn import svm
 import sys
 import random
 
-from DCE.Plotter import plot_waveform, plot_waveform_zoom
+from DCE.Plots import plot_waveform, plot_waveform_zoom
 
 WAV_SAMPLE_RATE = 44100.
 

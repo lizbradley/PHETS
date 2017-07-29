@@ -151,7 +151,7 @@ def auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename):
 
 
 def plot_power_spectrum(sig, out_file, crop=(1,2)):
-	from Plotter import plot_waveform
+	from Plots import plot_waveform
 	samp_freq = 44100.
 
 	if crop != 'none':

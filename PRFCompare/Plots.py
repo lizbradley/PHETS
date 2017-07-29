@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from DCE.Plotter import plot_waveform_zoom, plot_waveform
+from DCE.Plots import plot_waveform_zoom, plot_waveform
 from PH import make_PD, make_PRF_plot, make_movie, Filtration
 from PH.Plots import plot_heatmap
 from PH.TitleBox import add_filenames_table, add_filt_params_table

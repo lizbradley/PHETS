@@ -46,239 +46,243 @@ def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_tim
 	return facecolor, edgecolor
 
 
-def make_frames(filtration, color_scheme, alpha, save_frames):
 
-	def plot_2D_init(subplot, attractor_data, landmark_data):
+def plot_2D_init(subplot, witness_data, landmark_data):
 
-		def plot_witnesses(subplot, attractor_data):
-			attractor_data = np.array(attractor_data)
-			x = attractor_data[:, 0]
-			y = attractor_data[:, 1]
-			return subplot.scatter(x, y, color='black', marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'), facecolor='black', s=.1)
+	def plot_witnesses(subplot, attractor_data):
+		attractor_data = np.array(attractor_data)
+		x = attractor_data[:, 0]
+		y = attractor_data[:, 1]
+		return subplot.scatter(
+			x, y,
+			color='black',
+			marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'),
+			facecolor='black',
+			s=.1)
 
+	def plot_landmarks(subplot, landmark_data):
+		landmark_data = np.array(landmark_data)
+		x = landmark_data[:, 0]
+		y = landmark_data[:, 1]
+		return subplot.scatter(x, y, color='darkblue', s=35)
 
-		def plot_landmarks(subplot, landmark_data):
-			landmark_data = np.array(landmark_data)
-			x = landmark_data[:, 0]
-			y = landmark_data[:, 1]
-			return subplot.scatter(x, y, color='darkblue', s=35)
-
-		subplot.set_aspect('equal')
-		return [plot_witnesses(subplot, attractor_data), plot_landmarks(subplot, landmark_data)]
-
-
-	def plot_2D_update(subplot, filtration, i):
-
-		def plot_complex(subplot, i, complex_data):
-			"""plots all complexes for full filtration"""
-			patches = []
-
-			triangle_count = 0
-			for j, simplexes_coords in enumerate(complex_data[:i]):
-
-				f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
-
-				simplexes = collections.PolyCollection(
-					simplexes_coords,
-					edgecolors=e_color,
-					facecolors=f_color,
-					lw=1,
-					alpha=alpha,
-					zorder=0,
-					animated=True,
-					antialiased=True)
-
-				patches.append(subplot.add_collection(simplexes))
-				triangle_count += len(simplexes_coords)
-
-			with open('output/run_info/num_triangles.txt', 'a') as f:
-				f.write('frame {}: {}\n'.format(i, triangle_count))
-
-			return patches
-
-		return plot_complex(subplot, i, filtration.get_complex_plot_data())
+	subplot.set_aspect('equal')
+	return [plot_witnesses(subplot, witness_data), plot_landmarks(subplot, landmark_data)]
 
 
-	def plot_2D_update_gnuplot(subplot, filtration, i):
+def plot_2D_update(subplot, filtration, i, color_scheme, alpha):
 
-		def add_arrow(simplex, cmds):
-			set_arrow = ' '.join([
-				'set arrow from',
-				'{}, {} to'.format(*simplex[0]),
-				'{}, {}'.format(*simplex[1]),
-				# 'nohead lc "red"'
-				'nohead lw 1'
-			])
-			cmds.append(set_arrow)
+	def plot_complex(subplot, i, complex_data):
+		"""plots all complexes for full filtration"""
+		patches = []
 
-		def add_poly(simplex, cmds, poly_count):
-			set_poly = '\n'.join([
-				'set object {} polygon from \\'.format(poly_count),
-				'{}, {} to \\'.format(*simplex[0]),
-				'{}, {} to \\'.format(*simplex[1]),
-				'{}, {} to \\'.format(*simplex[2]),
-				'{}, {}'.format(*simplex[0]),
-			])
+		triangle_count = 0
+		for j, simplexes_coords in enumerate(complex_data[:i]):
 
-			style_poly = ' '.join([
-				'set object {} fc rgb "#999999"'.format(poly_count),
-				'fillstyle solid',
-				'lw 1'
-			])
+			f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
 
-			cmds.append(set_poly)
-			cmds.append(style_poly)
+			simplexes = collections.PolyCollection(
+				simplexes_coords,
+				edgecolors=e_color,
+				facecolors=f_color,
+				lw=1,
+				alpha=alpha,
+				zorder=0,
+				animated=True,
+				antialiased=True)
+
+			patches.append(subplot.add_collection(simplexes))
+			triangle_count += len(simplexes_coords)
+
+		with open('output/run_info/num_triangles.txt', 'a') as f:
+			f.write('frame {}: {}\n'.format(i, triangle_count))
+
+		return patches
+
+	return plot_complex(subplot, i, filtration.get_complex_plot_data())
 
 
+def plot_3D_update(subplot, filtration, i):
+	def add_arrow(simplex, cmds):
+		set_arrow = ' '.join([
+			'set arrow from',
+			'{}, {}, {} to'.format(*simplex[0]),
+			'{}, {}, {}'.format(*simplex[1]),
+			# 'nohead lc "red"'
+			'nohead lw 1'
+		])
+		cmds.append(set_arrow)
 
-		def write_gnup_script():
-			witness_data = filtration.witness_coords
-			landmark_data = filtration.landmark_coords
-			complex_data = filtration.get_complex_plot_data()
+	def add_poly(simplex, cmds, poly_count):
+		set_poly = '\n'.join([
+			'set object {} polygon from \\'.format(poly_count),
+			'{}, {}, {} to \\'.format(*simplex[0]),
+			'{}, {}, {} to \\'.format(*simplex[1]),
+			'{}, {}, {} to \\'.format(*simplex[2]),
+			'{}, {}, {}'.format(*simplex[0]),
+		])
 
-			np.savetxt('witnesses.txt', witness_data)
-			np.savetxt('landmarks.txt', landmark_data)
+		style_poly = ' '.join([
+			'set object {} fc rgb "#999999"'.format(poly_count),
+			'fillstyle solid',
+			'lw 1'
+		])
 
-			complex_data = complex_data[:i]
+		cmds.append(set_poly)
+		cmds.append(style_poly)
 
-			cmds = ['set terminal pngcairo size 500, 500',
-					# 'set output "PH/frames/frame{:02d}.png"'.format(i),
-					# 'set size ratio - 1',
-					# 'unset border',
-					# 'unset tics'
-					]
+	def write_gnup_script():
+		witness_data = filtration.witness_coords
+		landmark_data = filtration.landmark_coords
+		complex_data = filtration.get_complex_plot_data()
 
-			triangle_count = 1
-			for complex in complex_data:
-				for simplex in complex:
-					if len(simplex) == 1:
-						# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
-						pass
-					elif len(simplex) == 2:
-						add_arrow(simplex, cmds)
-					else:
-						add_poly(simplex, cmds, triangle_count)
-						triangle_count += 1
+		np.savetxt('witnesses.txt', witness_data)
+		np.savetxt('landmarks.txt', landmark_data)
 
-			with open('output/run_info/num_triangles.txt', 'a') as f:
-				f.write('frame {}: {}\n'.format(i, triangle_count))
+		complex_data = complex_data[:i]
 
-			# plot witnesses and landmarks
-			cmds.append('''plot \
+		cmds = ['set terminal pngcairo size 700, 700',
+				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
+				# 'set size ratio - 1',
+				# 'unset border',
+				# 'unset tics'
+				]
+
+		triangle_count = 1
+		for complex in complex_data:
+			for simplex in complex:
+				if len(simplex) == 1:
+					# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
+					pass
+				elif len(simplex) == 2:
+					add_arrow(simplex, cmds)
+				else:
+					add_poly(simplex, cmds, triangle_count)
+					triangle_count += 1
+
+		with open('output/run_info/num_triangles.txt', 'a') as f:
+			f.write('frame {}: {}\n'.format(i, triangle_count))
+
+		# plot witnesses and landmarks
+		cmds.append('''splot \
 						"witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
 						"landmarks.txt" with points pt 7 ps 1 notitle''')
 
-			cmds.append('q')
+		cmds.append('q')
+
+		with open('PH/temp_data/gnuplot_cmds.txt', 'w') as f:
+			f.write('\n'.join(cmds))
+
+	write_gnup_script()
+	p = subprocess.Popen(['gnuplot-x11', 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+
+	out, err = p.communicate()
+	f = io.BytesIO(out)
+	img = mpimg.imread(f, format='png')
+
+	# debugging
+	# if i ==3:
+	# 	fig = pyplot.figure(figsize=(6, 6), tight_layout=True, dpi=300)
+	# 	ax = fig.add_subplot(111)
+	# 	ax.axis('off')
+	# 	ax.imshow(img, interpolation='none')
+	# 	fig.savefig('test.png')
+	# 	sys.exit()
+
+	subplot.axis('off')
+	return subplot.imshow(img),
 
 
-			with open('PH/temp_data/gnuplot_cmds.txt', 'w') as f:
-				f.write('\n'.join(cmds))
+def plot_2D_update_gnuplot(subplot, filtration, i):
 
+	def add_arrow(simplex, cmds):
+		set_arrow = ' '.join([
+			'set arrow from',
+			'{}, {} to'.format(*simplex[0]),
+			'{}, {}'.format(*simplex[1]),
+			# 'nohead lc "red"'
+			'nohead lw 1'
+		])
+		cmds.append(set_arrow)
 
-		write_gnup_script()
-		p = subprocess.Popen([gnuplot_str, 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+	def add_poly(simplex, cmds, poly_count):
+		set_poly = '\n'.join([
+			'set object {} polygon from \\'.format(poly_count),
+			'{}, {} to \\'.format(*simplex[0]),
+			'{}, {} to \\'.format(*simplex[1]),
+			'{}, {} to \\'.format(*simplex[2]),
+			'{}, {}'.format(*simplex[0]),
+		])
 
-		out, err = p.communicate()
-		f = io.BytesIO(out)
-		img = mpimg.imread(f, format='png')
+		style_poly = ' '.join([
+			'set object {} fc rgb "#999999"'.format(poly_count),
+			'fillstyle solid',
+			'lw 1'
+		])
 
-
-		subplot.axis('off')
-		return subplot.imshow(img),
-
-
-	def plot_3D_update(subplot, filtration, i):
-		def add_arrow(simplex, cmds):
-			set_arrow = ' '.join([
-				'set arrow from',
-				'{}, {}, {} to'.format(*simplex[0]),
-				'{}, {}, {}'.format(*simplex[1]),
-				# 'nohead lc "red"'
-				'nohead lw 1'
-			])
-			cmds.append(set_arrow)
-
-		def add_poly(simplex, cmds, poly_count):
-			set_poly = '\n'.join([
-				'set object {} polygon from \\'.format(poly_count),
-				'{}, {}, {} to \\'.format(*simplex[0]),
-				'{}, {}, {} to \\'.format(*simplex[1]),
-				'{}, {}, {} to \\'.format(*simplex[2]),
-				'{}, {}, {}'.format(*simplex[0]),
-			])
-
-			style_poly = ' '.join([
-				'set object {} fc rgb "#999999"'.format(poly_count),
-				'fillstyle solid',
-				'lw 1'
-			])
-
-			cmds.append(set_poly)
-			cmds.append(style_poly)
-
-		def write_gnup_script():
-			witness_data = filtration.witness_coords
-			landmark_data = filtration.landmark_coords
-			complex_data = filtration.get_complex_plot_data()
-
-			np.savetxt('witnesses.txt', witness_data)
-			np.savetxt('landmarks.txt', landmark_data)
-
-			complex_data = complex_data[:i]
-
-			cmds = ['set terminal pngcairo size 700, 700',
-					# 'set output "PH/frames/frame{:02d}.png"'.format(i),
-					# 'set size ratio - 1',
-					# 'unset border',
-					# 'unset tics'
-					]
-
-			triangle_count = 1
-			for complex in complex_data:
-				for simplex in complex:
-					if len(simplex) == 1:
-						# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
-						pass
-					elif len(simplex) == 2:
-						add_arrow(simplex, cmds)
-					else:
-						add_poly(simplex, cmds, triangle_count)
-						triangle_count += 1
-
-			with open('output/run_info/num_triangles.txt', 'a') as f:
-				f.write('frame {}: {}\n'.format(i, triangle_count))
-
-			# plot witnesses and landmarks
-			cmds.append('''splot \
-							"witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
-							"landmarks.txt" with points pt 7 ps 1 notitle''')
-
-			cmds.append('q')
-
-			with open('PH/temp_data/gnuplot_cmds.txt', 'w') as f:
-				f.write('\n'.join(cmds))
-
-		write_gnup_script()
-		p = subprocess.Popen(['gnuplot-x11', 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
-
-		out, err = p.communicate()
-		f = io.BytesIO(out)
-		img = mpimg.imread(f, format='png')
-
-		# debugging
-		# if i ==3:
-		# 	fig = pyplot.figure(figsize=(6, 6), tight_layout=True, dpi=300)
-		# 	ax = fig.add_subplot(111)
-		# 	ax.axis('off')
-		# 	ax.imshow(img, interpolation='none')
-		# 	fig.savefig('test.png')
-		# 	sys.exit()
-
-		subplot.axis('off')
-		return subplot.imshow(img),
+		cmds.append(set_poly)
+		cmds.append(style_poly)
 
 
 
+	def write_gnup_script():
+		witness_data = filtration.witness_coords
+		landmark_data = filtration.landmark_coords
+		complex_data = filtration.get_complex_plot_data()
+
+		np.savetxt('witnesses.txt', witness_data)
+		np.savetxt('landmarks.txt', landmark_data)
+
+		complex_data = complex_data[:i]
+
+		cmds = ['set terminal pngcairo size 500, 500',
+				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
+				# 'set size ratio - 1',
+				# 'unset border',
+				# 'unset tics'
+				]
+
+		triangle_count = 1
+		for complex in complex_data:
+			for simplex in complex:
+				if len(simplex) == 1:
+					# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
+					pass
+				elif len(simplex) == 2:
+					add_arrow(simplex, cmds)
+				else:
+					add_poly(simplex, cmds, triangle_count)
+					triangle_count += 1
+
+		with open('output/run_info/num_triangles.txt', 'a') as f:
+			f.write('frame {}: {}\n'.format(i, triangle_count))
+
+		# plot witnesses and landmarks
+		cmds.append('''plot \
+					"witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
+					"landmarks.txt" with points pt 7 ps 1 notitle''')
+
+		cmds.append('q')
+
+
+		with open('PH/temp_data/gnuplot_cmds.txt', 'w') as f:
+			f.write('\n'.join(cmds))
+
+
+	write_gnup_script()
+	p = subprocess.Popen([gnuplot_str, 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+
+	out, err = p.communicate()
+	f = io.BytesIO(out)
+	img = mpimg.imread(f, format='png')
+
+
+	subplot.axis('off')
+	return subplot.imshow(img),
+
+
+
+def make_frames(filtration, color_scheme, alpha, save_frames):
 
 	fname_ax = 			pyplot.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
 	epsilon_ax = 		pyplot.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
@@ -313,7 +317,7 @@ def make_frames(filtration, color_scheme, alpha, save_frames):
 		sys.stdout.flush()
 
 		if amb_dim == 2:
-			comp_plot = plot_2D_update(plot_ax, filtration, i)
+			comp_plot = plot_2D_update(plot_ax, filtration, i, color_scheme, alpha)
 			# comp_plot = plot_2D_update_gnuplot(plot_ax, filtration, i)
 		else:
 			comp_plot = plot_3D_update(plot_ax, filtration, i)

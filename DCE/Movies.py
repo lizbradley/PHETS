@@ -1,12 +1,12 @@
 import DCE
 from MovieTools import frames_to_movie
-import Plotter
+import Plots
 import numpy as np
 import sys
 
 from Utilities import pwd
 
-from Tools import auto_tau
+from Tools import auto_tau, auto_crop
 
 from MovieTools import remove_old_frames
 from MovieTools import prep_save_worms_single, save_worms_single, prep_save_worms_double, save_worms_double
@@ -44,7 +44,7 @@ def slide_window(
 		if save_trajectories: save_worms_single('{:d}-{}'.format(i, in_filename), i, tau, embed_crop)
 
 		if save_movie:
-			Plotter.make_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
+			Plots.make_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)
@@ -72,7 +72,7 @@ def vary_tau(
 
 		if save_trajectories: save_worms_single('{:d}-{}'.format(i, in_filename), i, int(tau), embed_crop)
 
-		if save_movie: Plotter.make_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
+		if save_movie: Plots.make_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)
@@ -104,7 +104,7 @@ def compare_vary_tau(
 		if save_trajectories: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop, embed_crop)
 
 		if save_movie:
-			Plotter.compare_vary_tau_frame('DCE/frames/frame%03d.png' % i, in_filename_1, in_filename_2, i, tau, embed_crop, m)
+			Plots.compare_vary_tau_frame('DCE/frames/frame%03d.png' % i, in_filename_1, in_filename_2, i, tau, embed_crop, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)
@@ -155,10 +155,6 @@ def get_comp_tables(*args):
 
 
 
-
-from Tools import auto_crop
-
-
 def compare_multi(
 		dir1, dir1_base,
 		dir2, dir2_base,
@@ -193,10 +189,6 @@ def compare_multi(
 	remove_old_frames()
 	frame_idx = 0
 
-
-
-
-
 	for i in xrange(i_lims[0], i_lims[1]):
 
 		frame_idx += 1
@@ -228,7 +220,7 @@ def compare_multi(
 
 		title_tables = [params_table, computed_tables]
 		if save_movie:
-			Plotter.compare_multi_frame(frame_idx, sig_1, sig_2, crop_1, crop_2, dpi, title_tables, m)
+			Plots.compare_multi_frame(frame_idx, sig_1, sig_2, crop_1, crop_2, dpi, title_tables, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)

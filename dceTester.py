@@ -1,17 +1,22 @@
 import sys
 import time
 import math
+
+import numpy as np
+
+
+from DCE.DCE import embed
 from DCE.Utilities import wav_to_txt, batch_wav_to_txt
 from DCE.Tools import plot_power_spectrum
-from DCE.Plotter import make_frame
+from DCE.Plots import make_frame, plot_dce_pub
 from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
-from DCE.Plotter import plot_waveform_zoom_only
+from DCE.Plots import plot_waveform_zoom_only
 
 # slide_window, vary_tau, compare_vary_tau: tau is in samples not seconds
 # compare_multi: tau is in seconds; has all options for tau and crop *****
 
 
-set_test = 5		# set here or with command line argument
+set_test = 12		# set here or with command line argument
 
 
 
@@ -174,6 +179,9 @@ if test == 10:
 
 
 if test == 11:
+	############# IDA PAPER FIG 1 ###############
+
+
 	dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'  # numerical index goes in front of base
 	dir2, base2 = "datasets/time_series/C135B", '-C135B.txt'
 	out_filename = 'output/DCE/C134vC135_fontsize.mp4'
@@ -198,7 +206,7 @@ if test == 11:
 		save_trajectories=False,  		# to output/DCE/trajectories
 		save_movie=True,
 
-		waveform_zoom = out_filename
+		waveform_zoom=out_filename
 
 	)
 
@@ -211,6 +219,15 @@ if test == 11:
 		embed_crop='auto',
 		auto_crop_length=.05,
 	)
+
+
+if test == 12:
+	############# IDA PAPER FIG 1 ###############
+
+	sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
+	traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.721, 1.771))
+	np.savetxt('datasets/IDA_PAPER/piano_traj.txt', traj)
+	plot_dce_pub(traj, 'output/DCE/testing.png')
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 

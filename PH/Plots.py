@@ -4,11 +4,15 @@ import matplotlib.pyplot as pyplot
 import itertools
 import numpy as np
 from os import system, chdir
+
+from matplotlib import pyplot as plt
 from memory_profiler import profile
 from sys import platform
 
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
+
+from PH.FiltrationMovie import plot_2D_init, plot_2D_update
 from TitleBox import add_filename_table, add_filt_params_table
 
 
@@ -192,6 +196,7 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 	else:
 		func = filtration
 
+
 	x, y, z, max_lim = func
 
 	if len(x.shape) == 2: 			# meshgrid format
@@ -204,9 +209,34 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 
 
 	fig.savefig(out_filename)
+	pyplot.close(fig)
 
 
 
+def plot_filtration_pub(
+		filtration, i, out_filename,
+		color_scheme='none',
+		alpha=1
+):
+	fig = plt.figure(figsize=(6, 6), dpi=500)
+	ax = fig.add_subplot(111)
+	plot_2D_init(ax, filtration.witness_coords, filtration.landmark_coords)
+	plot_2D_update(ax, filtration, i, color_scheme, alpha)
+	eps = [0] + filtration.epsilons
+	ax.set_title('$\epsilon = {:.7f}$'.format(eps[i]))
 
-if __name__ == '__main__':
-	make_PD('filt_test.txt')
+	ax.text(.9, .9, '(a)',
+			horizontalalignment='center',
+			transform=ax.transAxes)
+
+
+	plt.savefig(out_filename)
+	plt.close(fig)
+
+
+def plot_PD_pub(filtration, out_filename):
+	fig = pyplot.figure(figsize=(6, 6), dpi=500)
+	ax = fig.add_subplot(111)
+	add_persistence_plot(ax, filtration)
+	pyplot.savefig(out_filename)
+	pyplot.close(fig)
