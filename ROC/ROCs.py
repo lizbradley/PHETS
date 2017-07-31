@@ -23,6 +23,7 @@ def norm(f):
 
 
 	dA = 2. / (res ** 2)		# normalize such that area of PRF domain is 1
+	# dA = 1. / ((res - 1) ** 2)
 	# dA = 1
 	return np.sqrt(np.nansum(np.power(f, 2)) * dA)
 
@@ -34,8 +35,6 @@ def test_inclusion(mean, var, tests, k):
 		diff = np.subtract(spec, mean)
 
 		dist = norm(diff)
-		print k
-		# print dist
 		pred.append(dist <= var_norm * k)
 	return pred
 
@@ -249,6 +248,161 @@ def PRF_vs_FFT(
 		print_data_spec.append((mean_spec_1, var_spec_1, label_1, mean_spec_2, var_spec_2, label_2))
 		print_data_prf.append((mean_prf_1, var_prf_1, label_1, mean_prf_2, var_prf_2, label_2))
 
+
+	print 'plotting...'
+	plot_fig(data, k, label_1, label_2, window_length, out_filename)
+
+	print_stats_multi(print_data_spec, print_data_prf, window_length)
+
+def PRF_vs_FFT_v2(
+		fname_1,
+		fname_2,
+		out_filename,
+		label_1,
+		label_2,
+		crop_1=None,
+		crop_2=None,
+
+		tau=None,
+		m=2,
+
+		window_length=2000,
+		num_windows=15,
+		num_landmarks=30,
+
+		FT_bins=50,
+
+		k=(0, 1, .01),
+
+		load_saved_filts=False,
+		normalize_volume=True,
+
+):
+	if not load_saved_filts: clear_dir('ROC/samps/')
+	start = time.time()
+	print 'loading signal...'
+	sig_full_1 = np.loadtxt(fname_1)
+	sig_full_2 = np.loadtxt(fname_2)
+
+	print 'processing...'
+	sig_1 = crop_sig(sig_full_1, crop_1)
+	sig_2 = crop_sig(sig_full_2, crop_2)
+
+	data = []
+	print_data_spec = []
+	print_data_prf = []
+
+	if isinstance(window_length, int):
+		window_length = [window_length]
+
+	k_arr = np.arange(*k)
+	for wl in window_length:
+		windows_1, st_pts_1 = slice_sig(sig_1, l=wl, n=num_windows, normalize=normalize_volume)
+		windows_2, st_pts_2 = slice_sig(sig_2, l=wl, n=num_windows, normalize=normalize_volume)
+
+		plot_sig(sig_full_1, crop_1, windows_1, st_pts_1, 'ROC/sig1_wl{}.png'.format(wl))
+		plot_sig(sig_full_2, crop_2, windows_2, st_pts_2, 'ROC/sig2_wl{}.png'.format(wl))
+
+		specs_1 = get_specs(windows_1, FT_bins)
+		specs_2 = get_specs(windows_2, FT_bins)
+
+		trajs_1 = [embed(w, tau, m) for w in windows_1]
+		trajs_2 = [embed(w, tau, m) for w in windows_2]
+
+		prfs_1 = get_prfs(trajs_1, filt_params, wl, num_landmarks, load_saved=load_saved_filts, label=label_1)
+		prfs_2 = get_prfs(trajs_2, filt_params, wl, num_landmarks, load_saved=load_saved_filts, label=label_2)
+
+		specs_train_1, specs_test_1, mean_spec_1, var_spec_1 = pre_proc_data(specs_1)
+		specs_train_2, specs_test_2, mean_spec_2, var_spec_2 = pre_proc_data(specs_2)
+
+		prfs_train_1, prfs_test_1, mean_prf_1, var_prf_1 = pre_proc_data(prfs_1)
+		prfs_train_2, prfs_test_2, mean_prf_2, var_prf_2 = pre_proc_data(prfs_2)
+
+		def get_dists(mean, tests):
+			return [norm(np.subtract(test, mean)) for test in tests]
+
+
+		def get_rate_vs_k(dists, var, k_arr):
+			rate = []
+			for k in k_arr:
+				pred = dists <= norm(var) * k
+				rate.append(sum(pred) / float(len(pred)))
+			return rate
+
+		def get_rate_vs_k_v2(dists, dists_train, k_arr):
+			std_dev = np.mean(dists_train)
+			rate=[]
+			for k in k_arr:
+				pred = dists <= std_dev * k
+				rate.append(sum(pred) / float(len(pred)))
+			return rate
+
+		def plot_dists(test_dists, train_dists, var, title):
+
+			fig = plt.figure(figsize=(10, 6))
+			ax = fig.add_subplot(111)
+			ax.set_ylim(bottom=0)
+
+			ax.plot(test_dists, 'o')
+
+			std_dev = np.mean(train_dists)
+
+			npv_line = ax.axhline(norm(var), c='C0')
+			std_dev_line = ax.axhline(std_dev, c='C1')
+			var_line = ax.axhline(std_dev ** 2, c='C2')
+
+			fig.legend([npv_line, std_dev_line, var_line],
+					   ['norm of pointwise variance', 'avg dist to mean', 'avg dist to mean squared'])
+
+			fig.suptitle(title)
+
+			plt.savefig('output/ROC/dists.png')
+
+
+
+		prf_dists_1_vs_1 = get_dists(mean_prf_1, prfs_test_1)
+		prf_dists_2_vs_1 = get_dists(mean_prf_1, prfs_test_2)
+		prf_dists_1_vs_2 = get_dists(mean_prf_2, prfs_test_1)
+		prf_dists_2_vs_2 = get_dists(mean_prf_2, prfs_test_2)
+
+
+
+		train_dists_1_vs_1 = get_dists(mean_prf_1, prfs_train_1)
+		train_dists_2_vs_2 = get_dists(mean_prf_2, prfs_train_2)
+
+		plot_dists(prf_dists_1_vs_1, train_dists_1_vs_1, var_prf_1, 'clarinet vs clarinet')
+
+		# prf_1_tpr = get_rate_vs_k(prf_dists_1_vs_1, var_prf_1, k_arr)
+		# prf_1_fpr = get_rate_vs_k(prf_dists_2_vs_1, var_prf_1, k_arr)
+		#
+		# prf_2_tpr = get_rate_vs_k(prf_dists_2_vs_2, var_prf_2, k_arr)
+		# prf_2_fpr = get_rate_vs_k(prf_dists_1_vs_2, var_prf_2, k_arr)
+
+		prf_1_tpr = get_rate_vs_k_v2(prf_dists_1_vs_1, train_dists_1_vs_1, k_arr)
+		prf_1_fpr = get_rate_vs_k_v2(prf_dists_2_vs_1, train_dists_1_vs_1, k_arr)
+		prf_2_tpr = get_rate_vs_k_v2(prf_dists_2_vs_2, train_dists_2_vs_2, k_arr)
+		prf_2_fpr = get_rate_vs_k_v2(prf_dists_1_vs_2, train_dists_2_vs_2, k_arr)
+
+
+
+		prf_data_1 = [prf_1_fpr, prf_1_tpr]
+		prf_data_2 = [prf_2_fpr, prf_2_tpr]
+
+
+
+		fft_data_1 = roc_data(mean_spec_1, var_spec_1, specs_test_1, specs_test_2, k_arr)
+		fft_data_2 = roc_data(mean_spec_2, var_spec_2, specs_test_2, specs_test_1, k_arr)
+
+		# print_title('clarinet')
+		# prf_data_1 = roc_data(mean_prf_1, var_prf_1, prfs_test_1, prfs_test_2, k_arr)
+		# print_title('viol')
+		# prf_data_2 = roc_data(mean_prf_2, var_prf_2, prfs_test_2, prfs_test_1, k_arr)
+
+
+		data.append((fft_data_1, fft_data_2, prf_data_1, prf_data_2))
+
+		print_data_spec.append((mean_spec_1, var_spec_1, label_1, mean_spec_2, var_spec_2, label_2))
+		print_data_prf.append((mean_prf_1, var_prf_1, label_1, mean_prf_2, var_prf_2, label_2))
 
 	print 'plotting...'
 	plot_fig(data, k, label_1, label_2, window_length, out_filename)

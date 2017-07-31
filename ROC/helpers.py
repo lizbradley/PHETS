@@ -87,10 +87,10 @@ def plot_spec_x(spec, fname):
 
 def plot_roc(ax, data, k, title):
 	fpr, tpr = data
-	l, = ax.plot(fpr, tpr, clip_on=False, lw=4, zorder=0)
+	l, = ax.plot(fpr, tpr, clip_on=False, lw=3, zorder=0)
 	k = np.arange(*k)
 	# k = np.power(np.arange(*k), 2)
-	cm = ax.scatter(fpr, tpr, s=50, zorder=1, clip_on=False, c=k)
+	cm = ax.scatter(fpr, tpr, s=100, zorder=1, clip_on=False, c=k, alpha=1)
 	ax.plot([0, 1], [0, 1], '--')
 	ax.set_xlim([0, 1])
 	ax.set_ylim([0, 1])
