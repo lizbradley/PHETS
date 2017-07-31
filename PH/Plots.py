@@ -178,7 +178,7 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 	return cmap
 
 
-def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename=None):
+def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename=None, annot_hm=False):
 	print "plotting PRF..."
 
 	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
@@ -203,7 +203,7 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 		x, y = x[0], y[:, 0]		# reduce to arange format
 
 
-	plot_heatmap(plot_ax, cbar_ax, x, y, z)
+	plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=annot_hm)
 	add_filename_table(fname_ax, in_filename)
 	add_filt_params_table(params_ax, params)
 
@@ -218,16 +218,16 @@ def plot_filtration_pub(
 		color_scheme='none',
 		alpha=1
 ):
-	fig = plt.figure(figsize=(6, 6), dpi=500)
+	fig = plt.figure(figsize=(6, 6), dpi=700)
 	ax = fig.add_subplot(111)
 	plot_2D_init(ax, filtration.witness_coords, filtration.landmark_coords)
 	plot_2D_update(ax, filtration, i, color_scheme, alpha)
 	eps = [0] + filtration.epsilons
 	ax.set_title('$\epsilon = {:.7f}$'.format(eps[i]))
 
-	ax.text(.9, .9, '(a)',
-			horizontalalignment='center',
-			transform=ax.transAxes)
+	# ax.text(.9, .9, '(a)',
+	# 		horizontalalignment='center',
+	# 		transform=ax.transAxes)
 
 
 	plt.savefig(out_filename)

@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 5			 # set test number here or with command line argument
+set_test = 5003			 # set test number here or with command line argument
 
 
 
@@ -2769,6 +2769,51 @@ if test == 5002:
 		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 		quiet=False,
 		annot_hm=True
+	)
+
+if test == 5003:
+	params = parameter_set
+	# params = standard_parameter_set
+	params.update(
+		{
+			'ds_rate': 40,
+			'max_filtration_param': -8,
+			'num_divisions': 30,
+			'use_cliques': True,
+
+		}
+	)
+
+	plot_dists_vs_means(
+		'datasets/time_series/Clarinet/40-clarinet.txt',
+		'datasets/time_series/viol/40-viol.txt',
+		'output/PRFCompare/mean/test_5503.png',  # out filename
+		params,
+
+		load_saved_PRFs=False,
+
+		time_units='seconds',
+
+		crop_1=(2, 4),  # time_units or 'auto'
+		crop_2=(1, 3),  # time_units or 'auto'
+
+		window_size=.05,  # time_units
+		num_windows=30,  # evenly spaced
+		mean_samp_num=15,  # number of windows to use for mean
+
+
+		weight_func=lambda i, j: 1,
+
+		PRF_res=30,  # num divisions
+
+		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
+		# a is magnitude of window PRF, b is magnitude of ref PRF
+
+		normalize_volume=True,
+
+		see_samples=0,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+
 	)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

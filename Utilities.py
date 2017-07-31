@@ -42,7 +42,7 @@ def clear_dir(dir):
 
 	files = os.listdir(dir)
 	if files:
-		r = raw_input('Overwrite files in {}? (y/n/q) '.format(dir))
+		r = raw_input('Clear files in {}? (y/n/q) '.format(dir))
 	else:
 		return True
 
@@ -57,6 +57,8 @@ def clear_dir(dir):
 	else:
 		print 'Goodbye'
 		sys.exit()
+
+
 
 
 def lambda_to_str(f):

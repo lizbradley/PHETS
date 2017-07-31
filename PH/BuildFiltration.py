@@ -114,7 +114,9 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 	if max_filtration_param < 0:
 		if float(number_of_vertices) < abs(max_filtration_param) + 1:
-			print "ERROR: 'max_filtration_param' ({}) and number of landmarks ({}) are incompatible.Reduce 'ds_rate'.".format(max_filtration_param, number_of_vertices)
+			print '''ERROR: 'max_filtration_param' ({}) and number of landmarks ({})
+			are incompatible. Try decreasing 'ds_rate' or increasing 'worm_length'.'''.format(max_filtration_param,
+			number_of_vertices)
 			sys.exit()
 
 	num_threads = 2

@@ -59,13 +59,13 @@ def plot_waveform(subplot, waveform_data, crop, time_units='seconds'):
 		x = np.arange(0, len(y))
 		subplot.set_xlabel('time (samples)')
 
-	elif time_units == 'seconds':
+	else: 			# seconds
 		x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
 		subplot.set_xlabel('time (seconds)')
 
 	subplot.plot(x, y, color='k', zorder=0, lw= .5)
 	subplot.axis('tight')
-	if math.fabs(crop[0] - crop[1]) < .01:   # how to un-hardcode?
+	if math.fabs(crop[0] - crop[1]) < .01:
 		subplot.axvline(crop[0], color='r', alpha=0.7, zorder=1)
 	subplot.axvspan(crop[0], crop[1], facecolor='r', alpha=0.5, zorder=1)
 
@@ -91,22 +91,8 @@ def plot_waveform_zoom(ax, full_sig, crop, time_units='seconds', sig=None):
 			x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
 		y = full_sig[crop[0]:crop[1]]
 
-	# x0,x1 = ax.get_xlim()
-	# y0,y1 = ax.get_ylim()
-	# ylim = abs(y0) if abs(y0) >= abs(y1) else abs(y1)
-	# ax.set_ylim([-ylim, ylim])
-
-	# ax.set_aspect(abs(x1-x0)/abs(y1-y0))
 
 	ax.plot(x, y, color='k', zorder=0, lw= .5)
-
-	# ax.axis('tight')
-
-	# ax.set_xlabel('time (s)')
-
-	# subplot.set_ylim(-1.1, 1.1)
-	# subplot.set_yticks([-1, 0, 1])
-
 
 
 def plot_title(subplot, in_file_name, tau):

@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from helpers import crop_sig, slice_sig, get_spec, downsample_spec, plot_sig
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 
+from ROC.helpers import crop_sig, slice_sig, get_spec, downsample_spec, plot_sig
 
 fname_1 = '../datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt'
 fname_2 = '../datasets/time_series/viol/40-viol.txt'
@@ -31,8 +31,8 @@ sig_1 = crop_sig(sig_full_1, crop_1)
 sig_2 = crop_sig(sig_full_2, crop_2)
 
 
-windows_1 = slice_sig(sig_1, l=window_length, n=num_windows)
-windows_2 = slice_sig(sig_2, l=window_length, n=num_windows)
+windows_1, st_pts = slice_sig(sig_1, l=window_length, n=num_windows)
+windows_2, st_pts = slice_sig(sig_2, l=window_length, n=num_windows)
 
 print 'plotting...'
 
