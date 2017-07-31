@@ -153,6 +153,16 @@ class Filtration:
 				row[:] = expanded_row
 
 
+			'''check for duplicate triangles in order of birth time'''
+			all_tris=set()
+			for row in ID_array:
+				unique_row=[]
+				for tri in row:
+					tr=set(tri)
+					if tr not in all_tris:
+						unique_row.append(tri)
+						all_tris.add(tr)
+				row[:]=unique_row
 		filt_ID_array = group_by_birth_time(filt_ID_list)	# 1d list -> 2d array
 		expand_to_2simplexes(filt_ID_array)
 		# add _remove_duplicates() here IFF we want to process data before going in to perseus
