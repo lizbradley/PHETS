@@ -212,16 +212,74 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 	pyplot.close(fig)
 
 
+from matplotlib import collections
 
 def plot_filtration_pub(
 		filtration, i, out_filename,
-		color_scheme='none',
-		alpha=1
+
+		landmark_size=10,
+		landmark_color='lime',
+
+		alpha=1,
+		dpi=600
 ):
+
+	def plot_witnesses(subplot, attractor_data):
+		attractor_data = np.array(attractor_data)
+		x = attractor_data[:, 0]
+		y = attractor_data[:, 1]
+		subplot.scatter(
+			x, y,
+			color='black',
+			marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'),
+			facecolor='black',
+			s=.1)
+
+
+	def plot_landmarks(subplot, landmark_data):
+		landmark_data = np.array(landmark_data)
+		x = landmark_data[:, 0]
+		y = landmark_data[:, 1]
+		subplot.scatter(
+			x, y,
+			marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'),
+			s=landmark_size,
+			facecolor=landmark_color
+		)
+
+
+	def plot_complex(subplot, complex_data, i):
+		"""plots all complexes for full filtration"""
+
+		triangle_count = 0
+		for j, simplexes_coords in enumerate(complex_data[:i]):
+			f_color, e_color = 'C0', 'black'
+
+			simplexes = collections.PolyCollection(
+				simplexes_coords,
+				edgecolors=e_color,
+				facecolors=f_color,
+				lw=1,
+				alpha=alpha,
+				zorder=0,
+				animated=True,
+				antialiased=True)
+
+			subplot.add_collection(simplexes)
+			triangle_count += len(simplexes_coords)
+			print 'frame {}: {} triangles'.format(j, triangle_count)
+
+		with open('output/run_info/num_triangles.txt', 'a') as f:
+			f.write('frame {}: {}\n'.format(i, triangle_count))
+
+
+
+	print 'plotting filtration frame...'
 	fig = plt.figure(figsize=(6, 6), dpi=700)
 	ax = fig.add_subplot(111)
-	plot_2D_init(ax, filtration.witness_coords, filtration.landmark_coords)
-	plot_2D_update(ax, filtration, i, color_scheme, alpha)
+	plot_witnesses(ax, filtration.witness_coords)
+	plot_landmarks(ax, filtration.landmark_coords)
+	plot_complex(ax, filtration.get_complex_plot_data(), i)
 	eps = [0] + filtration.epsilons
 	ax.set_title('$\epsilon = {:.7f}$'.format(eps[i]))
 

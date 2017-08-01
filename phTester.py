@@ -9,7 +9,7 @@ from PH import make_movie, make_PD, make_PRF_plot
 
 import time
 
-set_test = 101		# set test number here or with command line argument
+set_test = 102		# set test number here or with command line argument
 
 
 
@@ -535,9 +535,39 @@ if test == 17:
 		'output/PH/test17.mp4'
 	)
 
+if test == 18:
+	# fig 2a sandbox
+	in_filename = "datasets/IDA_PAPER/49-C135B.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 1,
+			'worm_length': 800,
+			'min_filtration_param': .002,
+			'max_filtration_param': .003,
+			'num_divisions': 1,
+			'use_cliques': False
+		})
 
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()
 
+	#
+	# make_movie(
+	# 	filtration,
+	# 	"output/IDA_PAPER/49-C135B.mp4",
+	# 	color_scheme='none',
+	# )
 
+	# plot_filtration_pub(
+	# 	filtration, 1,
+	# 	'output/PH/cheching.png',
+	#
+	# 	landmark_size=.5,
+	# 	landmark_color='lime',
+	#
+	# 	dpi=600
+	# )
 
 
 if test == 20:
@@ -710,7 +740,7 @@ if test == 101:
 
 if test == 102:
 	# figure 2a
-	in_filename = "datasets/IDA_PAPER/piano_traj.txt"
+	in_filename = "datasets/IDA_PAPER/49-C135B.txt"
 	filt_params = parameter_set
 	filt_params.update(
 		{
@@ -725,16 +755,16 @@ if test == 102:
 	filtration = Filtration(in_filename, filt_params)
 	# filtration = load_saved_filtration()
 
+	#
+	# make_movie(
+	# 	filtration,
+	# 	"output/IDA_PAPER/49-C135B.mp4",
+	# 	color_scheme='none',
+	# )
 
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
-
-	plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3.png')
-
-	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
+	# plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3.png')
+	#
+	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
 
 
 

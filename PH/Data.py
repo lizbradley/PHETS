@@ -14,6 +14,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def load_saved_filtration():
+	print 'loading saved filtration...'
 	caller_dir = os.getcwd()
 	os.chdir(SCRIPT_DIR)
 	filtration = pickle.load(open('temp_data/filtration.p'))
@@ -92,8 +93,8 @@ class Filtration:
 		if len(self.sig.shape) == 1:
 			print "ERROR: Filtration input 'sig' is one dimensional"
 			sys.exit()
-		start_time = time.time()
 		np.savetxt('temp_data/worm_data.txt', self.sig)
+		start_time = time.time()
 
 		try:
 			if silent: blockPrint()
@@ -110,7 +111,7 @@ class Filtration:
 		abstract_filtration = sorted(list(filtration[0]))
 		epsilons = filtration[2]		# add to build_filtration return
 
-		if not silent: print("build_and_save_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
+		if not silent: print("build_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
 		return [witness_coords, landmark_coords, abstract_filtration, epsilons]
 
 	def _unpack_complexes(self, filt_ID_list):

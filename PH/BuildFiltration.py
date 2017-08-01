@@ -32,9 +32,9 @@ def sort(i):
 
 
 
-# f = open("output/PH/build_filtration_memory.txt","wb")
+f = open("output/PH/build_filtration_memory.txt","wb")
 
-# @profile(stream=f)
+@profile(stream=f)
 def build_filtration(input_file_name, parameter_set, silent=False):
 	num_threads = 2
 	global d
@@ -44,7 +44,6 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	def get_param(key):
 		return parameter_set.get(key)
 
-	# 	input_file = open("datasets/trajectories/test_cases/"+input_file_name+'.txt')
 	input_file = open(input_file_name)
 	speed_amplify = float(get_param("d_speed_amplify"))
 	orientation_amplify = float(get_param("d_orientation_amplify"))
