@@ -9,7 +9,6 @@ from config import WAV_SAMPLE_RATE
 # TODO third plot sig panel: zoom window
 # TODO time_units
 # TODO FFT ROC accuracy vs FT_bins (logspace)
-# TODO ROC color
 
 def sec_to_samp(crop):
 	return (np.array(crop) * WAV_SAMPLE_RATE).astype(int)

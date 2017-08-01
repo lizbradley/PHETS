@@ -1,5 +1,1 @@
-40: tau = 0.001 (seconds), embed_crop = [1.00000, 1.30000] (seconds) 
-41: tau = 0.001 (seconds), embed_crop = [1.00000, 1.30000] (seconds) 
-42: tau = 0.001 (seconds), embed_crop = [1.00000, 1.30000] (seconds) 
-43: tau = 0.001 (seconds), embed_crop = [1.00000, 1.30000] (seconds) 
-44: tau = 0.001 (seconds), embed_crop = [1.00000, 1.30000] (seconds) 
+49: tau = 0.01192 (seconds), embed_crop = [3.21714, 3.26714] (seconds) 

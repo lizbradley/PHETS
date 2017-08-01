@@ -179,7 +179,7 @@ if test == 10:
 
 
 if test == 11:
-	############# IDA PAPER FIG 1 ###############
+	############# IDA PAPER FIG 1 (using auto crop) ###############
 
 
 	dir1, base1 = 'datasets/time_series/C134C', '-C134C.txt'  # numerical index goes in front of base
@@ -197,13 +197,13 @@ if test == 11:
 		embed_crop_2='auto',  			# seconds or 'auto'
 		auto_crop_length=.05, 			# seconds for when embed_crop = 'auto'
 
-		tau_1='auto detect', 			# seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
+		tau_1=.01192, 			# seconds 'auto detect' or 'auto ideal'. note 'auto detect' is considerably slower that 'auto ideal'
 		tau_2=.01192,
 		tau_T=math.pi,  				# for auto tau. tau = period * tau_T
 
 		normalize_volume=True,
 
-		save_trajectories=False,  		# to output/DCE/trajectories
+		save_trajectories=True,  		# to output/DCE/trajectories
 		save_movie=True,
 
 		waveform_zoom=out_filename
@@ -222,11 +222,11 @@ if test == 11:
 
 
 if test == 12:
-	############# IDA PAPER FIG 1 ###############
+	############# IDA PAPER FIG 1 (explicit) ###############
 
 	sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
-	traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.721, 1.771))
-	np.savetxt('datasets/IDA_PAPER/piano_traj.txt', traj)
+	traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.72132, 1.77132))
+	np.savetxt('datasets/IDA_PAPER/49-C135B.txt', traj)
 	plot_dce_pub(traj, 'output/DCE/testing.png')
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

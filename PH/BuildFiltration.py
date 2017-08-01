@@ -30,12 +30,10 @@ def sort(i):
 
 
 
-MEMORY_PROFILE_ON = False
 
 
 # f = open("output/PH/build_filtration_memory.txt","wb")
 
-# @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)
 def build_filtration(input_file_name, parameter_set, silent=False):
 	num_threads = 2

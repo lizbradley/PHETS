@@ -153,17 +153,19 @@ class Filtration:
 				row[:] = expanded_row
 
 
-			'''check for duplicate triangles in order of birth time'''
-			all_tris=set()
-			for row in ID_array:
-				unique_row=[]
-				for tri in row:
-					tr=set(tri)
-					if tr not in all_tris:
-						unique_row.append(tri)
-						all_tris.add(tr)
-				row[:]=unique_row
-		filt_ID_array = group_by_birth_time(filt_ID_list)	# 1d list -> 2d array
+			# '''check for duplicate triangles in order of birth time'''
+			# all_tris=set()
+			# for row in ID_array:
+			# 	unique_row=[]
+			# 	for tri in row:
+			# 		tr=set(tri)
+			# 		if tr not in all_tris:
+			# 			unique_row.append(tri)
+			# 			all_tris.add(tr)
+			# 	row[:]=unique_row
+
+
+		filt_ID_array = group_by_birth_time(filt_ID_list)		# 1d list -> 2d array
 		expand_to_2simplexes(filt_ID_array)
 		# add _remove_duplicates() here IFF we want to process data before going in to perseus
 		# might run faster if we don't give perseus a filtration where simplexes are reborn
@@ -373,7 +375,6 @@ class Filtration:
 		# if remove_dups: ID_array = remove_duplicates(ID_array)
 		coords_array = IDs_to_coords(ID_array)
 		return coords_array
-
 
 
 	def get_PD_data(self):
