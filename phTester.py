@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 
-from PH.Plots import plot_filtration_pub, plot_PD_pub
+from PH.PubPlots import plot_PD_pub, plot_filtration_pub
 from config import default_filtration_params as parameter_set
 
 from PH import Filtration, load_saved_filtration
@@ -9,7 +9,7 @@ from PH import make_movie, make_PD, make_PRF_plot
 
 import time
 
-set_test = 17		# set test number here or with command line argument
+set_test = 103		# set test number here or with command line argument
 
 
 
@@ -764,7 +764,7 @@ if test == 102:
 
 	plot_filtration_pub(filtration, 0, 'output/IDA_PAPER/checking.png')
 	#
-	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
+	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
 
 
 
@@ -787,18 +787,19 @@ if test == 103:
 	# filtration = load_saved_filtration()
 
 
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
+	# make_movie(
+	# 	filtration,
+	# 	"output/IDA_PAPER/49-C135B.mp4",
+	# 	color_scheme='none',
+	# )
+
+	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
 
 	plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3a.png')
 	plot_filtration_pub(filtration, 3, 'output/IDA_PAPER/fig3b.png')
 	plot_filtration_pub(filtration, 5, 'output/IDA_PAPER/fig3c.png')
 	plot_filtration_pub(filtration, 7, 'output/IDA_PAPER/fig2bcheck.png')
 
-	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
 
 if test == 104:
 	# figure 4

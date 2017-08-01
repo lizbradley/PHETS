@@ -5,7 +5,7 @@ import numpy as np
 
 from DCE.DCE import embed
 from PH import Filtration
-from PH.Plots import plot_filtration_pub
+from PH.PubPlots import plot_filtration_pub
 from helpers import crop_sig, slice_sig, get_spec, downsample_spec, plot_sig, plot_roc
 from Utilities import print_title
 from config import default_filtration_params as filt_params
@@ -167,7 +167,7 @@ def print_stats_multi(spec_data, prf_data, window_length):
 
 
 
-
+##### USES NORM OF POINTWISE VARIANCE #####
 def PRF_vs_FFT(
 	fname_1,
 	fname_2,
@@ -254,6 +254,8 @@ def PRF_vs_FFT(
 
 	print_stats_multi(print_data_spec, print_data_prf, window_length)
 
+
+##### USES VARIANCE (or std dev if you change it on line 331) #####
 def PRF_vs_FFT_v2(
 		fname_1,
 		fname_2,
@@ -278,6 +280,7 @@ def PRF_vs_FFT_v2(
 		normalize_volume=True,
 
 ):
+
 	if not load_saved_filts: clear_dir('ROC/samps/')
 	start = time.time()
 	print 'loading signal...'
@@ -325,17 +328,18 @@ def PRF_vs_FFT_v2(
 
 		def get_rate_vs_k(dists, dists_train, k_arr):
 			variance = np.mean(np.power(dists_train, 2))
+			std_dev = np.mean(np.power(dists_train, 2)) ** .5
 			rate = []
 			for k in k_arr:
 				pred = dists <= variance * k
 				rate.append(sum(pred) / float(len(pred)))
 			return rate
 
-		def plot_dists(test_dists, train_dists, var, title):
+		def plot_dists(test_dists, train_dists, var, title, fname):
 
 			fig = plt.figure(figsize=(10, 6))
 			ax = fig.add_subplot(111)
-			ax.set_ylim(bottom=0)
+			# ax.set_ylim(bottom=0)
 
 			ax.plot(test_dists, 'o')
 
@@ -346,11 +350,11 @@ def PRF_vs_FFT_v2(
 			var_line = ax.axhline(variance, c='C2')
 
 			fig.legend([npv_line, std_dev_line, var_line],
-					   ['norm of pointwise variance', 'avg dist to mean', 'avg dist to mean squared'])
+					   ['norm of pointwise variance', 'standard deviation', 'variance'])
 
 			fig.suptitle(title)
 
-			plt.savefig('output/ROC/dists.png')
+			plt.savefig(fname)
 
 
 
@@ -364,7 +368,15 @@ def PRF_vs_FFT_v2(
 		train_dists_1_vs_1 = get_dists(mean_prf_1, prfs_train_1)
 		train_dists_2_vs_2 = get_dists(mean_prf_2, prfs_train_2)
 
-		plot_dists(prf_dists_1_vs_1, train_dists_1_vs_1, var_prf_1, 'clarinet vs clarinet')
+		title_11 = '{} vs {}'.format(label_1, label_1)
+		title_12 = '{} vs {}'.format(label_1, label_2)
+		title_21 = '{} vs {}'.format(label_2, label_1)
+		title_22 = '{} vs {}'.format(label_2, label_2)
+
+		plot_dists(prf_dists_1_vs_1, train_dists_1_vs_1, var_prf_1, title_11, 'output/ROC/' + title_11 + '.png')
+		plot_dists(prf_dists_1_vs_2, train_dists_2_vs_2, var_prf_2, title_12, 'output/ROC/' + title_12 + '.png')
+		plot_dists(prf_dists_2_vs_1, train_dists_1_vs_1, var_prf_1, title_21, 'output/ROC/' + title_21 + '.png')
+		plot_dists(prf_dists_2_vs_2, train_dists_2_vs_2, var_prf_2, title_22, 'output/ROC/' + title_22 + '.png')
 
 
 		prf_1_tpr = get_rate_vs_k(prf_dists_1_vs_1, train_dists_1_vs_1, k_arr)

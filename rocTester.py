@@ -17,7 +17,7 @@ def out_fname():
 	return 'output/ROC/test_{}.png'.format(test)
 
 
-test = 20
+test = 1
 
 
 if test == 1:
@@ -31,10 +31,10 @@ if test == 1:
 		}
 	)
 
-	PRF_vs_FFT(
+	PRF_vs_FFT_v2(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
 		'datasets/time_series/viol/40-viol.txt',
-		'output/ROC/test_1.png',
+		'output/ROC/test_1_v2.png',
 
 		'clarinet',
 		'viol',
@@ -50,8 +50,8 @@ if test == 1:
 		num_windows=15,
 		num_landmarks=30,
 		FT_bins=50,
-		k=(0, 100, .1),		# min, max, int
-		load_saved_filts=False,
+		k=(0, 10, .01),		# min, max, int
+		load_saved_filts=True,
 		normalize_volume=True
 
 	)

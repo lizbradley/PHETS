@@ -1,25 +1,11 @@
-import subprocess
-import os
-import matplotlib.pyplot as pyplot
-import itertools
-import numpy as np
-from os import system, chdir
-
-from matplotlib import pyplot as plt
-from memory_profiler import profile
-from sys import platform
-
-from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
-
-from PH.FiltrationMovie import plot_2D_init, plot_2D_update
-from TitleBox import add_filename_table, add_filt_params_table
-
-
-# from Utilities import mem_profile
-from config import MEMORY_PROFILE_ON
+import matplotlib.pyplot as pyplot
+import numpy as np
 
 from Data import Filtration
+from TitleBox import add_filename_table, add_filt_params_table
+
+# from Utilities import mem_profile
 
 f=open("output/run_info/group_by_birth_time_memory.txt","wb")
 f2=open("output/run_info/expand_to_2simplexes_memory.txt","wb")
@@ -212,84 +198,3 @@ def make_PRF_plot(filtration, out_filename, PRF_res=50, params=None, in_filename
 	pyplot.close(fig)
 
 
-from matplotlib import collections
-
-def plot_filtration_pub(
-		filtration, i, out_filename,
-
-		landmark_size=10,
-		landmark_color='lime',
-
-		alpha=1,
-		dpi=600
-):
-
-	def plot_witnesses(subplot, attractor_data):
-		attractor_data = np.array(attractor_data)
-		x = attractor_data[:, 0]
-		y = attractor_data[:, 1]
-		subplot.scatter(
-			x, y,
-			color='black',
-			marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'),
-			facecolor='black',
-			s=.1)
-
-
-	def plot_landmarks(subplot, landmark_data):
-		landmark_data = np.array(landmark_data)
-		x = landmark_data[:, 0]
-		y = landmark_data[:, 1]
-		subplot.scatter(
-			x, y,
-			marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'),
-			s=landmark_size,
-			facecolor=landmark_color
-		)
-
-
-	def plot_complex(subplot, complex_data, i):
-		"""plots all complexes for full filtration"""
-
-		for j, simplexes_coords in enumerate(complex_data[:i]):
-			f_color, e_color = 'C0', 'black'
-
-			simplexes = collections.PolyCollection(
-				simplexes_coords,
-				edgecolors=e_color,
-				facecolors=f_color,
-				lw=1,
-				alpha=alpha,
-				zorder=0,
-				animated=True,
-				antialiased=True)
-
-			subplot.add_collection(simplexes)
-
-
-
-
-	print 'plotting filtration frame...'
-	fig = plt.figure(figsize=(6, 6), dpi=700)
-	ax = fig.add_subplot(111)
-	plot_witnesses(ax, filtration.witness_coords)
-	plot_landmarks(ax, filtration.landmark_coords)
-	plot_complex(ax, filtration.get_complex_plot_data(), i)
-	eps = [0] + filtration.epsilons
-	ax.set_title('$\epsilon = {:.7f}$'.format(eps[i]))
-
-	# ax.text(.9, .9, '(a)',
-	# 		horizontalalignment='center',
-	# 		transform=ax.transAxes)
-
-
-	plt.savefig(out_filename)
-	plt.close(fig)
-
-
-def plot_PD_pub(filtration, out_filename):
-	fig = pyplot.figure(figsize=(6, 6), dpi=500)
-	ax = fig.add_subplot(111)
-	add_persistence_plot(ax, filtration)
-	pyplot.savefig(out_filename)
-	pyplot.close(fig)
