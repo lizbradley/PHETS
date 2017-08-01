@@ -679,7 +679,7 @@ if test == 101:
 
 	from DCE.DCE import embed
 	sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
-	traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.72132, 1.77132))
+	traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.72132, 1.77132), normalize=True)
 
 	# in_filename = 'datasets/IDA_PAPER/49-C135B.txt'
 	filt_params = parameter_set
