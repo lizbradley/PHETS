@@ -92,10 +92,7 @@ def plot_2D_update(subplot, filtration, i, color_scheme, alpha):
 				antialiased=True)
 
 			patches.append(subplot.add_collection(simplexes))
-			triangle_count += len(simplexes_coords)
 
-		with open('output/run_info/num_triangles.txt', 'a') as f:
-			f.write('frame {}: {}\n'.format(i, triangle_count))
 
 		return patches
 
@@ -160,8 +157,6 @@ def plot_3D_update(subplot, filtration, i):
 					add_poly(simplex, cmds, triangle_count)
 					triangle_count += 1
 
-		with open('output/run_info/num_triangles.txt', 'a') as f:
-			f.write('frame {}: {}\n'.format(i, triangle_count))
 
 		# plot witnesses and landmarks
 		cmds.append('''splot \
@@ -170,8 +165,6 @@ def plot_3D_update(subplot, filtration, i):
 
 		cmds.append('q')
 
-		with open('PH/temp_data/gnuplot_cmds.txt', 'w') as f:
-			f.write('\n'.join(cmds))
 
 	write_gnup_script()
 	p = subprocess.Popen(['gnuplot-x11', 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
@@ -254,8 +247,6 @@ def plot_2D_update_gnuplot(subplot, filtration, i):
 					add_poly(simplex, cmds, triangle_count)
 					triangle_count += 1
 
-		with open('output/run_info/num_triangles.txt', 'a') as f:
-			f.write('frame {}: {}\n'.format(i, triangle_count))
 
 		# plot witnesses and landmarks
 		cmds.append('''plot \
@@ -302,8 +293,6 @@ def make_frames(filtration, color_scheme, alpha, save_frames):
 		print 'ERROR: invalid ambient dimension {}, must be 2 or 3'.format(amb_dim)
 		sys.exit()
 
-	with open('output/run_info/num_triangles.txt', 'a') as f:
-		f.truncate(0)
 
 
 	def init():

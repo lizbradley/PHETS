@@ -318,22 +318,16 @@ def PRF_vs_FFT_v2(
 		prfs_train_1, prfs_test_1, mean_prf_1, var_prf_1 = pre_proc_data(prfs_1)
 		prfs_train_2, prfs_test_2, mean_prf_2, var_prf_2 = pre_proc_data(prfs_2)
 
+
 		def get_dists(mean, tests):
 			return [norm(np.subtract(test, mean)) for test in tests]
 
 
-		def get_rate_vs_k(dists, var, k_arr):
+		def get_rate_vs_k(dists, dists_train, k_arr):
+			variance = np.mean(np.power(dists_train, 2))
 			rate = []
 			for k in k_arr:
-				pred = dists <= norm(var) * k
-				rate.append(sum(pred) / float(len(pred)))
-			return rate
-
-		def get_rate_vs_k_v2(dists, dists_train, k_arr):
-			std_dev = np.mean(dists_train)
-			rate=[]
-			for k in k_arr:
-				pred = dists <= std_dev * k
+				pred = dists <= variance * k
 				rate.append(sum(pred) / float(len(pred)))
 			return rate
 
@@ -345,11 +339,11 @@ def PRF_vs_FFT_v2(
 
 			ax.plot(test_dists, 'o')
 
-			std_dev = np.mean(train_dists)
+			variance = np.mean(np.power(train_dists, 2))
 
 			npv_line = ax.axhline(norm(var), c='C0')
-			std_dev_line = ax.axhline(std_dev, c='C1')
-			var_line = ax.axhline(std_dev ** 2, c='C2')
+			std_dev_line = ax.axhline(variance ** .5, c='C1')
+			var_line = ax.axhline(variance, c='C2')
 
 			fig.legend([npv_line, std_dev_line, var_line],
 					   ['norm of pointwise variance', 'avg dist to mean', 'avg dist to mean squared'])
@@ -372,16 +366,11 @@ def PRF_vs_FFT_v2(
 
 		plot_dists(prf_dists_1_vs_1, train_dists_1_vs_1, var_prf_1, 'clarinet vs clarinet')
 
-		# prf_1_tpr = get_rate_vs_k(prf_dists_1_vs_1, var_prf_1, k_arr)
-		# prf_1_fpr = get_rate_vs_k(prf_dists_2_vs_1, var_prf_1, k_arr)
-		#
-		# prf_2_tpr = get_rate_vs_k(prf_dists_2_vs_2, var_prf_2, k_arr)
-		# prf_2_fpr = get_rate_vs_k(prf_dists_1_vs_2, var_prf_2, k_arr)
 
-		prf_1_tpr = get_rate_vs_k_v2(prf_dists_1_vs_1, train_dists_1_vs_1, k_arr)
-		prf_1_fpr = get_rate_vs_k_v2(prf_dists_2_vs_1, train_dists_1_vs_1, k_arr)
-		prf_2_tpr = get_rate_vs_k_v2(prf_dists_2_vs_2, train_dists_2_vs_2, k_arr)
-		prf_2_fpr = get_rate_vs_k_v2(prf_dists_1_vs_2, train_dists_2_vs_2, k_arr)
+		prf_1_tpr = get_rate_vs_k(prf_dists_1_vs_1, train_dists_1_vs_1, k_arr)
+		prf_1_fpr = get_rate_vs_k(prf_dists_2_vs_1, train_dists_1_vs_1, k_arr)
+		prf_2_tpr = get_rate_vs_k(prf_dists_2_vs_2, train_dists_2_vs_2, k_arr)
+		prf_2_fpr = get_rate_vs_k(prf_dists_1_vs_2, train_dists_2_vs_2, k_arr)
 
 
 

@@ -251,7 +251,6 @@ def plot_filtration_pub(
 	def plot_complex(subplot, complex_data, i):
 		"""plots all complexes for full filtration"""
 
-		triangle_count = 0
 		for j, simplexes_coords in enumerate(complex_data[:i]):
 			f_color, e_color = 'C0', 'black'
 
@@ -266,11 +265,7 @@ def plot_filtration_pub(
 				antialiased=True)
 
 			subplot.add_collection(simplexes)
-			triangle_count += len(simplexes_coords)
-			print 'frame {}: {} triangles'.format(j, triangle_count)
 
-		with open('output/run_info/num_triangles.txt', 'a') as f:
-			f.write('frame {}: {}\n'.format(i, triangle_count))
 
 
 
