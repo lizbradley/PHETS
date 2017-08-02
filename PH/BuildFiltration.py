@@ -32,11 +32,11 @@ def sort(i):
 
 
 
-# f = open("output/PH/build_filtration_memory.txt","wb")
+# f = open("output/run_info/build_filtration_memory.txt","wb")
 #
 # @profile(stream=f)
 def build_filtration(input_file_name, parameter_set, silent=False):
-	num_threads = 2
+	num_threads = 1
 	global d
 	d = []
 

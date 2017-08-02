@@ -334,8 +334,6 @@ def make_movie(
 		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
 
 ):
-	start = time.time()
-
 	movie_info = [color_scheme, camera_angle, alpha]
 	fnames = [filtration.filename, out_filename]
 
@@ -364,9 +362,6 @@ def make_movie(
 					 out_filename])
 
 	os.remove('output/PH/temp.mp4')
-
-
-	print 'time elapsed: {} s'.format(time.time() - start)
 
 
 

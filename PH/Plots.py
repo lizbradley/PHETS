@@ -99,16 +99,6 @@ def make_PD(filt, out_filename):
 	add_filename_table(fname_ax, filt.filename)
 	add_filt_params_table(params_ax, filt.params)
 
-	# IDA paper figures #
-	# title_block.tick_params(labelsize=23)
-	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-	# ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-
-	# xlims = ax.get_xlim()
-	# ax.set_xticks([0, round(xlims[1]/2., 4), xlims[1]])
-	# ylims = ax.get_ylim()
-	# ax.set_yticks([round(ylims[1]/2., 4), ylims[1]])
-	# ax.tick_params(labelsize=23)
 
 	pyplot.savefig(out_filename)
 	pyplot.clf()

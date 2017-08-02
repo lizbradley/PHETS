@@ -55,6 +55,7 @@ class Filtration:
 
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
+		if not silent: print 'unpacking...'
 		self.complexes = self._unpack_complexes(arr[2])
 		self.epsilons = arr[3]
 
@@ -65,6 +66,7 @@ class Filtration:
 		self.PD_data = None
 		self.PRF = None
 
+		if not silent: print 'pickling...'
 		pickle.dump(self, open('temp_data/filtration.p', 'wb'))
 
 		os.chdir(caller_dir)
@@ -111,12 +113,13 @@ class Filtration:
 		abstract_filtration = sorted(list(filtration[0]))
 		epsilons = filtration[2]		# add to build_filtration return
 
-		if not silent: print("build_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
+		if not silent: print("build_filtration() time elapsed: {} seconds \n".format(time.time() - start_time))
 		return [witness_coords, landmark_coords, abstract_filtration, epsilons]
 
 	def _unpack_complexes(self, filt_ID_list):
 
 		def group_by_birth_time(ID_list):
+
 			"""Reformats 1D list of SimplexBirth objects into 2D array of
 			landmark_set lists, where 2nd index is  birth time (? see below)"""
 
@@ -199,10 +202,13 @@ class Filtration:
 			f.close()
 
 
-
+		print 'group by birth time'
 		ID_array = group_by_birth_time(filt_ID_list)		# 1d list -> 2d array
+		print 'expand to 2-simplexes'
 		ID_array = expand_to_2simplexes(ID_array)
-		# ID_array = remove_duplicates_all(ID_array)
+		print 'remove duplicates'
+		ID_array = remove_duplicates_all(ID_array)
+		print 'count triangles'
 		count_triangles(ID_array)
 		return ID_array
 
