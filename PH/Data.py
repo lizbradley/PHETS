@@ -142,6 +142,22 @@ class Filtration:
 			return ID_array
 
 
+		# def expand_to_2simplexes(ID_arr):
+		# 	"""for each k-simplex in filtration array, if k > 2, replaces with the
+		# 	component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
+		# 	for row in ID_arr:
+		# 		expanded_row = []
+		# 		for landmark_ID_set in row:
+		# 			if len(landmark_ID_set) > 3:
+		# 				expanded_set = list(itertools.combinations(landmark_ID_set, 3))
+		# 			else:
+		# 				expanded_set = [list(landmark_ID_set)]
+		# 			expanded_row.extend(expanded_set)		# flatten
+		# 			# expanded_row.append(expanded_set)		# group by parent
+		# 		row[:] = expanded_row
+		# 	return np.asarray(ID_arr)
+
+		# changing datatypes for optimization -- may break edge cases
 		def expand_to_2simplexes(ID_arr):
 			"""for each k-simplex in filtration array, if k > 2, replaces with the
 			component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
@@ -149,17 +165,20 @@ class Filtration:
 				expanded_row = []
 				for landmark_ID_set in row:
 					if len(landmark_ID_set) > 3:
-						expanded_set = list(itertools.combinations(landmark_ID_set, 3))
+						expanded_set = itertools.combinations(landmark_ID_set, 3)
 					else:
-						expanded_set = [list(landmark_ID_set)]
+						expanded_set = [landmark_ID_set]
 					expanded_row.extend(expanded_set)		# flatten
 					# expanded_row.append(expanded_set)		# group by parent
 				row[:] = expanded_row
 			return np.asarray(ID_arr)
 
 
+
 		def remove_duplicates_all(ID_arr):
-			'''omit simplexes that have been already added to the filtration or repeated in a row'''
+			"""Omit simplexes that have been already added to the filtration or are
+			repeated within a row
+			"""
 			all_tris = set()
 			dups_count = 0
 			for row in ID_arr:

@@ -130,6 +130,7 @@ def plot_filtration_pub(
 
 		for j, simplexes_coords in enumerate(complex_data[:i]):
 			f_color, e_color = 'C0', 'black'
+			print 'frame', j
 
 			simplexes = collections.PolyCollection(
 				simplexes_coords,
