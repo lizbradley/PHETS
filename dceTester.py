@@ -8,9 +8,9 @@ import numpy as np
 from DCE.DCE import embed
 from DCE.Utilities import wav_to_txt, batch_wav_to_txt
 from DCE.Tools import plot_power_spectrum
-from DCE.Plots import make_frame, plot_dce_pub
+from DCE.Plots import make_frame
+from PubPlots import plot_dce_pub, plot_waveform_sec
 from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
-from DCE.Plots import plot_waveform_zoom_only
 
 # slide_window, vary_tau, compare_vary_tau: tau is in samples not seconds
 # compare_multi: tau is in seconds; has all options for tau and crop *****
@@ -211,7 +211,7 @@ if test == 11:
 	)
 
 
-	plot_waveform_zoom_only(
+	plot_waveform_sec(
 
 		'datasets/time_series/C135B/49-C135B.txt',		# in filename
 		'output/DCE/time_series_zoom.png',				# out filename

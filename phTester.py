@@ -1,15 +1,12 @@
 import sys
-import numpy as np
-
-from PH.PubPlots import plot_PD_pub, plot_filtration_pub
-from config import default_filtration_params as parameter_set
-
-from PH import Filtration, load_saved_filtration
-from PH import make_movie, make_PD, make_PRF_plot
-
 import time
 
-set_test = 102		# set test number here or with command line argument
+from PH import Filtration, load_saved_filtration
+from PH import make_movie
+from PubPlots import plot_PD_pub, plot_filtration_pub
+from config import default_filtration_params as parameter_set
+
+set_test = 101		# set test number here or with command line argument
 
 
 
@@ -672,163 +669,6 @@ if test == 22:
 
 
 
-
-############### IDA PAPER FIGURES ###############
-
-
-if test == 100:
-	# figure 2b
-	in_filename = 'datasets/IDA_PAPER/49-C135B_embedded.txt'
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 10,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .005,
-			'num_divisions': 2,
-			'use_cliques': False
-		})
-
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()
-
-
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
-	#
-	# plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3.png')
-	#
-	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
-
-
-if test == 101:
-	# figure 2c
-
-	# from DCE.DCE import embed
-	# sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
-	# traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.72132, 1.77132), normalize=True)
-	# np.savetxt('datasets/IDA_PAPER/49-C135B_embedded.txt', traj)
-
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 40,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .005,
-			'num_divisions': 2,
-			'use_cliques': False
-		})
-
-	filtration = Filtration('datasets/IDA_PAPER/49-C135B_embedded.txt', filt_params)
-	# filtration = Filtration(traj, filt_params)
-	# filtration = load_saved_filtration()
-
-
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		alpha=.5
-	)
-
-	# plot_filtration_pub(filtration, 8, 'output/IDA_PAPER/fig2c.png')
-
-	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig2c_PD.png')
-
-
-if test == 102:
-	# figure 2a
-	in_filename = 'datasets/IDA_PAPER/49-C135B_embedded.txt'
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 1,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .005,
-			'num_divisions': 2,
-			'use_cliques': False
-		})
-
-	# filtration = Filtration(in_filename, filt_params)
-	filtration = load_saved_filtration()
-
-	#
-	# make_movie(
-	# 	filtration,
-	# 	"output/IDA_PAPER/49-C135B.mp4",
-	# 	color_scheme='none',
-	# )
-
-	plot_filtration_pub(filtration, 0, 'output/IDA_PAPER/checking.png',
-						landmark_size=1)
-	#
-	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
-
-
-
-
-if test == 103:
-	# figure 3
-	in_filename = 'datasets/IDA_PAPER/49-C135B_embedded.txt'
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 10,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .011,
-			'num_divisions': 20,
-			'use_cliques': False
-		})
-
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()
-
-
-	# make_movie(
-	# 	filtration,
-	# 	"output/IDA_PAPER/49-C135B.mp4",
-	# 	color_scheme='none',
-	# )
-
-	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
-
-	plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3a.png')
-	plot_filtration_pub(filtration, 3, 'output/IDA_PAPER/fig3b.png')
-	plot_filtration_pub(filtration, 5, 'output/IDA_PAPER/fig3c.png')
-	plot_filtration_pub(filtration, 7, 'output/IDA_PAPER/fig2bcheck.png')
-
-
-if test == 104:
-	# figure 4
-	in_filename = 'datasets/IDA_PAPER/49-C135B_embedded.txt'
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 10,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .011,
-			'num_divisions': 20,
-			'use_cliques': False
-		})
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()
-
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
-	# plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig4.png')
-	# plot_filtration_pub(filtration, 3, 'output/IDA_PAPER/fig4.png')
-	# plot_filtration_pub(filtration, 5, 'output/IDA_PAPER/fig4.png')
-	# plot_filtration_pub(filtration, 7, 'output/IDA_PAPER/fig4.png')
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 

@@ -5,10 +5,10 @@ import numpy as np
 
 from DCE.DCE import embed
 from PH import Filtration
-from PH.PubPlots import plot_filtration_pub
-from helpers import crop_sig, slice_sig, get_spec, downsample_spec, plot_sig, plot_roc
+from PubPlots import plot_filtration_pub
 from Utilities import print_title
 from config import default_filtration_params as filt_params
+from helpers import crop_sig, slice_sig, get_spec, downsample_spec, plot_sig, plot_roc
 
 
 def norm(f):

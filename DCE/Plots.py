@@ -1,12 +1,9 @@
-import math, sys
-import numpy as np
+import math
+import sys
+
 import matplotlib.pyplot as pyplot
+import numpy as np
 from matplotlib.ticker import FormatStrFormatter
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.image as mpimg
-
-from Tools import auto_crop
-
 
 WAV_SAMPLE_RATE = 44100.
 
@@ -255,34 +252,3 @@ def compare_multi_frame(frame_idx, sig1, sig2, crop_1, crop_2, dpi, title_tables
 
 
 
-def plot_waveform_zoom_only(
-		in_filename,
-		out_filename,
-		embed_crop='auto',
-		auto_crop_length=.3,
-		normalize_volume=True,
-
-	):
-
-	sig = np.loadtxt(in_filename)
-	if normalize_volume: sig = sig / np.max(np.abs(sig))
-	crop = auto_crop(embed_crop, sig, auto_crop_length)
-	fig = pyplot.figure(figsize=(5, 3), dpi=300, tight_layout=False)
-	ax = fig.add_subplot(1, 1, 1)
-	ax.set_title(in_filename.split('/')[-1])
-	ax.set_position([.2, .3, .6, .4])
-	plot_waveform_zoom(ax, sig, crop)
-	pyplot.savefig(out_filename)
-
-
-def plot_dce_pub(traj, out_fname):
-	fig = pyplot.figure(figsize=(6, 6))
-
-	if traj.shape[1] == 3:
-		ax = fig.add_subplot(111, projection='3d')
-	else:
-		ax = fig.add_subplot(111)
-
-	plot_dce(ax, traj)
-	pyplot.savefig(out_fname)
-	pyplot.close(fig)
