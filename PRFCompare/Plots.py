@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from DCE.Plots import plot_waveform_zoom, plot_waveform
+from DCE.Plots import plot_signal_zoom, plot_signal
 from PH import make_PD, make_PRF_plot, make_movie, Filtration
 from PH.Plots import plot_heatmap
 from PH.TitleBox import add_filenames_table, add_filt_params_table
@@ -177,7 +177,7 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 		plt.setp(ax4.get_xticklines(), visible=False)
 
 		ax5 = fig.add_subplot(425, sharex=ax1)
-		plot_waveform_zoom(ax5, None, crop_1, time_units=time_units, sig=sig_1)
+		plot_signal_zoom(ax5, None, crop_1, time_units=time_units, sig=sig_1)
 		ax5.grid(axis='x', zorder=0)
 		plt.setp(ax5.get_yticklabels(), visible=False)
 		plt.setp(ax5.get_yticklines(), visible=False)
@@ -185,7 +185,7 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 
 
 		ax6 = fig.add_subplot(426, sharex=ax2)
-		plot_waveform_zoom(ax6, None, crop_2, time_units=time_units, sig=sig_2)
+		plot_signal_zoom(ax6, None, crop_2, time_units=time_units, sig=sig_2)
 		ax6.grid(axis='x', zorder=0)
 		plt.setp(ax6.get_yticklabels(), visible=False)
 		plt.setp(ax6.get_yticklines(), visible=False)
@@ -195,12 +195,12 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 		ax6.set_ylim(-ylim, ylim)
 
 		ax7 = fig.add_subplot(427)
-		plot_waveform(ax7, sig_1_full, crop_1, time_units=time_units)
+		plot_signal(ax7, sig_1_full, crop_1, time_units=time_units)
 		plt.setp(ax7.get_yticklabels(), visible=False)
 		plt.setp(ax7.get_yticklines(), visible=False)
 
 		ax8 = fig.add_subplot(428, sharey=ax7)
-		plot_waveform(ax8, sig_2_full, crop_2, time_units=time_units)
+		plot_signal(ax8, sig_2_full, crop_2, time_units=time_units)
 		plt.setp(ax8.get_yticklabels(), visible=False)
 		plt.setp(ax8.get_yticklines(), visible=False)
 

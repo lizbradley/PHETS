@@ -37,14 +37,14 @@ class PDData:
 
 class Filtration:
 
-	def __init__(self, sig, params, filename='none', silent=False):
+	def __init__(self, traj, params, filename='none', silent=False):
 		caller_dir = os.getcwd()
 
-		if isinstance(sig, basestring):			# is filename
-			self.sig = np.loadtxt(sig)
-			self.filename = caller_dir + '/' + sig
+		if isinstance(traj, basestring):			# is filename
+			self.sig = np.loadtxt(traj)
+			self.filename = caller_dir + '/' + traj
 		else:									# is array
-			self.sig = sig
+			self.sig = traj
 			self.filename = filename
 
 		os.chdir(SCRIPT_DIR)

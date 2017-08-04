@@ -5,13 +5,16 @@ import numpy as np
 from matplotlib import pyplot as pyplot, collections, pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
-from DCE.Plots import plot_waveform_zoom
+from DCE.Plots import plot_signal_zoom
 from DCE.Tools import auto_crop
 
 from config import WAV_SAMPLE_RATE
 
+from Tools import normalize_volume
 
-def plot_PD_pub(filtration, out_filename):
+
+
+def plot_PD_pub(filtration, out_filename, label=None):
 	def add_persistence_plot(ax, filtration):
 		ax.set_aspect('equal')
 		min_lim = 0
@@ -19,8 +22,8 @@ def plot_PD_pub(filtration, out_filename):
 		ax.set_xlim(min_lim, max_lim)
 		ax.set_ylim(min_lim, max_lim)
 
-		ax.set_xlabel('birth ($\epsilon$)')
-		ax.set_ylabel('death ($\epsilon$)')
+		ax.set_xlabel('$\epsilon_B$')
+		ax.set_ylabel('$\epsilon_D$')
 
 		ax.grid(which=u'major', zorder=0)
 		ax.minorticks_on()
@@ -31,14 +34,7 @@ def plot_PD_pub(filtration, out_filename):
 		min_size = 0
 		t_ms_scale = 50
 		p_ms_scale = 30
-		color = 'C1'
-
-		# BIG for IDA paper #
-		# min_size = 300
-		# t_ms_scale = 150
-		# p_ms_scale = 60
-		# color = 'red'
-
+		color = 'C3'
 
 		# add legend #
 		mark_t_1 = ax.scatter([], [], marker='^', s=t_ms_scale, c=color)
@@ -78,35 +74,47 @@ def plot_PD_pub(filtration, out_filename):
 		# end add legend #
 
 
-	# IDA paper figures #
-	# title_block.tick_params(labelsize=23)
-	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-	# ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	if isinstance(out_filename, basestring):
+		fig = pyplot.figure(figsize=(6, 6), dpi=500)
+		ax = fig.add_subplot(111)
+		add_persistence_plot(ax, filtration)
 
-	# xlims = ax.get_xlim()
-	# ax.set_xticks([0, round(xlims[1]/2., 4), xlims[1]])
-	# ylims = ax.get_ylim()
-	# ax.set_yticks([round(ylims[1]/2., 4), ylims[1]])
-	# ax.tick_params(labelsize=23)
+	else:
+		ax = out_filename
+		add_persistence_plot(ax, filtration)
 
+	ax.text(.5, .8, r'   $\beta_1$   ',
+			horizontalalignment='center',
+			verticalalignment='center',
+			size='x-large',
+			bbox=dict(alpha=1, facecolor='white', pad=10),
+			transform=ax.transAxes)
 
+	if label:
+		ax.text(.7, .95, label,
+				horizontalalignment='center',
+				verticalalignment='center',
+				transform=ax.transAxes)
 
-	fig = pyplot.figure(figsize=(6, 6), dpi=500)
-	ax = fig.add_subplot(111)
-	add_persistence_plot(ax, filtration)
-	pyplot.savefig(out_filename)
-	pyplot.close(fig)
+	if isinstance(out_filename, basestring):
+		pyplot.savefig(out_filename)
+		pyplot.close(fig)
+
 
 
 
 def plot_filtration_pub(
-		filtration, i, out_filename,
+		filtration, i,
+		out_filename,
 
 		landmark_size=10,
 		landmark_color='lime',
 
 		alpha=1,
-		dpi=600
+		dpi=700,
+		show_eps=True,
+		label=None,
+		ticks=None
 ):
 
 	def plot_witnesses(subplot, attractor_data):
@@ -116,9 +124,10 @@ def plot_filtration_pub(
 		subplot.scatter(
 			x, y,
 			color='black',
-			marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'),
-			facecolor='black',
-			s=.1)
+			s=1,
+			marker='o',
+			facecolor='black', edgecolor=''
+		)
 
 
 	def plot_landmarks(subplot, landmark_data):
@@ -156,95 +165,100 @@ def plot_filtration_pub(
 
 
 	print 'plotting filtration frame...'
-	fig = plt.figure(figsize=(6, 6), dpi=700)
-	ax = fig.add_subplot(111)
+
+	if isinstance(out_filename, basestring):
+		fig = plt.figure(figsize=(4.5, 4.4), dpi=dpi, tight_layout=True)
+		ax = fig.add_subplot(111)
+	else:
+		ax = out_filename
 	plot_witnesses(ax, filtration.witness_coords)
 	plot_landmarks(ax, filtration.landmark_coords)
 	plot_complex(ax, filtration.get_complex_plot_data(), i)
 	eps = [0] + filtration.epsilons
-	ax.set_title('$\epsilon = {:.7f}$'.format(eps[i]))
 
-	ax.text(.9, .9, '(a)',
-			horizontalalignment='center',
-			transform=ax.transAxes)
+	if show_eps:
+		ax.set_title('$\epsilon = {:.7f}$'.format(eps[i]))
 
-
-	plt.savefig(out_filename)
-	plt.close(fig)
-
-
-def plot_dce_pub(traj, out_fname):
-	def plot_dce(ax, in_file_name):
-		# print 'plotting dce...'
-
-		if isinstance(in_file_name, basestring):
-			dce_data = np.loadtxt(in_file_name)
-		else:
-			dce_data = np.asarray(in_file_name)
-
-		amb_dim = dce_data.shape[1]
-
-		if amb_dim == 2:
-
-			x = dce_data[:, 0]
-			y = dce_data[:, 1]
-			ax.scatter(x, y, color='black', s=.1)
-			# subplot.set_aspect('equal')
-			ax.set(adjustable='box-forced', aspect='equal')
-
-			ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-			ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	if label:
+		ax.text(.7, .95, label,
+				horizontalalignment='left',
+				verticalalignment='center',
+				transform=ax.transAxes)
+	if ticks:
+		ax.xaxis.set_ticks(ticks)
+		ax.yaxis.set_ticks(ticks)
+	ax.set_aspect('equal')
+	if isinstance(out_filename, basestring):
+		plt.savefig(out_filename)
+		plt.close(fig)
 
 
-		elif amb_dim == 3:
-			x = dce_data[:, 0]
-			y = dce_data[:, 1]
-			z = dce_data[:, 2]
-
-			ax.scatter(x, y, z, color='black', s=.1)
-			# subplot.set_aspect('equal')
-			ax.set(adjustable='box-forced', aspect='equal')
-		# ax.axis('off')
-
-
-		else:
-			print 'ERROR: invalid amb_dim (m)'
-			sys.exit()
-
-
-	fig = pyplot.figure(figsize=(6, 6))
-
-	if traj.shape[1] == 3:
-		ax = fig.add_subplot(111, projection='3d')
-	else:
-		ax = fig.add_subplot(111)
-
-	plot_dce(ax, traj)
-	pyplot.savefig(out_fname)
-	pyplot.close(fig)
 
 
 def plot_waveform_sec(
-		in_filename,
+		sig,
 		out_filename,
 		crop=None,
-
-
+		normalize=True
 	):
-	sig = np.loadtxt(in_filename)
 
-	fig = pyplot.figure(figsize=(6, 2), dpi=500, tight_layout=False)
+	if isinstance(sig, basestring):
+		sig = np.loadtxt(sig)
+
+	if normalize: sig = normalize_volume(sig)
+
+	fig = pyplot.figure(figsize=(5, 2), dpi=600, tight_layout=True)
 
 	ax = fig.add_subplot(1, 1, 1)
 
 	if crop:
-		crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
-		sig = sig[crop[0] : crop[1]]
+		c0, c1 = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		sig = sig[c0: c1]
 		t = np.linspace(crop[0], crop[1], num=len(sig))
 
 	else:
 		t = np.true_divide(np.arange(0, len(sig)), WAV_SAMPLE_RATE)
 
-	ax.plot(t, sig, c='k', lw=.1)
+	ax.plot(t, sig, c='k', lw=.5)
 
 	pyplot.savefig(out_filename), WAV_SAMPLE_RATE
+
+
+
+def plot_dce_pub(traj, out_fname):
+
+	fig = pyplot.figure(figsize=(2.3, 2), dpi=600, tight_layout=True)
+
+	if isinstance(traj, basestring):
+		traj = np.loadtxt(traj)
+
+
+	if traj.shape[1] == 2:
+		ax = fig.add_subplot(111)
+		x = traj[:, 0]
+		y = traj[:, 1]
+		ax.scatter(
+			x, y,
+			s=.5,
+			marker='o',
+			facecolor='black', edgecolor=''
+
+		)
+
+	elif traj.shape[1] == 3:
+		ax = fig.add_subplot(111, projection='3d')
+
+		x = traj[:, 0]
+		y = traj[:, 1]
+		z = traj[:, 2]
+		ax.scatter(x, y, z, color='black', s=.1)
+
+	else:
+		print 'ERROR: invalid amb_dim (m)'
+		sys.exit()
+
+	ax.set_aspect('equal')
+	pyplot.savefig(out_fname)
+	pyplot.close(fig)
+
+

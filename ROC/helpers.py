@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy import fftpack, interpolate
 
-from DCE.Plots import plot_waveform
+from DCE.Plots import plot_signal
 from config import WAV_SAMPLE_RATE
 
 
@@ -45,7 +45,7 @@ def plot_sig(sig_full, crop, windows, st_pts, fname):
 	ax1 = fig.add_subplot(211)
 	ax2 = fig.add_subplot(212)
 
-	plot_waveform(ax1, sig_full, crop, 'samples')
+	plot_signal(ax1, sig_full, crop, 'samples')
 
 	t = np.arange(crop[0], crop[1])
 	ax2.plot(t, sig_full[crop[0] : crop[1]], lw=.5, c='k', zorder=0)

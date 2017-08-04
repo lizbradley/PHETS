@@ -17,7 +17,7 @@ def out_fname():
 	return 'output/ROC/test_{}.png'.format(test)
 
 
-test = 1
+test = 7
 
 
 if test == 1:
@@ -247,7 +247,7 @@ if test == 7:
 	filt_params.update(
 		{
 			'max_filtration_param': -8,
-			'num_divisions': 30,
+			'num_divisions': 10,
 			'use_cliques': True,
 		}
 	)
@@ -255,7 +255,8 @@ if test == 7:
 	PRF_vs_FFT_v2(
 		'datasets/time_series/Clarinet/40-clarinet.txt',
 		'datasets/time_series/viol/40-viol.txt',
-		out_fname(),
+		# out_fname(),
+		'output/ROC/test7tau311',
 
 		'clarinet',
 		'viol',
@@ -268,11 +269,11 @@ if test == 7:
 
 		window_length=1000,
 		# window_length=(1000, 8000, 24000),
-		num_windows=10,
+		num_windows=15,
 		num_landmarks=55,
 		FT_bins=50,
-		k=(0, 2, .01),		# min, max, step
-		load_saved_filts=True,
+		k=(0, 10, .001),		# min, max, step
+		load_saved_filts=False,
 		normalize_volume=True
 
 	)

@@ -53,7 +53,7 @@ if test == 2:
 			window_size=.05*(i+1),    # seconds
 			ds_rate=1,
 			tau=.001,					# seconds
-			step_size=1)      # how much to move window each frame
+			window_step=1)      # how much to move window each frame
 
 
 if test == 3:
@@ -88,7 +88,7 @@ if test == 5:
 		'output/DCE/test_5.mp4',
 		window_size=.1,    	# seconds
 		tau=.001,			# seconds
-		step_size=1,      	# how much to move window each frame
+		window_step=1,      	# how much to move window each frame
 	)
 
 
@@ -225,7 +225,7 @@ if test == 12:
 	############# IDA PAPER FIG 1 (explicit) ###############
 
 	sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
-	traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.72132, 1.77132))
+	traj = embed(sig, tau=.01192, m=2, time_units='seconds', crop=(1.72132, 1.77132))
 	np.savetxt('datasets/IDA_PAPER/49-C135B.txt', traj)
 	plot_dce_pub(traj, 'output/DCE/testing.png')
 

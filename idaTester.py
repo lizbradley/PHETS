@@ -1,9 +1,10 @@
 import sys, time
+import matplotlib.pyplot as plt
 from config import default_filtration_params as parameter_set
 from PH import Filtration, make_movie, load_saved_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
 
-set_test = 1		# set test number here or with command line argument
+set_test = 6		# set test number here or with command line argument
 
 
 if len(sys.argv) > 1: test = int(sys.argv[1])
@@ -17,23 +18,26 @@ start_time = time.time()
 # traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.72132, 1.77132), normalize=True)
 # np.savetxt('datasets/IDA_PAPER/49-C135B_embedded.txt', traj)
 
+paper_path = '/home/elliott/phets_notes/IDA 2017/figs/'
+ticks = [-.05, 0, .05]
 
 if test == 1:
 	# figure 1a
 
 	plot_waveform_sec(
 		'datasets/IDA_PAPER/49-C135B.txt',
-		'output/IDA_PAPER/fig1a.png',
+		paper_path + 'Figure1/49_C135B_time_series.png',
 		crop=(1.72, 1.77)
 	)
+
 
 
 if test == 2:
 	# figure 1b
 
 	plot_dce_pub(
-		'datasets/IDA_PAPER/49-C135B.txt',
-		'output/IDA_PAPER/fig2b.png'
+		'datasets/IDA_PAPER/49-C135B_embedded.txt',
+		paper_path + 'Figure1/49_C135B_embedded_taudetect_525.png'
 	)
 
 
@@ -51,8 +55,8 @@ if test == 3:
 			'use_cliques': False
 		})
 
-	# filtration = Filtration(in_filename, filt_params)
-	filtration = load_saved_filtration()
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()
 
 	#
 	# make_movie(
@@ -61,11 +65,15 @@ if test == 3:
 	# 	color_scheme='none',
 	# )
 
-	plot_filtration_pub(filtration, 2, 'output/IDA_PAPER/fig2a.png',
-						landmark_size=1)
-	#
+	plot_filtration_pub(
+		filtration, 2,
+		paper_path + 'Figure2/epsilon_005/49_C135B_2000Wcech_ep005.png',
+		landmark_size=10,
+		show_eps=False,
+		label='(a)'
+	)
+#
 	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
-
 
 
 
@@ -89,13 +97,14 @@ if test == 4:
 	# filtration = load_saved_filtration()
 
 
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
 
-	plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig2b.png')
+	plot_filtration_pub(
+		filtration, 1,
+		paper_path + 'Figure2/epsilon_005/49_C135B_2000W200L_ep005.png',
+		landmark_size=10,
+		show_eps=False,
+		label='(b)'
+	)
 
 
 if test == 5:
@@ -114,17 +123,115 @@ if test == 5:
 		})
 
 	filtration = Filtration('datasets/IDA_PAPER/49-C135B_embedded.txt', filt_params)
-	# filtration = Filtration(traj, filt_params)
 	# filtration = load_saved_filtration()
 
 
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		alpha=.5
+
+	plot_filtration_pub(
+		filtration, 2,
+		paper_path + 'Figure2/epsilon_005/49_C135B_2000W50L_ep005.png',
+		landmark_size=10,
+		show_eps=False,
+		label='(c)')
+
+
+if test == 50:
+	fig = plt.figure(figsize=(10, 3.5), tight_layout=True, dpi=700)
+	ax1 = fig.add_subplot(131)
+	ax2 = fig.add_subplot(132)
+	ax3 = fig.add_subplot(133)
+
+
+	# 2a
+
+	in_filename = 'datasets/IDA_PAPER/49-C135B_embedded.txt'
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 1,
+			'worm_length': 2000,
+			'min_filtration_param': .001,
+			'max_filtration_param': .005,
+			'num_divisions': 2,
+			'use_cliques': False
+		})
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()
+
+	#
+	# make_movie(
+	# 	filtration,
+	# 	"output/IDA_PAPER/49-C135B.mp4",
+	# 	color_scheme='none',
+	# )
+
+	plot_filtration_pub(
+		filtration, 2,
+		ax1,
+		landmark_size=.1,
+		show_eps=False,
+		label='(a)',
+		ticks=ticks,
 	)
 
-	plot_filtration_pub(filtration, 2, 'output/IDA_PAPER/fig2c.png')
+	# 2b
+	in_filename = 'datasets/IDA_PAPER/49-C135B_embedded.txt'
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 2000,
+			'min_filtration_param': .001,
+			'max_filtration_param': .005,
+			'num_divisions': 2,
+			'use_cliques': False
+		})
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()
+
+
+
+	plot_filtration_pub(
+		filtration, 1,
+		ax2,
+		landmark_size=1,
+		show_eps=False,
+		label='(b)',
+		ticks=ticks,
+
+	)
+
+	# 2c
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'min_filtration_param': .001,
+			'max_filtration_param': .005,
+			'num_divisions': 2,
+			'use_cliques': False
+		})
+
+	filtration = Filtration('datasets/IDA_PAPER/49-C135B_embedded.txt', filt_params)
+	# filtration = load_saved_filtration()
+
+
+
+	plot_filtration_pub(
+		filtration, 2,
+		ax3,
+		landmark_size=10,
+		show_eps=False,
+		label='(c)',
+		ticks=ticks,
+	)
+
+	# ax1.set_aspect('equal')
+
+	plt.savefig(paper_path + 'Figure2/filts.png')
 
 
 
@@ -137,14 +244,14 @@ if test == 6:
 		{
 			'ds_rate': 10,
 			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .011,
+			'min_filtration_param': .000,
+			'max_filtration_param': .010,
 			'num_divisions': 20,
 			'use_cliques': False
 		})
 
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()
+	# filtration = Filtration(in_filename, filt_params)
+	filtration = load_saved_filtration()
 
 
 	# make_movie(
@@ -153,12 +260,18 @@ if test == 6:
 	# 	color_scheme='none',
 	# )
 
+	fig = plt.figure(figsize=(8.5, 7.5), tight_layout=True, dpi=700)
+	ax1 = fig.add_subplot(221)
+	ax2 = fig.add_subplot(222)
+	ax3 = fig.add_subplot(223)
+	ax4 = fig.add_subplot(224)
 
-	plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3a.png')
-	plot_filtration_pub(filtration, 3, 'output/IDA_PAPER/fig3b.png')
-	plot_filtration_pub(filtration, 5, 'output/IDA_PAPER/fig3c.png')
-	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3d.png')
+	plot_filtration_pub(filtration, 1, ax1, label='(a) $\epsilon = 0.001$', show_eps=False, ticks=ticks)
+	plot_filtration_pub(filtration, 3, ax2, label='(b) $\epsilon = 0.002$', show_eps=False, ticks=ticks)
+	plot_filtration_pub(filtration, 5, ax3, label='(c) $\epsilon = 0.003$', show_eps=False, ticks=ticks)
+	plot_PD_pub(filtration, ax4, label='(d)')
 
+	plt.savefig(paper_path + 'Figure3/figs.png')
 
 
 if test == 7:

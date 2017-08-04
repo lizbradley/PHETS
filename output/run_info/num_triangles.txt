@@ -1,2 +1,10 @@
-frame 1: 17
-frame 2: 29
+frame 1: 30
+frame 2: 41
+frame 3: 59
+frame 4: 78
+frame 5: 139
+frame 6: 228
+frame 7: 359
+frame 8: 696
+frame 9: 877
+frame 10: 1199

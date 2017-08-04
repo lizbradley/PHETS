@@ -2,7 +2,7 @@ import sys
 import time
 
 from PH import Filtration, load_saved_filtration
-from PH import make_movie
+from PH import make_movie, make_PD, make_PRF_plot
 from PubPlots import plot_PD_pub, plot_filtration_pub
 from config import default_filtration_params as parameter_set
 
@@ -514,17 +514,17 @@ if test == 17:
 
 
 
-	# make_PRF_plot(
-	# 	filtration,
-	# 	'output/PH/49-C135B_PRF_w_dups.png',
-	# 	PRF_res=50
-	#
-	# )
+	make_PRF_plot(
+		filtration,
+		'output/PH/49-C135B_PRF_w_dups.png',
+		PRF_res=50
 
-	# make_PD(
-	# 	filtration,
-	# 	'output/PH/.png'
-	# )
+	)
+
+	make_PD(
+		filtration,
+		'output/PH/.png'
+	)
 
 
 	make_movie(

@@ -42,28 +42,25 @@ def embed(
 		tau,
 		m,
 		time_units='samples',
-		embed_crop=None,
-		ds_rate=1,
-		channel=0,
-		normalize=False
+		crop=None,
+		normalize=False,
+		ds_rate=1
 ):
-	if normalize:
-		signal = np.true_divide(signal, np.max(np.abs(signal)))
+	if normalize: signal = np.true_divide(signal, np.max(np.abs(signal)))
 
+	signal = signal[::ds_rate]
 
-	if embed_crop:
+	if crop:
 		if time_units == 'samples':
 			pass
 		elif time_units == 'seconds':
-			embed_crop = (np.array(embed_crop) * WAV_SAMPLE_RATE).astype(int)
+			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
 		else:
 			print 'ERROR: invalid time_units'
 			sys.exit()
-		signal = signal[embed_crop[0] : embed_crop[1]]
+		signal = signal[crop[0] : crop[1]]
 
-	if time_units == 'seconds':
-		tau = int(tau * WAV_SAMPLE_RATE)
-
+	if time_units == 'seconds': tau = int(tau * WAV_SAMPLE_RATE)
 
 
 	end = len(signal) - (tau * (m - 1)) - 1
