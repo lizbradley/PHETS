@@ -12,7 +12,7 @@ def crop_sig(sig, crop):
 	return sig[crop[0] : crop[1]]
 
 
-def slice_sig(sig, l=2000, n=25, normalize=True):
+def slice_sig(sig, l, n, normalize=True):
 	start_pts = np.floor(np.linspace(0, len(sig) - 1, n, endpoint=False)).astype(int)
 	windows = np.asarray([sig[pt:pt + l] for pt in start_pts])
 	if normalize:

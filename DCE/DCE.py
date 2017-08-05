@@ -44,6 +44,7 @@ def embed(
 		time_units='samples',
 		crop=None,
 		normalize=False,
+		normalize_crop=True,
 		ds_rate=1
 ):
 	if normalize: signal = np.true_divide(signal, np.max(np.abs(signal)))
@@ -61,6 +62,9 @@ def embed(
 		signal = signal[crop[0] : crop[1]]
 
 	if time_units == 'seconds': tau = int(tau * WAV_SAMPLE_RATE)
+
+	if normalize_crop: signal = np.true_divide(signal, np.max(np.abs(signal)))
+
 
 
 	end = len(signal) - (tau * (m - 1)) - 1

@@ -1,10 +1,12 @@
 import sys, time
 import matplotlib.pyplot as plt
+import numpy as np
 from config import default_filtration_params as parameter_set
+from DCE.DCE import embed
 from PH import Filtration, make_movie, load_saved_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
 
-set_test = 6		# set test number here or with command line argument
+set_test = 7		# set test number here or with command line argument
 
 
 if len(sys.argv) > 1: test = int(sys.argv[1])
@@ -237,7 +239,7 @@ if test == 50:
 
 
 if test == 6:
-	# figure 3a, 3b, 3c, 3d
+	# figures 3a, 3b, 3c, 3d
 	in_filename = 'datasets/IDA_PAPER/49-C135B_embedded.txt'
 	filt_params = parameter_set
 	filt_params.update(
@@ -275,21 +277,67 @@ if test == 6:
 
 
 if test == 7:
-	# figure 4a
-	pass
+
+	# figures 4a, 4b, 4c, 4d
+
+	fig = plt.figure(figsize=(8.5, 7.5), tight_layout=True, dpi=700)
+	ax1 = fig.add_subplot(221)
+	ax2 = fig.add_subplot(222)
+	ax3 = fig.add_subplot(223)
+	ax4 = fig.add_subplot(224)
+
+	# CLARINET #
+
+	sig = np.loadtxt('datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt')
+	traj = embed(sig, tau=32, m=2, time_units='samples', crop=(100000, 102205), normalize_crop=True)
+
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 20,
+			'worm_length': 2000,
+			'min_filtration_param': 0,
+			'max_filtration_param': -15,
+			'num_divisions': 10,
+
+		})
+
+	filtration = Filtration(traj, filt_params)
+
+
+	plot_filtration_pub(filtration, 8, ax1)				# 4a
+	plot_PD_pub(filtration, ax3)						# 4c
+
+
+	# VIOL #
+
+	sig = np.loadtxt('datasets/time_series/viol/40-viol.txt')
+	traj = embed(sig, tau=32, m=2, time_units='samples', crop=(50000, 52205), normalize_crop=True)
+
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 20,
+			'worm_length': 2000,
+			'min_filtration_param': 0,
+			'max_filtration_param': -15,
+			'num_divisions': 10,
+
+		})
+
+	filtration = Filtration(traj, filt_params)
+	plot_filtration_pub(filtration, 4, ax2)				# 4b
+	plot_PD_pub(filtration, ax4)						# 4d
+
+	plt.savefig('output/IDA_PAPER/fig4.png')
 
 
 if test == 8:
-	# figure 4b
-	pass
-
-
-if test == 9:
 	# figure 5a
 	# leave as is
 	pass
 
-if test == 10:
+if test == 9:
 	# figure 5b
 	# leave as is
 	pass
