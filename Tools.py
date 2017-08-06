@@ -22,3 +22,6 @@ def crop_sig(sig, crop, time_units):
 
 	return sig
 
+
+def sec_to_samp(crop):
+	return (np.array(crop) * WAV_SAMPLE_RATE).astype(int)

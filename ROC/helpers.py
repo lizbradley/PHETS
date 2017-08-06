@@ -40,7 +40,7 @@ def downsample_spec(freqs, spec, n):
 
 def plot_sig(sig_full, crop, windows, st_pts, fname):
 	print 'plotting signal...'
-	fig = plt.figure(figsize=(10, 5), tight_layout=True)
+	fig = plt.figure(figsize=(10, 5), tight_layout=True, dpi=600)
 
 	ax1 = fig.add_subplot(211)
 	ax2 = fig.add_subplot(212)

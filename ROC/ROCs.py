@@ -326,12 +326,15 @@ def PRF_vs_FFT_v2(
 			return [norm(np.subtract(test, mean)) for test in tests]
 
 
-		def get_rate_vs_k(dists, dists_train, k_arr):
+		def get_rate_vs_k(dists, dists_train, k_arr, mean_train):
 			variance = np.mean(np.power(dists_train, 2))
 			std_dev = np.mean(np.power(dists_train, 2)) ** .5
+			scaled_variance = variance / norm(mean_train)
 			rate = []
 			for k in k_arr:
-				pred = dists <= variance * k
+				# pred = dists <= variance * k
+				# pred = dists <= std_dev * k
+				pred = dists <= scaled_variance * k
 				rate.append(sum(pred) / float(len(pred)))
 			return rate
 
@@ -379,10 +382,10 @@ def PRF_vs_FFT_v2(
 		plot_dists(prf_dists_2_vs_2, train_dists_2_vs_2, var_prf_2, title_22, 'output/ROC/' + title_22 + '.png')
 
 
-		prf_1_tpr = get_rate_vs_k(prf_dists_1_vs_1, train_dists_1_vs_1, k_arr)
-		prf_1_fpr = get_rate_vs_k(prf_dists_2_vs_1, train_dists_1_vs_1, k_arr)
-		prf_2_tpr = get_rate_vs_k(prf_dists_2_vs_2, train_dists_2_vs_2, k_arr)
-		prf_2_fpr = get_rate_vs_k(prf_dists_1_vs_2, train_dists_2_vs_2, k_arr)
+		prf_1_tpr = get_rate_vs_k(prf_dists_1_vs_1, train_dists_1_vs_1, k_arr, mean_prf_1)
+		prf_1_fpr = get_rate_vs_k(prf_dists_2_vs_1, train_dists_1_vs_1, k_arr, mean_prf_1)
+		prf_2_tpr = get_rate_vs_k(prf_dists_2_vs_2, train_dists_2_vs_2, k_arr, mean_prf_2)
+		prf_2_fpr = get_rate_vs_k(prf_dists_1_vs_2, train_dists_2_vs_2, k_arr, mean_prf_2)
 
 
 
@@ -411,3 +414,4 @@ def PRF_vs_FFT_v2(
 	print_stats_multi(print_data_spec, print_data_prf, window_length)
 
 	print 'time elapsed:', time.time() - start
+

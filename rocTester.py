@@ -1,17 +1,12 @@
-import numpy as np
 from ROC import PRF_vs_FFT, PRF_vs_FFT_v2
+from Tools import sec_to_samp
 from config import default_filtration_params as filt_params
-from config import WAV_SAMPLE_RATE
-
 
 
 # TODO worm_length override
 # TODO third plot sig panel: zoom window
 # TODO time_units
 # TODO FFT ROC accuracy vs FT_bins (logspace)
-
-def sec_to_samp(crop):
-	return (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
 
 def out_fname():
 	return 'output/ROC/test_{}.png'.format(test)

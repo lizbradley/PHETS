@@ -68,7 +68,7 @@ def plot_signal(out, waveform_data, crop=None, time_units='seconds'):
 	ax.plot(x, y, color='k', zorder=0, lw= .5)
 	ax.axis('tight')
 
-	if crop:
+	if crop is not None:
 		if math.fabs(crop[0] - crop[1]) < .01:
 			ax.axvline(crop[0], color='r', alpha=0.7, zorder=1)
 		ax.axvspan(crop[0], crop[1], facecolor='r', alpha=0.5, zorder=1)

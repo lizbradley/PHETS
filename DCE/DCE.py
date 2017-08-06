@@ -44,7 +44,7 @@ def embed(
 		time_units='samples',
 		crop=None,
 		normalize=False,
-		normalize_crop=True,
+		normalize_crop=False,
 		ds_rate=1
 ):
 	if normalize: signal = np.true_divide(signal, np.max(np.abs(signal)))
