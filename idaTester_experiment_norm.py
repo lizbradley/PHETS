@@ -159,7 +159,7 @@ ticks = None
 #
 
 
-test = 10
+# test = 10
 
 if test == 10:
 
@@ -332,7 +332,7 @@ if test == 30:
 
 
 
-test = 40
+# test = 40
 
 if test == 40:
 
@@ -393,12 +393,13 @@ if test == 40:
 	plt.savefig(paper_path + 'fig4.png')
 
 
-# test = 50
+test = 50
 
 
-###### new Sunday
 
 if test == 50:
+	# figure 5 -- pending
+	# run this with new max_filtration_param (-10)
 	filt_params.update(
 		{
 			'max_filtration_param': -10,
@@ -410,7 +411,7 @@ if test == 50:
 	PRF_vs_FFT_v2(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
 		'datasets/time_series/viol/40-viol.txt',
-		'output/ROC/test_26_scvar.png',
+		'output/ROC/fig5.png',
 
 		'clarinet',
 		'viol',
@@ -425,13 +426,14 @@ if test == 50:
 		num_windows=50,
 		num_landmarks=100,
 		FT_bins=50,
-		k=(0, 5, .01),  # min, max, int
+		k=(0, 10, .01),  # min, max, int
 		load_saved_filts=True,
 		normalize_volume=True
 
 	)
 	
-	
+
+# test = 60
 if test == 60:
 	# figure 6a, PD upright piano
 
@@ -444,7 +446,7 @@ if test == 60:
 			'ds_rate': 20,
 			'worm_length': 2000,
 			'min_filtration_param': 0,
-			'max_filtration_param': -15,
+			'max_filtration_param': -10,
 			'num_divisions': 10,
 
 		})
@@ -466,12 +468,11 @@ if test == 61:
 			'ds_rate': 20,
 			'worm_length': 2000,
 			'min_filtration_param': 0,
-			'max_filtration_param': -15,
+			'max_filtration_param': -10,
 			'num_divisions': 10,
 
 		})
 
 	filtration = Filtration(traj, filt_params)
-	# filtration = load_saved_filtration()
 
 	plot_PD_pub(filtration, paper_path + 'fig6b.png')

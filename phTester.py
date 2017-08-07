@@ -6,7 +6,7 @@ from PH import make_movie, make_PD, make_PRF_plot
 from PubPlots import plot_PD_pub, plot_filtration_pub
 from config import default_filtration_params as parameter_set
 
-set_test = 101		# set test number here or with command line argument
+set_test = 16		# set test number here or with command line argument
 
 
 
@@ -487,7 +487,7 @@ if test == 16:
 
 	make_movie(
 		filtration,
-		'output/PH/49-C135B_movie.mp4',
+		'output/PH/test16.mp4',
 		color_scheme='highlight new'
 	)
 
@@ -503,9 +503,10 @@ if test == 17:
 		{
 			'ds_rate': 50,
 			'worm_length': 1000,
-			'max_filtration_param': -10,
+			'max_filtration_param': .05,
 			'num_divisions': 10,
-			'use_cliques': True
+			# 'use_cliques': True,
+			'graph_induced': True,
 
 		})
 
@@ -514,18 +515,18 @@ if test == 17:
 
 
 
-	make_PRF_plot(
-		filtration,
-		'output/PH/49-C135B_PRF_w_dups.png',
-		PRF_res=50
-
-	)
-
-	make_PD(
-		filtration,
-		'output/PH/.png'
-	)
-
+	# make_PRF_plot(
+	# 	filtration,
+	# 	'output/PH/49-C135B_PRF_w_dups.png',
+	# 	PRF_res=50
+	#
+	# )
+	#
+	# make_PD(
+	# 	filtration,
+	# 	'output/PH/.png'
+	# )
+	#
 
 	make_movie(
 		filtration,
@@ -665,6 +666,40 @@ if test == 22:
 	# 	framerate=1,
 	# )
 
+
+if test == 23:
+	# IDA paper figure 4
+	in_filename = "output/DCE/trajectories/double/b/49-C135B.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate' : 1,
+			'worm_length' : 2000,
+			'min_filtration_param': .001,
+			'max_filtration_param': .005,
+			'num_divisions': 2,
+			#'use_cliques': True
+		})
+
+	start_pt = 0   # skip first half of in data file (primitive sliding window)
+	# build_and_save_filtration(in_filename, build_filt_params, start=start_pt) # comment out to reuse filtration
+
+	filtration
+	# make_persistence_diagram(
+	# 	in_filename,
+	# 	"output/PH/49_C135B_Cech.png",
+	# 	filt_params
+	# )
+	#
+	# make_filtration_movie(
+	# 	in_filename,             				# used to check if saved filtration is up to date, and in titlebox
+	# 	"output/PH/49_C135B_Cech.mp4",      		# output filename
+	# 	filt_params,              					# passed to BuildComplex.build_filtration()
+	#
+	# 	color_scheme='none',		# 'none' or 'highlight new' or ('birth time gradient', cycles), where cycles is number
+	# 								# of cycles through color gradient. (ie use larger cycles for faster color changes.)
+	# 	framerate=1,
+	# )
 
 
 
