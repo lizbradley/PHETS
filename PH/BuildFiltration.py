@@ -365,15 +365,15 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	'''=============== End code written by Sam ======================'''
 
 	'''============= Start code written by Elliott =================='''
-	if graph_induced:
-		# import matplotlib.pyplot as plt
-		import pandas as pd
-
-		g = nx.read_edgelist('edgelist.txt')
-
-		closest_wits = np.loadtxt('closest_wits.txt', dtype='int')	# witness, landmark
-		wit_coords = np.array(witnesses)
-		land_coords = np.array(landmarks)
+	# if graph_induced:
+	# 	# import matplotlib.pyplot as plt
+	# 	import pandas as pd
+	#
+	# 	g = nx.read_edgelist('edgelist.txt')
+	#
+	# 	closest_wits = np.loadtxt('closest_wits.txt', dtype='int')	# witness, landmark
+	# 	wit_coords = np.array(witnesses)
+	# 	land_coords = np.array(landmarks)
 
 		# land = np.unique(closest_wits[:,1])
 
