@@ -297,6 +297,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	}
 
 
+
 	if(!quiet) 
 		printf(" %d/%d witnesses read...",l,num_wits);
 	fclose(fp);
@@ -353,7 +354,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 
 /***************** Calculating distance matrix ********************/
 
-	#pragma omp parallel num_threads(num_threads) shared(euc_distance,witnesses,num_wits,wit_pts) private(i,j,sum)
+	#pragma omp parallel num_threads(num_threads) shared(euc_distance,witnesses,num_wits,wit_pts) private(i,j,k,sum)
 	{
 		#pragma omp for nowait schedule (runtime)
 		for(i=0;i<num_wits;i++){		
@@ -371,7 +372,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	if(use_euclidean){
 		printf("Calculating euclidean distances...");
 		fflush(stdout);
-		#pragma omp parallel num_threads(num_threads) shared(distances,witnesses,num_wits,wit_pts) private(i,j,sum)
+		#pragma omp parallel num_threads(num_threads) shared(distances,witnesses,num_wits,wit_pts) private(i,j,k,sum)
 		{
 			#pragma omp for nowait schedule (runtime)
 			for(i=0;i<num_wits;i++){		
