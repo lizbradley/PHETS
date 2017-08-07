@@ -36,6 +36,7 @@ End from CSCI5576 HW7
 /*=============================================================
         Samantha Molnar
 		Calculate euclidean distance matrix of witnesses then landmark selection.
+		08/2017 Adding dimensionality option for witnesses
 =============================================================*/
 typedef enum { false, true } bool; // Provide C++ style 'bool' type in C
 float           *witnesses;
@@ -86,7 +87,7 @@ int              num_threads = 2;
 int              d_cov = 0;
 
 int              max_avg=50;
-int              wit_pts=2; 
+int              wit_pts; 
 int             *landmarks;
 
 bool             use_est=false;
@@ -101,7 +102,7 @@ void dprint(char *c);
 void print_matrix(float *A);
 float std_dev(float d[],int s);
 float calc_error(float d,int n);
-float e_dist(float,float,float,float);
+
 bool in_matrix(int* matrix,int size,int value);
 int main(int argc, char* argv[]){
         char *parse;
@@ -208,11 +209,6 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	  		printf("Using euclidean distance.\n");
 	  	use_euclidean = true;
 	  	break;
-
-	  case 17:
-	   	if(!quiet)
-	  		printf("Calculating distance with covariance matrix.\n");
-	  	break;
 	  case 18:
 	   	if(!quiet)
 	  		printf("Outputting edgelist for graph induced complex.\n");
@@ -232,19 +228,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 
 
 
-	witnesses         = (float*) calloc(num_wits*wit_pts,sizeof(float));// x,y points for a witness
-	distances         = (float*) calloc((float)num_wits*(float)num_wits,sizeof(float)); //distance between all witnesses
-	euc_distance      = (float*) calloc((float)num_wits*(float)num_wits,sizeof(float)); //distance between all witnesses
-	landmarks         = (int*)   calloc(num_landmarks,sizeof(int));//landmark set
-	times             = (float*) calloc(max_avg,sizeof(float));//used for timing results
-	velocities        = (float*) calloc(num_wits*wit_pts,sizeof(float));//velocities of witnesses
-	norm_velocity     = (float*) calloc(num_wits*wit_pts,sizeof(float));//normalized velocities of witnesses
-	speeds            = (float*) calloc(num_wits,sizeof(float)); //speeds of witnesses
-	landmark_set      = (char*)  calloc(num_wits,sizeof(char)); //set of chosen landmarks
-	cov_matrices      = (float*) calloc(num_wits*wit_pts*wit_pts,sizeof(float));
-	float fx,fy;
-	i = 0;
-	j = 0;
+	
 	/**************** Putting data into data structures ****************/
 	fp=fopen(file,"r");
 	if (fp == NULL) {
@@ -260,61 +244,108 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	
 	l = 0;
 	i=0;
-	while(l<stop){
-		fscanf(fp,"%f %f",&fx,&fy);	
+	int w=0;
+	//need to change this to use getline
+	char *pch;
+	char *lpt=NULL;
+	size_t sze=0;
+	getline(&lpt,&sze,fp);
+	pch = strtok(lpt," ");
+	wit_pts=0;
+	while (pch != NULL){
+    	pch = strtok (NULL, " ");
+    	wit_pts++;
+    
+    }
+	printf("wit_pts: %d \n",wit_pts);
+	rewind(fp); //set back to beginning
 
+	witnesses         = (float*) calloc(num_wits*wit_pts,sizeof(float)); // x,y points for a witness
+	distances         = (float*) calloc((float)num_wits*(float)num_wits,sizeof(float)); //distance between all witnesses
+	euc_distance      = (float*) calloc((float)num_wits*(float)num_wits,sizeof(float)); //distance between all witnesses
+	landmarks         = (int*)   calloc(num_landmarks,sizeof(int)); //landmark set
+	times             = (float*) calloc(max_avg,sizeof(float)); //used for timing results
+	velocities        = (float*) calloc(num_wits*wit_pts,sizeof(float)); //velocities of witnesses
+	norm_velocity     = (float*) calloc(num_wits*wit_pts,sizeof(float)); //normalized velocities of witnesses
+	speeds            = (float*) calloc(num_wits,sizeof(float)); //speeds of witnesses
+	landmark_set      = (char*)  calloc(num_wits,sizeof(char)); //set of chosen landmarks
+	cov_matrices      = (float*) calloc(num_wits*wit_pts*wit_pts,sizeof(float)); //use for d_cov distance calculation
+	
+	i = 0;
+	j = 0;
+
+	while(l<stop){
+		
 		if(l>=start){ 
-			witnesses[i*wit_pts]=fx;
-			witnesses[i*wit_pts+1]=fy;
+			getline(&lpt,&sze,fp);
+
+			pch = strtok(lpt," ");
+			
+			w=0;
+			while (pch != NULL){
+				
+    			witnesses[i*wit_pts+w]=atof(pch);
+
+    			pch = strtok (NULL, " ");
+    			w++;
+    		}
 			landmark_set[l] = 'n';
 			i++;
+			l++;
 		}
-		l++;
+		
 	}
 
-	if(!quiet) //this is a debugging statement
+
+	if(!quiet) 
 		printf(" %d/%d witnesses read...",l,num_wits);
 	fclose(fp);
 	fp=NULL;
 
 	printf("done\n");
 	fflush(stdout);
+
 	//calculating velocities
-	float vx,vy;
+	float v;
 	printf("Calculating vectors...");
 	fflush(stdout);
 	for(i=0;i<num_wits-1;i++){
-		vx = (witnesses[i*wit_pts+wit_pts]-witnesses[i*wit_pts]);
-		vy = (witnesses[i*wit_pts+1+wit_pts]-witnesses[i*wit_pts+1]);
-		velocities[i*wit_pts] = vx;
-		velocities[i*wit_pts+1]=vy;
+		for(j=0;j<wit_pts;j++){
+			v = (witnesses[i*wit_pts+wit_pts]-witnesses[i*wit_pts+j]);	
+			velocities[i*wit_pts+j] = v;
+		}
 	}
 
 	//Last one's velocity is just copy of second to last one's velocity.
-
-	velocities[num_wits*wit_pts-wit_pts] = velocities[(i-1)*wit_pts];
-	velocities[num_wits*wit_pts-1] = velocities[(i-1)*wit_pts+1];
+	for(j=0;j<wit_pts;j++){
+		velocities[(num_wits-1)*wit_pts+j] = velocities[(num_wits-2)*wit_pts+j];	
+	}
 	
 	//calculating speeds
+	float sum;
 	for(i=0;i<num_wits-1;i++){
-		speeds[i]=sqrt(velocities[i*wit_pts]*velocities[i*wit_pts]+velocities[i*wit_pts+1]*velocities[i*wit_pts+1]);
+		sum=0;
+		for(j=0;j<wit_pts;j++){
+			sum+=velocities[i*wit_pts+j]*velocities[i*wit_pts+j];
+		}
+		speeds[i]=sqrt(sum);
 		if(speeds[i]>max_speed)
 			max_speed = speeds[i];
 		if(speeds[i]<min_speed)
 			min_speed = speeds[i];
 	}
 	speeds[num_wits-1] = speeds[num_wits-2];
-	j=0;
+	
 	for(i=0;i<num_wits-1;i++){
-		norm_velocity[i*wit_pts] = velocities[i*wit_pts]/speeds[j];
-		norm_velocity[i*wit_pts+1] = velocities[i*wit_pts+1]/speeds[j];
-		j++;
+		for(j=0;j<wit_pts;j++){
+			norm_velocity[i*wit_pts+j] = velocities[i*wit_pts+j]/speeds[i];
+		}
 	}
 	
+	for(j=0;j<wit_pts;j++){
+		norm_velocity[(num_wits-1)*wit_pts+j] = norm_velocity[(num_wits-2)*wit_pts+j];
+	}
 	
-	norm_velocity[num_wits*wit_pts-wit_pts] = norm_velocity[(i-1)*wit_pts];
-	norm_velocity[num_wits*wit_pts-1] = norm_velocity[(i-1)*wit_pts+1];
-
 	printf("done\n");
 	fflush(stdout);
 
@@ -322,102 +353,58 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 
 /***************** Calculating distance matrix ********************/
 
-	
-	if(use_euclidean){
-		
-		t = 0;
-		bool done = false;
-		if(timing){
-			printf("Running distance calculations 1 with");
-			while(!done && t<max_avg){// run this multiple times to get a better value for the average time
-	  		#pragma omp parallel num_threads(num_threads) shared(distances,witnesses,num_wits,wit_pts) private(i,j,x,y)
-	  		{	
-			/************************************************/	
-					if(omp_get_thread_num()==0 && t==0){
-						printf(" %d threads..",omp_get_num_threads());
-						fflush(stdout);
-					}
-					gettimeofday(&begin,NULL);
-					#pragma omp for nowait schedule (runtime)
-					for(i=0;i<num_wits;i++){		
-						for(j=0;j<num_wits;j++){
-							x = witnesses[i*wit_pts]-witnesses[j*wit_pts];
-							x = x*x;
-							y = witnesses[i*wit_pts+1]-witnesses[j*wit_pts+1];
-							y = y*y;
-							distances[i*num_wits+j] = sqrt(x+y);
-						}
-					}
-					gettimeofday(&end,NULL);
-					printf("Thread %d took %f to do work\n",omp_get_thread_num(),calctime(begin,end));	
-      	    /************************************************/
-	    	}
-	  		times[t] = calctime(begin,end);
-	  		t++;
-	  		dev = std_dev(times,t);
-	  		err = calc_error(dev,t);
-	  		if(err<=.1 && t>=2)
-	      	done = true;
-			}
-			printf("done\n");
-			sum = 0.0;
-			for(i = 0; i<t;i++){
-	  		sum+=times[i];
-	  		times[i]=0;
-			}
-			printf("\tDistance matrix of size %lld took %f (s) with an error of %f.\n",num_wits,sum/(float)t,err);
-		}
-		else{//not timing
-			printf("Running distance calculations 2..."); //euclidean
-			fflush(stdout);
+	#pragma omp parallel num_threads(num_threads) shared(euc_distance,witnesses,num_wits,wit_pts) private(i,j,sum)
+	{
+		#pragma omp for nowait schedule (runtime)
+		for(i=0;i<num_wits;i++){		
+			for(j=0;j<num_wits;j++){
+				sum = 0;
+				for(k=0;k<wit_pts;k++){
 
-			#pragma omp parallel num_threads(num_threads) shared(distances,witnesses,num_wits,wit_pts) private(i,j,x,y)
-			{
-				#pragma omp for nowait schedule (runtime)
-				for(i=0;i<num_wits;i++){		
-					for(j=0;j<num_wits;j++){
-						x = witnesses[i*wit_pts]-witnesses[j*wit_pts];
-						x = x*x;
-						y = witnesses[i*wit_pts+1]-witnesses[j*wit_pts+1];
-						y = y*y;
-						distances[i*num_wits+j] = sqrt(x+y);
-					}
-				}	
+					sum+=(witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k])*(witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k]);
+				}
+				euc_distance[i*num_wits+j] = sqrt(sum);
 			}
-
-		}
-
+		}	
 	}
-	else{
+
+	if(use_euclidean){
 		printf("Calculating euclidean distances...");
 		fflush(stdout);
-		#pragma omp parallel num_threads(num_threads) shared(euc_distance,witnesses,num_wits,wit_pts) private(i,j)
+		#pragma omp parallel num_threads(num_threads) shared(distances,witnesses,num_wits,wit_pts) private(i,j,sum)
 		{
 			#pragma omp for nowait schedule (runtime)
 			for(i=0;i<num_wits;i++){		
 				for(j=0;j<num_wits;j++){
-					euc_distance[i*num_wits+j] = e_dist(witnesses[i*wit_pts], witnesses[i*wit_pts+1], witnesses[j*wit_pts], witnesses[j*wit_pts+1]);
+					sum = 0;
+					for(k=0;k<wit_pts;k++){
+						sum+=(witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k])*(witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k]);
+					}
+					distances[i*num_wits+j] = sqrt(sum);
 				}
 			}	
 		}
 		printf("done\n");
 		fflush(stdout);
 	}
-
-
-	if(use_hamiltonian!=0.0){ //hamiltonian is something other than 0
-		printf("Running distance calculations 3...");
+	
+	else if(use_hamiltonian!=0.0){ 
+		printf("Calculating hamiltonian distance...");
 		fflush(stdout);
 		float dhamil=0.,deuc=0.;
 		if(use_hamiltonian<0){
 		
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,straight_VB,distances,wit_pts) private(i,j,deuc,dhamil)
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,deuc,dhamil,sum)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
 					for(j=0;j<num_wits;j++){
 						deuc = euc_distance[i*num_wits+j];
-						dhamil = -1*use_hamiltonian*e_dist(norm_velocity[i*wit_pts],norm_velocity[i*wit_pts+1],norm_velocity[j*wit_pts],norm_velocity[j*wit_pts+1]);
+						sum=0;
+						for(k=0;k<wit_pts;k++){
+							sum+=norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k];
+						}
+						dhamil = -1*use_hamiltonian*sqrt(sum);
 						distances[i*num_wits+j] = sqrt(deuc*deuc+(dhamil*dhamil));
 					}
 				}
@@ -425,13 +412,17 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 
 		else{
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,straight_VB,distances,wit_pts) private(i,j,deuc,dhamil)
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,deuc,dhamil,sum)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
 					for(j=0;j<num_wits;j++){
 						deuc = euc_distance[i*num_wits+j];
-						dhamil = use_hamiltonian*e_dist(velocities[i*wit_pts],velocities[i*wit_pts+1],velocities[j*wit_pts],velocities[j*wit_pts+1]);
+						sum=0;
+						for(k=0;k<wit_pts;k++){
+							sum+=norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k];
+						}
+						dhamil = use_hamiltonian*sqrt(sum);
 						distances[i*num_wits+j] = sqrt(deuc*deuc+(dhamil*dhamil));
 					}
 				}
@@ -440,7 +431,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	}
 
 	else if(m2_d!= 0.0){
-		printf("Running distance calculations 4..."); //m2_d
+		printf("Calculating m2_d distance..."); //m2_d
 		fflush(stdout);
 		float d1,d2;
 			#pragma omp parallel num_threads(num_threads) shared(euc_distance,witnesses,num_wits,distances) private(i,j,d1,d2)
@@ -458,7 +449,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	}
 	else if(d_cov!=0){
 		
-		printf("Running distance calculations 5..."); // covariance
+		printf("Calculating covariance distance..."); // covariance
 		fflush(stdout);
 
 
@@ -473,16 +464,16 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 			float min = 88888;
 			int min_index = -1;
 			float mean[wit_pts];
-			float sum=0;
+			
 
 			#pragma omp parallel num_threads(num_threads) shared(d_cov,num_wits,witnesses,euc_distance,wit_pts) private(i,j,k,l,min,min_index,neighbors,ndist,found,mean,sum)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
 					found = 0;
-					mean[0]=0;
-					mean[1]=0;
-
+					for(j=0;j<wit_pts;j++){
+						mean[j] = 0;
+					}
 					//find nearest neighbors
 					while(found<d_cov){
 						min = 8888888;
@@ -499,11 +490,13 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 					}
 
 					for(j=0;j<d_cov;j++){
-						mean[0]+=witnesses[neighbors[j]*wit_pts];
-						mean[1]+=witnesses[neighbors[j]*wit_pts+1];
+						for(k=0;k<wit_pts;k++){
+							mean[k] += witnesses[neighbors[j]*wit_pts+k];
+						}
 					}
-					mean[0]=mean[0]/(float)d_cov;
-					mean[1]=mean[1]/(float)d_cov;
+					for(j=0;j<wit_pts;j++){
+						mean[j] = mean[j]/(float)d_cov;
+					}
 					
 					for(j=0;j<wit_pts;j++){
 						for(k=0;k<wit_pts;k++){
@@ -516,7 +509,6 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 					}
 				}
 			}
-
 		}
 
 
@@ -535,9 +527,11 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
+
 					found = 0;
-					closest[0]=0;
-					closest[1]=0;
+					for(k=0;k<wit_pts;k++){
+						closest[k] = 0;
+					}
 					for(j=0;j<d_cov;j++){
 						neighbors[j] = -1;
 					}
@@ -565,9 +559,10 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 						}
 					}
 
-					closest[0]=witnesses[min_index*wit_pts];
-					closest[1]=witnesses[min_index*wit_pts+1];
-	
+					for(j=0;j<wit_pts;j++){
+						closest[j]=witnesses[min_index*wit_pts+j];	
+					}
+					
 					for(j=0;j<wit_pts;j++){
 						for(k=0;k<wit_pts;k++){
 							sum = 0;
@@ -583,35 +578,48 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 
 
-		float c0,c1;
-		#pragma omp parallel num_threads(num_threads) shared(distances,cov_matrices,witnesses,wit_pts,num_wits) private(i,j,c0,c1)
+		float c[wit_pts*wit_pts];
+		
+		#pragma omp parallel num_threads(num_threads) shared(distances,cov_matrices,witnesses,wit_pts,num_wits) private(i,j,c,sum)
 		{
 			#pragma omp for nowait schedule (runtime)
 			for(i=0;i<num_wits;i++){
 				for(j=0;j<num_wits;j++){
-					c0 = witnesses[i*wit_pts] - witnesses[j*wit_pts];
-					c1 = witnesses[i*wit_pts+1] - witnesses[j*wit_pts+1];
-					distances[i*num_wits+j] = c0*c0*cov_matrices[(i*wit_pts*wit_pts)] + c0*c1+cov_matrices[(i*wit_pts*wit_pts)+1] + c0*c1+cov_matrices[(i*wit_pts*wit_pts)+2] + c1*c1+cov_matrices[(i*wit_pts*wit_pts)+3];
+					for(k=0;k<wit_pts;k++){
+						c[k] = witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k];
+					}
+					sum=0;
+					for(k=0;k<wit_pts;k++){
+						for(l=0;l<wit_pts;l++){
+							sum+=c[k]*c[l]*cov_matrices[(i*wit_pts*wit_pts)+k*wit_pts+l];
+						}
+					}
+					distances[i*num_wits+j] = sum;
 					if(distances[i*num_wits+j]<0)
 						distances[i*num_wits+j]*=-1;
 				}
 			}
 		}
+		
 
 	}
 
 	else if(orientation_amplify!=1){
 		float de,dot;
-		printf("Running distance calculations 6..."); //orientation
+		printf("Calculating orientation amplify distance..."); //orientation
 		fflush(stdout);
-		#pragma omp parallel num_threads(num_threads) shared(num_wits,witnesses,stretch,norm_velocity,orientation_amplify,speeds,min_speed,max_speed,speed_amplify,distances,straight_VB) private(i,j,de,dot)
+		#pragma omp parallel num_threads(num_threads) shared(num_wits,witnesses,stretch,norm_velocity,orientation_amplify,speeds,min_speed,max_speed,speed_amplify,distances,straight_VB) private(i,j,de,dot,sum)
 		{
 			#pragma omp for nowait schedule (runtime)
 			for(i=0;i<num_wits;i++){
 				for(j=0;j<num_wits;j++){
-					dot = orientation_amplify*(norm_velocity[i*wit_pts]*norm_velocity[j*wit_pts]+norm_velocity[i*wit_pts+1]*norm_velocity[j*wit_pts+1]+1)/2.;
-					de = e_dist(witnesses[i*wit_pts],witnesses[i*wit_pts+1],witnesses[j*wit_pts],witnesses[j*wit_pts+1]);
-					distances[i*num_wits+j] = de/(dot+1.); 			
+					sum=0;
+					for(k=0;k<wit_pts;k++){
+						sum+=(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k])*(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k]);
+					}
+					dot = orientation_amplify*(1+sqrt(sum))/2.;
+					de = euc_distance[i*num_wits+j];
+					distances[i*num_wits+j] = de*de+dot*dot;	
 				}
 			}
 		}
@@ -629,53 +637,50 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	if(!use_est){
 		landmark_set[0]='l';
 		landmarks[0]=0;
+
 		printf("Determining landmark set using MaxMin...",num_threads);
 		fflush(stdout);
 		float   max=-1,min=888888888,dist;
 		int     max_index,landmark,min_index,l_count=1;
-		int     candidate_set[num_wits];
 		float   candidate_dist[num_wits];
 
 		while(l_count<num_landmarks){
-			#pragma omp parallel num_threads(num_threads) shared(l_count,witnesses,num_wits,num_landmarks,candidate_set,candidate_dist,landmark_set) private(i,l,min,min_index,max_index,max,dist,landmark) 
+			#pragma omp parallel num_threads(num_threads) shared(l_count,witnesses,num_wits,num_landmarks,candidate_dist,landmark_set,euc_distance) private(i,l,min,min_index,max_index,max,dist,landmark) 
 			{
 				#pragma omp for nowait schedule(runtime)
 					for(i=0;i<num_wits;i++){
 						min = 888888888;
 						min_index = -1;
 						if(landmark_set[i]=='n'){
-							
 							for(l=0;l<l_count;l++){
+
 								landmark = landmarks[l];			
-								dist = e_dist(witnesses[landmark*wit_pts],witnesses[landmark*wit_pts+1],witnesses[i*wit_pts],witnesses[i*wit_pts+1]);
+								dist = euc_distance[landmark*num_wits+i];
 								if(dist<min){
 									min = dist;
 									min_index = i;
 								}
 							}
 						}
-						candidate_set[i] = min_index;
 						candidate_dist[i] = min;
 					}
 				#pragma omp master
 				{	
-					max = 0.;
+					max = -8888888.;
 					max_index = -1;
 					for(i=0;i<num_wits;i++){
-						if(candidate_dist[i]>max && landmark_set[i]!='l'){
+						if(candidate_dist[i]>max && landmark_set[i]=='n'){
 							max = candidate_dist[i];
 							max_index = i;
 						}
 					}
-					landmarks[l]=max_index;
+					landmarks[l_count]=max_index;
 					landmark_set[max_index] = 'l';
-					l_count+=1;
+					l_count++;
 				}
 				#pragma omp barrier
-				
 		  	}
 		}
-		
 		printf("done\n");
 		fflush(stdout);
 	}
@@ -757,18 +762,23 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 
 		fprintf(fp,"# edgelist for graph induced complex.\n");
+		printf("Outputting edgelist...");
 		for(i=0;i<num_wits;i++){
 			for(j=0;j<num_wits;j++){
-				if(euc_distance[i*num_wits+j]<=max_filtration_param && closest[i*2+1]!=closest[j*2+1])
+				if(euc_distance[i*num_wits+j]<=max_filtration_param && closest[i*2+1]!=closest[j*2+1]){
+
 					fprintf(fp,"%d %d {\'weight\' : %f}\n",i,j,euc_distance[i*num_wits+j]);
+				}
 			}
 		}
+		printf("done\n");
+		fflush(stdout);
 		if(!quiet){
 			printf("done\n");
 			fflush(stdout);
 		}
 		fclose(fp);
-//		free(closest);  // added by elliott 4/29
+		free(closest);  // added by elliott 4/29
 	}
 
 
@@ -851,9 +861,7 @@ void dprint(char *c){
 	printf("]\n");
 	fflush(stdout);
 }
-float e_dist(float ix, float iy, float jx, float jy){
-	return sqrt((jx-ix)*(jx-ix)+(jy-iy)*(jy-iy));
-}
+
 
 float std_dev(float d[],int n){
     float sum=0.0;
