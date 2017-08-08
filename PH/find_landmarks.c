@@ -76,15 +76,15 @@ char            *landmark_set;
 FILE            *fp;
 
 int64_t          num_wits=1;
-int64_t          i,j,k;
+int64_t          i,j,k,t,l;
 int              m2_d = 0.0;
 int              num_landmarks=1;
-int              t,l;
 int              est;
 int              start=0;
 int              stop=1;
 int              num_threads = 2;
 int              d_cov = 0;
+int              num_divs=0;
 
 int              max_avg=50;
 int              wit_pts; 
@@ -97,6 +97,7 @@ bool             timing=false;
 bool             use_euclidean = false;
 bool             done = false;
 bool 			 quiet = true;
+
 
 void dprint(char *c);
 void print_matrix(float *A);
@@ -131,7 +132,8 @@ poptContext POPT_Context;  /* context for parsing command-line options */
     { "set stretch ",              's', POPT_ARG_FLOAT,      &stretch,                     15, "Set the stretch variable.",                                            0 },
     { "use euclidean ",            'c', POPT_ARG_NONE,       0,                            16, "Calculate distance using euclidean distance.",                         0 },
     { "cov",                       'x', POPT_ARG_INT,        &d_cov,                       17, "Calculate distance using covariance.",                                 0 },
-    { "output edgelist",           'f', POPT_ARG_FLOAT,      &max_filtration_param,        18, "Output edgelist for graph induced complex.",                           0 },
+    { "compute GI complex",        'f', POPT_ARG_FLOAT,      &max_filtration_param,        18, "Output edgelist for graph induced complex.",                           0 },
+    { "set num divisions",         'd', POPT_ARG_FLOAT,      &num_divs,                    19, "Set number of divisions for graph induced complex.",                   0 },
     POPT_AUTOHELP
     { NULL, '\0', 0, NULL, 0}
   };
@@ -395,7 +397,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		float dhamil=0.,deuc=0.;
 		if(use_hamiltonian<0){
 		
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,deuc,dhamil,sum)
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,k,deuc,dhamil,sum)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
@@ -413,7 +415,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 
 		else{
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,deuc,dhamil,sum)
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,k,deuc,dhamil,sum)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
@@ -581,7 +583,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 
 		float c[wit_pts*wit_pts];
 		
-		#pragma omp parallel num_threads(num_threads) shared(distances,cov_matrices,witnesses,wit_pts,num_wits) private(i,j,c,sum)
+		#pragma omp parallel num_threads(num_threads) shared(distances,cov_matrices,witnesses,wit_pts,num_wits) private(i,j,k,l,c,sum)
 		{
 			#pragma omp for nowait schedule (runtime)
 			for(i=0;i<num_wits;i++){
@@ -609,7 +611,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		float de,dot;
 		printf("Calculating orientation amplify distance..."); //orientation
 		fflush(stdout);
-		#pragma omp parallel num_threads(num_threads) shared(num_wits,witnesses,stretch,norm_velocity,orientation_amplify,speeds,min_speed,max_speed,speed_amplify,distances,straight_VB) private(i,j,de,dot,sum)
+		#pragma omp parallel num_threads(num_threads) shared(num_wits,witnesses,stretch,norm_velocity,orientation_amplify,speeds,min_speed,max_speed,speed_amplify,distances,straight_VB) private(i,j,k,de,dot,sum)
 		{
 			#pragma omp for nowait schedule (runtime)
 			for(i=0;i<num_wits;i++){
@@ -738,42 +740,48 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 
 
-		fp = fopen("closest_wits.txt","w");
-		if (fp == NULL) {
-    		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
-    		fflush(stdout);
-    		return 1;
+		// fp = fopen("closest_wits.txt","w");
+		// if (fp == NULL) {
+  //   		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
+  //   		fflush(stdout);
+  //   		return 1;
+		// }
+
+		// fprintf(fp,"#witness closest_landmark\n");
+		// for(i=0;i<num_wits;i++){
+		// 	fprintf(fp,"%d %d\n",i,closest[i*2+1]);
+		// }
+		// fclose(fp);
+
+		// fp = fopen("edgelist.txt","w");
+		// if (fp == NULL) {
+  //   		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
+  //   		fflush(stdout);
+  //   		return 1;
+		// }
+		// if(!quiet){
+		// 	printf("Finding edges for graph induced complex...");
+		// 	fflush(stdout);
+		// }
+
+		// fprintf(fp,"# edgelist for graph induced complex.\n");
+		// printf("Outputting edgelist...");
+		// for(i=0;i<num_wits;i++){
+		// 	for(j=0;j<num_wits;j++){
+		// 		if(euc_distance[i*num_wits+j]<=max_filtration_param && closest[i*2+1]!=closest[j*2+1]){
+
+		// 			fprintf(fp,"%d %d {\'weight\' : %f}\n",i,j,euc_distance[i*num_wits+j]);
+		// 		}
+		// 	}
+		// }
+		// printf("done\n");
+		// fflush(stdout);
+
+		if(max_filtration_param>0){
+
 		}
 
-		fprintf(fp,"#witness closest_landmark\n");
-		for(i=0;i<num_wits;i++){
-			fprintf(fp,"%d %d\n",i,closest[i*2+1]);
-		}
-		fclose(fp);
 
-		fp = fopen("edgelist.txt","w");
-		if (fp == NULL) {
-    		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
-    		fflush(stdout);
-    		return 1;
-		}
-		if(!quiet){
-			printf("Finding edges for graph induced complex...");
-			fflush(stdout);
-		}
-
-		fprintf(fp,"# edgelist for graph induced complex.\n");
-		printf("Outputting edgelist...");
-		for(i=0;i<num_wits;i++){
-			for(j=0;j<num_wits;j++){
-				if(euc_distance[i*num_wits+j]<=max_filtration_param && closest[i*2+1]!=closest[j*2+1]){
-
-					fprintf(fp,"%d %d {\'weight\' : %f}\n",i,j,euc_distance[i*num_wits+j]);
-				}
-			}
-		}
-		printf("done\n");
-		fflush(stdout);
 		if(!quiet){
 			printf("done\n");
 			fflush(stdout);
