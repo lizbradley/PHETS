@@ -51,7 +51,7 @@ def embed(
 
 	signal = signal[::ds_rate]
 
-	if crop:
+	if crop is not None:
 		if time_units == 'samples':
 			pass
 		elif time_units == 'seconds':

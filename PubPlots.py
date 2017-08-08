@@ -247,6 +247,8 @@ def plot_waveform_sec(
 	if yticks is not None:
 		ax.yaxis.set_ticks(yticks)
 
+	ax.set_xlabel('time (s)')
+
 
 
 

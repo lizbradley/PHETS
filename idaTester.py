@@ -23,12 +23,12 @@ start_time = time.time()
 
 piano_sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 piano_sig = normalize_volume(piano_sig)
-# piano_traj = embed(piano_sig, tau=.01192, m=2, time_units='seconds', crop=(1.72132, 1.77132))		# current
+piano_traj = embed(piano_sig, tau=.01192, m=2, time_units='seconds', crop=(1.72132, 1.77132))		# current
 
 # piano_traj = embed(piano_sig, tau=.01192, m=2, time_units='seconds', crop=(1.72132, 1.77872))		# experiment 2000 wits
 # piano_traj = embed(piano_sig, tau=.001216, m=2, time_units='seconds', crop=(1.72132, 1.77152))	# experiment small tau
 
-# paper_path = '/home/elliott/programming/phets_notes/IDA 2017/figs/'
+paper_path = '/home/elliott/programming/phets_notes/IDA 2017/figs/'
 # paper_path = '/home/elliott/programming/phets_notes/IDA 2017/figs/experiment_2000_wits/'
 # paper_path = '/home/elliott/programming/phets_notes/IDA 2017/figs/experiment_small_tau/'
 ticks = [-.06, -.02, .02, .06]
@@ -274,7 +274,7 @@ if test == 20:
 	plt.savefig(paper_path + 'fig2.png')
 
 
-# test = 30
+test = 30
 
 if test == 30:
 	# figures 3a, 3b, 3c, 3d
@@ -422,15 +422,20 @@ if test == 50:
 		normalize_volume=True
 
 	)
-	
+
+
+
 	
 if test == 60:
 	# figure 6a, PD upright piano
 
 	sig = np.loadtxt('datasets/IDA_PAPER/40-C144F.txt')
+
+	plot_signal('fig')
 	traj = embed(sig, tau=4, m=2, time_units='samples', crop=(70000, 72205), normalize=True)
 
-	
+
+
 	filt_params.update(
 		{
 			'ds_rate': 20,

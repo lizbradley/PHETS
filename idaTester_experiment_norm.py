@@ -381,7 +381,7 @@ if test == 40:
 			'ds_rate': 20,
 			'worm_length': 2000,
 			'min_filtration_param': 0,
-			'max_filtration_param': -15,
+			'max_filtration_param': -10,
 			'num_divisions': 10,
 
 		})
@@ -393,13 +393,14 @@ if test == 40:
 	plt.savefig(paper_path + 'fig4.png')
 
 
-test = 50
+# test = 50
 
-
+# paper_path = '/home/elliott/programming/phets_notes/IDA 2017/figs/'
 
 if test == 50:
 	# figure 5 -- pending
-	# run this with new max_filtration_param (-10)
+	# small tau
+	# what kind of threshold to use???
 	filt_params.update(
 		{
 			'max_filtration_param': -10,
@@ -411,7 +412,7 @@ if test == 50:
 	PRF_vs_FFT_v2(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
 		'datasets/time_series/viol/40-viol.txt',
-		'output/ROC/fig5.png',
+		paper_path + 'fig5_smalltau.png',
 
 		'clarinet',
 		'viol',
@@ -427,18 +428,57 @@ if test == 50:
 		num_landmarks=100,
 		FT_bins=50,
 		k=(0, 10, .01),  # min, max, int
-		load_saved_filts=True,
+		load_saved_filts=False,
 		normalize_volume=True
 
 	)
-	
 
-# test = 60
+# test = 51
+
+if test == 51:
+	# figure 5 -- pending
+	# big tau
+	# what kind of threshold to use???
+	filt_params.update(
+		{
+			'max_filtration_param': -10,
+			'num_divisions': 10,
+			# 'use_cliques': True,
+		}
+	)
+
+	PRF_vs_FFT_v2(
+		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
+		'datasets/time_series/viol/40-viol.txt',
+		paper_path + 'fig5_bigtau.png',
+
+		'clarinet',
+		'viol',
+
+		crop_1=(75000, 180000),
+		crop_2=(35000, 140000),
+
+		tau=314,  # samples
+		m=2,
+
+		window_length=2315,
+		num_windows=50,
+		num_landmarks=100,
+		FT_bins=50,
+		k=(0, 10, .01),  # min, max, int
+		load_saved_filts=False,
+		normalize_volume=True
+
+	)
+
+
+test = 60
 if test == 60:
 	# figure 6a, PD upright piano
 
 	sig = np.loadtxt('datasets/IDA_PAPER/40-C144F.txt')
-	traj = embed(sig, tau=4, m=2, time_units='samples', crop=(70000, 72205), normalize_crop=True)
+	traj = embed(sig, tau=32, m=2, time_units='samples',
+				 crop=(70000, 72205), normalize_crop=True)
 
 	
 	filt_params.update(
@@ -452,15 +492,16 @@ if test == 60:
 		})
 
 	filtration = Filtration(traj, filt_params)
-
 	plot_PD_pub(filtration, paper_path + 'fig6a.png')
+	make_movie(filtration, paper_path + 'fig6amovie.mp4')
 
-# test = 61
+test = 61
 if test == 61:
 	# figure 6b, PD grand piano
 
 	sig = np.loadtxt('datasets/IDA_PAPER/40-C134C.txt')
-	traj = embed(sig, tau=4, m=2, time_units='samples', crop=(86000, 88205), normalize_crop=True)
+	traj = embed(sig, tau=32, m=2, time_units='samples',
+				 crop=(86000, 88205), normalize_crop=True)
 
 	
 	filt_params.update(
@@ -474,5 +515,5 @@ if test == 61:
 		})
 
 	filtration = Filtration(traj, filt_params)
-
 	plot_PD_pub(filtration, paper_path + 'fig6b.png')
+	make_movie(filtration, paper_path + 'fig6bmovie.mp4')
