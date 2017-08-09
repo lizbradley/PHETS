@@ -14,7 +14,7 @@ from Tools import normalize_volume
 
 
 
-def plot_PD_pub(filtration, out_filename, label=None):
+def plot_PD_pub(filtration, out_filename, label=None, ticks=None):
 	def add_persistence_plot(ax, filtration):
 
 		min_lim = 0
@@ -39,7 +39,7 @@ def plot_PD_pub(filtration, out_filename, label=None):
 		color = 'C3'
 
 		def msize(n, scale, min):
-			return(n * scale) ** 1.3
+			return(n * scale) ** 1.2
 
 		# add legend #
 		mark_t_1 = ax.scatter([], [], marker='^', s=msize(1, t_scale, t_min), c=color)
@@ -69,7 +69,7 @@ def plot_PD_pub(filtration, out_filename, label=None):
 
 		if len(data.mortal) > 0:
 			x_mor, y_mor, count_mor = data.mortal
-			ax.scatter(x_mor, y_mor, s=msize(count_mor, p_scale, p_min), c=color, clip_on=False, zorder=100)
+			ax.scatter(x_mor, y_mor, s=msize(count_mor, p_scale, p_min), c=color, clip_on=True, zorder=100)
 
 		if len(data.immortal) > 0:
 			x_imm, count_imm = data.immortal
@@ -96,10 +96,15 @@ def plot_PD_pub(filtration, out_filename, label=None):
 			transform=ax.transAxes)
 
 	if label:
-		ax.text(.7, .95, label,
-				horizontalalignment='center',
-				verticalalignment='center',
-				transform=ax.transAxes)
+		ax.text(.97, .97, label,
+				horizontalalignment='right',
+				verticalalignment='top',
+				transform=ax.transAxes,
+				bbox=dict(alpha=1, facecolor='white', edgecolor='white', pad=6))
+
+	if ticks is not None:
+		ax.xaxis.set_ticks(ticks)
+		ax.yaxis.set_ticks(ticks)
 
 	if isinstance(out_filename, basestring):
 		pyplot.savefig(out_filename)

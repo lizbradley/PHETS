@@ -30,6 +30,8 @@ def norm(f):
 
 def test_inclusion(mean, var, tests, k):
 	var_norm = norm(var)
+	scaled_variance = variance / norm(mean_train)
+
 	pred = []
 	for spec in tests:
 		diff = np.subtract(spec, mean)
@@ -286,6 +288,42 @@ def PRF_vs_FFT_v2(
 		normalize_volume=True,
 
 ):
+	def get_dists(mean, tests):
+		return [norm(np.subtract(test, mean)) for test in tests]
+
+	def get_rate_vs_k(dists, dists_train, k_arr, mean_train):
+		variance = np.mean(np.power(dists_train, 2))
+		std_dev = np.mean(np.power(dists_train, 2)) ** .5
+		scaled_variance = variance / norm(mean_train)
+		rate = []
+		for k in k_arr:
+			# pred = dists <= variance * k
+			# pred = dists <= std_dev * k
+			pred = dists <= scaled_variance * k
+			rate.append(sum(pred) / float(len(pred)))
+		return rate
+
+	def plot_dists(test_dists, train_dists, var, title, fname):
+
+		fig = plt.figure(figsize=(10, 6))
+		ax = fig.add_subplot(111)
+		# ax.set_ylim(bottom=0)
+
+		ax.plot(test_dists, 'o')
+
+		variance = np.mean(np.power(train_dists, 2))
+
+		npv_line = ax.axhline(norm(var), c='C0')
+		std_dev_line = ax.axhline(variance ** .5, c='C1')
+		var_line = ax.axhline(variance, c='C2')
+
+		fig.legend([npv_line, std_dev_line, var_line],
+				   ['norm of pointwise variance', 'standard deviation', 'variance'])
+
+		fig.suptitle(title)
+
+		plt.savefig(fname)
+
 
 	if not load_saved_filts: clear_dir('ROC/samps/')
 	start = time.time()
@@ -328,44 +366,8 @@ def PRF_vs_FFT_v2(
 		prfs_train_2, prfs_test_2, mean_prf_2, var_prf_2 = pre_proc_data(prfs_2)
 
 
-		def get_dists(mean, tests):
-			return [norm(np.subtract(test, mean)) for test in tests]
 
-
-		def get_rate_vs_k(dists, dists_train, k_arr, mean_train):
-			variance = np.mean(np.power(dists_train, 2))
-			std_dev = np.mean(np.power(dists_train, 2)) ** .5
-			scaled_variance = variance / norm(mean_train)
-			rate = []
-			for k in k_arr:
-				# pred = dists <= variance * k
-				# pred = dists <= std_dev * k
-				pred = dists <= scaled_variance * k
-				rate.append(sum(pred) / float(len(pred)))
-			return rate
-
-		def plot_dists(test_dists, train_dists, var, title, fname):
-
-			fig = plt.figure(figsize=(10, 6))
-			ax = fig.add_subplot(111)
-			# ax.set_ylim(bottom=0)
-
-			ax.plot(test_dists, 'o')
-
-			variance = np.mean(np.power(train_dists, 2))
-
-			npv_line = ax.axhline(norm(var), c='C0')
-			std_dev_line = ax.axhline(variance ** .5, c='C1')
-			var_line = ax.axhline(variance, c='C2')
-
-			fig.legend([npv_line, std_dev_line, var_line],
-					   ['norm of pointwise variance', 'standard deviation', 'variance'])
-
-			fig.suptitle(title)
-
-			plt.savefig(fname)
-
-
+		# PRF STUFF #
 
 		prf_dists_1_vs_1 = get_dists(mean_prf_1, prfs_test_1)
 		prf_dists_2_vs_1 = get_dists(mean_prf_1, prfs_test_2)
@@ -373,43 +375,53 @@ def PRF_vs_FFT_v2(
 		prf_dists_2_vs_2 = get_dists(mean_prf_2, prfs_test_2)
 
 
+		prf_train_dists_1_vs_1 = get_dists(mean_prf_1, prfs_train_1)
+		prf_train_dists_2_vs_2 = get_dists(mean_prf_2, prfs_train_2)
 
-		train_dists_1_vs_1 = get_dists(mean_prf_1, prfs_train_1)
-		train_dists_2_vs_2 = get_dists(mean_prf_2, prfs_train_2)
+
+		prf_1_tpr = get_rate_vs_k(prf_dists_1_vs_1, prf_train_dists_1_vs_1, k_arr, mean_prf_1)
+		prf_1_fpr = get_rate_vs_k(prf_dists_2_vs_1, prf_train_dists_1_vs_1, k_arr, mean_prf_1)
+		prf_2_tpr = get_rate_vs_k(prf_dists_2_vs_2, prf_train_dists_2_vs_2, k_arr, mean_prf_2)
+		prf_2_fpr = get_rate_vs_k(prf_dists_1_vs_2, prf_train_dists_2_vs_2, k_arr, mean_prf_2)
+		
+		prf_data_1 = [prf_1_fpr, prf_1_tpr]
+		prf_data_2 = [prf_2_fpr, prf_2_tpr]
+		## find points evenly spaced in k here
+
 
 		title_11 = '{} vs {}'.format(label_1, label_1)
 		title_12 = '{} vs {}'.format(label_1, label_2)
 		title_21 = '{} vs {}'.format(label_2, label_1)
 		title_22 = '{} vs {}'.format(label_2, label_2)
-
-		plot_dists(prf_dists_1_vs_1, train_dists_1_vs_1, var_prf_1, title_11, 'output/ROC/' + title_11 + '.png')
-		plot_dists(prf_dists_1_vs_2, train_dists_2_vs_2, var_prf_2, title_12, 'output/ROC/' + title_12 + '.png')
-		plot_dists(prf_dists_2_vs_1, train_dists_1_vs_1, var_prf_1, title_21, 'output/ROC/' + title_21 + '.png')
-		plot_dists(prf_dists_2_vs_2, train_dists_2_vs_2, var_prf_2, title_22, 'output/ROC/' + title_22 + '.png')
-
-
-		prf_1_tpr = get_rate_vs_k(prf_dists_1_vs_1, train_dists_1_vs_1, k_arr, mean_prf_1)
-		prf_1_fpr = get_rate_vs_k(prf_dists_2_vs_1, train_dists_1_vs_1, k_arr, mean_prf_1)
-		prf_2_tpr = get_rate_vs_k(prf_dists_2_vs_2, train_dists_2_vs_2, k_arr, mean_prf_2)
-		prf_2_fpr = get_rate_vs_k(prf_dists_1_vs_2, train_dists_2_vs_2, k_arr, mean_prf_2)
+		plot_dists(prf_dists_1_vs_1, prf_train_dists_1_vs_1, var_prf_1, title_11, 'output/ROC/' + title_11 + '.png')
+		plot_dists(prf_dists_1_vs_2, prf_train_dists_2_vs_2, var_prf_2, title_12, 'output/ROC/' + title_12 + '.png')
+		plot_dists(prf_dists_2_vs_1, prf_train_dists_1_vs_1, var_prf_1, title_21, 'output/ROC/' + title_21 + '.png')
+		plot_dists(prf_dists_2_vs_2, prf_train_dists_2_vs_2, var_prf_2, title_22, 'output/ROC/' + title_22 + '.png')
 
 
-
-		prf_data_1 = [prf_1_fpr, prf_1_tpr]
-		prf_data_2 = [prf_2_fpr, prf_2_tpr]
-
-		## find points evenly spaced in k here
-
-		fft_data_1 = roc_data(mean_spec_1, var_spec_1, specs_test_1, specs_test_2, k_arr)
-		fft_data_2 = roc_data(mean_spec_2, var_spec_2, specs_test_2, specs_test_1, k_arr)
-
-		# print_title('clarinet')
-		# prf_data_1 = roc_data(mean_prf_1, var_prf_1, prfs_test_1, prfs_test_2, k_arr)
-		# print_title('viol')
-		# prf_data_2 = roc_data(mean_prf_2, var_prf_2, prfs_test_2, prfs_test_1, k_arr)
+		# SPEC STUFF #
+		
+		spec_dists_1_vs_1 = get_dists(mean_spec_1, specs_test_1)
+		spec_dists_2_vs_1 = get_dists(mean_spec_1, specs_test_2)
+		spec_dists_1_vs_2 = get_dists(mean_spec_2, specs_test_1)
+		spec_dists_2_vs_2 = get_dists(mean_spec_2, specs_test_2)
 
 
-		data.append((fft_data_1, fft_data_2, prf_data_1, prf_data_2))
+		spec_train_dists_1_vs_1 = get_dists(mean_spec_1, specs_train_1)
+		spec_train_dists_2_vs_2 = get_dists(mean_spec_2, specs_train_2)
+
+		spec_1_tpr = get_rate_vs_k(spec_dists_1_vs_1, spec_train_dists_1_vs_1, k_arr, mean_spec_1)
+		spec_1_fpr = get_rate_vs_k(spec_dists_2_vs_1, spec_train_dists_1_vs_1, k_arr, mean_spec_1)
+		spec_2_tpr = get_rate_vs_k(spec_dists_2_vs_2, spec_train_dists_2_vs_2, k_arr, mean_spec_2)
+		spec_2_fpr = get_rate_vs_k(spec_dists_1_vs_2, spec_train_dists_2_vs_2, k_arr, mean_spec_2)
+
+		spec_data_1 = [spec_1_fpr, spec_1_tpr]
+		spec_data_2 = [spec_2_fpr, spec_2_tpr]
+
+
+
+
+		data.append((spec_data_1, spec_data_2, prf_data_1, prf_data_2))
 
 		print_data_spec.append((mean_spec_1, var_spec_1, label_1, mean_spec_2, var_spec_2, label_2))
 		print_data_prf.append((mean_prf_1, var_prf_1, label_1, mean_prf_2, var_prf_2, label_2))
