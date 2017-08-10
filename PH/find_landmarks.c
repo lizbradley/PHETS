@@ -403,7 +403,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 						deuc = euc_distance[i*num_wits+j];
 						sum=0;
 						for(k=0;k<wit_pts;k++){
-							sum+=norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k];
+							sum+=(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k])*(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k]);
 						}
 						dhamil = -1*use_hamiltonian*sqrt(sum);
 						distances[i*num_wits+j] = sqrt(deuc*deuc+(dhamil*dhamil));
@@ -413,7 +413,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 
 		else{
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,k,deuc,dhamil,sum)
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,velocities,distances,wit_pts) private(i,j,k,deuc,dhamil,sum)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
@@ -421,7 +421,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 						deuc = euc_distance[i*num_wits+j];
 						sum=0;
 						for(k=0;k<wit_pts;k++){
-							sum+=norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k];
+							sum+=velocities[i*wit_pts+k]-velocities[j*wit_pts+k];
 						}
 						dhamil = use_hamiltonian*sqrt(sum);
 						distances[i*num_wits+j] = sqrt(deuc*deuc+(dhamil*dhamil));
