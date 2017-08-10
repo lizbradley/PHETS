@@ -16,7 +16,7 @@ from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
 # compare_multi: tau is in seconds; has all options for tau and crop *****
 
 
-set_test = 12		# set here or with command line argument
+set_test = 6		# set here or with command line argument
 
 
 

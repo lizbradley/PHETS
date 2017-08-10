@@ -22,9 +22,11 @@ piano_traj = embed(
 	normalize_crop=True,
 )
 
+eps_bins = 20
+simps_cutoff = -21
 
-# paper_path = '/home/elliott/programming/phets_notes/IDA 2017/figs/final/'
-paper_path = '/home/elliott/Dropbox/Data and Topology/Papers/IDA 2017/figs/'
+paper_path = '/home/elliott/programming/phets_notes/IDA 2017/figs/final/numdiv20/maxfilt21/'
+# paper_path = '/home/elliott/Dropbox/Data and Topology/Papers/IDA 2017/figs/'
 ticks = [-1, -.33, .33, 1]
 # ticks = None
 
@@ -44,7 +46,7 @@ def	fig1():
 		ax1,
 		piano_sig,
 		crop=(1.72132, 1.77132),
-		label='(a)',
+		label=' a ',
 		normalize_crop=True,
 		yticks=ticks
 	)
@@ -53,7 +55,7 @@ def	fig1():
 		ax2,
 		piano_traj,
 		ticks=ticks,
-		label='(b)'
+		label=' b '
 	)
 
 	plt.savefig(paper_path + 'fig1.png')
@@ -89,7 +91,7 @@ def fig2():
 		landmark_size=3,
 		line_width=.3,
 		show_eps=False,
-		label='(a)',
+		label=' a ',
 		ticks=ticks
 	)
 
@@ -110,9 +112,9 @@ def fig2():
 	plot_filtration_pub(
 		filtration, 2,
 		ax2,
-		landmark_size=5,
+		landmark_size=10,
 		show_eps=False,
-		label='(b)',
+		label=' b ',
 		ticks=ticks,
 
 	)
@@ -134,9 +136,9 @@ def fig2():
 	plot_filtration_pub(
 		filtration, 2,
 		ax3,
-		landmark_size=10,
+		landmark_size=15,
 		show_eps=False,
-		label='(c)',
+		label=' c ',
 		ticks=ticks,
 	)
 
@@ -152,8 +154,8 @@ def fig3():
 			'ds_rate': 10,
 			'worm_length': 2000,
 			'min_filtration_param': 0,
-			'max_filtration_param': -20,
-			'num_divisions': 10,
+			'max_filtration_param': simps_cutoff,
+			'num_divisions': eps_bins,
 			'use_cliques': False,
 		})
 
@@ -167,26 +169,26 @@ def fig3():
 
 	plot_filtration_pub(
 		filtration, 1, ax1,
-		label='(a) $\epsilon \\approx 0.013$',
+		label='a | $\epsilon \\approx 0.013$',
 		show_eps=False,
 		ticks=ticks,
 	)
 
 	plot_filtration_pub(
 		filtration, 2, ax2,
-		label='(b) $\epsilon \\approx 0.025$',
+		label='b | $\epsilon \\approx 0.025$',
 		show_eps=False,
 		ticks=ticks
 	)
 
 	plot_filtration_pub(
 		filtration, 4, ax3,
-		label='(c) $\epsilon  \\approx 0.050$',
+		label='c | $\epsilon  \\approx 0.050$',
 		show_eps=False,
 		ticks=ticks
 	)
 
-	plot_PD_pub(filtration, ax4, label='(d)')
+	plot_PD_pub(filtration, ax4, label=' d ')
 
 	plt.savefig(paper_path + 'fig3.png')
 
@@ -216,19 +218,19 @@ def fig4():
 			'ds_rate': 20,
 			'worm_length': 2000,
 			'min_filtration_param': 0,
-			'max_filtration_param': -20,
-			'num_divisions': 10,
+			'max_filtration_param': simps_cutoff,
+			'num_divisions': eps_bins,
 
 		})
 
 	filtration = Filtration(traj, filt_params)
 
 	plot_filtration_pub(filtration, 4, ax1,
-						label='(a) $\epsilon  \\approx 0.099$',
+						label='a | $\epsilon  \\approx 0.099$',
 						ticks=ticks,
 						show_eps=False
 						)
-	plot_PD_pub(filtration, ax3, label='(c)')
+	plot_PD_pub(filtration, ax3, label=' c ')
 
 
 	# VIOL #
@@ -241,19 +243,19 @@ def fig4():
 			'ds_rate': 20,
 			'worm_length': 2000,
 			'min_filtration_param': 0,
-			'max_filtration_param': -20,
-			'num_divisions': 10,
+			'max_filtration_param': simps_cutoff,
+			'num_divisions': eps_bins,
 
 		})
 
 	filtration = Filtration(traj, filt_params)
 
 	plot_filtration_pub(filtration, 4, ax2,
-						label='(b) $\epsilon  \\approx 0.114$',
+						label='b | $\epsilon  \\approx 0.114$',
 						ticks=ticks,
 						show_eps=False
 						)
-	plot_PD_pub(filtration, ax4, label='(d)')
+	plot_PD_pub(filtration, ax4, label=' d ')
 
 
 	plt.savefig(paper_path + 'fig4.png')
@@ -267,8 +269,8 @@ def fig5():
 	# include FFTs?
 	filt_params.update(
 		{
-			'max_filtration_param': -20,
-			'num_divisions': 10,
+			'max_filtration_param': simps_cutoff,
+			'num_divisions': eps_bins,
 			# 'use_cliques': True,
 		}
 	)
@@ -290,11 +292,14 @@ def fig5():
 		window_length=2033,
 		num_windows=50,
 		num_landmarks=100,
-		FT_bins=2000,
+		FT_bins=2033,
 		FT_bin_mode='log',
-		k=(0, 10, .01),  # min, max, int
+		k=(0, 5, .01),  # min, max, int
 		load_saved_filts=True,
-		normalize_volume=True
+		normalize_volume=True,
+
+		pub=True,
+		save_samps=True
 
 	)
 
@@ -304,18 +309,12 @@ from DCE.Plots import plot_signal
 def fig6():
 	print 'figure 6...'
 
-	tau = 54
-
-	c1 = 50000
-	l = 2000
-	crop = (c1, c1 + l + tau + 1)
-
 
 	fig = plt.figure(figsize=(8.5, 3.5), tight_layout=True, dpi=700)
 	ax1 = fig.add_subplot(121)
 	ax2 = fig.add_subplot(122)
 
-	ticks = [0, .05, .1, .15, .2]
+	tau = 54
 
 	# figure 6a, PD upright piano #
 	sig = np.loadtxt('datasets/time_series/piano_revisit/C144F/a440/07-consolidated.txt')
@@ -330,21 +329,19 @@ def fig6():
 			'ds_rate': 20,
 			'worm_length': 2000,
 			'min_filtration_param': 0,
-			'max_filtration_param': -20,
-			'num_divisions': 10,
+			'max_filtration_param': simps_cutoff,
+			'num_divisions': eps_bins,
 			'use_cliques': False
 
 		})
 
 	filtration = Filtration(traj, filt_params)
-	plot_PD_pub(filtration, ax1, label='(a)', cbar=False)
+	plot_PD_pub(filtration, ax1, label=' a ', cbar=True)
 	# plot_filtration_pub(filtration, 5, paper_path + 'fig6a_filt.png')
 	# make_movie(filtration, paper_path + 'fig6amovie.mp4')
 
 
 	# figure 6b, PD grand piano #
-
-
 	sig = np.loadtxt('datasets/time_series/piano_revisit/C134C/a440/07- C134C-consolidated.txt')
 	# plot_signal(paper_path + 'fig6b_sig.png', sig, crop=crop, time_units='samples')
 	crop_b = sec_to_samp((1.966, 2.016))
@@ -356,14 +353,16 @@ def fig6():
 			'ds_rate': 20,
 			'worm_length': 2000,
 			'min_filtration_param': 0,
-			'max_filtration_param': -20,
-			'num_divisions': 10,
+			'max_filtration_param': simps_cutoff,
+			# 'num_divisions': eps_bins,
+			'num_divisions': eps_bins,
 			'use_cliques': False
 
 		})
 
+	# filtration = load_saved_filtration()
 	filtration = Filtration(traj, filt_params)
-	plot_PD_pub(filtration, ax2, label='(b)', cbar=True)
+	plot_PD_pub(filtration, ax2, label=' b ', cbar=True)
 	# plot_filtration_pub(filtration, 5, paper_path + 'fig6b_filt.png')
 	# make_movie(filtration, paper_path + even'fig6bmovie.mp4')
 
@@ -376,5 +375,5 @@ if __name__ == '__main__':
 	# fig2()
 	# fig3()
 	# fig4()
-	# fig5()
-	fig6()
+	fig5()
+	# fig6()

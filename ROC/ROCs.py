@@ -1,5 +1,6 @@
 import time
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -72,8 +73,8 @@ def get_prfs(trajs, filt_params, window_length, num_landmarks, label='none', loa
 		filt_params.update({'ds_rate': window_length / num_landmarks})
 		filt = Filtration(t, filt_params)
 
-		fname_filt = 'ROC/samps/{}__filt__wl_{}__win_{}.png'.format(label, window_length, i)
-		fname_prf = 'ROC/samps/{}__prf__wl_{}__win_{}.png'.format(label, window_length, i)
+		fname_filt = 'output/ROC/samps/{}__filt__wl_{}__win_{}.png'.format(label, window_length, i)
+		fname_prf = 'output/ROC/samps/{}__prf__wl_{}__win_{}.png'.format(label, window_length, i)
 
 		# make_movie(filt, fname_movie)
 		filt_frame = filt_params['num_divisions'] - 1
@@ -115,32 +116,40 @@ def roc_data(mean, var, tests_true, tests_false, k_arr):
 
 
 def roc_title(label, mode):
-	return 'is it a {}? [{}])'.format(label, mode)
+	return 'is it a {}? [{}]'.format(label, mode)
 
 
-def plot_fig(data, k, label_1, label_2, window_length, fname):
-	fig = plt.figure(figsize=(12, 10))
+def plot_fig(data, k, label_1, label_2, window_length, fname, pub):
+	fig = plt.figure(figsize=(10, 8), tight_layout=True)
 
 	ax1 = fig.add_subplot(221)
 	ax2 = fig.add_subplot(222)
 	ax3 = fig.add_subplot(223)
 	ax4 = fig.add_subplot(224)
 
+	fig.subplots_adjust(right=0.8)
+	cax = fig.add_axes([0.92, 0.1, 0.03, 0.8])
+
 	lines = []
+
 
 	for data_wl in data:
 		fft_data_1, fft_data_2, prf_data_1, prf_data_2 = data_wl
 
-		plot_roc(ax1, fft_data_1, k, roc_title(label_1, 'FFT'))
-		plot_roc(ax2, fft_data_2, k, roc_title(label_2, 'FFT'))
-		plot_roc(ax3, prf_data_1, k, roc_title(label_1, 'PRF'))
-		l, cm = plot_roc(ax4, prf_data_2, k, roc_title(label_2, 'PRF'))
+		plot_roc(ax3, fft_data_1, k, roc_title(label_1, 'FFT'))
+		plot_roc(ax4, fft_data_2, k, roc_title(label_2, 'FFT'))
+		plot_roc(ax1, prf_data_1, k, roc_title(label_1, 'PRF'))
+		l, cm = plot_roc(ax2, prf_data_2, k, roc_title(label_2, 'PRF'))
 		lines.append(l)
 
-		fig.colorbar(cm)
+	from matplotlib import ticker
+	cb = fig.colorbar(cm, cax=cax, extend='max')
+	cb.set_label("k", labelpad=-1, size=19)
+	cb.ax.tick_params(labelsize=14)
 
-	fig.legend(lines, labels=window_length)
-	fig.suptitle('k = range({}, {}, {})'.format(*k), fontsize=16)
+	if not pub:
+		fig.suptitle('k = range({}, {}, {})'.format(*k), fontsize=16)
+		fig.legend(lines, labels=window_length)
 
 	fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 
@@ -283,9 +292,12 @@ def PRF_vs_FFT_v2(
 		FT_bin_mode='log',
 
 		k=(0, 1, .01),
+		pub=False,		# for publication
 
 		load_saved_filts=False,
 		normalize_volume=True,
+
+		save_samps=True
 
 ):
 	def get_dists(mean, tests):
@@ -299,11 +311,11 @@ def PRF_vs_FFT_v2(
 		for k in k_arr:
 			# pred = dists <= variance * k
 			# pred = dists <= std_dev * k
-			pred = dists <= scaled_variance * k
+			pred = dists <= std_dev * k
 			rate.append(sum(pred) / float(len(pred)))
 		return rate
 
-	def plot_dists(test_dists, train_dists, var, title, fname):
+	def plot_dists(test_dists, train_dists, var, fname):
 
 		fig = plt.figure(figsize=(10, 6))
 		ax = fig.add_subplot(111)
@@ -320,12 +332,12 @@ def PRF_vs_FFT_v2(
 		fig.legend([npv_line, std_dev_line, var_line],
 				   ['norm of pointwise variance', 'standard deviation', 'variance'])
 
-		fig.suptitle(title)
+
 
 		plt.savefig(fname)
 
 
-	if not load_saved_filts: clear_dir('ROC/samps/')
+	if save_samps and not load_saved_filts: clear_dir('output/ROC/samps/')
 	start = time.time()
 	print 'loading signal...'
 	sig_full_1 = np.loadtxt(fname_1)
@@ -347,8 +359,9 @@ def PRF_vs_FFT_v2(
 		windows_1, st_pts_1 = slice_sig(sig_1, l=wl, n=num_windows, normalize=normalize_volume)
 		windows_2, st_pts_2 = slice_sig(sig_2, l=wl, n=num_windows, normalize=normalize_volume)
 
-		plot_sig(sig_full_1, crop_1, windows_1, st_pts_1, 'ROC/sig1_wl{}.png'.format(wl))
-		plot_sig(sig_full_2, crop_2, windows_2, st_pts_2, 'ROC/sig2_wl{}.png'.format(wl))
+		if save_samps and not pub:
+			plot_sig(sig_full_1, crop_1, windows_1, st_pts_1, 'output/ROC/sig1_wl{}.png'.format(wl))
+			plot_sig(sig_full_2, crop_2, windows_2, st_pts_2, 'output/ROC/sig2_wl{}.png'.format(wl))
 
 		specs_1 = get_specs(windows_1, FT_bins, FT_bin_mode)
 		specs_2 = get_specs(windows_2, FT_bins, FT_bin_mode)
@@ -383,20 +396,19 @@ def PRF_vs_FFT_v2(
 		prf_1_fpr = get_rate_vs_k(prf_dists_2_vs_1, prf_train_dists_1_vs_1, k_arr, mean_prf_1)
 		prf_2_tpr = get_rate_vs_k(prf_dists_2_vs_2, prf_train_dists_2_vs_2, k_arr, mean_prf_2)
 		prf_2_fpr = get_rate_vs_k(prf_dists_1_vs_2, prf_train_dists_2_vs_2, k_arr, mean_prf_2)
+
 		
 		prf_data_1 = [prf_1_fpr, prf_1_tpr]
 		prf_data_2 = [prf_2_fpr, prf_2_tpr]
 		## find points evenly spaced in k here
 
 
-		title_11 = '{} vs {}'.format(label_1, label_1)
-		title_12 = '{} vs {}'.format(label_1, label_2)
-		title_21 = '{} vs {}'.format(label_2, label_1)
-		title_22 = '{} vs {}'.format(label_2, label_2)
-		plot_dists(prf_dists_1_vs_1, prf_train_dists_1_vs_1, var_prf_1, title_11, 'output/ROC/' + title_11 + '.png')
-		plot_dists(prf_dists_1_vs_2, prf_train_dists_2_vs_2, var_prf_2, title_12, 'output/ROC/' + title_12 + '.png')
-		plot_dists(prf_dists_2_vs_1, prf_train_dists_1_vs_1, var_prf_1, title_21, 'output/ROC/' + title_21 + '.png')
-		plot_dists(prf_dists_2_vs_2, prf_train_dists_2_vs_2, var_prf_2, title_22, 'output/ROC/' + title_22 + '.png')
+		if save_samps:
+			dist_fname = 'output/ROC/dists/{}_vs_{}.png'
+			plot_dists(prf_dists_1_vs_1, prf_train_dists_1_vs_1, var_prf_1, dist_fname.format(label_1, label_1))
+			plot_dists(prf_dists_1_vs_2, prf_train_dists_2_vs_2, var_prf_2, dist_fname.format(label_1, label_2))
+			plot_dists(prf_dists_2_vs_1, prf_train_dists_1_vs_1, var_prf_1, dist_fname.format(label_2, label_1))
+			plot_dists(prf_dists_2_vs_2, prf_train_dists_2_vs_2, var_prf_2, dist_fname.format(label_2, label_2))
 
 
 		# SPEC STUFF #
@@ -427,7 +439,7 @@ def PRF_vs_FFT_v2(
 		print_data_prf.append((mean_prf_1, var_prf_1, label_1, mean_prf_2, var_prf_2, label_2))
 
 	print 'plotting...'
-	plot_fig(data, k, label_1, label_2, window_length, out_filename)
+	plot_fig(data, k, label_1, label_2, window_length, out_filename, pub)
 
 	print_stats_multi(print_data_spec, print_data_prf, window_length)
 

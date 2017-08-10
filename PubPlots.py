@@ -15,6 +15,21 @@ from config import WAV_SAMPLE_RATE
 from Tools import normalize_volume
 
 
+def letter_label(ax, label, nudge_r=0.):
+	ax.text(
+		.95 + nudge_r, .95, label,
+		size='larger',
+		horizontalalignment='right',
+		verticalalignment='top',
+		transform=ax.transAxes,
+		bbox=dict(
+			alpha=1,
+			facecolor='white',
+			edgecolor='black',
+			pad=5,
+			boxstyle='round, pad=.5'
+		)
+	)
 
 def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 	def add_persistence_plot(ax, filtration, cax):
@@ -34,8 +49,15 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 
 		ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k', zorder=0)  # diagonal line
 
-		color = 'C3'
+		data = filtration.get_PD_data()
+		if data == 'empty':
+			return
 
+
+		# count by size #
+		#################
+		#
+		# color = 'C3'
 		# t_min = 5
 		# p_min = 5
 		# t_scale = 15
@@ -68,7 +90,6 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 
 		# # end add legend #
 
-		# # count by size #
 		# data = filtration.get_PD_data()
 		# if data == 'empty':
 		# 	return
@@ -82,23 +103,30 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 		# 	y_imm = [max_lim for i in x_imm]
 		# 	ax.scatter(x_imm, y_imm, marker='^', s=msize(count_imm, t_scale, t_min), c=color, clip_on=False, zorder=100)
 
+		#
+
+		pass
+		import matplotlib.colorbar as colorbar
 
 		# count by color #
-		data = filtration.get_PD_data()
-		if data == 'empty':
-			return
+		##################
+
+
+		levels = [1, 2, 3, 4, 5, 6]
 
 		if len(data.mortal) > 0:
 			x_mor, y_mor, count_mor = data.mortal
-			sc = ax.scatter(x_mor, y_mor, c=count_mor, clip_on=True, zorder=100)
+			sc = ax.scatter(x_mor, y_mor, s=50, c=count_mor, clip_on=True, zorder=100,
+							cmap='viridis', vmin=1, vmax=5)
 			if cax is not None:
-				plt.colorbar(sc, cax=cax)
+				plt.colorbar(sc, extend='max', cax=cax, boundaries=levels)
 
 
 		if len(data.immortal) > 0:
 			x_imm, count_imm = data.immortal
 			y_imm = [max_lim for i in x_imm]
-			ax.scatter(x_imm, y_imm, marker='^', c=count_imm, clip_on=False, zorder=100)
+			ax.scatter(x_imm, y_imm, marker='^', s=100, c=count_imm, clip_on=False, zorder=100,
+					   cmap='viridis', vmin=1, vmax=5)
 
 
 
@@ -113,7 +141,7 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 		ax = out_filename
 		if cbar is True:
 			divider = make_axes_locatable(ax)
-			cax = divider.append_axes('right', size='5%', pad=0.05)
+			cax = divider.append_axes('right', size='5%', pad=0.1)
 		else:
 			cax = None
 		add_persistence_plot(ax, filtration, cax)
@@ -126,11 +154,8 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 			transform=ax.transAxes)
 
 	if label:
-		ax.text(.97, .97, label,
-				horizontalalignment='right',
-				verticalalignment='top',
-				transform=ax.transAxes,
-				bbox=dict(alpha=1, facecolor='white', edgecolor='white', pad=6))
+		letter_label(ax, label)
+
 
 	if ticks is not None:
 		ax.xaxis.set_ticks(ticks)
@@ -168,7 +193,7 @@ def plot_filtration_pub(
 		subplot.scatter(
 			x, y,
 			color='black',
-			s=.5,
+			s=1,
 			facecolor='black', edgecolor='',
 			zorder=1
 		)
@@ -195,7 +220,7 @@ def plot_filtration_pub(
 		"""plots all complexes for full filtration"""
 
 		for j, simplexes_coords in enumerate(complex_data[:i]):
-			f_color, e_color = 'C0', 'black'
+			f_color, e_color = 'lightskyblue', 'black'
 			# f_color, e_color = 'C0', 'black'
 			print 'eps index', j
 
@@ -228,10 +253,13 @@ def plot_filtration_pub(
 		ax.set_title('$\epsilon = {:.7f}$'.format(eps[i]))
 
 	if label:
-		ax.text(.95, .95, label,
-				horizontalalignment='right',
-				verticalalignment='center',
-				transform=ax.transAxes)
+		# ax.text(.95, .95, label,
+		# 		horizontalalignment='right',
+		# 		verticalalignment='center',
+		# 		transform=ax.transAxes)
+
+		if label:
+			letter_label(ax, label)
 
 	if ticks:
 		ax.xaxis.set_ticks(ticks)
@@ -266,7 +294,6 @@ def plot_waveform_sec(
 		c0, c1 = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
 		sig = sig[c0: c1]
 		t = np.linspace(crop[0], crop[1], num=len(sig))
-		print 1 / np.max(np.abs(sig))
 
 
 	else:
@@ -277,11 +304,14 @@ def plot_waveform_sec(
 
 	ax.plot(t, sig, c='k', lw=.5)
 
+	# if label:
+	# 	ax.text(.97, .95, label,
+	# 			horizontalalignment='center',
+	# 			verticalalignment='center',
+	# 			transform=ax.transAxes)
+
 	if label:
-		ax.text(.97, .95, label,
-				horizontalalignment='center',
-				verticalalignment='center',
-				transform=ax.transAxes)
+		letter_label(ax, label, nudge_r=.02)
 
 	if yticks is not None:
 		ax.yaxis.set_ticks(yticks)
@@ -325,11 +355,14 @@ def plot_dce_pub(ax, traj, ticks=False, label=False):
 		ax.xaxis.set_ticks(ticks)
 		ax.yaxis.set_ticks(ticks)
 
+	# if label:
+	# 	ax.text(.94, .95, label,
+	# 			horizontalalignment='center',
+	# 			verticalalignment='center',
+	# 			transform=ax.transAxes)
+
 	if label:
-		ax.text(.94, .95, label,
-				horizontalalignment='center',
-				verticalalignment='center',
-				transform=ax.transAxes)
+		letter_label(ax, label)
 
 
 	ax.set_xlabel('$x(t)$')

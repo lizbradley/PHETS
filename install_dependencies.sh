@@ -13,5 +13,5 @@ sudo apt-get install ffmpeg
 # gnuplot
 sudo apt-get install gnuplot
 
-# for matplotlib
+# for python tkinter, for matplotlib
 sudo apt-get install python-tk

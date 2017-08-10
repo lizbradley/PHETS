@@ -1,1 +1,4 @@
-49: tau = 0.01192 (seconds), embed_crop = [3.21714, 3.26714] (seconds) 
+0: tau = 0.001 (seconds), embed_crop = [0.50000, 0.70000] (seconds) 
+1: tau = 0.002 (seconds), embed_crop = [0.50000, 0.70000] (seconds) 
+2: tau = 0.003 (seconds), embed_crop = [0.50000, 0.70000] (seconds) 
+3: tau = 0.004 (seconds), embed_crop = [0.50000, 0.70000] (seconds) 

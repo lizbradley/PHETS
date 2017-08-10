@@ -99,14 +99,31 @@ def plot_roc(ax, data, k, title):
 	fpr, tpr = data
 	l, = ax.plot(fpr, tpr, clip_on=False, lw=3, zorder=0)
 	k = np.arange(*k)
-	# k = np.power(np.arange(*k), 2)
-	cm = ax.scatter(fpr, tpr, s=100, zorder=1, clip_on=False, c=k, alpha=1)
-	ax.plot([0, 1], [0, 1], '--')
+
+	ax.plot([0, 1], [0, 1], '--', c='k')
+
+
+
+	def sparsify(data, k):
+		data = np.asarray(data)
+		k_args = (k % 0.25 == 0.0)
+		k_pts = k[k_args]
+		data_pts = data[:, k_args]
+		return data_pts, k_pts
+
+	data_sp, k_sp = sparsify(data, k)
+
+	fpr_sp, tpr_sp = data_sp
+
+	cm = ax.scatter(fpr_sp, tpr_sp, s=100, zorder=10, clip_on=False, c=k_sp, alpha=1)
+
+
+
 	ax.set_xlim([0, 1])
 	ax.set_ylim([0, 1])
 	ax.grid()
 	ax.set_aspect('equal')
 	ax.set_xlabel('false positive rate')
 	ax.set_ylabel('true positive rate')
-	ax.set_title(title)
+	ax.set_title(title, y=1.02)
 	return l, cm
