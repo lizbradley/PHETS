@@ -1,6 +1,8 @@
 import numpy as np
+import sys
 from matplotlib import pyplot as plt
 from scipy import fftpack, interpolate
+
 
 from DCE.Plots import plot_signal
 from config import WAV_SAMPLE_RATE
@@ -27,12 +29,20 @@ def get_spec(sig):
 	n = sig_fft.size
 	timestep = 1 / WAV_SAMPLE_RATE
 	freq = fftpack.rfftfreq(n, d=timestep)
+
 	return [freq, spec]
 
 
 
-def downsample_spec(freqs, spec, n):
-	freqs_interp = np.logspace(1, 4, n)
+def downsample_spec(freqs, spec, n, space='log'):
+	if space == 'log':
+		freqs_interp = np.logspace(1, 4, n)
+	elif space == 'lin':
+		freqs_interp = np.linspace(1, 4, n)
+	else:
+		print 'ERROR: invalid spectrum downsample mode'
+		sys.exit()
+
 	spec_interp = interpolate.interp1d(freqs, spec, bounds_error=False, fill_value=0)
 	return freqs_interp, spec_interp(freqs_interp)
 

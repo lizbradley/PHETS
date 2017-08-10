@@ -33,12 +33,12 @@ def	fig1():
 	print 'figure 1...'
 	# figure 1a, 1b
 	# add time (s) label
-	fig = plt.figure(figsize=(10, 3.5), tight_layout=True, dpi=600)
+	fig = plt.figure(figsize=(10, 3), tight_layout=True, dpi=600)
 
 	gs = gridspec.GridSpec(1, 2, width_ratios=[2, 1])
 
 	ax1 = fig.add_subplot(gs[0])
-	ax2 = fig.add_subplot(gs[1], sharey=ax1)
+	ax2 = fig.add_subplot(gs[1])
 
 	plot_waveform_sec(
 		ax1,
@@ -166,15 +166,15 @@ def fig3():
 	ax4 = fig.add_subplot(224)
 
 	plot_filtration_pub(
-		filtration, 2, ax1,
-		label='(a) $\epsilon \\approx 0.025$',
+		filtration, 1, ax1,
+		label='(a) $\epsilon \\approx 0.013$',
 		show_eps=False,
 		ticks=ticks,
 	)
 
 	plot_filtration_pub(
-		filtration, 3, ax2,
-		label='(b) $\epsilon \\approx 0.038$',
+		filtration, 2, ax2,
+		label='(b) $\epsilon \\approx 0.025$',
 		show_eps=False,
 		ticks=ticks
 	)
@@ -291,6 +291,7 @@ def fig5():
 		num_windows=50,
 		num_landmarks=100,
 		FT_bins=2000,
+		FT_bin_mode='log',
 		k=(0, 10, .01),  # min, max, int
 		load_saved_filts=True,
 		normalize_volume=True
@@ -310,7 +311,7 @@ def fig6():
 	crop = (c1, c1 + l + tau + 1)
 
 
-	fig = plt.figure(figsize=(8.5, 4), tight_layout=True, dpi=700)
+	fig = plt.figure(figsize=(8.5, 3.5), tight_layout=True, dpi=700)
 	ax1 = fig.add_subplot(121)
 	ax2 = fig.add_subplot(122)
 
@@ -336,7 +337,7 @@ def fig6():
 		})
 
 	filtration = Filtration(traj, filt_params)
-	plot_PD_pub(filtration, ax1, label='(a)', ticks=ticks)
+	plot_PD_pub(filtration, ax1, label='(a)', cbar=False)
 	# plot_filtration_pub(filtration, 5, paper_path + 'fig6a_filt.png')
 	# make_movie(filtration, paper_path + 'fig6amovie.mp4')
 
@@ -362,18 +363,18 @@ def fig6():
 		})
 
 	filtration = Filtration(traj, filt_params)
-	plot_PD_pub(filtration, ax2, label='(b)', ticks=ticks[:-1])
+	plot_PD_pub(filtration, ax2, label='(b)', cbar=True)
 	# plot_filtration_pub(filtration, 5, paper_path + 'fig6b_filt.png')
-	# make_movie(filtration, paper_path + 'fig6bmovie.mp4')
+	# make_movie(filtration, paper_path + even'fig6bmovie.mp4')
 
 	plt.savefig(paper_path + 'fig6.png')
 
 
-
 if __name__ == '__main__':
+	pass
 	# fig1()
 	# fig2()
 	# fig3()
 	# fig4()
-	fig5()
-	# fig6()
+	# fig5()
+	fig6()

@@ -4,6 +4,8 @@ import matplotlib
 import numpy as np
 from matplotlib import pyplot as pyplot, collections, pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import MaxNLocator
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from DCE.Plots import plot_signal_zoom
 from DCE.Tools import auto_crop
@@ -14,8 +16,8 @@ from Tools import normalize_volume
 
 
 
-def plot_PD_pub(filtration, out_filename, label=None, ticks=None):
-	def add_persistence_plot(ax, filtration):
+def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
+	def add_persistence_plot(ax, filtration, cax):
 
 		min_lim = 0
 		max_lim = np.max(filtration.epsilons)
@@ -32,51 +34,73 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None):
 
 		ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k', zorder=0)  # diagonal line
 
-		t_min = 5
-		p_min = 5
-		t_scale = 15
-		p_scale = 15
 		color = 'C3'
 
-		def msize(n, scale, min):
-			return(n * scale) ** 1.2
-
+		# t_min = 5
+		# p_min = 5
+		# t_scale = 15
+		# p_scale = 15
+		#
+		# def msize(n, scale, min):
+		# 	return(n * scale) ** 1.2
+		#
 		# add legend #
-		mark_t_1 = ax.scatter([], [], marker='^', s=msize(1, t_scale, t_min), c=color)
-		mark_t_3 = ax.scatter([], [], marker='^', s=msize(3, t_scale, t_min), c=color)
-		mark_t_5 = ax.scatter([], [], marker='^', s=msize(5, t_scale, t_min), c=color)
+		# mark_t_1 = ax.scatter([], [], marker='^', s=msize(1, t_scale, t_min), c=color)
+		# mark_t_3 = ax.scatter([], [], marker='^', s=msize(3, t_scale, t_min), c=color)
+		# mark_t_5 = ax.scatter([], [], marker='^', s=msize(5, t_scale, t_min), c=color)
+		#
+		# mark_p_1 = ax.scatter([], [], s=msize(1, p_scale, p_min), c=color)
+		# mark_p_3 = ax.scatter([], [], s=msize(3, p_scale, p_min), c=color)
+		# mark_p_5 = ax.scatter([], [], s=msize(5, p_scale, p_min), c=color)
+		#
+		# marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
+		# labels = ('', '', '', '1', '3', '5')
+		#
+		# ax.legend(
+		# 	marks, labels, loc='lower right', ncol=2, markerscale=1,
+		# 	borderpad=1,
+		# 	labelspacing=1,
+		# 	framealpha=1,
+		# 	columnspacing=0,
+		# 	borderaxespad=3
+		# 	# edgecolor='k'
+		# )
 
-		mark_p_1 = ax.scatter([], [], s=msize(1, p_scale, p_min), c=color)
-		mark_p_3 = ax.scatter([], [], s=msize(3, p_scale, p_min), c=color)
-		mark_p_5 = ax.scatter([], [], s=msize(5, p_scale, p_min), c=color)
+		# # end add legend #
 
-		marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
-		labels = ('', '', '', '1', '3', '5')
+		# # count by size #
+		# data = filtration.get_PD_data()
+		# if data == 'empty':
+		# 	return
+		#
+		# if len(data.mortal) > 0:
+		# 	x_mor, y_mor, count_mor = data.mortal
+		# 	ax.scatter(x_mor, y_mor, s=msize(count_mor, p_scale, p_min), c=color, clip_on=True, zorder=100)
+		#
+		# if len(data.immortal) > 0:
+		# 	x_imm, count_imm = data.immortal
+		# 	y_imm = [max_lim for i in x_imm]
+		# 	ax.scatter(x_imm, y_imm, marker='^', s=msize(count_imm, t_scale, t_min), c=color, clip_on=False, zorder=100)
 
-		ax.legend(
-			marks, labels, loc='lower right', ncol=2, markerscale=1,
-			borderpad=1,
-			labelspacing=1,
-			framealpha=1,
-			columnspacing=0,
-			borderaxespad=3
-			# edgecolor='k'
-		)
 
+		# count by color #
 		data = filtration.get_PD_data()
 		if data == 'empty':
 			return
 
 		if len(data.mortal) > 0:
 			x_mor, y_mor, count_mor = data.mortal
-			ax.scatter(x_mor, y_mor, s=msize(count_mor, p_scale, p_min), c=color, clip_on=True, zorder=100)
+			sc = ax.scatter(x_mor, y_mor, c=count_mor, clip_on=True, zorder=100)
+			if cax is not None:
+				plt.colorbar(sc, cax=cax)
+
 
 		if len(data.immortal) > 0:
 			x_imm, count_imm = data.immortal
 			y_imm = [max_lim for i in x_imm]
-			ax.scatter(x_imm, y_imm, marker='^', s=msize(count_imm, t_scale, t_min), c=color, clip_on=False, zorder=100)
+			ax.scatter(x_imm, y_imm, marker='^', c=count_imm, clip_on=False, zorder=100)
 
-		# end add legend #
+
 
 
 	if isinstance(out_filename, basestring):
@@ -84,11 +108,17 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None):
 		ax = fig.add_subplot(111)
 		add_persistence_plot(ax, filtration)
 
+
 	else:
 		ax = out_filename
-		add_persistence_plot(ax, filtration)
+		if cbar is True:
+			divider = make_axes_locatable(ax)
+			cax = divider.append_axes('right', size='5%', pad=0.05)
+		else:
+			cax = None
+		add_persistence_plot(ax, filtration, cax)
 
-	ax.text(.5, .8, r'   $\beta_1$   ',
+	ax.text(.75, .25, r'   $\beta_1$   ',
 			horizontalalignment='center',
 			verticalalignment='center',
 			size='x-large',
@@ -105,6 +135,10 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None):
 	if ticks is not None:
 		ax.xaxis.set_ticks(ticks)
 		ax.yaxis.set_ticks(ticks)
+	else:
+		ax.xaxis.set_major_locator(MaxNLocator(5))
+		ax.yaxis.set_major_locator(MaxNLocator(5))
+
 
 	if isinstance(out_filename, basestring):
 		pyplot.savefig(out_filename)
@@ -253,6 +287,7 @@ def plot_waveform_sec(
 		ax.yaxis.set_ticks(yticks)
 
 	ax.set_xlabel('time (s)')
+	ax.set_ylabel('$x(t)$')
 
 
 
@@ -296,3 +331,9 @@ def plot_dce_pub(ax, traj, ticks=False, label=False):
 				verticalalignment='center',
 				transform=ax.transAxes)
 
+
+	ax.set_xlabel('$x(t)$')
+	ax.set_ylabel('$x(t + \\tau)$')
+
+	# ax.set_ylim([-1.1, 1.1])
+	# ax.set_xlim([-1.1, 1.1])

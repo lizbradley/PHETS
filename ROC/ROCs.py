@@ -30,7 +30,6 @@ def norm(f):
 
 def test_inclusion(mean, var, tests, k):
 	var_norm = norm(var)
-	scaled_variance = variance / norm(mean_train)
 
 	pred = []
 	for spec in tests:
@@ -42,10 +41,10 @@ def test_inclusion(mean, var, tests, k):
 
 
 
-def get_specs(windows, FT_bins):
+def get_specs(windows, FT_bins, mode):
 	specs = [get_spec(w) for w in windows]
 	# plot_spec(specs_1[0], 'spec.png')
-	specs = np.asarray([downsample_spec(s[0], s[1], FT_bins)[1] for s in specs])
+	specs = np.asarray([downsample_spec(s[0], s[1], FT_bins, mode)[1] for s in specs])
 	# plot_spec(specs_ds_1[0], 'spec_ds.png')
 	return specs
 
@@ -281,6 +280,7 @@ def PRF_vs_FFT_v2(
 		num_landmarks=30,
 
 		FT_bins=50,
+		FT_bin_mode='log',
 
 		k=(0, 1, .01),
 
@@ -350,8 +350,8 @@ def PRF_vs_FFT_v2(
 		plot_sig(sig_full_1, crop_1, windows_1, st_pts_1, 'ROC/sig1_wl{}.png'.format(wl))
 		plot_sig(sig_full_2, crop_2, windows_2, st_pts_2, 'ROC/sig2_wl{}.png'.format(wl))
 
-		specs_1 = get_specs(windows_1, FT_bins)
-		specs_2 = get_specs(windows_2, FT_bins)
+		specs_1 = get_specs(windows_1, FT_bins, FT_bin_mode)
+		specs_2 = get_specs(windows_2, FT_bins, FT_bin_mode)
 
 		trajs_1 = [embed(w, tau, m) for w in windows_1]
 		trajs_2 = [embed(w, tau, m) for w in windows_2]
