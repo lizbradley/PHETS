@@ -32,9 +32,9 @@ def sort(i):
 
 
 
-f = open("output/PH/build_filtration_memory.txt","wb")
-
-@profile(stream=f)
+# f = open("output/PH/build_filtration_memory.txt","wb")
+#
+# @profile(stream=f)
 def build_filtration(input_file_name, parameter_set, silent=False):
 	num_threads = 2
 	global d
@@ -49,14 +49,16 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	orientation_amplify = float(get_param("d_orientation_amplify"))
 	stretch = float(get_param("d_stretch"))
 	ray_distance_amplify = get_param("d_ray_distance_amplify")
-	use_hamiltonian = float(get_param("d_use_hamiltonian"))
+	use_hamiltonian = get_param("d_use_hamiltonian")
+	print "use hamiltonian set to ", use_hamiltonian
 	m2_d = float(get_param("m2_d"))
 	straight_VB = float(get_param("straight_VB"))
 	d_cov = get_param("d_cov")
 	graph_induced = get_param("graph_induced")
-	always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov==0.
-
-
+	# always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov==0.
+	# print "always_euclidean set to ", always_euclidean
+	always_euclidean = get_param('always_euclidean')
+	# use_hamiltonian = -5
 
 	filtration = Set()
 	extra_data = None
@@ -311,6 +313,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch)
 				]
+
+	print find_landmarks_cmd
 
 	if silent:
 		p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)
