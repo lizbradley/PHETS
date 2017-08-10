@@ -435,14 +435,20 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		printf("Calculating m2_d distance..."); //m2_d
 		fflush(stdout);
 		float d1,d2;
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,witnesses,num_wits,distances) private(i,j,d1,d2)
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,witnesses,num_wits,distances,m2_d) private(i,j,d1,d2)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){		
 					for(j=0;j<num_wits;j++){
-						d1=euc_distance[i*num_wits+j];
-						d2=euc_distance[(i+1)*num_wits+(j+1)];
-						distances[i*num_wits+j]= sqrt(d1*d1+d2*d2);	
+						if(i>num_wits-m2_d-1 || j>num_wits-m2_d-1){
+							distances[i*num_wits+j] = 0.00000;
+
+						}
+						else{
+							d1=euc_distance[i*num_wits+j];
+							d2=euc_distance[(i+m2_d)*num_wits+(j+m2_d)];
+							distances[i*num_wits+j]= sqrt(d1*d1+d2*d2);	
+						}
 					}
 				}
 			}
