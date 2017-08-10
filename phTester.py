@@ -488,8 +488,7 @@ if test == 101:
 			'worm_length': 2000,
 			'max_filtration_param': .01,
 			'num_divisions': 10,
-			# set in FiltrationMovie
-			'd_use_hamiltonion': -5,
+			'd_use_hamiltonion': 5,
 			'always_euclidean': False,
 		})
 
@@ -499,35 +498,36 @@ if test == 101:
 
 	make_movie(
 		filtration,
-		'output/PH/test_ham5.mp4',
+		'output/PH/test_ham_p_5.mp4',
 	)
 
-test = 102
-if test == 102:
-	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 40,
-			'worm_length': 2000,
-			'max_filtration_param': .01,
-			'num_divisions': 10,
+# test = 102
+# NOT IMPLEMENTED #
+# if test == 102:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_speed_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_speed5.mp4',
+# 	)
 
-			'd_speed_amplify': 5,
 
-		})
-
-
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()		# reuses previous filtration
-
-	make_movie(
-		filtration,
-		'output/PH/test_speed5.mp4',
-	)
-
-
-test = 103
+# test = 103
 if test == 103:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
@@ -551,8 +551,86 @@ if test == 103:
 		'output/PH/test_orient5.mp4',
 	)
 
-test = 104
-if test == 104:
+
+# test = 104
+# NOT IMPLEMENTED #
+# if test == 104:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_stretch_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_stretch5.mp4',
+# 	)
+
+
+# test = 105
+# NOT IMPLEMENTED #
+# if test == 105:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_ray_distance_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_ray5.mp4',
+# 	)
+
+
+# test = 106
+# NOT IMPLEMENTED #
+# if test == 106:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'use_ne_for_maxmin': True,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_ne.mp4',
+# 	)
+
+# test = 107
+if test == 107:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
 	filt_params.update(
@@ -562,7 +640,7 @@ if test == 104:
 			'max_filtration_param': .01,
 			'num_divisions': 10,
 
-			'd_stretch_amplify': 5,
+			'm2_d': 10,
 
 		})
 
@@ -572,22 +650,24 @@ if test == 104:
 
 	make_movie(
 		filtration,
-		'output/PH/test_stretch5.mp4',
+		'output/PH/test_m2d10.mp4',
 	)
 
 
-test = 105
-if test == 105:
+
+
+# test = 108
+if test == 108:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
 	filt_params.update(
 		{
 			'ds_rate': 40,
 			'worm_length': 2000,
-			'max_filtration_param': .01,
+			'max_filtration_param': -8,
 			'num_divisions': 10,
 
-			'd_ray_distance_amplify': 5,
+			"d_cov": 20,
 
 		})
 
@@ -597,21 +677,21 @@ if test == 105:
 
 	make_movie(
 		filtration,
-		'output/PH/test_ray5.mp4',
+		'output/PH/test_dcov+20.mp4',
 	)
 
-test = 106
-if test == 106:
+# test = 109
+if test == 109:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
 	filt_params.update(
 		{
 			'ds_rate': 40,
 			'worm_length': 2000,
-			'max_filtration_param': .01,
+			'max_filtration_param': -8,
 			'num_divisions': 10,
 
-			'use_ne_for_maxmin': True,
+			"d_cov": -20,
 
 		})
 
@@ -621,12 +701,8 @@ if test == 106:
 
 	make_movie(
 		filtration,
-		'output/PH/test_ne.mp4',
+		'output/PH/test_dcov-20.mp4',
 	)
-
-
-
-
 
 
 
