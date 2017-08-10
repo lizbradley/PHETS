@@ -67,7 +67,7 @@ float            ray_distance_amplify = 1.0;
 float            straight_VB=0.0;
 float            stretch = 1.0;
 float            max_filtration_param = 0.0;
-
+float            num_divs = 0.0;
 
 char            *file;
 char            *wfile;
@@ -84,7 +84,7 @@ int              start=0;
 int              stop=1;
 int              num_threads = 2;
 int              d_cov = 0;
-int              num_divs=0;
+
 
 int              max_avg=50;
 int              wit_pts; 
@@ -103,7 +103,7 @@ void dprint(char *c);
 void print_matrix(float *A);
 float std_dev(float d[],int s);
 float calc_error(float d,int n);
-
+int comp (const void * elem1, const void * elem2) ;
 bool in_matrix(int* matrix,int size,int value);
 int main(int argc, char* argv[]){
         char *parse;
@@ -133,7 +133,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
     { "use euclidean ",            'c', POPT_ARG_NONE,       0,                            16, "Calculate distance using euclidean distance.",                         0 },
     { "cov",                       'x', POPT_ARG_INT,        &d_cov,                       17, "Calculate distance using covariance.",                                 0 },
     { "compute GI complex",        'f', POPT_ARG_FLOAT,      &max_filtration_param,        18, "Output edgelist for graph induced complex.",                           0 },
-    { "set num divisions",         'd', POPT_ARG_FLOAT,      &num_divs,                    19, "Set number of divisions for graph induced complex.",                   0 },
+    { "number of divisions",       'd', POPT_ARG_FLOAT,        &num_divs,                    19, "Set number of divisions for GI complex.",                              0 },
     POPT_AUTOHELP
     { NULL, '\0', 0, NULL, 0}
   };
@@ -259,7 +259,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
     	wit_pts++;
     
     }
-	printf("wit_pts: %d \n",wit_pts);
+	printf("dimension of points=%d ...",wit_pts);
 	rewind(fp); //set back to beginning
 
 	witnesses         = (float*) calloc(num_wits*wit_pts,sizeof(float)); // x,y points for a witness
@@ -387,8 +387,6 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 				}
 			}	
 		}
-		printf("done\n");
-		fflush(stdout);
 	}
 	
 	else if(use_hamiltonian!=0.0){ 
@@ -706,90 +704,128 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	}
 /******************************************************************/
 
-	// output list of closest witnesses to a landmark for graph induced complex
+/************************  GI Complex  ****************************/
 	if(max_filtration_param!=0){
+		printf("Computing GI Complex...");
+		fflush(stdout);
+		int *closest = (int*) calloc(num_wits,sizeof(int));
 		
-		int *closest = (int*) calloc(num_wits*2,sizeof(int));
-		
-		int min_index = -1;
+		int landmark,min_index = -1;
 		float min = 888888;
-		if(!quiet){
-			printf("Finding closest landmark to witnesses...");
-			fflush(stdout);
-		}
-		#pragma omp parallel shared(euc_distance,closest,landmarks,num_landmarks,num_wits) private(i,j,l,min,min_index)
+
+		#pragma omp parallel shared(distances,closest,landmarks,num_landmarks,num_wits) private(i,j,landmark,min,min_index)
 		{
 			#pragma omp for nowait schedule(runtime)
 			for(i=0;i<num_wits;i++){
 				min_index = -1;
 				min = 888888;
 				for(j=0;j<num_landmarks;j++){
-					l = landmarks[j];
-					if(euc_distance[i*num_wits+j]<min && i!=j){
-						min = euc_distance[i*num_wits+l];
-						min_index = l;
+					landmark = landmarks[j];
+					if(distances[i*num_wits+landmark]<min){
+						min = distances[i*num_wits+landmark]; //SHOULD THIS BE USING EUCLIDEAN DISTANCE OF OTHER DISTANCE METRIC??
+						min_index = landmark;
 					}
 				}
-				closest[i*2] = i;
-				closest[i*2+1] = min_index;
+				
+				closest[i] = min_index;
 			}
 		}
-		if(!quiet){
-			printf("done\n");
-			fflush(stdout);
+
+
+
+		fp = fopen("GI_edge_filtration.txt","w");
+		if (fp == NULL) {
+    		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
+    		fflush(stdout);
+    		return 1;
 		}
 
 
-		// fp = fopen("closest_wits.txt","w");
-		// if (fp == NULL) {
-  //   		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
-  //   		fflush(stdout);
-  //   		return 1;
-		// }
+		float max_e;
 
-		// fprintf(fp,"#witness closest_landmark\n");
-		// for(i=0;i<num_wits;i++){
-		// 	fprintf(fp,"%d %d\n",i,closest[i*2+1]);
-		// }
-		// fclose(fp);
+		if(max_filtration_param>0){ 
+			max_e = max_filtration_param;
+		}
+		else{   //SOME LANDMARKS ARE ONLY CLOSEST TO THEMSELVES IN VORONOI DIAGRAM!!!!!!
+			int cl;
+			float K[num_wits];
+			float R[num_landmarks-1];
+			float min_d;
+			int md,index;
+			#pragma omp parallel shared(distances,landmark_set,K,closest,landmarks,num_landmarks,num_wits) private(i,j,l,landmark,min_d,R,index,md,cl)
+			{
+				#pragma omp for nowait schedule(runtime)
+				for(i=0;i<num_wits;i++){
+					cl=closest[i];
+					if(landmark_set[i]=='n'){
+						index = 0;
+						for(l=0;l<num_landmarks;l++){
+							landmark = landmarks[l];
+							if(landmark!=cl){ // not looking at landmark set that witness is in
+								min_d=888888;
+								for(j=0;j<num_wits;j++){ //find all witnesses in that set
+									if(landmark_set[j]=='n' && closest[j]==landmark){
+										if(i!=j && min_d>distances[i*num_wits+j]){
+											min_d = distances[i*num_wits+j];
+										}
+									}
+								}
+								R[index] = min_d;
+								index++;
+							}	
+						}
+						qsort(R, sizeof(R)/sizeof(*R), sizeof(*R), comp);
 
-		// fp = fopen("edgelist.txt","w");
-		// if (fp == NULL) {
-  //   		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
-  //   		fflush(stdout);
-  //   		return 1;
-		// }
-		// if(!quiet){
-		// 	printf("Finding edges for graph induced complex...");
-		// 	fflush(stdout);
-		// }
+						md = -1*max_filtration_param;
+						K[i] = R[md];
+					}
+					else{
+						K[i] = 888888;
+					}
+					
+				}
 
-		// fprintf(fp,"# edgelist for graph induced complex.\n");
-		// printf("Outputting edgelist...");
-		// for(i=0;i<num_wits;i++){
-		// 	for(j=0;j<num_wits;j++){
-		// 		if(euc_distance[i*num_wits+j]<=max_filtration_param && closest[i*2+1]!=closest[j*2+1]){
 
-		// 			fprintf(fp,"%d %d {\'weight\' : %f}\n",i,j,euc_distance[i*num_wits+j]);
-		// 		}
-		// 	}
-		// }
-		// printf("done\n");
-		// fflush(stdout);
-
-		if(max_filtration_param>0){
-
+			}
+			min_d=88888888;
+			for(i=0;i<num_wits;i++){
+				if(K[i]<min_d){
+					min_d=K[i];
+				}
+			}
+			max_e = min_d;
+			
 		}
 
-
-		if(!quiet){
-			printf("done\n");
-			fflush(stdout);
+		int *A = (int*) calloc(num_wits*num_wits,sizeof(int));
+		fprintf(fp,"# max epsilon is %f\n",max_e);
+		fprintf(fp,"# eps: edgelist of landmarks\n");
+		float thresh = 0.0;
+		for(r = 0; r<num_divs;r++){
+			thresh += (max_e/num_divs);
+			fprintf(fp,"%f:",thresh);
+			for(i=0;i<num_wits;i++){
+				for(j=0;j<num_wits;j++){
+					if(distances[i*num_wits+j]<=thresh && closest[i]!= closest[j] && A[closest[i]*num_wits+closest[j]]!=1){
+						A[closest[i]*num_wits+closest[j]] = 1;
+						A[closest[j]*num_wits+closest[i]] = 1;
+						fprintf(fp," [%d,%d]",closest[i],closest[j]);
+					}
+				}
+			}
+			fprintf(fp,"\n");
 		}
+		
+		
+		
+		printf("done\n");
+		fflush(stdout);
+
 		fclose(fp);
 		free(closest);  // added by elliott 4/29
+		free(A);
 	}
-
+/******************************************************************/
 
 /************* Writing landmarks distances to file ****************/
 	printf("Writing landmarks to file...");
@@ -800,7 +836,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
     	fflush(stdout);
     	return 1;
 	}
-	fprintf(fp,"#landmark: d(l,w1), d(l,w2) ... d(l,w_n) where l refers to the landmark's occurence in the witness file, order of the list refers to order it was found\n");
+	fprintf(fp,"#landmark: d(l,w1), d(l,w2) ... d(l,w_n) where l refers to the landmark's occurence in the witness file, list is not sorted.\n");
 	
 	for(i=0;i<num_landmarks;i++){
 		fprintf(fp,"%d: ",landmarks[i]);
@@ -846,6 +882,14 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 
 	return 0;
 
+}
+int comp (const void * elem1, const void * elem2) 
+{
+    float f = *((float*)elem1);
+    float s = *((float*)elem2);
+    if (f > s) return  1;
+    if (f < s) return -1;
+    return 0;
 }
 bool in_matrix(int *matrix, int size,int value){
 	int z;
