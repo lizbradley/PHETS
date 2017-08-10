@@ -10,7 +10,7 @@ from PH import Filtration, make_movie, load_saved_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
 from Tools import normalize_volume, sec_to_samp
 
-
+# TODO: redo runtime / memory table!!
 piano_sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 
 piano_traj = embed(
@@ -66,7 +66,7 @@ def fig2():
 	print 'figure 2...'
 	# figure 2a, 2b, 2c
 
-	fig = plt.figure(figsize=(10, 3.5), tight_layout=True, dpi=700)
+	fig = plt.figure(figsize=(10, 3.4), tight_layout=True, dpi=600)
 	ax1 = fig.add_subplot(131)
 	ax2 = fig.add_subplot(132)
 	ax3 = fig.add_subplot(133)
@@ -161,29 +161,33 @@ def fig3():
 
 	filtration = Filtration(piano_traj, filt_params)
 
-	fig = plt.figure(figsize=(8.5, 7.5), tight_layout=True, dpi=700)
+	fig = plt.figure(figsize=(10, 9), tight_layout=True, dpi=500)
 	ax1 = fig.add_subplot(221)
 	ax2 = fig.add_subplot(222)
 	ax3 = fig.add_subplot(223)
 	ax4 = fig.add_subplot(224)
 
 	plot_filtration_pub(
-		filtration, 1, ax1,
-		label='a | $\epsilon \\approx 0.013$',
+		# filtration, 1, ax1,
+		filtration, 2, ax1,
+		label='a) $\epsilon \\approx 0.013$',
 		show_eps=False,
 		ticks=ticks,
 	)
 
 	plot_filtration_pub(
-		filtration, 2, ax2,
-		label='b | $\epsilon \\approx 0.025$',
+		# filtration, 2, ax2,
+		filtration, 4, ax2,
+		# label='b) $\epsilon \\approx 0.025$',
+		label='b) $\epsilon \\approx 0.026$',
 		show_eps=False,
 		ticks=ticks
 	)
 
 	plot_filtration_pub(
-		filtration, 4, ax3,
-		label='c | $\epsilon  \\approx 0.050$',
+		# filtration, 4, ax3,
+		filtration, 8, ax3,
+		label='c) $\epsilon  \\approx 0.050$',
 		show_eps=False,
 		ticks=ticks
 	)
@@ -202,7 +206,7 @@ def fig4():
 
 	# ticks, labels (with epsilon in filt frames)
 
-	fig = plt.figure(figsize=(8.5, 7.5), tight_layout=True, dpi=700)
+	fig = plt.figure(figsize=(10, 9), tight_layout=True, dpi=500)
 	ax1 = fig.add_subplot(221)
 	ax2 = fig.add_subplot(222)
 	ax3 = fig.add_subplot(223)
@@ -226,7 +230,7 @@ def fig4():
 	filtration = Filtration(traj, filt_params)
 
 	plot_filtration_pub(filtration, 4, ax1,
-						label='a | $\epsilon  \\approx 0.099$',
+						label='a) $\epsilon  \\approx 0.099$',
 						ticks=ticks,
 						show_eps=False
 						)
@@ -251,7 +255,7 @@ def fig4():
 	filtration = Filtration(traj, filt_params)
 
 	plot_filtration_pub(filtration, 4, ax2,
-						label='b | $\epsilon  \\approx 0.114$',
+						label='b) $\epsilon  \\approx 0.114$',
 						ticks=ticks,
 						show_eps=False
 						)
@@ -294,7 +298,7 @@ def fig5():
 		num_landmarks=100,
 		FT_bins=2033,
 		FT_bin_mode='log',
-		k=(0, 5, .01),  # min, max, int
+		k=(0, 5.01, .01),  # min, max, int
 		load_saved_filts=True,
 		normalize_volume=True,
 
@@ -310,7 +314,7 @@ def fig6():
 	print 'figure 6...'
 
 
-	fig = plt.figure(figsize=(8.5, 3.5), tight_layout=True, dpi=700)
+	fig = plt.figure(figsize=(10, 4), tight_layout=True, dpi=500)
 	ax1 = fig.add_subplot(121)
 	ax2 = fig.add_subplot(122)
 
@@ -337,13 +341,10 @@ def fig6():
 
 	filtration = Filtration(traj, filt_params)
 	plot_PD_pub(filtration, ax1, label=' a ', cbar=True)
-	# plot_filtration_pub(filtration, 5, paper_path + 'fig6a_filt.png')
-	# make_movie(filtration, paper_path + 'fig6amovie.mp4')
 
 
 	# figure 6b, PD grand piano #
 	sig = np.loadtxt('datasets/time_series/piano_revisit/C134C/a440/07- C134C-consolidated.txt')
-	# plot_signal(paper_path + 'fig6b_sig.png', sig, crop=crop, time_units='samples')
 	crop_b = sec_to_samp((1.966, 2.016))
 	traj = embed(sig, tau=tau, m=2, time_units='samples',
 				 crop=crop_b, normalize_crop=True)
@@ -360,11 +361,8 @@ def fig6():
 
 		})
 
-	# filtration = load_saved_filtration()
 	filtration = Filtration(traj, filt_params)
 	plot_PD_pub(filtration, ax2, label=' b ', cbar=True)
-	# plot_filtration_pub(filtration, 5, paper_path + 'fig6b_filt.png')
-	# make_movie(filtration, paper_path + even'fig6bmovie.mp4')
 
 	plt.savefig(paper_path + 'fig6.png')
 
@@ -373,7 +371,7 @@ if __name__ == '__main__':
 	pass
 	# fig1()
 	# fig2()
-	# fig3()
-	# fig4()
-	fig5()
-	# fig6()
+	fig3()
+	fig4()
+	# fig5()
+	fig6()

@@ -18,7 +18,7 @@ from Tools import normalize_volume
 def letter_label(ax, label, nudge_r=0.):
 	ax.text(
 		.95 + nudge_r, .95, label,
-		size='larger',
+		size='large',
 		horizontalalignment='right',
 		verticalalignment='top',
 		transform=ax.transAxes,
@@ -111,22 +111,22 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 		# count by color #
 		##################
 
-
 		levels = [1, 2, 3, 4, 5, 6]
 
 		if len(data.mortal) > 0:
 			x_mor, y_mor, count_mor = data.mortal
-			sc = ax.scatter(x_mor, y_mor, s=50, c=count_mor, clip_on=True, zorder=100,
-							cmap='viridis', vmin=1, vmax=5)
+			sc = ax.scatter(x_mor, y_mor, s=70, c=count_mor, clip_on=True, zorder=100,
+							cmap='viridis', vmin=0, vmax=5)
 			if cax is not None:
 				plt.colorbar(sc, extend='max', cax=cax, boundaries=levels)
 
 
 		if len(data.immortal) > 0:
 			x_imm, count_imm = data.immortal
+
 			y_imm = [max_lim for i in x_imm]
-			ax.scatter(x_imm, y_imm, marker='^', s=100, c=count_imm, clip_on=False, zorder=100,
-					   cmap='viridis', vmin=1, vmax=5)
+			ax.scatter(x_imm, y_imm, marker='^', s=120, c=count_imm, clip_on=False, zorder=100,
+					   cmap='viridis', vmin=0, vmax=5)
 
 
 
@@ -220,8 +220,8 @@ def plot_filtration_pub(
 		"""plots all complexes for full filtration"""
 
 		for j, simplexes_coords in enumerate(complex_data[:i]):
-			f_color, e_color = 'lightskyblue', 'black'
-			# f_color, e_color = 'C0', 'black'
+			# f_color, e_color = 'lightskyblue', 'black'
+			f_color, e_color = 'C0', 'black'
 			print 'eps index', j
 
 			simplexes = collections.PolyCollection(

@@ -120,7 +120,7 @@ def roc_title(label, mode):
 
 
 def plot_fig(data, k, label_1, label_2, window_length, fname, pub):
-	fig = plt.figure(figsize=(10, 8), tight_layout=True)
+	fig = plt.figure(figsize=(10, 8), tight_layout=True, dpi=500)
 
 	ax1 = fig.add_subplot(221)
 	ax2 = fig.add_subplot(222)
@@ -128,7 +128,7 @@ def plot_fig(data, k, label_1, label_2, window_length, fname, pub):
 	ax4 = fig.add_subplot(224)
 
 	fig.subplots_adjust(right=0.8)
-	cax = fig.add_axes([0.92, 0.1, 0.03, 0.8])
+	cax = fig.add_axes([0.92, 0.05, 0.03, 0.9])
 
 	lines = []
 
@@ -142,9 +142,9 @@ def plot_fig(data, k, label_1, label_2, window_length, fname, pub):
 		l, cm = plot_roc(ax2, prf_data_2, k, roc_title(label_2, 'PRF'))
 		lines.append(l)
 
-	from matplotlib import ticker
-	cb = fig.colorbar(cm, cax=cax, extend='max')
-	cb.set_label("k", labelpad=-1, size=19)
+	bounds = np.arange(k[0], k[1] + .5, .5)
+	cb = fig.colorbar(cm, cax=cax, boundaries=bounds)
+	cb.set_label("$k$", labelpad=-1, size=19)
 	cb.ax.tick_params(labelsize=14)
 
 	if not pub:

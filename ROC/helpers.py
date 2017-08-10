@@ -106,7 +106,7 @@ def plot_roc(ax, data, k, title):
 
 	def sparsify(data, k):
 		data = np.asarray(data)
-		k_args = (k % 0.25 == 0.0)
+		k_args = (k % 0.5 == 0.0)
 		k_pts = k[k_args]
 		data_pts = data[:, k_args]
 		return data_pts, k_pts
@@ -115,7 +115,7 @@ def plot_roc(ax, data, k, title):
 
 	fpr_sp, tpr_sp = data_sp
 
-	cm = ax.scatter(fpr_sp, tpr_sp, s=100, zorder=10, clip_on=False, c=k_sp, alpha=1)
+	cm = ax.scatter(fpr_sp, tpr_sp, s=150, zorder=10, clip_on=False, c=k_sp, alpha=1)
 
 
 
