@@ -421,7 +421,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 						deuc = euc_distance[i*num_wits+j];
 						sum=0;
 						for(k=0;k<wit_pts;k++){
-							sum+=velocities[i*wit_pts+k]-velocities[j*wit_pts+k];
+							sum+=(velocities[i*wit_pts+k]-velocities[j*wit_pts+k])*(velocities[i*wit_pts+k]-velocities[j*wit_pts+k]);
 						}
 						dhamil = use_hamiltonian*sqrt(sum);
 						distances[i*num_wits+j] = sqrt(deuc*deuc+(dhamil*dhamil));
