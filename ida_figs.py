@@ -321,27 +321,27 @@ def fig6():
 	tau = 54
 
 	# figure 6a, PD upright piano #
-	sig = np.loadtxt('datasets/time_series/piano_revisit/C144F/a440/07-consolidated.txt')
-	# plot_signal(paper_path + 'fig6a_sig.png', sig, crop=crop, time_units='samples')
-
-	crop_a = sec_to_samp((1.603, 1.653))
-	traj = embed(sig, tau=tau, m=2, time_units='samples',
-				 crop=crop_a, normalize_crop=True)
-
-	filt_params.update(
-		{
-			'ds_rate': 20,
-			'worm_length': 2000,
-			'min_filtration_param': 0,
-			'max_filtration_param': simps_cutoff,
-			'num_divisions': eps_bins,
-			'use_cliques': False
-
-		})
-
-	filtration = Filtration(traj, filt_params)
-	plot_PD_pub(filtration, ax1, label=' a ', cbar=True)
-
+	# sig = np.loadtxt('datasets/time_series/piano_revisit/C144F/a440/07-consolidated.txt')
+	# # plot_signal(paper_path + 'fig6a_sig.png', sig, crop=crop, time_units='samples')
+	#
+	# crop_a = sec_to_samp((1.603, 1.653))
+	# traj = embed(sig, tau=tau, m=2, time_units='samples',
+	# 			 crop=crop_a, normalize_crop=True)
+	#
+	# filt_params.update(
+	# 	{
+	# 		'ds_rate': 20,
+	# 		'worm_length': 2000,
+	# 		'min_filtration_param': 0,
+	# 		'max_filtration_param': simps_cutoff,
+	# 		'num_divisions': eps_bins,
+	# 		'use_cliques': False
+	#
+	# 	})
+	#
+	# filtration = Filtration(traj, filt_params)
+	# plot_PD_pub(filtration, ax1, label=' a ', cbar=True)
+	#
 
 	# figure 6b, PD grand piano #
 	sig = np.loadtxt('datasets/time_series/piano_revisit/C134C/a440/07- C134C-consolidated.txt')
@@ -362,7 +362,7 @@ def fig6():
 		})
 
 	filtration = Filtration(traj, filt_params)
-	plot_PD_pub(filtration, ax2, label=' b ', cbar=True)
+	# plot_PD_pub(filtration, ax2, label=' b ', cbar=True)
 
 	plt.savefig(paper_path + 'fig6.png')
 
@@ -371,7 +371,7 @@ if __name__ == '__main__':
 	pass
 	# fig1()
 	# fig2()
-	fig3()
-	fig4()
+	# fig3()
+	# fig4()
 	# fig5()
 	fig6()

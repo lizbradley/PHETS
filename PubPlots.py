@@ -111,22 +111,25 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 		# count by color #
 		##################
 
-		levels = [1, 2, 3, 4, 5, 6]
+		levels = [1, 2, 3, 4, 5]
 
 		if len(data.mortal) > 0:
 			x_mor, y_mor, count_mor = data.mortal
-			sc = ax.scatter(x_mor, y_mor, s=70, c=count_mor, clip_on=True, zorder=100,
-							cmap='viridis', vmin=0, vmax=5)
+			sc = ax.scatter(x_mor, y_mor, s=70, c=count_mor, clip_on=True, zorder=100, alpha=1,
+							# )
+							vmin=1, vmax=5)
 			if cax is not None:
-				plt.colorbar(sc, extend='max', cax=cax, boundaries=levels)
+				cb = plt.colorbar(sc, extend='max', cax=cax, values=levels, alpha=1.0)
+				cb.set_yticks(levels)
 
 
 		if len(data.immortal) > 0:
 			x_imm, count_imm = data.immortal
 
 			y_imm = [max_lim for i in x_imm]
-			ax.scatter(x_imm, y_imm, marker='^', s=120, c=count_imm, clip_on=False, zorder=100,
-					   cmap='viridis', vmin=0, vmax=5)
+			ax.scatter(x_imm, y_imm, marker='^', s=120, c=count_imm, clip_on=False, zorder=100, alpha=1,
+					   # )
+					   vmin=1, vmax=5)
 
 
 
