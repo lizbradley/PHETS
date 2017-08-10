@@ -102,7 +102,7 @@ def plot_2D_update(subplot, filtration, i, color_scheme, alpha):
 	return plot_complex(subplot, i, filtration.get_complex_plot_data())
 
 
-def plot_3D_update(subplot, filtration, i):
+def plot_3D_update(subplot, filtration, i, camera_angle):
 	def add_arrow(simplex, cmds):
 		set_arrow = ' '.join([
 			'set arrow from',
@@ -142,10 +142,11 @@ def plot_3D_update(subplot, filtration, i):
 		complex_data = complex_data[:i]
 
 		cmds = ['set terminal pngcairo size 700, 700',
+				'set view {}, {}'.format(*camera_angle)
 				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
 				# 'set size ratio - 1',
 				# 'unset border',
-				# 'unset tics'
+				# 'unset tics',
 				]
 
 		triangle_count = 1
@@ -282,7 +283,7 @@ def plot_2D_update_gnuplot(subplot, filtration, i):
 
 
 
-def make_frames(filtration, color_scheme, alpha, save_frames):
+def make_frames(filtration, color_scheme, alpha, save_frames, camera_angle=(0,45)):
 
 	fname_ax = 			pyplot.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
 	epsilon_ax = 		pyplot.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
@@ -320,7 +321,7 @@ def make_frames(filtration, color_scheme, alpha, save_frames):
 			comp_plot = plot_2D_update(plot_ax, filtration, i, color_scheme, alpha)
 			# comp_plot = plot_2D_update_gnuplot(plot_ax, filtration, i)
 		else:
-			comp_plot = plot_3D_update(plot_ax, filtration, i)
+			comp_plot = plot_3D_update(plot_ax, filtration, i, camera_angle)
 
 		eps = update_epsilon(epsilon_ax, i, filtration.epsilons)
 
@@ -337,10 +338,9 @@ def make_movie(
 		filtration,
 		out_filename,
 		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
-		camera_angle=(135, 55),  		# for 3D mode. [azimuthal, elevation]
+		camera_angle=(70, 45),  		# for 3D mode. [azimuthal, elevation]
 		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
 		dpi=150,  						# dots per inch (resolution)
-		hide_1simplexes=False,			# i need to find a way to optimize the plotting of 1-simplexes(lines) 3D plotting, as of now they slow mayavi significantly.
 		save_frames=False,  			# save frames to /frames/ dir
 		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
 
@@ -353,7 +353,7 @@ def make_movie(
 	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
 
 	print 'building movie...'
-	init, animate = make_frames(filtration, color_scheme, alpha, save_frames=save_frames)
+	init, animate = make_frames(filtration, color_scheme, alpha, save_frames=save_frames, camera_angle=camera_angle)
 	ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div + 1,
 								  blit=True, repeat=False)
 
