@@ -10,7 +10,7 @@ Reference
 
    :param sig: Input trajectory as numpy array or path to .txt file.
    :type sig: ndarray or str
-   :param dict params: Options for computation of filtration.
+   :param dict params: Options for computation of filtration. Defaults are  set in config.py. See filt_params_ref.txt.
    :param str filename: If sig is an ndarray, a filename may be provided for labelling in visualizations.
 
 

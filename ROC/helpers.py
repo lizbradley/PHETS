@@ -1,8 +1,10 @@
 import numpy as np
+import sys
 from matplotlib import pyplot as plt
 from scipy import fftpack, interpolate
 
-from DCE.Plots import plot_waveform
+
+from DCE.Plots import plot_signal
 from config import WAV_SAMPLE_RATE
 
 
@@ -12,7 +14,7 @@ def crop_sig(sig, crop):
 	return sig[crop[0] : crop[1]]
 
 
-def slice_sig(sig, l=2000, n=25, normalize=True):
+def slice_sig(sig, l, n, normalize=True):
 	start_pts = np.floor(np.linspace(0, len(sig) - 1, n, endpoint=False)).astype(int)
 	windows = np.asarray([sig[pt:pt + l] for pt in start_pts])
 	if normalize:
@@ -27,12 +29,20 @@ def get_spec(sig):
 	n = sig_fft.size
 	timestep = 1 / WAV_SAMPLE_RATE
 	freq = fftpack.rfftfreq(n, d=timestep)
+
 	return [freq, spec]
 
 
 
-def downsample_spec(freqs, spec, n):
-	freqs_interp = np.logspace(1, 4, n)
+def downsample_spec(freqs, spec, n, space='log'):
+	if space == 'log':
+		freqs_interp = np.logspace(1, 4, n)
+	elif space == 'lin':
+		freqs_interp = np.linspace(1, 4, n)
+	else:
+		print 'ERROR: invalid spectrum downsample mode'
+		sys.exit()
+
 	spec_interp = interpolate.interp1d(freqs, spec, bounds_error=False, fill_value=0)
 	return freqs_interp, spec_interp(freqs_interp)
 
@@ -40,12 +50,12 @@ def downsample_spec(freqs, spec, n):
 
 def plot_sig(sig_full, crop, windows, st_pts, fname):
 	print 'plotting signal...'
-	fig = plt.figure(figsize=(10, 5), tight_layout=True)
+	fig = plt.figure(figsize=(10, 5), tight_layout=True, dpi=600)
 
 	ax1 = fig.add_subplot(211)
 	ax2 = fig.add_subplot(212)
 
-	plot_waveform(ax1, sig_full, crop, 'samples')
+	plot_signal(ax1, sig_full, crop, 'samples')
 
 	t = np.arange(crop[0], crop[1])
 	ax2.plot(t, sig_full[crop[0] : crop[1]], lw=.5, c='k', zorder=0)
@@ -89,14 +99,31 @@ def plot_roc(ax, data, k, title):
 	fpr, tpr = data
 	l, = ax.plot(fpr, tpr, clip_on=False, lw=3, zorder=0)
 	k = np.arange(*k)
-	# k = np.power(np.arange(*k), 2)
-	cm = ax.scatter(fpr, tpr, s=100, zorder=1, clip_on=False, c=k, alpha=1)
-	ax.plot([0, 1], [0, 1], '--')
+
+	ax.plot([0, 1], [0, 1], '--', c='k')
+
+
+
+	def sparsify(data, k):
+		data = np.asarray(data)
+		k_args = (k % 0.25 == 0.0)
+		k_pts = k[k_args]
+		data_pts = data[:, k_args]
+		return data_pts, k_pts
+
+	data_sp, k_sp = sparsify(data, k)
+
+	fpr_sp, tpr_sp = data_sp
+
+	cm = ax.scatter(fpr_sp, tpr_sp, s=100, zorder=10, clip_on=False, c=k_sp, alpha=1)
+
+
+
 	ax.set_xlim([0, 1])
 	ax.set_ylim([0, 1])
 	ax.grid()
 	ax.set_aspect('equal')
 	ax.set_xlabel('false positive rate')
 	ax.set_ylabel('true positive rate')
-	ax.set_title(title)
+	ax.set_title(title, y=1.02)
 	return l, cm

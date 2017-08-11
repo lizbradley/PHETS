@@ -8,15 +8,15 @@ import numpy as np
 from DCE.DCE import embed
 from DCE.Utilities import wav_to_txt, batch_wav_to_txt
 from DCE.Tools import plot_power_spectrum
-from DCE.Plots import make_frame, plot_dce_pub
+from DCE.Plots import make_frame
+from PubPlots import plot_dce_pub, plot_waveform_sec
 from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
-from DCE.Plots import plot_waveform_zoom_only
 
 # slide_window, vary_tau, compare_vary_tau: tau is in samples not seconds
 # compare_multi: tau is in seconds; has all options for tau and crop *****
 
 
-set_test = 12		# set here or with command line argument
+set_test = 6		# set here or with command line argument
 
 
 
@@ -53,7 +53,7 @@ if test == 2:
 			window_size=.05*(i+1),    # seconds
 			ds_rate=1,
 			tau=.001,					# seconds
-			step_size=1)      # how much to move window each frame
+			window_step=1)      # how much to move window each frame
 
 
 if test == 3:
@@ -88,7 +88,7 @@ if test == 5:
 		'output/DCE/test_5.mp4',
 		window_size=.1,    	# seconds
 		tau=.001,			# seconds
-		step_size=1,      	# how much to move window each frame
+		window_step=1,      	# how much to move window each frame
 	)
 
 
@@ -211,7 +211,7 @@ if test == 11:
 	)
 
 
-	plot_waveform_zoom_only(
+	plot_waveform_sec(
 
 		'datasets/time_series/C135B/49-C135B.txt',		# in filename
 		'output/DCE/time_series_zoom.png',				# out filename
@@ -225,7 +225,7 @@ if test == 12:
 	############# IDA PAPER FIG 1 (explicit) ###############
 
 	sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
-	traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.72132, 1.77132))
+	traj = embed(sig, tau=.01192, m=2, time_units='seconds', crop=(1.72132, 1.77132))
 	np.savetxt('datasets/IDA_PAPER/49-C135B.txt', traj)
 	plot_dce_pub(traj, 'output/DCE/testing.png')
 

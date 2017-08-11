@@ -37,14 +37,14 @@ class PDData:
 
 class Filtration:
 
-	def __init__(self, sig, params, filename='none', silent=False):
+	def __init__(self, traj, params, filename='none', silent=False):
 		caller_dir = os.getcwd()
 
-		if isinstance(sig, basestring):			# is filename
-			self.sig = np.loadtxt(sig)
-			self.filename = caller_dir + '/' + sig
+		if isinstance(traj, basestring):			# is filename
+			self.sig = np.loadtxt(traj)
+			self.filename = caller_dir + '/' + traj
 		else:									# is array
-			self.sig = sig
+			self.sig = traj
 			self.filename = filename
 
 		os.chdir(SCRIPT_DIR)
@@ -55,6 +55,7 @@ class Filtration:
 
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
+		if not silent: print 'unpacking...'
 		self.complexes = self._unpack_complexes(arr[2])
 		self.epsilons = arr[3]
 
@@ -65,6 +66,7 @@ class Filtration:
 		self.PD_data = None
 		self.PRF = None
 
+		if not silent: print 'pickling...'
 		pickle.dump(self, open('temp_data/filtration.p', 'wb'))
 
 		os.chdir(caller_dir)
@@ -111,12 +113,13 @@ class Filtration:
 		abstract_filtration = sorted(list(filtration[0]))
 		epsilons = filtration[2]		# add to build_filtration return
 
-		if not silent: print("build_filtration() time elapsed: %d seconds \n" % (time.time() - start_time))
+		if not silent: print("build_filtration() time elapsed: {} seconds \n".format(time.time() - start_time))
 		return [witness_coords, landmark_coords, abstract_filtration, epsilons]
 
 	def _unpack_complexes(self, filt_ID_list):
 
 		def group_by_birth_time(ID_list):
+
 			"""Reformats 1D list of SimplexBirth objects into 2D array of
 			landmark_set lists, where 2nd index is  birth time (? see below)"""
 
@@ -139,38 +142,96 @@ class Filtration:
 			return ID_array
 
 
-		def expand_to_2simplexes(ID_array):
+		# def expand_to_2simplexes(ID_arr):
+		# 	"""for each k-simplex in filtration array, if k > 2, replaces with the
+		# 	component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
+		# 	for row in ID_arr:
+		# 		expanded_row = []
+		# 		for landmark_ID_set in row:
+		# 			if len(landmark_ID_set) > 3:
+		# 				expanded_set = list(itertools.combinations(landmark_ID_set, 3))
+		# 			else:
+		# 				expanded_set = [list(landmark_ID_set)]
+		# 			expanded_row.extend(expanded_set)		# flatten
+		# 			# expanded_row.append(expanded_set)		# group by parent
+		# 		row[:] = expanded_row
+		# 	return np.asarray(ID_arr)
+
+		# changing datatypes for optimization -- may break edge cases
+		def expand_to_2simplexes(ID_arr):
 			"""for each k-simplex in filtration array, if k > 2, replaces with the
 			component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
-			for row in ID_array:
+			for row in ID_arr:
 				expanded_row = []
 				for landmark_ID_set in row:
 					if len(landmark_ID_set) > 3:
-						expanded_set = list(itertools.combinations(landmark_ID_set, 3))
+						expanded_set = itertools.combinations(landmark_ID_set, 3)
 					else:
-						expanded_set = [list(landmark_ID_set)]
+						expanded_set = [landmark_ID_set]
 					expanded_row.extend(expanded_set)		# flatten
 					# expanded_row.append(expanded_set)		# group by parent
 				row[:] = expanded_row
+			return np.asarray(ID_arr)
 
 
-			# '''check for duplicate triangles in order of birth time'''
-			# all_tris=set()
-			# for row in ID_array:
-			# 	unique_row=[]
-			# 	for tri in row:
-			# 		tr=set(tri)
-			# 		if tr not in all_tris:
-			# 			unique_row.append(tri)
-			# 			all_tris.add(tr)
-			# 	row[:]=unique_row
+
+		def remove_duplicates_all(ID_arr):
+			"""Omit simplexes that have been already added to the filtration or are
+			repeated within a row
+			"""
+			all_tris = set()
+			dups_count = 0
+			for row in ID_arr:
+				unique_row = []
+				for tri in row:
+					tr = frozenset(tri)
+					if tr in all_tris:
+						dups_count += 1
+					else:
+						unique_row.append(tri)
+						all_tris.add(tr)
+
+				row[:] = unique_row
+				# print dups_count
+			return np.asarray(ID_arr)
 
 
-		filt_ID_array = group_by_birth_time(filt_ID_list)		# 1d list -> 2d array
-		expand_to_2simplexes(filt_ID_array)
-		# add _remove_duplicates() here IFF we want to process data before going in to perseus
-		# might run faster if we don't give perseus a filtration where simplexes are reborn
-		return filt_ID_array
+		def remove_duplicates_row(ID_arr):
+			'''
+			Omit duplicate simplexes within a row.
+			It appears that there are actually no duplicates of this nature
+			'''
+			dups_count = 0
+			for row in ID_arr:
+				sets_row = [frozenset(tri) for tri in row]
+				unique_row = np.asarray(sets_row)
+				dups_count += len(row) - len(unique_row)
+				print dups_count
+				row[:] = unique_row
+			return ID_arr
+
+
+		def count_triangles(ID_arr):
+			tri_count = 0
+			f = open('../output/run_info/num_triangles.txt', 'w')
+			for i, row in enumerate(ID_arr):
+				tris = [simp for simp in row if len(simp) == 3]
+				tri_count += len(tris)
+				f.write('frame {}: {}\n'.format(i + 1, tri_count))
+			f.close()
+
+
+		print 'group by birth time'
+		ID_array = group_by_birth_time(filt_ID_list)		# 1d list -> 2d array
+		print 'expand to 2-simplexes'
+		ID_array = expand_to_2simplexes(ID_array)
+		print 'remove duplicates'
+		ID_array = remove_duplicates_all(ID_array)
+		print 'count triangles'
+		count_triangles(ID_array)
+		return ID_array
+
+
 
 	def _get_intervals(self, silent=False):
 

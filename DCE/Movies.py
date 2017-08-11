@@ -7,47 +7,66 @@ import sys
 from Utilities import pwd
 
 from Tools import auto_tau, auto_crop
+from config import WAV_SAMPLE_RATE
 
 from MovieTools import remove_old_frames
 from MovieTools import prep_save_worms_single, save_worms_single, prep_save_worms_double, save_worms_double
-
-WAV_SAMPLE_RATE = 44100
 
 
 def slide_window(
 		in_filename,
 		out_filename,
+		time_units='seconds',
 		window_size=.5,    # seconds
-		step_size=.1,      # seconds
+		window_step=.1,      # seconds
 		tau=10,
 		ds_rate=1,
 		m=2,  # embed dimension
-		save_trajectories=True,
-		save_movie=True
+		save_movie=True,
+		crop=None
 	):
 
-	if save_trajectories: prep_save_worms_single()
 
-	remove_old_frames()
+	if save_movie: remove_old_frames()
 
-	worm_length = sum(1 for line in open(in_filename)) / WAV_SAMPLE_RATE
-	num_frames = worm_length/step_size
+	if isinstance(in_filename, basestring): sig = np.loadtxt(in_filename)
+	else: sig = in_filename
 
-	for i, start in enumerate(np.arange(0, worm_length, step_size)):
+	if crop:
+		if time_units == 'samples':
+			pass
+		elif time_units == 'seconds':
+			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		else:
+			print 'ERROR: invalid time_units'
+			sys.exit()
+		sig = sig[crop[0] : crop[1]]
+
+	if time_units == 'seconds': worm_length = len(sig) / WAV_SAMPLE_RATE
+	else: worm_length = len(sig)
+
+	num_frames = worm_length / window_step
+
+	trajs = []
+
+	for i, start in enumerate(np.arange(0, worm_length, window_step)):
 		print 'frame %i of %i' % (i, num_frames)
 
-		embed_crop = [start, start + window_size]
-		sig = np.loadtxt(in_filename)
-		DCE.embed_v1(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m, ds_rate=ds_rate)
-		DCE.embed_v1(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m, ds_rate=ds_rate)
-
-		if save_trajectories: save_worms_single('{:d}-{}'.format(i, in_filename), i, tau, embed_crop)
+		crop = [start, start + window_size]
+		# DCE.embed_v1(sig, 'DCE/temp_data/embedded_coords.txt', crop, tau, m, ds_rate=ds_rate)
+		traj = DCE.embed(sig, tau, m, crop=crop, ds_rate=ds_rate, time_units=time_units)
+		trajs.append(traj)
 
 		if save_movie:
-			Plots.make_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
+			Plots.make_frame(traj, in_filename, 'DCE/frames/frame%03d.png' % i, crop, tau, m)
 
 	if save_movie:
 		frames_to_movie(out_filename, framerate=1)
+
+	return trajs
+
+
+
 
 def vary_tau(
 		in_filename,
@@ -57,25 +76,25 @@ def vary_tau(
 		embed_crop=(1, 2),
 		ds_rate=1,
 		m=2,  # embed dimension
-		save_trajectories=True,
 		save_movie=True,
 	):
 
-	remove_old_frames()
+	if save_movie: remove_old_frames()
 
-	if save_trajectories: prep_save_worms_single()
+	trajs = []
+
 
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
 		sig = np.loadtxt(in_filename)
 		DCE.embed_v1(sig, 'DCE/temp_data/embedded_coords.txt', embed_crop, tau, m,  ds_rate=ds_rate)
+		traj = DCE.embed(sig, tau, m, crop=embed_crop, ds_rate=ds_rate, time_units='seconds')
+		trajs.append(traj)
+		if save_movie: Plots.make_frame(traj, in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
 
-		if save_trajectories: save_worms_single('{:d}-{}'.format(i, in_filename), i, int(tau), embed_crop)
+	if save_movie: frames_to_movie(out_filename, framerate=1)
 
-		if save_movie: Plots.make_frame('DCE/temp_data/embedded_coords.txt', in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
-
-	if save_movie:
-		frames_to_movie(out_filename, framerate=1)
+	return trajs
 
 
 def compare_vary_tau(

@@ -8,7 +8,7 @@ from sklearn import svm
 import sys
 import random
 
-from DCE.Plots import plot_waveform, plot_waveform_zoom
+from DCE.Plots import plot_signal, plot_signal_zoom
 
 WAV_SAMPLE_RATE = 44100.
 
@@ -26,7 +26,7 @@ def get_sigs(dir, dir_base, idxs, crop):
 		if show_fig:
 			fig = plt.figure()
 			ax = fig.add_subplot(111)
-			plot_waveform(ax, sig, crop)
+			plot_signal(ax, sig, crop)
 			fig.show()
 			ans = raw_input('next, continue, or exit? (n/c/q)')
 			if ans == 'q': sys.exit()
