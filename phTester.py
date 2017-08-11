@@ -9,7 +9,7 @@ from PH import make_movie, make_PD, make_PRF_plot
 
 import time
 
-set_test = 102		# set test number here or with command line argument
+set_test = 0		# set test number here or with command line argument
 
 
 
@@ -455,18 +455,290 @@ start_time = time.time()
 #	test format changed May 2017, all preceding tests will not run
 ########################################################################################################################
 
+# test = 100
+if test == 100:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
+			'always_euclidean': True
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+
+	make_movie(
+		filtration,
+		'output/PH/test_euc.mp4',
+	)
+
+# test = 101
+if test == 101:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
+			'd_use_hamiltonion': 5,
+			'always_euclidean': False,
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_ham_p_5.mp4',
+	)
+
+# test = 102
+# NOT IMPLEMENTED #
+# if test == 102:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_speed_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_speed5.mp4',
+# 	)
+
+
+# test = 103
+if test == 103:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
+
+			'd_orientation_amplify': 5,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_orient5.mp4',
+	)
+
+
+# test = 104
+# NOT IMPLEMENTED #
+# if test == 104:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_stretch_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_stretch5.mp4',
+# 	)
+
+
+# test = 105
+# NOT IMPLEMENTED #
+# if test == 105:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_ray_distance_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_ray5.mp4',
+# 	)
+
+
+# test = 106
+# NOT IMPLEMENTED #
+# if test == 106:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'use_ne_for_maxmin': True,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_ne.mp4',
+# 	)
+
+# test = 107
+if test == 107:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
+
+			'd_use_hamiltonion': 0,
+			'm2_d': 10,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_m2d10.mp4',
+	)
+
+
+
+
+# test = 108
+if test == 108:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+
+			"d_cov": 20,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_dcov+20.mp4',
+	)
+
+# test = 109
+if test == 109:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+
+			"d_cov": -20,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_dcov-20.mp4',
+	)
+
+test = 110
+if test == 110:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -10,
+			'num_divisions': 10,
+			'd_use_hamiltonion': 0,
+			# 'use_euclid'
+			'graph_induced': True
+		})
+
+	filtration = Filtration(in_filename, filt_params)
+
+
+
 
 if test == 16:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
 	filt_params.update(
 		{
-			'ds_rate': 50,
+			'ds_rate': 40,
 			'worm_length': 2000,
+			'd_use_hamiltonion': -5,
+			'always_euclidean' : False,
+
 			# 'min_filtration_param': .001,
 			# 'max_filtration_param': .015,
-			'max_filtration_param': -10,
-			'num_divisions': 20,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
 			# 'use_cliques': True
 		})
 
@@ -474,23 +746,10 @@ if test == 16:
 	filtration = Filtration(in_filename, filt_params)
 	# filtration = load_saved_filtration()		# reuses previous filtration
 
-	# make_PD(
-	# 	filtration,
-	# 	'output/PH/49-C135B_PD.png',
-	# )
-	#
-	# make_PRF_plot(
-	# 	filtration,
-	# 	'output/PH/49-C135B_PRF.png',
-	# 	PRF_res=50
-	#
-	# )
-	#
-
 
 	make_movie(
 		filtration,
-		'output/PH/49-C135B_movie.mp4',
+		'output/PH/test16_ham5.mp4',
 		color_scheme='highlight new'
 	)
 
@@ -669,162 +928,6 @@ if test == 22:
 
 
 
-
-
-
-############### IDA PAPER FIGURES ###############
-
-
-if test == 100:
-	# figure 2b
-	in_filename = "datasets/IDA_PAPER/piano_traj.txt"
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 10,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .005,
-			'num_divisions': 2,
-			'use_cliques': False
-		})
-
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()
-
-
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
-
-	plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3.png')
-
-	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
-
-
-if test == 101:
-	# figure 2c
-
-	from DCE.DCE import embed
-	sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
-	traj = embed(sig, tau=.01192, m=2, time_units='seconds', embed_crop=(1.72132, 1.77132), normalize=True)
-
-	# in_filename = 'datasets/IDA_PAPER/49-C135B.txt'
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 40,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .006,
-			'num_divisions': 10,
-			'use_cliques': False
-		})
-
-	filtration = Filtration(traj, filt_params)
-	# filtration = load_saved_filtration()
-
-
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
-
-	plot_filtration_pub(filtration, 8, 'output/IDA_PAPER/fig2c.png')
-
-	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig2c_PD.png')
-
-
-if test == 102:
-	# figure 2a
-	in_filename = "datasets/IDA_PAPER/49-C135B.txt"
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 1,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .005,
-			'num_divisions': 2,
-			'use_cliques': False
-		})
-
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()
-
-	#
-	# make_movie(
-	# 	filtration,
-	# 	"output/IDA_PAPER/49-C135B.mp4",
-	# 	color_scheme='none',
-	# )
-
-	# plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3.png')
-	#
-	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
-
-
-
-
-if test == 103:
-	# figure 3
-	in_filename = "datasets/IDA_PAPER/piano_traj.txt"
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 10,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .011,
-			'num_divisions': 20,
-			'use_cliques': False
-		})
-
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()
-
-
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
-
-	plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig3a.png')
-	plot_filtration_pub(filtration, 3, 'output/IDA_PAPER/fig3b.png')
-	plot_filtration_pub(filtration, 5, 'output/IDA_PAPER/fig3c.png')
-	plot_filtration_pub(filtration, 7, 'output/IDA_PAPER/fig2bcheck.png')
-
-	plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
-
-if test == 104:
-	# figure 4
-	in_filename = "datasets/IDA_PAPER/piano_traj.txt"
-	filt_params = parameter_set
-	filt_params.update(
-		{
-			'ds_rate': 10,
-			'worm_length': 2000,
-			'min_filtration_param': .001,
-			'max_filtration_param': .011,
-			'num_divisions': 20,
-			'use_cliques': False
-		})
-	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()
-	make_movie(
-		filtration,
-		"output/IDA_PAPER/49-C135B.mp4",
-		color_scheme='none',
-	)
-	# plot_filtration_pub(filtration, 1, 'output/IDA_PAPER/fig
-	# plot_filtration_pub(filtration, 3, 'output/IDA_PAPER/fig
-	# plot_filtration_pub(filtration, 5, 'output/IDA_PAPER/fig
-	# plot_filtration_pub(filtration, 7, 'output/IDA_PAPER/fig
-	# plot_PD_pub(filtration, 'output/IDA_PAPER/fig3_PD.png')
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 
