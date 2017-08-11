@@ -31,8 +31,8 @@ def letter_label(ax, label, nudge_r=0.):
 		)
 	)
 
-def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
-	def add_persistence_plot(ax, filtration, cax):
+def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True, fig=None):
+	def add_persistence_plot(ax, filtration):
 
 		min_lim = 0
 		max_lim = np.max(filtration.epsilons)
@@ -111,28 +111,35 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 		# count by color #
 		##################
 
-		levels = [1, 2, 3, 4, 5]
+		sc = None
 
 		if len(data.mortal) > 0:
 			x_mor, y_mor, count_mor = data.mortal
-			sc = ax.scatter(x_mor, y_mor, s=70, c=count_mor, clip_on=True, zorder=100, alpha=1,
-							# )
+			sc = ax.scatter(x_mor, y_mor, s=70,
+							c=count_mor, alpha=.8,
+							clip_on=True, zorder=100,
 							vmin=1, vmax=5)
-			if cax is not None:
-				cb = plt.colorbar(sc, extend='max', cax=cax, values=levels, alpha=1.0)
-				cb.set_yticks(levels)
 
 
 		if len(data.immortal) > 0:
 			x_imm, count_imm = data.immortal
 
 			y_imm = [max_lim for i in x_imm]
-			ax.scatter(x_imm, y_imm, marker='^', s=120, c=count_imm, clip_on=False, zorder=100, alpha=1,
-					   # )
-					   vmin=1, vmax=5)
+			sc = ax.scatter(x_imm, y_imm, marker='^', s=120,
+							c=count_imm, alpha=.8,
+							clip_on=False, zorder=100,
+					 		vmin=1, vmax=5)
 
+		if cbar and sc:
+			levels = [1, 2, 3, 4, 5]
 
+			cb = plt.colorbar(sc, extend='max', extendrect=True, extendfrac=.2, ax=ax, values=levels)
 
+			cb.ax.text(1.5, 0.10, '1')
+			cb.ax.text(1.5, 0.35, '2')
+			cb.ax.text(1.5, 0.60, '3')
+			cb.ax.text(1.5, 0.85, '4')
+			cb.ax.text(1.5, 1.10, '5+')
 
 	if isinstance(out_filename, basestring):
 		fig = pyplot.figure(figsize=(6, 6), dpi=500)
@@ -142,14 +149,12 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True):
 
 	else:
 		ax = out_filename
-		if cbar is True:
-			divider = make_axes_locatable(ax)
-			cax = divider.append_axes('right', size='5%', pad=0.1)
-		else:
-			cax = None
-		add_persistence_plot(ax, filtration, cax)
+		# if cbar is True:
+			# divider = make_axes_locatable(ax)
+			# cax = divider.append_axes('right', size='5%', pad=0.1)
+		add_persistence_plot(ax, filtration)
 
-	ax.text(.75, .25, r'   $\beta_1$   ',
+	ax.text(.75, .5, r'   $\beta_1$   ',
 			horizontalalignment='center',
 			verticalalignment='center',
 			size='x-large',
@@ -314,7 +319,7 @@ def plot_waveform_sec(
 	# 			transform=ax.transAxes)
 
 	if label:
-		letter_label(ax, label, nudge_r=.02)
+		letter_label(ax, label, nudge_r=.03)
 
 	if yticks is not None:
 		ax.yaxis.set_ticks(yticks)

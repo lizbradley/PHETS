@@ -118,6 +118,22 @@ def roc_data(mean, var, tests_true, tests_false, k_arr):
 def roc_title(label, mode):
 	return 'is it a {}? [{}]'.format(label, mode)
 
+def letter_label(ax, label, nudge_r=0.):
+	ax.text(
+		.95 + nudge_r, .1, label,
+		size='large',
+		horizontalalignment='right',
+		verticalalignment='top',
+		transform=ax.transAxes,
+		bbox=dict(
+			alpha=1,
+			facecolor='white',
+			edgecolor='black',
+			pad=5,
+			boxstyle='round, pad=.5'
+		)
+	)
+
 
 def plot_fig(data, k, label_1, label_2, window_length, fname, pub):
 	fig = plt.figure(figsize=(10, 8), tight_layout=True, dpi=500)
@@ -126,6 +142,12 @@ def plot_fig(data, k, label_1, label_2, window_length, fname, pub):
 	ax2 = fig.add_subplot(222)
 	ax3 = fig.add_subplot(223)
 	ax4 = fig.add_subplot(224)
+
+	letter_label(ax1, ' a ')
+	letter_label(ax2, ' b ')
+	letter_label(ax3, ' c ')
+	letter_label(ax4, ' d ')
+
 
 	fig.subplots_adjust(right=0.8)
 	cax = fig.add_axes([0.92, 0.05, 0.03, 0.9])
@@ -145,6 +167,11 @@ def plot_fig(data, k, label_1, label_2, window_length, fname, pub):
 	bounds = np.arange(k[0], k[1] + .5, .5)
 	cb = fig.colorbar(cm, cax=cax, boundaries=bounds)
 	cb.set_label("$k$", labelpad=-1, size=19)
+
+	labels = bounds[::2]
+	loc = labels + .25
+	cb.set_ticks(loc)
+	cb.set_ticklabels([int(l) for l in labels])
 	cb.ax.tick_params(labelsize=14)
 
 	if not pub:

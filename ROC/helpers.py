@@ -115,7 +115,7 @@ def plot_roc(ax, data, k, title):
 
 	fpr_sp, tpr_sp = data_sp
 
-	cm = ax.scatter(fpr_sp, tpr_sp, s=150, zorder=10, clip_on=False, c=k_sp, alpha=1)
+	cm = ax.scatter(fpr_sp, tpr_sp, s=150, zorder=10, clip_on=False, c=k_sp)
 
 
 
