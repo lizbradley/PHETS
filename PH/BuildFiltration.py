@@ -58,7 +58,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	# always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov==0.
 	# print "always_euclidean set to ", always_euclidean
 	always_euclidean = get_param('always_euclidean')
-	# use_hamiltonian = -5
+	use_hamiltonian = get_param('d_use_hamiltonion')
 
 	filtration = Set()
 	extra_data = None
@@ -323,6 +323,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		p = subprocess.Popen(find_landmarks_cmd)
 		p.communicate()
 
+	if m2_d!=0:
+		number_of_datapoints = int(number_of_datapoints-m2_d)
 	## Build and sort distance matrix.
 	landmarks_file = open("landmark_outputs.txt","rb")
 
