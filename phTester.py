@@ -629,7 +629,7 @@ if test == 103:
 # 		'output/PH/test_ne.mp4',
 # 	)
 
-test = 107
+# test = 107
 if test == 107:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
@@ -705,7 +705,22 @@ if test == 109:
 		'output/PH/test_dcov-20.mp4',
 	)
 
+test = 110
+if test == 110:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -10,
+			'num_divisions': 10,
+			'd_use_hamiltonion': 0,
+			# 'use_euclid'
+			'graph_induced': True
+		})
 
+	filtration = Filtration(in_filename, filt_params)
 
 
 

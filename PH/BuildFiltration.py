@@ -55,10 +55,9 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	straight_VB = float(get_param("straight_VB"))
 	d_cov = get_param("d_cov")
 	graph_induced = get_param("graph_induced")
-	# always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov==0.
-	# print "always_euclidean set to ", always_euclidean
-	always_euclidean = get_param('always_euclidean')
 	use_hamiltonian = get_param('d_use_hamiltonion')
+
+	always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov==0.
 
 	filtration = Set()
 	extra_data = None
@@ -143,7 +142,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-e {}".format(downsample_rate),
 					"-x {}".format(d_cov),
 					"-c",
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -182,7 +182,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-s {}".format(stretch),
 					"-x {}".format(d_cov),
 					"-e {}".format(downsample_rate),
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -220,7 +221,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-v {}".format(straight_VB),
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -257,7 +259,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
 					"-c",
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -294,7 +297,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-v {}".format(straight_VB),
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
