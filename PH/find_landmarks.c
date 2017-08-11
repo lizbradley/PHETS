@@ -99,10 +99,7 @@ bool             done = false;
 bool 			 quiet = true;
 
 
-void dprint(char *c);
 void print_matrix(float *A);
-float std_dev(float d[],int s);
-float calc_error(float d,int n);
 int comp (const void * elem1, const void * elem2) ;
 bool in_matrix(int* matrix,int size,int value);
 int main(int argc, char* argv[]){
@@ -781,7 +778,6 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 							}	
 						}
 						qsort(R, sizeof(R)/sizeof(*R), sizeof(*R), comp);
-
 						md = -1*max_filtration_param;
 						K[i] = R[md];
 					}
@@ -800,29 +796,76 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 				}
 			}
 			max_e = min_d;
-			
 		}
 
 		int *A = (int*) calloc(num_wits*num_wits,sizeof(int));
-		fprintf(fp,"# max epsilon is %f\n",max_e);
-		fprintf(fp,"# eps: edgelist of landmarks\n");
+		int nd= num_divs;
+		
 		float thresh = 0.0;
-		for(r = 0; r<num_divs;r++){
+		// assemble adjacency matrix
+		int m=0; //number of total edges
+		for(t = 0; t<num_divs;t++){
 			thresh += (max_e/num_divs);
-			fprintf(fp,"%f:",thresh);
 			for(i=0;i<num_wits;i++){
 				for(j=0;j<num_wits;j++){
-					if(distances[i*num_wits+j]<=thresh && closest[i]!= closest[j] && A[closest[i]*num_wits+closest[j]]!=1){
-						A[closest[i]*num_wits+closest[j]] = 1;
-						A[closest[j]*num_wits+closest[i]] = 1;
-						fprintf(fp," [%d,%d]",closest[i],closest[j]);
+					if(distances[i*num_wits+j]<=thresh && closest[i]!= closest[j]){
+						if(A[closest[i]*num_wits+closest[j]]==0){
+							A[closest[i]*num_wits+closest[j]] = t+1;
+							A[closest[j]*num_wits+closest[i]] = t+1; //ask Nikki if we need to check both distance value in matrix i.e. d[i,j] and d[j,i] for nonsymmetric distance matrices
+							m+=1;	
+						}
+					}
+				}
+			}
+		}
+
+
+
+		thresh = 0.;
+		if(!quiet){
+			printf("Searching for triangles and edges...\n");
+			printf("Number of total edges: %d\n",m);
+			fflush(stdout);
+		}
+		int l1,l2,l3;
+		bool found_tri;
+		int nt,ne;
+		for(t=0;t<num_divs;t++){
+			thresh+=(max_e/num_divs);
+			fprintf(fp,"%f:",thresh);
+			nt = 0;
+			ne=0;
+			for(i=0;i<num_landmarks;i++){
+				l1 = landmarks[i];
+				for(j=0;j<num_landmarks;j++){
+					l2 = landmarks[j];
+					found_tri=false;
+					if(l1!=l2 && A[l1*num_wits+l2]!=0 && A[l1*num_wits+l2]<=t+1){ // is edge in this filtration step
+						// check for triangle
+						for(k=0;k<num_landmarks;k++){
+							l3 = landmarks[k];
+							if(l3!=l2 && l3!=l1 && A[l1*num_wits+l3]!=0 && A[l1*num_wits+l3]<=t+1 && A[l2*num_wits+l3]!=0 && A[l2*num_wits+l3]<=t+1){
+								//check if triangle is new by checking if one of the edges is new in this step, does not account for duplicate triangles within a given threshold only accross thresholds
+								if(A[l1*num_wits+l3]>t || A[l2*num_wits+l3]>t || A[l1*num_wits+l2]>t){ 
+									found_tri=true;
+									fprintf(fp," [%d,%d,%d]",l1,l2,l3);
+									nt++;
+								}
+							}
+						}
+						if(!found_tri && A[l1*num_wits+l2]>t){ //check if edge is new in this filtration step
+							ne++;
+							fprintf(fp," [%d,%d]",l1,l2);
+						}
 					}
 				}
 			}
 			fprintf(fp,"\n");
+			if(!quiet){
+				printf("Threshold = %f Number of edges: %d Number of triangles: %d\n",thresh,ne,nt);
+				fflush(stdout);
+			}
 		}
-		
-		
 		
 		printf("done\n");
 		fflush(stdout);
@@ -830,6 +873,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		fclose(fp);
 		free(closest);  // added by elliott 4/29
 		free(A);
+
 	}
 /******************************************************************/
 
@@ -905,38 +949,11 @@ bool in_matrix(int *matrix, int size,int value){
 	}
 	return false;
 }
-void print_matrix(float *A){
-	for(i=0;i<num_wits;i++){
-		for(j=0;j<num_wits;j++){
-			printf("%.2f ",A[i*num_wits+j]);
-		}
-		printf("\n");
-	}
-}
-
-void dprint(char *c){
-	printf("DUBUGGING STATEMENT\t[");
-	printf(c);
-	printf("]\n");
-	fflush(stdout);
-}
 
 
-float std_dev(float d[],int n){
-    float sum=0.0;
-    int z;
-    for(z=0; z<n;z++){
-        sum+=d[z];
-    }
-    float mean=sum/(float)n;
-    sum=0.0;
-    for(z=0;z<n;z++){
-        sum+=(d[z]-mean)*(d[z]-mean);
-    }
-    return sqrt(sum/(float)n);
-}
 
-float calc_error(float dev,int n){
-    float e=1.96*dev/(float)sqrt(n);
-    return e;
-}
+
+
+
+
+
