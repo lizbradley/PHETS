@@ -323,6 +323,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		p = subprocess.Popen(find_landmarks_cmd)
 		p.communicate()
 
+	if m2_d!=0:
+		number_of_datapoints = int(number_of_datapoints-m2_d)
 	## Build and sort distance matrix.
 	landmarks_file = open("landmark_outputs.txt","rb")
 

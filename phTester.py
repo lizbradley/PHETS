@@ -478,7 +478,7 @@ if test == 100:
 		'output/PH/test_euc.mp4',
 	)
 
-test = 101
+# test = 101
 if test == 101:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
@@ -629,7 +629,7 @@ if test == 103:
 # 		'output/PH/test_ne.mp4',
 # 	)
 
-# test = 107
+test = 107
 if test == 107:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
@@ -640,6 +640,7 @@ if test == 107:
 			'max_filtration_param': .01,
 			'num_divisions': 10,
 
+			'd_use_hamiltonion': 0,
 			'm2_d': 10,
 
 		})
