@@ -6,7 +6,13 @@ from PH import make_movie, make_PD, make_PRF_plot
 from PubPlots import plot_PD_pub, plot_filtration_pub
 from config import default_filtration_params as parameter_set
 
+
+import time
+
+set_test = 0		# set test number here or with command line argument
+
 set_test = 16		# set test number here or with command line argument
+
 
 
 
@@ -452,18 +458,290 @@ start_time = time.time()
 #	test format changed May 2017, all preceding tests will not run
 ########################################################################################################################
 
+# test = 100
+if test == 100:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
+			'always_euclidean': True
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+
+	make_movie(
+		filtration,
+		'output/PH/test_euc.mp4',
+	)
+
+# test = 101
+if test == 101:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
+			'd_use_hamiltonion': 5,
+			'always_euclidean': False,
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_ham_p_5.mp4',
+	)
+
+# test = 102
+# NOT IMPLEMENTED #
+# if test == 102:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_speed_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_speed5.mp4',
+# 	)
+
+
+# test = 103
+if test == 103:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
+
+			'd_orientation_amplify': 5,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_orient5.mp4',
+	)
+
+
+# test = 104
+# NOT IMPLEMENTED #
+# if test == 104:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_stretch_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_stretch5.mp4',
+# 	)
+
+
+# test = 105
+# NOT IMPLEMENTED #
+# if test == 105:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'd_ray_distance_amplify': 5,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_ray5.mp4',
+# 	)
+
+
+# test = 106
+# NOT IMPLEMENTED #
+# if test == 106:
+# 	in_filename = "datasets/trajectories/btc2milIC123.txt"
+# 	filt_params = parameter_set
+# 	filt_params.update(
+# 		{
+# 			'ds_rate': 40,
+# 			'worm_length': 2000,
+# 			'max_filtration_param': .01,
+# 			'num_divisions': 10,
+#
+# 			'use_ne_for_maxmin': True,
+#
+# 		})
+#
+#
+# 	filtration = Filtration(in_filename, filt_params)
+# 	# filtration = load_saved_filtration()		# reuses previous filtration
+#
+# 	make_movie(
+# 		filtration,
+# 		'output/PH/test_ne.mp4',
+# 	)
+
+# test = 107
+if test == 107:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
+
+			'd_use_hamiltonion': 0,
+			'm2_d': 10,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_m2d10.mp4',
+	)
+
+
+
+
+# test = 108
+if test == 108:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+
+			"d_cov": 20,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_dcov+20.mp4',
+	)
+
+# test = 109
+if test == 109:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+
+			"d_cov": -20,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/PH/test_dcov-20.mp4',
+	)
+
+test = 110
+if test == 110:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -10,
+			'num_divisions': 10,
+			'd_use_hamiltonion': 0,
+			# 'use_euclid'
+			'graph_induced': True
+		})
+
+	filtration = Filtration(in_filename, filt_params)
+
+
+
 
 if test == 16:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
 	filt_params.update(
 		{
-			'ds_rate': 50,
+			'ds_rate': 40,
 			'worm_length': 2000,
+			'd_use_hamiltonion': -5,
+			'always_euclidean' : False,
+
 			# 'min_filtration_param': .001,
 			# 'max_filtration_param': .015,
-			'max_filtration_param': -10,
-			'num_divisions': 20,
+			'max_filtration_param': .01,
+			'num_divisions': 10,
 			# 'use_cliques': True
 		})
 
@@ -471,23 +749,11 @@ if test == 16:
 	filtration = Filtration(in_filename, filt_params)
 	# filtration = load_saved_filtration()		# reuses previous filtration
 
-	# make_PD(
-	# 	filtration,
-	# 	'output/PH/49-C135B_PD.png',
-	# )
-	#
-	# make_PRF_plot(
-	# 	filtration,
-	# 	'output/PH/49-C135B_PRF.png',
-	# 	PRF_res=50
-	#
-	# )
-	#
-
 
 	make_movie(
 		filtration,
-		'output/PH/test16.mp4',
+
+		'output/PH/test16_ham5.mp4',
 		color_scheme='highlight new'
 	)
 
@@ -665,6 +931,8 @@ if test == 22:
 	# 								# of cycles through color gradient. (ie use larger cycles for faster color changes.)
 	# 	framerate=1,
 	# )
+
+
 
 
 if test == 23:

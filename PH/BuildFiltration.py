@@ -32,9 +32,14 @@ def sort(i):
 
 
 
-f = open("output/run_info/build_filtration_memory.txt","wb")
 
-@profile(stream=f)
+
+# f = open("output/PH/build_filtration_memory.txt","wb")
+
+# f = open("output/run_info/build_filtration_memory.txt","wb")
+
+#
+# @profile(stream=f)
 def build_filtration(input_file_name, parameter_set, silent=False):
 	num_threads = 2
 	global d
@@ -49,14 +54,15 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	orientation_amplify = float(get_param("d_orientation_amplify"))
 	stretch = float(get_param("d_stretch"))
 	ray_distance_amplify = get_param("d_ray_distance_amplify")
-	use_hamiltonian = float(get_param("d_use_hamiltonian"))
+	use_hamiltonian = get_param("d_use_hamiltonian")
+	print "use hamiltonian set to ", use_hamiltonian
 	m2_d = float(get_param("m2_d"))
 	straight_VB = float(get_param("straight_VB"))
 	d_cov = get_param("d_cov")
 	graph_induced = get_param("graph_induced")
+	use_hamiltonian = get_param('d_use_hamiltonion')
+
 	always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov==0.
-
-
 
 	filtration = Set()
 	extra_data = None
@@ -141,7 +147,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-e {}".format(downsample_rate),
 					"-x {}".format(d_cov),
 					"-c",
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -180,7 +187,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-s {}".format(stretch),
 					"-x {}".format(d_cov),
 					"-e {}".format(downsample_rate),
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -218,7 +226,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-v {}".format(straight_VB),
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -255,7 +264,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
 					"-c",
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -292,7 +302,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-v {}".format(straight_VB),
 					"-x {}".format(d_cov),
 					"-s {}".format(stretch),
-					"-f {}".format(max_filtration_param)
+					"-f {}".format(max_filtration_param),
+					"-d {}".format(num_divisions)
 				]
 			else:
 				find_landmarks_cmd = [
@@ -312,6 +323,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-s {}".format(stretch)
 				]
 
+	print find_landmarks_cmd
+
 	if silent:
 		p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)
 		out, err = p.communicate()
@@ -319,6 +332,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		p = subprocess.Popen(find_landmarks_cmd)
 		p.communicate()
 
+	if m2_d!=0:
+		number_of_datapoints = int(number_of_datapoints-m2_d)
 	## Build and sort distance matrix.
 	landmarks_file = open("landmark_outputs.txt","rb")
 
