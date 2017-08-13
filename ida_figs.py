@@ -30,7 +30,7 @@ ticks = [-1, -.33, .33, 1]
 # ticks = None
 
 
-def	fig1():
+def fig1():
 	print 'figure 1...'
 	# figure 1a, 1b
 	# add time (s) label
@@ -65,10 +65,10 @@ def fig2():
 	print 'figure 2...'
 	# figure 2a, 2b, 2c
 
-	# fig = plt.figure(figsize=(10, 3.4), tight_layout=True, dpi=600)
-	# ax1 = fig.add_subplot(131)
-	# ax2 = fig.add_subplot(132)
-	# ax3 = fig.add_subplot(133)
+	fig = plt.figure(figsize=(10, 3.4), tight_layout=True, dpi=600)
+	ax1 = fig.add_subplot(131)
+	ax2 = fig.add_subplot(132)
+	ax3 = fig.add_subplot(133)
 
 	# 2a #
 
@@ -84,15 +84,15 @@ def fig2():
 
 	filtration = Filtration(piano_traj, filt_params)
 
-	# plot_filtration_pub(
-	# 	filtration, 2,
-	# 	ax1,
-	# 	landmark_size=3,
-	# 	line_width=.3,
-	# 	show_eps=False,
-	# 	label=' a ',
-	# 	ticks=ticks
-	# )
+	plot_filtration_pub(
+		filtration, 2,
+		ax1,
+		landmark_size=3,
+		line_width=.3,
+		show_eps=False,
+		label=' a ',
+		ticks=ticks
+	)
 
 	# 2b #
 
@@ -106,17 +106,17 @@ def fig2():
 			'use_cliques': False,
 		})
 
-	# filtration = Filtration(piano_traj, filt_params)
+	filtration = Filtration(piano_traj, filt_params)
 
-	# plot_filtration_pub(
-	# 	filtration, 2,
-	# 	ax2,
-	# 	landmark_size=10,
-	# 	show_eps=False,
-	# 	label=' b ',
-	# 	ticks=ticks,
-	#
-	# )
+	plot_filtration_pub(
+		filtration, 2,
+		ax2,
+		landmark_size=10,
+		show_eps=False,
+		label=' b ',
+		ticks=ticks,
+
+	)
 
 	# 2c #
 
@@ -130,18 +130,18 @@ def fig2():
 			'use_cliques': False,
 		})
 
-	# filtration = Filtration(piano_traj, filt_params)
+	filtration = Filtration(piano_traj, filt_params)
 
-	# plot_filtration_pub(
-	# 	filtration, 2,
-	# 	ax3,
-	# 	landmark_size=15,
-	# 	show_eps=False,
-	# 	label=' c ',
-	# 	ticks=ticks,
-	# )
+	plot_filtration_pub(
+		filtration, 2,
+		ax3,
+		landmark_size=15,
+		show_eps=False,
+		label=' c ',
+		ticks=ticks,
+	)
 
-	# plt.savefig(paper_path + 'fig2.png')
+	plt.savefig(paper_path + 'fig2.png')
 
 
 def fig3():
@@ -285,7 +285,7 @@ def fig5():
 	PRF_vs_FFT_v2(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
 		'datasets/time_series/viol/40-viol.txt',
-		paper_path + 'fig5.png',
+		paper_path + 'fig5_ktest.png',
 
 		'clarinet',
 		'viol',
@@ -372,9 +372,9 @@ def fig6():
 
 if __name__ == '__main__':
 	pass
-	# fig1()
+	fig1()
 	# fig2()
 	# fig3()
 	# fig4()
-	fig5()
+	# fig5()
 	# fig6()

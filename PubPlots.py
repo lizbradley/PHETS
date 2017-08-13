@@ -312,11 +312,6 @@ def plot_waveform_sec(
 
 	ax.plot(t, sig, c='k', lw=.5)
 
-	# if label:
-	# 	ax.text(.97, .95, label,
-	# 			horizontalalignment='center',
-	# 			verticalalignment='center',
-	# 			transform=ax.transAxes)
 
 	if label:
 		letter_label(ax, label, nudge_r=.03)

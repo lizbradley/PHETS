@@ -164,12 +164,14 @@ def plot_fig(data, k, label_1, label_2, window_length, fname, pub):
 		l, cm = plot_roc(ax2, prf_data_2, k, roc_title(label_2, 'PRF'))
 		lines.append(l)
 
-	bounds = np.arange(k[0], k[1] + .5, .5)
+	# bounds = np.arange(k[0], k[1] + .5, .5)
+	bounds = np.arange(k[0], k[1] + 1, 1)
 	cb = fig.colorbar(cm, cax=cax, boundaries=bounds)
 	cb.set_label("$k$", labelpad=-1, size=19)
 
 	labels = bounds[::2]
-	loc = labels + .25
+	# loc = labels + .25
+	loc = labels + .5
 	cb.set_ticks(loc)
 	cb.set_ticklabels([int(l) for l in labels])
 	cb.ax.tick_params(labelsize=14)
