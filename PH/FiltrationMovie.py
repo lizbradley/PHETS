@@ -136,6 +136,20 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 
 		cmds.append('q')
 
+		triangle_count = 1
+		for complex in complex_data:
+			for simplex in complex:
+				if len(simplex) == 1:
+					# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
+					pass
+				elif len(simplex) == 2:
+					add_arrow(simplex, cmds)
+				else:
+					add_poly(simplex, cmds, triangle_count)
+					triangle_count += 1
+
+
+
 
 	write_gnup_script()
 	p = subprocess.Popen(['gnuplot-x11', 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
