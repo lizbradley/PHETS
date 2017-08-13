@@ -1,23 +1,16 @@
-import os, sys, subprocess, time, io
+import io
+import subprocess
+import sys
+
+import matplotlib.image as mpimg
+import matplotlib.markers
+import matplotlib.pyplot as pyplot
 import numpy as np
 from matplotlib import collections
-import matplotlib.pyplot as pyplot
-import matplotlib.markers
 
-from matplotlib import animation
-import matplotlib.image as mpimg
-
-
-import Utilities
 from TitleBox import add_filename_table, add_filt_params_table, update_epsilon, add_movie_params_table
+from Utilities import remove_old_frames, frames_to_movie
 from config import gnuplot_str
-
-
-def remove_old_frames():
-	dir = 'PH/frames'
-	for f in os.listdir(dir):
-		if f.endswith(".png"):
-			os.remove(dir + f)
 
 
 def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_time):
@@ -41,65 +34,55 @@ def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_tim
 		edgecolor = (.5, prog, 1 - prog)
 
 	else:
-		print 'error:', scheme, 'is not a valid color scheme'
+		print 'ERROR:', scheme, 'is not a valid color scheme'
 
 	return facecolor, edgecolor
 
 
 
-def plot_2D_init(subplot, witness_data, landmark_data):
 
-	def plot_witnesses(subplot, attractor_data):
-		attractor_data = np.array(attractor_data)
-		x = attractor_data[:, 0]
-		y = attractor_data[:, 1]
-		return subplot.scatter(
-			x, y,
-			color='black',
-			marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'),
-			facecolor='black',
-			s=.1)
-
-	def plot_landmarks(subplot, landmark_data):
-		landmark_data = np.array(landmark_data)
-		x = landmark_data[:, 0]
-		y = landmark_data[:, 1]
-		return subplot.scatter(x, y, color='darkblue', s=35)
-
-	subplot.set_aspect('equal')
-	return [plot_witnesses(subplot, witness_data), plot_landmarks(subplot, landmark_data)]
+def plot_witnesses_2D(subplot, attractor_data):
+	attractor_data = np.array(attractor_data)
+	x = attractor_data[:, 0]
+	y = attractor_data[:, 1]
+	subplot.scatter(
+		x, y,
+		color='black',
+		marker=matplotlib.markers.MarkerStyle(marker='o', fillstyle='full'),
+		facecolor='black',
+		s=.1)
 
 
-def plot_2D_update(subplot, filtration, i, color_scheme, alpha):
-
-	def plot_complex(subplot, i, complex_data):
-		"""plots all complexes for full filtration"""
-		patches = []
-
-		triangle_count = 0
-		for j, simplexes_coords in enumerate(complex_data[:i]):
-
-			f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
-
-			simplexes = collections.PolyCollection(
-				simplexes_coords,
-				edgecolors=e_color,
-				facecolors=f_color,
-				lw=1,
-				alpha=alpha,
-				zorder=0,
-				animated=True,
-				antialiased=True)
-
-			patches.append(subplot.add_collection(simplexes))
+def plot_landmarks_2D(subplot, landmark_data):
+	landmark_data = np.array(landmark_data)
+	x = landmark_data[:, 0]
+	y = landmark_data[:, 1]
+	subplot.scatter(x, y, color='darkblue', s=35)
 
 
-		return patches
 
-	return plot_complex(subplot, i, filtration.get_complex_plot_data())
+def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
+
+	complex_data = filtration.get_complex_plot_data()
+
+	for j, simplexes_coords in enumerate(complex_data[:i + 1]):
+
+		f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
+
+		simplexes = collections.PolyCollection(
+			simplexes_coords,
+			edgecolors=e_color,
+			facecolors=f_color,
+			lw=1,
+			alpha=alpha,
+			zorder=0,
+			animated=True,
+			antialiased=True)
+
+		subplot.add_collection(simplexes)
 
 
-def plot_3D_update(subplot, filtration, i, camera_angle):
+def plot_all_3D(subplot, filtration, i, camera_angle):
 	def add_arrow(simplex, cmds):
 		set_arrow = ' '.join([
 			'set arrow from',
@@ -136,28 +119,15 @@ def plot_3D_update(subplot, filtration, i, camera_angle):
 		np.savetxt('witnesses.txt', witness_data)
 		np.savetxt('landmarks.txt', landmark_data)
 
-		complex_data = complex_data[:i]
+		complex_data = complex_data[:i + 1]
 
 		cmds = ['set terminal pngcairo size 700, 700',
-				'set view {}, {}'.format(*camera_angle)
-				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
+				'set view {}, {}'.format(*camera_angle),
+				'set output "PH/frames/frame{:02d}.png"'.format(i),
 				# 'set size ratio - 1',
 				# 'unset border',
 				# 'unset tics',
 				]
-
-		triangle_count = 1
-		for complex in complex_data:
-			for simplex in complex:
-				if len(simplex) == 1:
-					# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
-					pass
-				elif len(simplex) == 2:
-					add_arrow(simplex, cmds)
-				else:
-					add_poly(simplex, cmds, triangle_count)
-					triangle_count += 1
-
 
 		# plot witnesses and landmarks
 		cmds.append('''splot \
@@ -174,7 +144,7 @@ def plot_3D_update(subplot, filtration, i, camera_angle):
 	f = io.BytesIO(out)
 	img = mpimg.imread(f, format='png')
 
-	# debugging
+	# # debugging
 	# if i ==3:
 	# 	fig = pyplot.figure(figsize=(6, 6), tight_layout=True, dpi=300)
 	# 	ax = fig.add_subplot(111)
@@ -184,10 +154,10 @@ def plot_3D_update(subplot, filtration, i, camera_angle):
 	# 	sys.exit()
 
 	subplot.axis('off')
-	return subplot.imshow(img),
+	subplot.imshow(img)
 
 
-def plot_2D_update_gnuplot(subplot, filtration, i):
+def plot_all_2D_gnuplot(subplot, filtration, i):
 
 	def add_arrow(simplex, cmds):
 		set_arrow = ' '.join([
@@ -236,17 +206,6 @@ def plot_2D_update_gnuplot(subplot, filtration, i):
 				# 'unset tics'
 				]
 
-		triangle_count = 1
-		for complex in complex_data:
-			for simplex in complex:
-				if len(simplex) == 1:
-					# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
-					pass
-				elif len(simplex) == 2:
-					add_arrow(simplex, cmds)
-				else:
-					add_poly(simplex, cmds, triangle_count)
-					triangle_count += 1
 
 
 		# plot witnesses and landmarks
@@ -274,13 +233,26 @@ def plot_2D_update_gnuplot(subplot, filtration, i):
 
 
 
-def make_frames(filtration, color_scheme, alpha, save_frames, camera_angle=(0,45)):
 
-	fname_ax = 			pyplot.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
-	epsilon_ax = 		pyplot.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
-	movie_params_ax =	pyplot.subplot2grid((12, 8), (4, 0), rowspan=2, colspan=2)
-	filt_params_ax =	pyplot.subplot2grid((12, 8), (6, 0), rowspan=6, colspan=2)
-	plot_ax = 			pyplot.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
+
+def make_movie(
+		filtration,
+		out_filename,
+		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
+		camera_angle=(70, 45),  		# for 3D mode. [azimuthal, elevation]
+		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
+		dpi=200,  						# dots per inch (resolution)
+
+):
+	print 'building movie...'
+	remove_old_frames('PH/frames/')
+	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
+
+	fname_ax = pyplot.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
+	epsilon_ax = pyplot.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
+	movie_params_ax = pyplot.subplot2grid((12, 8), (4, 0), rowspan=2, colspan=2)
+	filt_params_ax = pyplot.subplot2grid((12, 8), (6, 0), rowspan=6, colspan=2)
+	plot_ax = pyplot.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
 
 	add_filename_table(fname_ax, filtration.filename)
 	add_movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
@@ -294,75 +266,24 @@ def make_frames(filtration, color_scheme, alpha, save_frames, camera_angle=(0,45
 		print 'ERROR: invalid ambient dimension {}, must be 2 or 3'.format(amb_dim)
 		sys.exit()
 
-
-
-	def init():
-		if amb_dim == 2:
-			return plot_2D_init(plot_ax, witness_data, landmark_data)
-		else:
-			return plot_ax.plot([])		# FuncAnimation wants an artist object
-
-	def animate(i):
-		sys.stdout.write('\rplotting frame {} of {}'.format(i, filtration.num_div))
+	for i, eps in enumerate(filtration.epsilons):
+		sys.stdout.write('\rplotting frame {} of {}'.format(i + 1, filtration.num_div))
 		sys.stdout.flush()
 
 		if amb_dim == 2:
-			comp_plot = plot_2D_update(plot_ax, filtration, i, color_scheme, alpha)
-			# comp_plot = plot_2D_update_gnuplot(plot_ax, filtration, i)
+			plot_witnesses_2D(plot_ax, witness_data)
+			plot_landmarks_2D(plot_ax, landmark_data)
+			plot_complex_2D(plot_ax, filtration, i, color_scheme, alpha)
+		# plot_2D_update_gnuplot(plot_ax, filtration, i)
 		else:
-			comp_plot = plot_3D_update(plot_ax, filtration, i, camera_angle)
+			plot_all_3D(plot_ax, filtration, i, camera_angle)
 
-		eps = update_epsilon(epsilon_ax, i, filtration.epsilons)
+		update_epsilon(epsilon_ax, eps)
 
-		if save_frames: pyplot.savefig('frames/image%03d.png' % i)
+		pyplot.savefig('PH/frames/frame%03d.png' % i)
 
-		return list(comp_plot) + list(eps)
-
-	return init, animate
-
-
-
-
-def make_movie(
-		filtration,
-		out_filename,
-		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
-		camera_angle=(70, 45),  		# for 3D mode. [azimuthal, elevation]
-		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
-		dpi=150,  						# dots per inch (resolution)
-		save_frames=False,  			# save frames to /frames/ dir
-		framerate=1						# number of frames per second. for a constant max_frames, higher framerate will make a shorter movie.
-
-):
-	movie_info = [color_scheme, camera_angle, alpha]
-	fnames = [filtration.filename, out_filename]
-
-	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
-
-	print 'building movie...'
-	init, animate = make_frames(filtration, color_scheme, alpha, save_frames=save_frames, camera_angle=camera_angle)
-	ani = animation.FuncAnimation(fig, animate, init_func=init, frames=filtration.num_div + 1,
-								  blit=True, repeat=False)
-
-	# FuncAnimation.save() uses pipes to send frames to ffmpeg, which is significantly faster than saving to png.
-	# However the videos it creates do not work well if fps is low (~ 1) because it uses fps for the output framerate.
-	# As a workaround, ani.save(fps=10) is used and then ffmpeg is called to reduce the speed of the video by a 10x
-	# Another option would be to stream to FFMPEG ourselves: http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
-
-
-	ani.save('output/PH/temp.mp4', fps=10)
-
-	print '... done.'
-
-	# correct framerate
-	subprocess.call(['ffmpeg',
-					 '-loglevel', 'panic', '-y',
-					 '-i', 'output/PH/temp.mp4',
-					 '-filter:v', 'setpts={:d}*PTS'.format(int(10 / framerate)),
-					 out_filename])
-
-	os.remove('output/PH/temp.mp4')
-
+	print ''
+	frames_to_movie(out_filename, 'PH/frames/frame%03d.png')
 
 
 

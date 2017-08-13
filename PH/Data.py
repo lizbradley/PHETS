@@ -41,6 +41,7 @@ class Filtration:
 		caller_dir = os.getcwd()
 
 		if isinstance(traj, basestring):			# is filename
+			print 'reading input file...'
 			self.sig = np.loadtxt(traj)
 			self.filename = caller_dir + '/' + traj
 		else:									# is array

@@ -34,11 +34,8 @@ def sort(i):
 
 
 
-# f = open("output/PH/build_filtration_memory.txt","wb")
 
 # f = open("output/run_info/build_filtration_memory.txt","wb")
-
-#
 # @profile(stream=f)
 def build_filtration(input_file_name, parameter_set, silent=False):
 	num_threads = 2
@@ -47,7 +44,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 
 	def get_param(key):
-		return parameter_set.get(key)
+		return parameter_set[key]
 
 	input_file = open(input_file_name)
 	speed_amplify = float(get_param("d_speed_amplify"))
@@ -60,10 +57,9 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	straight_VB = float(get_param("straight_VB"))
 	d_cov = get_param("d_cov")
 	graph_induced = get_param("graph_induced")
-	use_hamiltonian = get_param('d_use_hamiltonion')
 
-	always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov==0.
-
+	always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov == 0.
+	print 'always e', always_euclidean
 	filtration = Set()
 	extra_data = None
 	min_filtration_param = float(get_param("min_filtration_param"))
@@ -323,8 +319,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-s {}".format(stretch)
 				]
 
-	print find_landmarks_cmd
 
+	print 'find_landmarks command:', find_landmarks_cmd
 	if silent:
 		p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)
 		out, err = p.communicate()
@@ -334,6 +330,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 	if m2_d!=0:
 		number_of_datapoints = int(number_of_datapoints-m2_d)
+
 	## Build and sort distance matrix.
 	landmarks_file = open("landmark_outputs.txt","rb")
 
@@ -363,54 +360,18 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	sys.stdout.write("Sorting distances...")
 	sys.stdout.flush()
 
-	# p=multiprocessing.Pool(processes=4)   # commented out by Elliott 4/25
 
 	inputs=[]
 	for w in range(0,len(witnesses)):
 		inputs.append(w)
 		d[w].sort()
 
-	# p.map(sort,inputs)  # was commented out as of 4/25
-	# p.terminate()       # added by Elliott 4/25
 
 	sys.stdout.write("done\n")
 	sys.stdout.flush()
 	assert len(landmarks) == number_of_vertices
 
 	'''=============== End code written by Sam ======================'''
-
-	'''============= Start code written by Elliott =================='''
-	# if graph_induced:
-	# 	# import matplotlib.pyplot as plt
-	# 	import pandas as pd
-	#
-	# 	g = nx.read_edgelist('edgelist.txt')
-	#
-	# 	closest_wits = np.loadtxt('closest_wits.txt', dtype='int')	# witness, landmark
-	# 	wit_coords = np.array(witnesses)
-	# 	land_coords = np.array(landmarks)
-
-		# land = np.unique(closest_wits[:,1])
-
-		# closest_wits = pd.DataFrame(closest_wits, columns=('witness', 'landmark'))
-		# print closest_wits
-		# closest_wits = closest_wits.sort_values(by='landmark')
-		# print closest_wits
-		#
-		# closest_wits = closest_wits.values
-		# print closest_wits
-
-
-
-		# fig = plt.figure(figsize=(8, 8))
-		# ax = fig.add_subplot(111)
-		# ax.scatter(wit_coords[:, 0], wit_coords[:, 1], s=.1)
-		# ax.scatter(land_coords[:, 0], land_coords[:, 1])
-		# fig.savefig('veronoi_test.png')
-
-	'''=============== End code written by Elliott =================='''
-
-
 
 
 	print("Building filtration...")

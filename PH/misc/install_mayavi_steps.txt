@@ -1,5 +1,0 @@
-sudo apt-get install python-tk      [for matplotlib]
-
-sudo apt-get install vtk6
-sudo apt-get install python-dev
-sudo apt-get install python-wxgtk3.0

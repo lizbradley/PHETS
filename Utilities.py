@@ -1,4 +1,6 @@
 import os, sys, inspect
+import subprocess
+
 from memory_profiler import profile
 
 
@@ -104,4 +106,33 @@ def count_lines(dir, blanks=True):
 				print '{}: {}'.format(fname, length)
 
 	print_title('num files: {}\tnum lines: {}'.format(count_f, count_l))
+
+
+def remove_old_frames(dir):
+	for f in os.listdir(dir):
+		if f.endswith(".png"):
+			os.remove(dir + f)
+
+
+def frames_to_movie(out_filename, frame_path, framerate=1):
+
+	if os.path.exists(out_filename):
+		overwrite = raw_input(out_filename + " already exists. Overwrite? (y/n)\n")
+		if overwrite == "y":
+			pass
+		else:
+			sys.exit()
+	print 'consolidating frames...'
+	cmd = [
+		'ffmpeg',
+		'-loglevel', 'panic',
+		'-y',
+		'-framerate', str(framerate),
+		'-i', frame_path,
+		'-r', str(24),
+		out_filename
+
+	]
+	subprocess.call(cmd)
+	print out_filename, 'complete.'
 

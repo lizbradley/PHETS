@@ -88,7 +88,7 @@ def add_persistence_plot(ax, filtration):
 def make_PD(filt, out_filename):
 	print '\nplotting persistence diagram...'
 
-	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
+	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=700)
 
 	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)

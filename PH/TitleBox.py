@@ -61,9 +61,8 @@ def add_filt_params_table(subplot, filt_params):
 
 
 
-def update_epsilon(ax, i, epsilons):
+def update_epsilon(ax,e):
 	ax.axis('off')
-	e = ([0] + epsilons)[i]
 	time_table = ax.table(
 		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
 		bbox=[0, 0, 1, 1],    # x0, y0, width, height
@@ -75,7 +74,6 @@ def update_epsilon(ax, i, epsilons):
 	# time_table.auto_set_font_size(False)
 	# time_table.set_fontsize(8)
 
-	return time_table,
 
 
 def add_movie_params_table(ax, params):
