@@ -83,8 +83,8 @@ def fig2():
 			'use_cliques': False
 		})
 
-	# filtration = Filtration(piano_traj, filt_params, out_fname='temp_data/fig2a.p')
-	filtration = load_filtration(in_file='temp_data/fig2a.p')
+	# filtration = Filtration(piano_traj, filt_params, out_fname='temp/fig2a.p')
+	filtration = load_filtration(in_file='temp/fig2a.p')
 
 	plot_filtration_pub(
 		filtration, 2,

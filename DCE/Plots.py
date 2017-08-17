@@ -155,8 +155,8 @@ def compare_vary_tau_frame(out_file_name, wave_file_name1, wave_file_name2, fram
 	subplot4 = plt.subplot2grid((5, 2), (4, 1), sharey=subplot3)
 	plt.setp(subplot4.get_yticklabels(), visible=False)
 
-	plot_dce(subplot1, 'DCE/temp_data/embedded_coords_comp1.txt')
-	plot_dce(subplot2, 'DCE/temp_data/embedded_coords_comp2.txt')
+	plot_dce(subplot1, 'DCE/temp/embedded_coords_comp1.txt')
+	plot_dce(subplot2, 'DCE/temp/embedded_coords_comp2.txt')
 
 	wave_data1, wave_data2 = np.loadtxt(wave_file_name1), np.loadtxt(wave_file_name2)
 	plot_signal(subplot3, wave_data1, embed_crop)
@@ -243,8 +243,8 @@ def compare_multi_frame(frame_idx, sig1, sig2, crop_1, crop_2, dpi, title_tables
 
 	plot_titlebox(title_plots, title_tables)
 
-	plot_dce(ax1, 'DCE/temp_data/embedded_coords_comp1.txt')
-	plot_dce(ax2, 'DCE/temp_data/embedded_coords_comp2.txt')
+	plot_dce(ax1, 'DCE/temp/embedded_coords_comp1.txt')
+	plot_dce(ax2, 'DCE/temp/embedded_coords_comp2.txt')
 
 	plot_signal(ax3, sig1, crop_1)
 	plot_signal(ax4, sig2, crop_2)

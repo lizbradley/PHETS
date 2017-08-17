@@ -67,9 +67,9 @@ class Filtration:
 		self.PD_data = None
 		self.PRF = None
 
-		if not silent: print 'pickling...'
 		if out_fname:
-			pickle.dump(self, open(out_fname, 'wb'))
+			if not silent: print 'pickling...'
+			pickle.dump(self, open('filtrations/' + out_fname, 'wb'))
 
 		os.chdir(caller_dir)
 
@@ -97,18 +97,18 @@ class Filtration:
 		if len(self.sig.shape) == 1:
 			print "ERROR: Filtration input 'sig' is one dimensional"
 			sys.exit()
-		np.savetxt('temp_data/worm_data.txt', self.sig)
+		np.savetxt('temp/worm_data.txt', self.sig)
 		start_time = time.time()
 
 		try:
 			if silent: blockPrint()
-			filtration = BuildFiltration.build_filtration('temp_data/worm_data.txt', params, silent=silent)
+			filtration = BuildFiltration.build_filtration('temp/worm_data.txt', params, silent=silent)
 			if silent: enablePrint()
 		except OSError:
 			print "WARNING: invalid PH/find_landmarks binary. Recompiling..."
 			compile_find_landmarks_c()
 
-		os.remove('temp_data/worm_data.txt')
+		os.remove('temp/worm_data.txt')
 
 		witness_coords = filtration[1][1]
 		landmark_coords = filtration[1][0]

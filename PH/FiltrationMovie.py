@@ -116,30 +116,26 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		landmark_data = filtration.landmark_coords
 		complex_data = filtration.get_complex_plot_data()
 
-		np.savetxt('PH/temp_data/witnesses.txt', witness_data)
-		np.savetxt('PH/temp_data/landmarks.txt', landmark_data)
+		np.savetxt('PH/temp/witnesses.txt', witness_data)
+		np.savetxt('PH/temp/landmarks.txt', landmark_data)
 
 
 		cmds = ['set terminal pngcairo size 700, 700',
 				'set view {}, {}'.format(*camera_angle),
-				'set output "PH/frames/frame{:02d}.png"'.format(i),
+				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
 				# 'set size ratio - 1',
 				# 'unset border',
 				# 'unset tics',
 				]
 
-		# plot witnesses and landmarks
-		cmds.append('''splot \
-						"PH/temp_data/witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
-						"PH/temp_data/landmarks.txt" with points pt 7 ps 1 notitle''')
 
-
+		# plot complex
 		complex_data = complex_data[:i + 1]
 		poly_count = 1
 		for complex in complex_data:
 			for simplex in complex:
 				if len(simplex) == 1:
-					pass
+					print 'WARNING: 0-simplex encountered'
 				elif len(simplex) == 2:
 					add_arrow(simplex, cmds)
 				else:
@@ -147,25 +143,27 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 					poly_count += 1
 
 
+		# plot witnesses and landmarks
+		wits_arg = '"PH/temp/witnesses.txt" with points pt 7 ps .1 lc "black" notitle'
+		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 notitle'
+		cmds.append('splot {}, {}'.format(wits_arg, lands_arg))
+
+
+
 		cmds.append('q')
+
+		with open('PH/temp/gnuplot_cmds.txt', 'w') as f:
+			f.write('\n'.join(cmds))
+
 
 
 
 	write_gnup_script()
-	p = subprocess.Popen([gnuplot_str, 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+	p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
 
 	out, err = p.communicate()
 	f = io.BytesIO(out)
 	img = mpimg.imread(f, format='png')
-
-	# # debugging
-	# if i ==3:
-	# 	fig = pyplot.figure(figsize=(6, 6), tight_layout=True, dpi=300)
-	# 	ax = fig.add_subplot(111)
-	# 	ax.axis('off')
-	# 	ax.imshow(img, interpolation='none')
-	# 	fig.savefig('test.png')
-	# 	sys.exit()
 
 	subplot.axis('off')
 	subplot.imshow(img)
@@ -210,10 +208,10 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 		landmark_data = filtration.landmark_coords
 		complex_data = filtration.get_complex_plot_data()[:i + 1]
 
-		np.savetxt('PH/temp_data/witnesses.txt', witness_data)
-		np.savetxt('PH/temp_data/andmarks.txt', landmark_data)
+		np.savetxt('PH/temp/witnesses.txt', witness_data)
+		np.savetxt('PH/temp/andmarks.txt', landmark_data)
 
-		cmds = ['set terminal pngcairo size 500, 500',
+		cmds = ['set terminal pngcairo size 700, 700',
 				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
 				# 'set size ratio - 1',
 				# 'unset border',
@@ -221,10 +219,6 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 				]
 
 
-		# plot witnesses and landmarks
-		cmds.append('''plot \
-					"PH/temp_data/witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
-					"PH/temp_data/landmarks.txt" with points pt 7 ps 1 notitle''')
 
 
 		poly_count = 1
@@ -239,13 +233,20 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 					poly_count += 1
 		cmds.append('q')
 
+		# plot witnesses and landmarks
+		wits_arg = '"PH/temp/witnesses.txt" with points pt 7 ps .1 lc "black" notitle'
+		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 notitle'
+		cmds.append('plot {}, {}'.format(wits_arg, lands_arg))
 
-		with open('PH/temp_data/gnuplot_cmds.txt', 'w') as f:
+
+
+
+		with open('PH/temp/gnuplot_cmds.txt', 'w') as f:
 			f.write('\n'.join(cmds))
 
 
 	write_gnup_script()
-	p = subprocess.Popen([gnuplot_str, 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+	p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
 
 	out, err = p.communicate()
 	f = io.BytesIO(out)
@@ -256,7 +257,6 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 
 
 	subplot.imshow(img),
-
 
 
 
@@ -310,7 +310,7 @@ def make_movie(
 
 	print ''
 	frames_to_movie(out_filename, 'PH/frames/frame%03d.png')
-	clear_temp_files('PH/temp_data')
+	clear_temp_files('PH/temp/')
 
 
 
