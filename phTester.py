@@ -10,7 +10,7 @@ from config import default_filtration_params as parameter_set
 import time
 
 
-set_test = 16		# set test number here or with command line argument
+set_test = 17		# set test number here or with command line argument
 
 
 
