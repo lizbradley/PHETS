@@ -1,7 +1,7 @@
 import sys
 import time
 
-from PH import Filtration, load_saved_filtration
+from PH import Filtration, load_filtration
 from PH import make_movie, make_PD, make_PRF_plot
 from PubPlots import plot_PD_pub, plot_filtration_pub
 from config import default_filtration_params as parameter_set
@@ -473,12 +473,23 @@ if test == 16:
 
 
 	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()		# reuses previous filtration
 
 
 	make_movie(
 		filtration,
 		'output/PH/test16.mp4',
+	)
+
+	make_PRF_plot(
+		filtration,
+		'output/PH/test17_PRF.png',
+		PRF_res=50
+
+	)
+
+	make_PD(
+		filtration,
+		'output/PH/test17_PD.png'
 	)
 
 
@@ -500,7 +511,6 @@ if test == 17:
 		})
 
 	filtration = Filtration(in_filename, filt_params)
-	# filtration = load_saved_filtration()		# reuse last filtration
 
 
 

@@ -1,6 +1,4 @@
-import io
-import subprocess
-import sys
+import io, subprocess, sys, os
 
 import matplotlib.image as mpimg
 import matplotlib.markers
@@ -9,7 +7,7 @@ import numpy as np
 from matplotlib import collections
 
 from TitleBox import add_filename_table, add_filt_params_table, update_epsilon, add_movie_params_table
-from Utilities import remove_old_frames, frames_to_movie
+from Utilities import remove_old_frames, frames_to_movie, clear_temp_files
 from config import gnuplot_str
 
 
@@ -93,6 +91,7 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		])
 		cmds.append(set_arrow)
 
+
 	def add_poly(simplex, cmds, poly_count):
 		set_poly = '\n'.join([
 			'set object {} polygon from \\'.format(poly_count),
@@ -111,15 +110,15 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		cmds.append(set_poly)
 		cmds.append(style_poly)
 
+
 	def write_gnup_script():
 		witness_data = filtration.witness_coords
 		landmark_data = filtration.landmark_coords
 		complex_data = filtration.get_complex_plot_data()
 
-		np.savetxt('witnesses.txt', witness_data)
-		np.savetxt('landmarks.txt', landmark_data)
+		np.savetxt('PH/temp_data/witnesses.txt', witness_data)
+		np.savetxt('PH/temp_data/landmarks.txt', landmark_data)
 
-		complex_data = complex_data[:i + 1]
 
 		cmds = ['set terminal pngcairo size 700, 700',
 				'set view {}, {}'.format(*camera_angle),
@@ -131,28 +130,29 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 
 		# plot witnesses and landmarks
 		cmds.append('''splot \
-						"witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
-						"landmarks.txt" with points pt 7 ps 1 notitle''')
+						"PH/temp_data/witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
+						"PH/temp_data/landmarks.txt" with points pt 7 ps 1 notitle''')
 
-		cmds.append('q')
 
-		triangle_count = 1
+		complex_data = complex_data[:i + 1]
+		poly_count = 1
 		for complex in complex_data:
 			for simplex in complex:
 				if len(simplex) == 1:
-					# print 'length 1 simplex ({}) encountered. skipping'.format(simplex)
 					pass
 				elif len(simplex) == 2:
 					add_arrow(simplex, cmds)
 				else:
-					add_poly(simplex, cmds, triangle_count)
-					triangle_count += 1
+					add_poly(simplex, cmds, poly_count)
+					poly_count += 1
 
+
+		cmds.append('q')
 
 
 
 	write_gnup_script()
-	p = subprocess.Popen(['gnuplot-x11', 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+	p = subprocess.Popen([gnuplot_str, 'PH/temp_data/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
 
 	out, err = p.communicate()
 	f = io.BytesIO(out)
@@ -169,6 +169,8 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 
 	subplot.axis('off')
 	subplot.imshow(img)
+
+
 
 
 def plot_all_2D_gnuplot(subplot, filtration, i):
@@ -206,12 +208,10 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 	def write_gnup_script():
 		witness_data = filtration.witness_coords
 		landmark_data = filtration.landmark_coords
-		complex_data = filtration.get_complex_plot_data()
+		complex_data = filtration.get_complex_plot_data()[:i + 1]
 
-		np.savetxt('witnesses.txt', witness_data)
-		np.savetxt('landmarks.txt', landmark_data)
-
-		complex_data = complex_data[:i]
+		np.savetxt('PH/temp_data/witnesses.txt', witness_data)
+		np.savetxt('PH/temp_data/andmarks.txt', landmark_data)
 
 		cmds = ['set terminal pngcairo size 500, 500',
 				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
@@ -221,12 +221,22 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 				]
 
 
-
 		# plot witnesses and landmarks
 		cmds.append('''plot \
-					"witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
-					"landmarks.txt" with points pt 7 ps 1 notitle''')
+					"PH/temp_data/witnesses.txt" with points pt 7 ps .1 lc "black" notitle, \
+					"PH/temp_data/landmarks.txt" with points pt 7 ps 1 notitle''')
 
+
+		poly_count = 1
+		for complex in complex_data:
+			for simplex in complex:
+				if len(simplex) == 1:
+					pass
+				elif len(simplex) == 2:
+					add_arrow(simplex, cmds)
+				else:
+					add_poly(simplex, cmds, poly_count)
+					poly_count += 1
 		cmds.append('q')
 
 
@@ -243,7 +253,9 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 
 
 	subplot.axis('off')
-	return subplot.imshow(img),
+
+
+	subplot.imshow(img),
 
 
 
@@ -288,9 +300,9 @@ def make_movie(
 			plot_witnesses_2D(plot_ax, witness_data)
 			plot_landmarks_2D(plot_ax, landmark_data)
 			plot_complex_2D(plot_ax, filtration, i, color_scheme, alpha)
-		# plot_2D_update_gnuplot(plot_ax, filtration, i)
+			# plot_all_2D_gnuplot(plot_ax, filtration, i)			# to test consistency of gnuplot and matplotlib results
 		else:
-			plot_all_3D(plot_ax, filtration, i, camera_angle)
+			plot_all_3D(plot_ax, filtration, i, camera_angle)		# uses gnuplot
 
 		update_epsilon(epsilon_ax, eps)
 
@@ -298,6 +310,7 @@ def make_movie(
 
 	print ''
 	frames_to_movie(out_filename, 'PH/frames/frame%03d.png')
+	clear_temp_files('PH/temp_data')
 
 
 

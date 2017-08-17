@@ -13,11 +13,11 @@ from Utilities import blockPrint, enablePrint
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def load_saved_filtration():
+def load_filtration(in_file):
 	print 'loading saved filtration...'
 	caller_dir = os.getcwd()
 	os.chdir(SCRIPT_DIR)
-	filtration = pickle.load(open('temp_data/filtration.p'))
+	filtration = pickle.load(open('filtrations/' + in_file))
 	os.chdir(caller_dir)
 	return filtration
 
@@ -37,14 +37,14 @@ class PDData:
 
 class Filtration:
 
-	def __init__(self, traj, params, filename='none', silent=False):
+	def __init__(self, traj, params, filename='none', silent=False, out_fname=None):
 		caller_dir = os.getcwd()
 
 		if isinstance(traj, basestring):			# is filename
 			print 'reading input file...'
 			self.sig = np.loadtxt(traj)
 			self.filename = caller_dir + '/' + traj
-		else:									# is array
+		else:										# is array
 			self.sig = traj
 			self.filename = filename
 
@@ -68,7 +68,8 @@ class Filtration:
 		self.PRF = None
 
 		if not silent: print 'pickling...'
-		pickle.dump(self, open('temp_data/filtration.p', 'wb'))
+		if out_fname:
+			pickle.dump(self, open(out_fname, 'wb'))
 
 		os.chdir(caller_dir)
 

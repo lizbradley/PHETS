@@ -1,3 +1,4 @@
+''' helpers for processing data '''
 import numpy as np
 import sys
 from config import WAV_SAMPLE_RATE

@@ -1,3 +1,5 @@
+''' helpers for miscellaneous tasks eg file management '''
+
 import os, sys, inspect
 import subprocess
 
@@ -61,6 +63,12 @@ def clear_dir(dir):
 		sys.exit()
 
 
+def clear_temp_files(dir):
+	if not dir.endswith('/'):
+		dir = dir + '/'
+	for f in os.listdir(dir):
+		if f != '.gitignore':
+			os.remove(dir + f)
 
 
 def lambda_to_str(f):
@@ -71,8 +79,6 @@ def blockPrint():
 
 def enablePrint():
 	sys.stdout = sys.__stdout__
-
-
 
 
 def print_title(str):

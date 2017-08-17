@@ -6,11 +6,12 @@ import numpy as np
 from ROC import PRF_vs_FFT_v2
 from config import default_filtration_params as filt_params
 from DCE.DCE import embed
-from PH import Filtration, make_movie, load_saved_filtration
+from PH import Filtration, make_movie, load_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
 from Tools import normalize_volume, sec_to_samp
 
-# TODO: redo runtime / memory table!!
+# move this script to parent directory to run #
+
 piano_sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 
 piano_traj = embed(
@@ -25,7 +26,7 @@ piano_traj = embed(
 eps_bins = 20
 simps_cutoff = -21
 
-paper_path = '/home/elliott/Dropbox/Data and Topology/Papers/IDA 2017/figs/'
+paper_path = '/home/elliott/Desktop/IDA 2017/figs/'
 ticks = [-1, -.33, .33, 1]
 # ticks = None
 
@@ -34,7 +35,7 @@ def fig1():
 	print 'figure 1...'
 	# figure 1a, 1b
 	# add time (s) label
-	fig = plt.figure(figsize=(10, 3), tight_layout=True, dpi=600)
+	fig = plt.figure(figsize=(10, 3), tight_layout=True, dpi=100)
 
 	gs = gridspec.GridSpec(1, 2, width_ratios=[2, 1])
 
@@ -65,7 +66,7 @@ def fig2():
 	print 'figure 2...'
 	# figure 2a, 2b, 2c
 
-	fig = plt.figure(figsize=(10, 3.4), tight_layout=True, dpi=600)
+	fig = plt.figure(figsize=(10, 3.4), tight_layout=True, dpi=100)
 	ax1 = fig.add_subplot(131)
 	ax2 = fig.add_subplot(132)
 	ax3 = fig.add_subplot(133)
@@ -82,7 +83,8 @@ def fig2():
 			'use_cliques': False
 		})
 
-	filtration = Filtration(piano_traj, filt_params)
+	# filtration = Filtration(piano_traj, filt_params, out_fname='temp_data/fig2a.p')
+	filtration = load_filtration(in_file='temp_data/fig2a.p')
 
 	plot_filtration_pub(
 		filtration, 2,
@@ -160,7 +162,7 @@ def fig3():
 
 	filtration = Filtration(piano_traj, filt_params)
 
-	fig = plt.figure(figsize=(10, 7), tight_layout=True, dpi=500)
+	fig = plt.figure(figsize=(10, 7), tight_layout=True, dpi=100)
 	ax1 = fig.add_subplot(221)
 	ax2 = fig.add_subplot(222)
 	ax3 = fig.add_subplot(223)
@@ -205,7 +207,7 @@ def fig4():
 
 	# ticks, labels (with epsilon in filt frames)
 
-	fig = plt.figure(figsize=(10, 7), tight_layout=True, dpi=500)
+	fig = plt.figure(figsize=(10, 7), tight_layout=True, dpi=100)
 	ax1 = fig.add_subplot(221)
 	ax2 = fig.add_subplot(222)
 	ax3 = fig.add_subplot(223)
@@ -285,7 +287,7 @@ def fig5():
 	PRF_vs_FFT_v2(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
 		'datasets/time_series/viol/40-viol.txt',
-		paper_path + 'fig5_ktest.png',
+		paper_path + 'fig5.png',
 
 		'clarinet',
 		'viol',
@@ -317,7 +319,7 @@ def fig6():
 	print 'figure 6...'
 
 
-	fig = plt.figure(figsize=(10, 4), tight_layout=True, dpi=500)
+	fig = plt.figure(figsize=(10, 4), tight_layout=True, dpi=100)
 	ax1 = fig.add_subplot(121)
 	ax2 = fig.add_subplot(122)
 
@@ -373,8 +375,8 @@ def fig6():
 if __name__ == '__main__':
 	pass
 	fig1()
-	# fig2()
-	# fig3()
-	# fig4()
-	# fig5()
-	# fig6()
+	fig2()
+	fig3()
+	fig4()
+	fig5()
+	fig6()
