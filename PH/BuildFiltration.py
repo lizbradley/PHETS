@@ -320,7 +320,6 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 				]
 
 
-	print 'find_landmarks command:', find_landmarks_cmd
 	if silent:
 		p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)
 		out, err = p.communicate()
@@ -334,22 +333,24 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	## Build and sort distance matrix.
 	landmarks_file = open("landmark_outputs.txt","rb")
 
-	l = landmarks_file.readlines()
+	line = landmarks_file.readlines()
 	sys.stdout.write("Reading in distance calculations...")
 	sys.stdout.flush()
 	landmark_index = 0
-	for line in l:
+	witness_to_landmark = {}
+	for line in line:
 		f = line.strip('\n')
 		if "#" not in f:
 			landmark = int(f.split(":")[0])
 
 			distances = [float(i) for i in f.split(":")[1].split(",")]
-			for witness_index in range(0,len(distances)):
 
-				d[witness_index].append(LandmarkDistance(landmark_index,distances[witness_index]))
+			for witness_index in range(0, len(distances)):
+				d[witness_index].append(LandmarkDistance(landmark_index, distances[witness_index]))
+
 			landmarks.append(witnesses[landmark])
 			landmark_indices.append(landmark)
-			landmark_index+=1
+			landmark_index += 1
 
 	assert(len(d)>0)
 	sys.stdout.write("done\n")
@@ -372,6 +373,50 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	assert len(landmarks) == number_of_vertices
 
 	'''=============== End code written by Sam ======================'''
+	'''=============== Start code written by Elliott ======================'''
+
+	w2l_id_dict = {}
+	for land_id, wit_id in enumerate(landmark_indices):
+		w2l_id_dict[wit_id] = land_id
+
+	def wit_ids_2_land_ids(simplex):
+		return [w2l_id_dict[wit_id] for wit_id in simplex]
+
+
+	if graph_induced:
+		import re
+		with open('GI_edge_filtration.txt', 'r') as f:
+			lines = f.readlines()
+
+		eps = []
+		filt_diffs = []
+		for line in lines:
+			e, filt_diff_str = line.split(': ')
+			eps.append(float(e))
+
+			fd_str_arr = filt_diff_str.split(' ')
+			fd_str_arr = [re.sub('[\[\]]', '', simp_str) for simp_str in fd_str_arr]
+			filt_diff = [np.fromstring(simp_str, sep=',', dtype=int) for simp_str in fd_str_arr]
+			filt_diffs.append(filt_diff)
+
+		filt_diffs = np.asarray(filt_diffs)
+
+		for i, row in enumerate(filt_diffs):
+			for j, simp in enumerate(row):
+				filt_diffs[i][j] = wit_ids_2_land_ids(simp)
+
+
+		simplexes = []
+		for i, row in enumerate(filt_diffs):
+			complex = [SimplexBirth(ids, i, sort_output) for ids in row]
+			simplexes.extend(complex)
+
+
+		return (simplexes, (landmarks, witnesses), eps)
+
+
+	'''=============== End code written by Elliott ======================'''
+
 
 
 	print("Building filtration...")
@@ -388,8 +433,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	print '%s' % use_twr
 	if use_cliques: # AKA "Lazy" witness relation.
 		g = nx.Graph()
-		for l in xrange(number_of_vertices):
-			g.add_node(l)
+		for line in xrange(number_of_vertices):
+			g.add_node(line)
 	def filter_and_build():
 		g2 = None
 		if reentry_filter:

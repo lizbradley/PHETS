@@ -1,6 +1,7 @@
 import numpy as np
 from Tools import idx_to_freq
 from DCE import embed, plot_signal
+from DCE.Plots import plot_dce
 from DCE.Movies import slide_window, vary_tau
 from PH import Filtration, make_movie, make_PD
 from config import default_filtration_params as filt_params
@@ -19,19 +20,21 @@ sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 plot_signal('output/demo/signal.png', sig, crop=crop, time_units=time_units)
 # following line does the right thing with axis labels
 
-trajs = slide_window(
-	sig,
-	'output/demo/embed_movie.mp4',
-	tau=tau,
-	m=2,
-	window_size=.05,  # this is in seconds
-	window_step=.1,
-	crop=crop
-)
+# trajs = slide_window(
+# 	sig,
+# 	'output/demo/embed_movie.mp4',
+# 	tau=tau,
+# 	m=2,
+# 	window_size=.05,  # this is in seconds
+# 	window_step=.1,
+# 	crop=crop
+# )
+#
+# traj = trajs[5]		# take embedding from 5th frame of movie
 
-traj = trajs[5]		# take embedding from 5th frame of movie
+traj = embed(sig, tau, m, crop=crop, time_units=time_units)		# alternatively, embed explicitly
 
-# traj = embed(sig, tau, m, crop=crop, time_units=time_units)		# alternatively, embed explicitly
+plot_dce()
 
 # parameters used to build the filtration:
 filt_params.update(

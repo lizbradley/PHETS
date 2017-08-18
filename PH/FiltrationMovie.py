@@ -27,7 +27,7 @@ def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_tim
 
 	elif hasattr(scheme, '__len__') and scheme[0] == 'birth time gradient':
 		cycles = scheme[1]
-		prog = divmod(((past_birth_time / float(max_birth_time)) * cycles), 1)[1] # modulo 1
+		prog = divmod(((past_birth_time / float(max_birth_time)) * cycles), 1)[1] 	# modulo 1
 		facecolor = (1, prog, 1 - prog)
 		edgecolor = (.5, prog, 1 - prog)
 
