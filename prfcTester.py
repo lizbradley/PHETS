@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 5003			 # set test number here or with command line argument
+set_test = 8000			 # set test number here or with command line argument
 
 
 
@@ -2823,8 +2823,8 @@ if test == 8000:
 	params = parameter_set
 	params.update(
 		{
-			'max_filtration_param': -5, #no simplexes larger than 5-simplex
-			'num_divisions': 10, #5 complexes in the filtration
+			'max_filtration_param': -5, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
 			'use_cliques': True,
 			'ds_rate':30
 
@@ -2833,24 +2833,17 @@ if test == 8000:
 
 	plot_variance(
 		'datasets/trajectories/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/variance/joetest.png',  # out filename
+		'output/PRFCompare/variance/joetest.png', 		 	 # out filename
 		params,
 
-		('worm_length', [200,500,1000,2000,5000]),		# vary param 1
-		None,
-		# ('use_cliques', (True, False)),				# vary param 2
+		('worm_length', [200, 500, 1000, 2000, 5000]),		 # vary param 1
+		None,												 # vary param 2
 
-													# For now, if you do not want to use second vary param, set this like
-													# the line above: a list with one element, note the trailing comma
-													# For now, both vary params must be filtration params. Working on
-													# getting it to work for other params like weight_func.
-
-		load_saved_filts=True,
+		load_saved_filts=False,
 
 		time_units='samples',
 
 		crop=(5000, 2005000),     # (start, stop) in time_units, or 'auto'
-
 		num_windows=10,			  # evenly spaced
 
 
@@ -2864,7 +2857,7 @@ if test == 8000:
 
 		normalize_volume=True,
 
-		see_samples=5,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=10,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
 

@@ -10,7 +10,7 @@ from config import default_filtration_params as parameter_set
 import time
 
 
-set_test = 15		# set test number here or with command line argument
+set_test = 14		# set test number here or with command line argument
 
 
 
@@ -19,6 +19,37 @@ if len(sys.argv) > 1: test = int(sys.argv[1])
 else: test = set_test
 print 'running test %d...' % test
 start_time = time.time()
+
+if test == 14:
+	in_filename = 'datasets/trajectories/49/C134C.txt'
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -10,
+			'num_divisions': 10,
+			'graph_induced': False
+		})
+
+	filtration = Filtration(in_filename, filt_params)
+
+	make_movie(
+		filtration,
+		'output/PH/test14.mp4',
+	)
+
+	make_PRF_plot(
+		filtration,
+		'output/PH/test14_PRF.png',
+		PRF_res=50
+
+	)
+
+	make_PD(
+		filtration,
+		'output/PH/test14_PD.png'
+	)
 
 if test == 15:
 	in_filename = 'datasets/trajectories/49/C134C.txt'
@@ -59,7 +90,6 @@ if test == 16:
 		{
 			'ds_rate': 40,
 			'worm_length': 2000,
-
 			'max_filtration_param': -10,
 			'num_divisions': 10,
 		})

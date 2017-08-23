@@ -3,6 +3,7 @@ import sys
 import time
 import pickle
 import subprocess
+import warnings
 
 import numpy as np
 import itertools
@@ -207,13 +208,13 @@ class Filtration:
 			f.close()
 
 
-		print 'group by birth time'
+		# print 'group by birth time'
 		ID_array = group_by_birth_time(filt_ID_list)		# 1d list -> 2d array
-		print 'expand to 2-simplexes'
+		# print 'expand to 2-simplexes'
 		ID_array = expand_to_2simplexes(ID_array)
-		print 'remove duplicates'
+		# print 'remove duplicates'
 		ID_array = remove_duplicates_all(ID_array)
-		print 'count triangles'
+		# print 'count triangles'
 		count_triangles(ID_array)
 		return ID_array
 
@@ -262,9 +263,11 @@ class Filtration:
 			os.chdir('..')
 
 		def load_perseus_out_file():
-			self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
+			with warnings.catch_warnings():
+				warnings.simplefilter("ignore")
+				self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
 			if len(self.intervals) == 0:
-				print 'WARNING: no homology for this window!'
+				if not silent: print 'WARNING: no homology for this window!'
 				self.intervals = 'empty'
 
 		if self.intervals is not None:
@@ -314,34 +317,32 @@ class Filtration:
 		if len(self.intervals.shape) == 1:		# one interval
 			birth_t, death_t = self.intervals
 			if death_t == -1:
-				immortal = [t_to_eps(birth_t), 1]
+				immortal = np.array([[t_to_eps(birth_t)], [1]])
 				mortal = []
 			else:
 				immortal = []
-				mortal = [t_to_eps(birth_t), t_to_eps(death_t), 1]
+				mortal = np.array([[t_to_eps(birth_t)], [t_to_eps(death_t)], [1]])
 
-			data = PDData(mortal, immortal, lim)
-			self.PD_data = data
-			return
+		else:
+			birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
+			for interval in zip(birth_t, death_t):
+				if interval[1] == -1:							# immortal
+					birth_e_imm.append(t_to_eps(interval[0]))
+				else:											# mortal
+					birth_e_mor.append(t_to_eps(interval[0]))
+					death_e_mor.append(t_to_eps(interval[1]))
 
-		birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
+			count_mor = get_multiplicity(birth_e_mor, death_e_mor)
+			mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
 
-		for interval in zip(birth_t, death_t):
-			if interval[1] == -1:				# immortal
-				birth_e_imm.append(t_to_eps(interval[0]))
-			else:
-				birth_e_mor.append(t_to_eps(interval[0]))
-				death_e_mor.append(t_to_eps(interval[1]))
+			if len(mortal):
+				mortal = np.vstack({tuple(row) for row in mortal}).T 		# toss duplicates
 
-		count_mor = get_multiplicity(birth_e_mor, death_e_mor)
-		mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
-		if len(mortal):
-			mortal = np.vstack({tuple(row) for row in mortal}).T  # toss duplicates
+			count_imm = get_multiplicity(birth_e_imm, None)
+			immortal = np.asarray([birth_e_imm, count_imm]).T
 
-		count_imm = get_multiplicity(birth_e_imm, None)
-		immortal = np.asarray([birth_e_imm, count_imm]).T
-		if len(immortal):
-			immortal = np.vstack({tuple(row) for row in immortal}).T # toss duplicates
+			if len(immortal):
+				immortal = np.vstack({tuple(row) for row in immortal}).T 	# toss duplicates
 
 
 		data = PDData(mortal, immortal, lim)
