@@ -545,11 +545,12 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 			# HOMEGROWN VARIANCE #
 
 			dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in prf_evo]
-			variance = np.mean(dists ** 2)  # plot as data point
+			variance = np.mean(np.power(dists, 2))  # plot as data point
+			# variance = np.sum(dists **2) / (len(dists) - 1)
 			var_data.variance.append(variance)
 
 			scaled_dists = get_dists_from_ref(prf_evo, pointwise_mean, weight_func, metric, dist_scale)
-			scaled_variance = np.mean(scaled_dists ** 2)  # plot as data point
+			scaled_variance = np.mean(np.power(scaled_dists, 2))  # plot as data point
 			var_data.scaled_variance.append(scaled_variance)
 
 			# POINTWISE VARIANCE #
