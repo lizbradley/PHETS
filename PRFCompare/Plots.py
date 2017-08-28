@@ -319,9 +319,9 @@ def plot_variance(
 
 		normalize_volume=True,
 
-		PRF_res=50, 		 # number of divisions used for PRF
-		dist_scale='none',	 # 'none', 'a', or 'a + b'
-		metric='L2', 		 # 'L1' (abs) or 'L2' (euclidean)
+		PRF_res=50, 		 		# number of divisions used for PRF
+		dist_scale='b',	 			# 'none', 'a', or 'a + b'
+		metric='L2', 		 		# 'L1' (abs) or 'L2' (euclidean)
 		weight_func=lambda i, j: 1,
 
 		see_samples=5,
@@ -527,6 +527,21 @@ def plot_variance(
 
 		fig.savefig(out_filename)
 
+	def plot_weight_function(f):
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		div = make_axes_locatable(ax)
+		cax = div.append_axes('right', size='10%', pad=.2)
+		dA = 2. / (PRF_res ** 2)  # normalize such that area of PRF domain is 1
+
+		x = y = np.linspace(0, 2 ** .5, PRF_res)
+		xx, yy = np.meshgrid(x, y)
+		z = f(xx, yy)
+		if isinstance(z, int):
+			z = xx * 0 + z
+
+		plot_heatmap(ax, cax, x, y, z)
+		plt.savefig('output/PRFCompare/variance/weight_function.png')
 	# ===========================================================================
 	# 		MAIN: plot_variance()
 	# ===========================================================================
@@ -540,7 +555,7 @@ def plot_variance(
 
 
 	# plot_trajectory(sig)
-
+	plot_weight_function(weight_func)
 	prf_evo_array, filt_evo_array = get_variance_data(filename, kwargs)
 	stats_data, hmap_data = process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_param_2)
 	make_main_fig(stats_data, out_filename)
