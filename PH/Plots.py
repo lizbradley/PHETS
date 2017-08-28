@@ -113,10 +113,10 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 	plot_ax.set_aspect('equal')
 
 	viridis = matplotlib.cm.get_cmap('viridis')
-	colors = [viridis(i) for i in np.linspace(0, 1, 12)]
+	colors = [viridis(i) for i in np.linspace(0, 1, 13)]
 
 	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
-	cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors)
+	cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors, extend='max')
 
 	zm = ma.masked_where(np.isnan(z), z)
 
@@ -149,7 +149,7 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 	x, y = extend_domain(x, y)
 
 	plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
-	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels)
+	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels, extend='max')
 
 	return cmap
 
