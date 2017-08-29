@@ -14,47 +14,39 @@ from PH.Plots import make_PD, make_PRF_plot
 from Utilities import clear_old_files, blockPrint, enablePrint, print_title
 from config import WAV_SAMPLE_RATE
 
-def apply_weight_func(f, f_weight):
+def apply_weight_func(f, weight_func):
 
-	if len(f.shape) == 2:		# untested
+	f_format_full = len(f.shape) == 1 and f.size == 4		# x, y, max_lim included vs z only
 
-		PRF_res = len(f)
-		dA = 2. / (PRF_res ** 2)  # normalize such that area of PRF domain is 1
-		f_weight = f_weight(*np.meshgrid(np.linspace(0, dA ** .5, PRF_res), np.linspace(0, dA ** .5, PRF_res)))
+	z = f[2] if f_format_full else f
 
-		return np.multiply(f, f_weight)
+	x = y = np.linspace(0, 2 ** .5, len(z))
+	xx, yy = np.meshgrid(x, y)
 
-	elif len(f.shape) == 1 and f.size == 4:		# x, y, max_lim included
+	weight_func = weight_func(xx, yy)
+	if isinstance(weight_func, int):
+		weight_func = xx * 0 + weight_func
 
-		z = f[2]
-		PRF_res = int(z.size ** .5)
-		dA = 2. / (PRF_res ** 2)  # normalize such that area of PRF domain is 1
-		f_weight = f_weight(*np.meshgrid(np.linspace(0, dA ** .5, PRF_res), np.linspace(0, dA ** .5, PRF_res)))
+	z = np.multiply(z, weight_func)
 
-		# print f_weight		# debugging
-		z_weighted = np.multiply(z, f_weight)
-		f[2] = z_weighted
+	if f_format_full:
+		f[2] = z
 		return f
-
 	else:
-		print 'ERROR [weight function]: invalid PRF'
-		sys.exit()
+		return z
 
 
 
+def norm(f, metric):
 
-def norm(f, metric, f_weight):
-
-	PRF_res = len(f)
-	dA = 2. / (PRF_res ** 2)		# normalize such that area of PRF domain is 1
-	f_weight = f_weight(*np.meshgrid(np.linspace(0, dA ** .5, PRF_res), np.linspace(0, dA ** .5, PRF_res)))
+	prf_res = len(f)
+	dA = 2. / (prf_res ** 2)		# normalize such that area of PRF domain is 1
 
 	if metric == 'L1':
-		return np.nansum(np.multiply(np.abs(f), f_weight)) * dA
+		return np.nansum(np.abs(f)) * dA
 
 	elif metric == 'L2':
-
-		return np.sqrt(np.nansum(np.multiply(np.power(f, 2), f_weight)) * dA)
+		return np.sqrt(np.nansum(np.power(f, 2)) * dA)
 
 	else:
 		print "ERROR: metric not recognized. Use 'L1' or 'L2'."
@@ -81,12 +73,11 @@ def scale_dists(dists, norms, norm_ref, scale):
 
 
 
-def get_dists_from_ref(funcs, ref_func, weight_func, metric, scale):
-	dists = [norm(np.subtract(f, ref_func), metric, weight_func) for f in funcs]
-	norms = [norm(f, metric, lambda i, j: 1) for f in funcs]
-	norm_ref = [norm(ref_func, metric, lambda i, j: 1)] * len(dists)
+def get_dists_from_ref(funcs, ref_func, metric, scale):
+	dists = [norm(np.subtract(f, ref_func), metric) for f in funcs]
+	norms = [norm(f, metric) for f in funcs]
+	norm_ref = [norm(ref_func, metric)] * len(dists)
 	return scale_dists(dists, norms, norm_ref, scale)
-
 
 
 def get_PRFs(
@@ -306,10 +297,10 @@ def dists_compare(
 	np.savetxt('PRFCompare/text_data/mean_2.txt', funcs_2_avg_z)
 
 
-	dists_1_vs_1 = get_dists_from_ref(funcs_1_z, funcs_1_avg_z, weight_func, metric, dist_scale)
-	dists_2_vs_1 = get_dists_from_ref(funcs_2_z, funcs_1_avg_z, weight_func, metric, dist_scale)
-	dists_1_vs_2 = get_dists_from_ref(funcs_1_z, funcs_2_avg_z, weight_func, metric, dist_scale)
-	dists_2_vs_2 = get_dists_from_ref(funcs_2_z, funcs_2_avg_z, weight_func, metric, dist_scale)
+	dists_1_vs_1 = get_dists_from_ref(funcs_1_z, funcs_1_avg_z, metric, dist_scale)
+	dists_2_vs_1 = get_dists_from_ref(funcs_2_z, funcs_1_avg_z, metric, dist_scale)
+	dists_1_vs_2 = get_dists_from_ref(funcs_1_z, funcs_2_avg_z, metric, dist_scale)
+	dists_2_vs_2 = get_dists_from_ref(funcs_2_z, funcs_2_avg_z, metric, dist_scale)
 
 
 	np.savetxt('PRFCompare/text_data/dist_1_vs_1.txt', dists_1_vs_1)
@@ -506,14 +497,21 @@ class HeatmapData:
 
 def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_param_2):
 
+	def apply_weight_to_evo(prf_evo, weight_f):
+		weighted_prf_evo = []
+		for prf in prf_evo:
+			weighted_prf_evo.append(apply_weight_func(prf, weight_f))
+		return np.asarray(weighted_prf_evo)
+
+
+	def apply_weight_func_to_prf_evo_array(prf_evo_array, weight_f):
+		for row in prf_evo_array:
+			for evo in row:
+				evo[...] = apply_weight_func(evo, weight_f)
+		return prf_evo_array
+
+
 	def vary_evos_over_weight_func(prf_evos_1d):
-
-		def apply_weight_to_evo(prf_evo, weight_f):
-			weighted_prf_evo = []
-			for prf in prf_evo:
-				weighted_prf_evo.append(apply_weight_func(prf, weight_f))
-			return np.asarray(weighted_prf_evo)
-
 		prf_evos_2d = []
 		for prf_evo in prf_evos_1d:
 			prf_evo_vary_2 = []
@@ -525,6 +523,7 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 		prf_evos_2d = np.transpose(np.asarray(prf_evos_2d), (1, 0, 2, 3))
 		return prf_evos_2d
 
+
 	def calculate_curve_data(prf_evos_1d):
 		var_data = VarianceData()
 		hmap_data_arr = []
@@ -535,21 +534,20 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 			# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
 
 			prf_evo = prf_evo[:, 2]  # take z component only
-			null_weight_func = lambda i, j: 1
 			pointwise_mean = np.mean(prf_evo, axis=0)  # plot as heatmap
 			hmap_data.pointwise_mean = pointwise_mean
 
-			pmn = norm(pointwise_mean, metric, null_weight_func)  # plot as data point
+			pmn = norm(pointwise_mean, metric)  # plot as data point
 			var_data.pointwise_mean_norm.append(pmn)
 
 			# HOMEGROWN VARIANCE #
 
-			dists = [norm(np.subtract(PRF, pointwise_mean), metric, weight_func) for PRF in prf_evo]
+			dists = [norm(np.subtract(PRF, pointwise_mean), metric) for PRF in prf_evo]
 			variance = np.mean(np.power(dists, 2))  # plot as data point
 			# variance = np.sum(np.power(dists, 2)) / (len(dists) - 1)
 			var_data.variance.append(variance)
 
-			scaled_dists = get_dists_from_ref(prf_evo, pointwise_mean, weight_func, metric, dist_scale)
+			scaled_dists = get_dists_from_ref(prf_evo, pointwise_mean, metric, dist_scale)
 			scaled_variance = np.mean(np.power(scaled_dists, 2))  # plot as data point
 			var_data.scaled_variance.append(scaled_variance)
 
@@ -560,13 +558,13 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 			pointwise_variance = np.var(diffs, axis=0)  # plot as heatmap
 			hmap_data.pointwise_var = pointwise_variance
 
-			pvn = norm(pointwise_variance, metric, null_weight_func)  # plot as data point
+			pvn = norm(pointwise_variance, metric)  # plot as data point
 			var_data.pointwise_variance_norm.append(pvn)
 
 			functional_COV = pointwise_variance / pointwise_mean  # plot as heatmap
 			hmap_data.functional_COV = functional_COV
 
-			fcovn = norm(functional_COV, metric, null_weight_func)  # plot as data point
+			fcovn = norm(functional_COV, metric)  # plot as data point
 			var_data.functional_COV_norm.append(fcovn)
 
 			hmap_data_arr.append(hmap_data)
@@ -574,15 +572,19 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 		return var_data, hmap_data_arr
 
 
+
 	print 'processing data...'
 
 	if vary_param_2 is None:
+		prf_evo_array = apply_weight_func_to_prf_evo_array(prf_evo_array, weight_func)
 		return calculate_curve_data(prf_evo_array)
 
 	else:
 
 		if vary_param_2[0] == 'weight_func':
 			prf_evo_array = vary_evos_over_weight_func(prf_evo_array)
+		else:
+			prf_evo_array = apply_weight_func_to_prf_evo_array(prf_evo_array, weight_func)
 
 		stats_data = []
 		hmap_data = []

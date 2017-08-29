@@ -7,7 +7,7 @@ import warnings
 
 import numpy as np
 import itertools
-
+from numba import jit
 import BuildFiltration
 from Utilities import blockPrint, enablePrint
 
@@ -160,8 +160,7 @@ class Filtration:
 				row[:] = expanded_row
 			return np.asarray(ID_arr)
 
-
-
+		# @jit
 		def remove_duplicates_all(ID_arr):
 			"""Omit simplexes that have been already added to the filtration or are
 			repeated within a row

@@ -34,7 +34,6 @@ ticks = [-1, -.33, .33, 1]
 def fig1():
 	print 'figure 1...'
 	# figure 1a, 1b
-	# add time (s) label
 	fig = plt.figure(figsize=(10, 3), tight_layout=True, dpi=100)
 
 	gs = gridspec.GridSpec(1, 2, width_ratios=[2, 1])
@@ -83,8 +82,8 @@ def fig2():
 			'use_cliques': False
 		})
 
-	# filtration = Filtration(piano_traj, filt_params, out_fname='temp/fig2a.p')
-	filtration = load_filtration(in_file='temp/fig2a.p')
+	filtration = Filtration(piano_traj, filt_params, out_fname='temp/fig2a.p')
+	# filtration = load_filtration(in_file='temp/fig2a.p')
 
 	plot_filtration_pub(
 		filtration, 2,

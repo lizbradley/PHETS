@@ -118,7 +118,7 @@ def plot_dists_vs_ref(
 
 	funcs_z = funcs[:, 2]
 	ref_func_z = ref_func[2]
-	dists = get_dists_from_ref(funcs_z, ref_func_z, weight_func, metric, dist_scale)
+	dists = get_dists_from_ref(funcs_z, ref_func_z, metric, dist_scale)
 	plot_distances(i_ref, i_arr, dists, out_filename)
 
 
@@ -310,7 +310,7 @@ def plot_variance(
 
 		time_units='seconds',
 
-		crop=(100, 1100),
+		crop=(),
 
 		num_windows=5,
 		window_size=None,
@@ -478,7 +478,7 @@ def plot_variance(
 		ax1 = plt.subplot2grid((5, 9), (0, 3), colspan=6)
 		ax2 = plt.subplot2grid((5, 9), (1, 3), colspan=6, sharex=ax1)
 		ax3 = plt.subplot2grid((5, 9), (2, 3), colspan=6, sharex=ax1)
-		ax4 = plt.subplot2grid((5, 9), (3, 3), colspan=6, sharex=ax1)
+		ax4 = plt.subplot2grid((5, 9), (3, 3), colspan=6, sharex=ax1, sharey=ax2)
 		ax5 = plt.subplot2grid((5, 9), (4, 3), colspan=6, sharex=ax1)
 
 		add_filenames_table(fname_ax, [filename, out_filename])
@@ -532,7 +532,6 @@ def plot_variance(
 		ax = fig.add_subplot(111)
 		div = make_axes_locatable(ax)
 		cax = div.append_axes('right', size='10%', pad=.2)
-		dA = 2. / (PRF_res ** 2)  # normalize such that area of PRF domain is 1
 
 		x = y = np.linspace(0, 2 ** .5, PRF_res)
 		xx, yy = np.meshgrid(x, y)
