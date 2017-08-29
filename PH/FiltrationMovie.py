@@ -135,7 +135,7 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		for complex in complex_data:
 			for simplex in complex:
 				if len(simplex) == 1:
-					print 'WARNING: 0-simplex encountered'
+					pass
 				elif len(simplex) == 2:
 					add_arrow(simplex, cmds)
 				else:

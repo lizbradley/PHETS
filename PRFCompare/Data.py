@@ -1,6 +1,7 @@
 from __future__ import division
 
 import sys
+import warnings
 from math import ceil
 
 import numpy as np
@@ -448,6 +449,7 @@ def get_variance_data(filename, kwargs):
 	if vary_param_2 is None or vary_param_2[0] == 'weight_func':
 		val_2 = ''		# for status indicator
 		prf_evos, filt_evos = vary_evos_over_param(sig, vary_param_1, filt_params); print '\n'
+		prf_evos, filt_evos = [prf_evos], [filt_evos]
 
 	elif vary_param_2[0] in filt_params:
 		prf_arr = []
@@ -504,14 +506,15 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 		return np.asarray(weighted_prf_evo)
 
 
-	def apply_weight_func_to_prf_evo_array(prf_evo_array, weight_f):
+	def apply_weight_func_to_array(prf_evo_array, weight_f):
 		for row in prf_evo_array:
 			for evo in row:
-				evo[...] = apply_weight_func(evo, weight_f)
+				evo[...] = apply_weight_to_evo(evo, weight_f)
 		return prf_evo_array
 
 
-	def vary_evos_over_weight_func(prf_evos_1d):
+	def vary_evos_over_weight_func(prf_evos):
+		prf_evos_1d = prf_evos[0]
 		prf_evos_2d = []
 		for prf_evo in prf_evos_1d:
 			prf_evo_vary_2 = []
@@ -524,7 +527,7 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 		return prf_evos_2d
 
 
-	def calculate_curve_data(prf_evos_1d):
+	def calculate_stats(prf_evos_1d):
 		var_data = VarianceData()
 		hmap_data_arr = []
 
@@ -561,7 +564,10 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 			pvn = norm(pointwise_variance, metric)  # plot as data point
 			var_data.pointwise_variance_norm.append(pvn)
 
-			functional_COV = pointwise_variance / pointwise_mean  # plot as heatmap
+			with warnings.catch_warnings():
+				warnings.simplefilter("ignore")
+				functional_COV = pointwise_variance / pointwise_mean  # plot as heatmap
+
 			hmap_data.functional_COV = functional_COV
 
 			fcovn = norm(functional_COV, metric)  # plot as data point
@@ -575,25 +581,28 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 
 	print 'processing data...'
 
-	if vary_param_2 is None:
-		prf_evo_array = apply_weight_func_to_prf_evo_array(prf_evo_array, weight_func)
-		return calculate_curve_data(prf_evo_array)
+	prf_evo_array_pre_weight = prf_evo_array
 
-	else:
+	if vary_param_2 and vary_param_2[0] == 'weight_func':
+		prf_evo_array = vary_evos_over_weight_func(prf_evo_array)
+	elif vary_param_2:
+		prf_evo_array = apply_weight_func_to_array(prf_evo_array, weight_func)
 
-		if vary_param_2[0] == 'weight_func':
-			prf_evo_array = vary_evos_over_weight_func(prf_evo_array)
-		else:
-			prf_evo_array = apply_weight_func_to_prf_evo_array(prf_evo_array, weight_func)
 
-		stats_data = []
-		hmap_data = []
-		for row in prf_evo_array:
-			stats_data_1D, hmap_data_1d = calculate_curve_data(row)
-			stats_data.append(stats_data_1D)
-			hmap_data.append(hmap_data_1d)
+	curve_data = []
+	hmap_data = []
+	for row in prf_evo_array:
+		cd, hmd = calculate_stats(row)
+		curve_data.append(cd)
+		hmap_data.append(hmd)
 
-		return np.asarray(stats_data), np.asarray(np.asarray(hmap_data))
+	hmap_data_pre_weight = []
+	for row in prf_evo_array_pre_weight:
+		cd, hmd_pre_weight = calculate_stats(row)
+		hmap_data_pre_weight.append(hmd_pre_weight)
+
+
+	return np.asarray(curve_data), np.asarray(hmap_data), np.asarray(hmap_data_pre_weight)
 
 
 

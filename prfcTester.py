@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 8000			 # set test number here or with command line argument
+set_test = 8001			 # set test number here or with command line argument
 
 
 
@@ -2838,7 +2838,7 @@ if test == 8000:
 		'output/PRFCompare/variance/joetest.png', 		 	 # out filename
 		params,
 
-		('worm_length', [200, 500, 1000, 2000, 5000]),		 # vary param 1
+		('worm_length', [200, 500, 1000, 2000]),		 # vary param 1
 		None,												 # vary param 2
 
 		load_saved_filts=True,
@@ -2850,14 +2850,12 @@ if test == 8000:
 
 
 		# weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
-		weight_func=lambda i, j: j - i,  # no weighting (constant). see test 4 for other examples
+		weight_func=lambda x, y: y - x,
 
 		PRF_res=10,  # num divisions
 
-		# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,
-
 		see_samples=10,  # interval to build filt movies and PDs. 0 means no PDs or movies.
 
 	)
@@ -2867,22 +2865,34 @@ if test == 8001:
 	params.update(
 		{
 			'max_filtration_param': -5, 		# no simplexes larger than 5-simplex
-			'num_divisions': 10, 				# 5 complexes in the filtration
+			'num_divisions': 20, 				# 5 complexes in the filtration
 			'use_cliques': True,
 			'ds_rate':30
 
 		})
 
 	# todo: remove weight func as arg to norm, weight prfs up front. fix weight function domain!!!
-	# todo:
+	# todo: ditch PRF_res, automatically determine from num div instead
 
 	plot_variance(
 		'datasets/trajectories/btc200thou.txt',
-		'output/PRFCompare/variance/3dtest.png', 		 	 # out filename
+		'output/PRFCompare/variance/testing.png', 		 	 # out filename
 		params,
 
-		('worm_length', [200, 500, 1000, 2000, 3000, 4000]),		 # vary param 1
-		None,												 # vary param 2
+		('worm_length', [200, 500, 1000, 2000]),		 # vary param 1
+		('weight_func',						# vary param 2 as weight function
+			(
+				lambda x, y: 1,
+				lambda x, y: 5 * (y - x),
+				lambda x, y: np.e ** (y - x)
+			)
+		),
+
+		legend_labels=(						# Needed only when vary param 2 is weight_func. (For legend and filenames.)
+			'weight: none',
+			'weight: linear k=5',
+			'weight: exponential k=1'
+		),
 
 		load_saved_filts=True,
 
@@ -2891,11 +2901,7 @@ if test == 8001:
 		crop=(5000, 2005000),     # (start, stop) in time_units, or 'auto'
 		num_windows=10,			  # evenly spaced
 
-
-		# weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
-		weight_func=lambda i, j: j - i,  # no weighting (constant). see test 4 for other examples
-
-		PRF_res=10,  # num divisions
+		PRF_res=20,  # num divisions
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -2907,6 +2913,44 @@ if test == 8001:
 		quiet=True
 	)
 
+
+
+
+if test == 8002:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -5, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'ds_rate':30
+
+		})
+
+	# todo: remove weight func as arg to norm, weight prfs up front. fix weight function domain!!!
+	# todo: ditch PRF_res, automatically determine from num div instead
+
+	plot_variance(
+		'datasets/trajectories/btc200thou.txt',
+		'output/PRFCompare/variance/testing.png', 		 	 # out filename
+		params,
+
+		('worm_length', (200, 500, 1000, 2000)),		 # vary param 1
+		('use_cliques', (True, False)),
+
+		load_saved_filts=True,
+
+		time_units='samples',
+		crop=(5000, 2005000),     # (start, stop) in time_units, or 'auto'
+		num_windows=10,			  # evenly spaced
+
+		weight_func=lambda x, y: 1,  # no weighting (constant). see test 4 for other examples
+
+		PRF_res=10,  # num divisions
+
+		normalize_volume=True,
+		see_samples=10,  # interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
 
 
 
