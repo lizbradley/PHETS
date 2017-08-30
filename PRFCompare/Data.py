@@ -497,7 +497,7 @@ class HeatmapData:
 
 
 
-def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_param_2):
+def process_variance_data(prf_evo_array, metric, weight_func, vary_param_2):
 
 	def apply_weight_to_evo(prf_evo, weight_f):
 		weighted_prf_evo = []
@@ -527,7 +527,7 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 		return prf_evos_2d
 
 
-	def calculate_stats(prf_evos_1d):
+	def calculate_stats(prf_evos_1d, apply_weight_to_fcov=True):
 		var_data = VarianceData()
 		hmap_data_arr = []
 
@@ -543,18 +543,16 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 			pmn = norm(pointwise_mean, metric)  # plot as data point
 			var_data.pointwise_mean_norm.append(pmn)
 
-			# HOMEGROWN VARIANCE #
 
 			dists = [norm(np.subtract(PRF, pointwise_mean), metric) for PRF in prf_evo]
 			variance = np.mean(np.power(dists, 2))  # plot as data point
 			# variance = np.sum(np.power(dists, 2)) / (len(dists) - 1)
 			var_data.variance.append(variance)
 
-			scaled_dists = get_dists_from_ref(prf_evo, pointwise_mean, metric, dist_scale)
+			scaled_dists = get_dists_from_ref(prf_evo, pointwise_mean, metric, 'b')
 			scaled_variance = np.mean(np.power(scaled_dists, 2))  # plot as data point
 			var_data.scaled_variance.append(scaled_variance)
 
-			# POINTWISE VARIANCE #
 
 			diffs = [PRF - pointwise_mean for PRF in prf_evo]
 
@@ -568,7 +566,11 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 				warnings.simplefilter("ignore")
 				functional_COV = pointwise_variance / pointwise_mean  # plot as heatmap
 
-			hmap_data.functional_COV = functional_COV
+			if apply_weight_to_fcov:
+				hmap_data.functional_COV = apply_weight_func(functional_COV, weight_func)
+			else:
+				hmap_data.functional_COV = functional_COV
+
 
 			fcovn = norm(functional_COV, metric)  # plot as data point
 			var_data.functional_COV_norm.append(fcovn)
@@ -598,7 +600,7 @@ def process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_p
 
 	hmap_data_pre_weight = []
 	for row in prf_evo_array_pre_weight:
-		cd, hmd_pre_weight = calculate_stats(row)
+		cd, hmd_pre_weight = calculate_stats(row, apply_weight_to_fcov=False)
 		hmap_data_pre_weight.append(hmd_pre_weight)
 
 

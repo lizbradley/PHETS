@@ -319,8 +319,6 @@ def plot_variance(
 
 		normalize_volume=True,
 
-		PRF_res=50, 		 		# number of divisions used for PRF
-		dist_scale='b',	 			# 'none', 'a', or 'a + b'
 		metric='L2', 		 		# 'L1' (abs) or 'L2' (euclidean)
 		weight_func=lambda i, j: 1,
 
@@ -337,6 +335,40 @@ def plot_variance(
 		cbar = ax.scatter(sig[:,0], sig[:,1], s=.05, c=np.arange(sig.shape[0]))
 		fig.colorbar(cbar)
 		fig.savefig('output/PRFCompare/variance/trajectory.png')
+
+
+	def plot_weight_functions():
+		print 'plotting weight function(s)...'
+		dir = 'output/PRFCompare/variance/weight_functions/'
+		clear_temp_files(dir)
+
+		if vary_param_2 and vary_param_2[0] == 'weight_func':
+			funcs = vary_param_2[1]
+			fnames = legend_labels
+
+		else:
+			funcs = [weight_func]
+			fnames = 'f'
+
+		for fname, func in zip(fnames, funcs):
+			fig = plt.figure()
+			ax = fig.add_subplot(111)
+			div = make_axes_locatable(ax)
+			cax = div.append_axes('right', size='10%', pad=.2)
+
+			x = y = np.linspace(0, 2 ** .5, filt_params['num_divisions'])
+			xx, yy = np.meshgrid(x, y)
+			z = func(xx, yy)
+			if isinstance(z, int):
+				z = xx * 0 + z
+
+			mask = lambda x, y: x > y
+			mask = mask(xx, yy)
+			mask = np.where(mask == True, np.nan, 1)
+			z = np.multiply(z, mask)
+
+			plot_heatmap(ax, cax, x, y, z)
+			plt.savefig('{}{}.png'.format(dir, fname))
 
 
 	def plot_heatmaps(data_arr, data_arr_pre_weight):
@@ -368,7 +400,7 @@ def plot_variance(
 				fig.tight_layout(pad=3, rect=(.05, 0, .95, .95))
 
 
-			x = y = np.linspace(0, np.power(2, .5), PRF_res)
+			x = y = np.linspace(0, np.power(2, .5), filt_params['num_divisions'])
 
 			plot_heatmap(ax1, cax, x, y, hmap_data.pointwise_mean, annot=annot_hm)
 			plot_heatmap(ax2, cax, x, y, hmap_data.pointwise_var, annot=annot_hm)
@@ -385,7 +417,7 @@ def plot_variance(
 			ax1.set_ylabel('weighted',		fontsize=12, labelpad=10)		# abuse y axis label
 			ax4.set_ylabel('unweighted',	fontsize=12, labelpad=10)
 
-			ticks = np.linspace(0, 1.4, PRF_res, endpoint=True)
+			ticks = np.linspace(0, 1.4, filt_params['num_divisions'], endpoint=True)
 			while len(ticks) > 6:
 				ticks = ticks[1::2]
 			for ax in [ax1, ax2, ax3, ax4, ax5, ax6]:
@@ -459,7 +491,7 @@ def plot_variance(
 						movie_filename = dir + comp_name + 'movie.mp4'
 
 						make_PD(filt, PD_filename)
-						make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
+						make_PRF_plot(filt, PRF_filename, PRF_res=filt_params['num_divisions'])
 						make_movie(filt, movie_filename)
 
 		else:
@@ -478,7 +510,7 @@ def plot_variance(
 					movie_filename = dir + comp_name + 'movie.mp4'
 
 					make_PD(filt, PD_filename)
-					make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
+					make_PRF_plot(filt, PRF_filename, PRF_res=filt_params['num_divisions'])
 					make_movie(filt, movie_filename)
 
 
@@ -505,11 +537,11 @@ def plot_variance(
 		add_filenames_table(fname_ax, [filename, out_filename])
 		add_filt_params_table(params_ax, filt_params)
 
-		ax1.set_ylabel('norm of\npointwise\nmean', **label_kwargs)
-		ax2.set_ylabel('variance', **label_kwargs)
-		ax3.set_ylabel('scaled\nvariance', **label_kwargs)
-		ax4.set_ylabel('norm of\npointwise\nvariance', **label_kwargs)
-		ax5.set_ylabel('norm of\nfunctional\nCOV', **label_kwargs)
+		ax1.set_ylabel('norm of mean', **label_kwargs)
+		ax2.set_ylabel('global variance', **label_kwargs)
+		ax3.set_ylabel('global fano factor', **label_kwargs)
+		ax4.set_ylabel('local variance', **label_kwargs)
+		ax5.set_ylabel('local fano factor', **label_kwargs)
 
 		ax5.set_xlabel(vary_param_1[0])
 
@@ -548,38 +580,6 @@ def plot_variance(
 
 		fig.savefig(out_filename)
 
-	def plot_weight_functions():
-		print 'plotting weight function(s)...'
-		dir = 'output/PRFCompare/variance/weight_functions/'
-		clear_temp_files(dir)
-
-		if vary_param_2 and vary_param_2[0] == 'weight_func':
-			funcs = vary_param_2[1]
-			fnames = legend_labels
-		else:
-			funcs = [weight_func]
-			fnames = 'f'
-
-		for fname, func in zip(fnames, funcs):
-
-			fig = plt.figure()
-			ax = fig.add_subplot(111)
-			div = make_axes_locatable(ax)
-			cax = div.append_axes('right', size='10%', pad=.2)
-
-			x = y = np.linspace(0, 2 ** .5, PRF_res)
-			xx, yy = np.meshgrid(x, y)
-			z = func(xx, yy)
-			if isinstance(z, int):
-				z = xx * 0 + z
-
-			mask = lambda x, y: x > y
-			mask = mask(xx, yy)
-			mask = np.where(mask == True, np.nan, 1)
-			z = np.multiply(z, mask)
-
-			plot_heatmap(ax, cax, x, y, z)
-			plt.savefig('{}{}.png'.format(dir, fname))
 
 
 	# ===========================================================================
@@ -588,16 +588,21 @@ def plot_variance(
 
 	# options = [PRF_res, time_units, normalize_volume, mean_samp_num, num_windows, window_size, see_samples]
 
+	PRF_res = filt_params['num_divisions']
 	kwargs = locals()
-
 
 	from Data import get_variance_data, process_variance_data
 
+	in_weight_func = weight_func
 
+	def sqrt_weight_func(x, y):
+		return in_weight_func(x, y) ** .5
+
+	weight_func = sqrt_weight_func
 	# plot_trajectory(sig)
 	plot_weight_functions()
 	prf_evo_array, filt_evo_array = get_variance_data(filename, kwargs)
-	stats_data, hmap_data, hmap_data_pw = process_variance_data(prf_evo_array, metric, weight_func, dist_scale, vary_param_2)
+	stats_data, hmap_data, hmap_data_pw = process_variance_data(prf_evo_array, metric, weight_func, vary_param_2)
 	make_main_fig(stats_data, out_filename)
 	plot_heatmaps(hmap_data, hmap_data_pw)
 	if see_samples: show_samples(filt_evo_array)
