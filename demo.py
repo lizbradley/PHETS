@@ -18,7 +18,7 @@ sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 
 
 # the call, which includes setting where it puts the results
-plot_signal('output/demo/signal.png', sig, crop=crop, time_units=time_units)
+plot_signal('output/demo/signal.png', sig, window=crop, time_units=time_units)
 # following line does the right thing with axis labels
 
 trajs = slide_window(

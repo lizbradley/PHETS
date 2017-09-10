@@ -39,7 +39,7 @@ def add_param_table(ax, params):
 		colWidths=[1, 1],
 		bbox=[0, 0, 1, 1],  # x0, y0, width, height
 	)
-	param_table.auto_set_font_size(False)
-	param_table.set_fontsize(6)
+	# param_table.auto_set_font_size(False)
+	# param_table.set_fontsize(6)
 
 

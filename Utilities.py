@@ -134,9 +134,9 @@ def frames_to_movie(out_filename, frame_path, framerate=1, aspect=None):
 		'-loglevel', 'panic',
 		'-y',
 		'-framerate', str(framerate),
-		'-aspect', '{}:{}'.format(aspect[0], aspect[1]),
 		'-i', frame_path,
 		'-r', str(24),
+		# '-aspect', '{}:{}'.format(aspect[0], aspect[1]),
 		out_filename
 
 	]

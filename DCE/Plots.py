@@ -62,7 +62,7 @@ def plot_dce(fig, ax, dce_data):
 
 
 
-def plot_signal(out, waveform_data, crop=None, time_units='seconds', offset=None):
+def plot_signal(out, waveform_data, window=None, time_units='seconds', offset=None):
 	
 	if isinstance(out, basestring):
 		fig = plt.figure(figsize=(4, 1))
@@ -78,17 +78,20 @@ def plot_signal(out, waveform_data, crop=None, time_units='seconds', offset=None
 
 	else: 			# seconds
 		x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
-		if offset:
-			x = x + offset
+
 		ax.set_xlabel('time (seconds)')
+
+	if offset:
+		x = x + offset
+		window = np.array(window) + offset
 
 	ax.plot(x, y, color='k', zorder=0, lw= .5)
 	ax.axis('tight')
 
-	if crop is not None:
-		if math.fabs(crop[0] - crop[1]) < .01:
-			ax.axvline(crop[0], color='r', alpha=0.7, zorder=1)
-		ax.axvspan(crop[0], crop[1], facecolor='r', alpha=0.5, zorder=1)
+	if window is not None:
+		if math.fabs(window[0] - window[1]) < .01:
+			ax.axvline(window[0], color='r', alpha=0.7, zorder=1)
+		ax.axvspan(window[0], window[1], facecolor='r', alpha=0.5, zorder=1)
 
 	ymin, ymax = ax.get_ylim()
 	ylim = abs(ymin) if abs(ymin) >= abs(ymax) else abs(ymax)
@@ -129,8 +132,8 @@ def plot_title(fname_ax, param_ax, title_info):
 
 
 def make_frame(traj, sig, window, frame_fname, title_info):
-	fig = plt.figure(figsize=(10, 8), tight_layout=False)
-	fig.subplots_adjust(hspace=.5)
+	fig = plt.figure(figsize=(10, 8), tight_layout=False, dpi=300)
+	# fig.subplots_adjust(hspace=.5)
 	m = title_info['m']
 
 	fname_ax = 				plt.subplot2grid((8, 10), (0, 0), colspan=3)
