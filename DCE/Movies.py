@@ -1,5 +1,5 @@
 import DCE
-from MovieTools import frames_to_movie
+# from MovieTools import frames_to_movie
 import Plots
 import numpy as np
 import sys
@@ -12,6 +12,18 @@ from config import WAV_SAMPLE_RATE
 from MovieTools import remove_old_frames
 from MovieTools import prep_save_worms_single, save_worms_single, prep_save_worms_double, save_worms_double
 
+def crop_sig(crop, sig, time_units):
+	if crop:
+		if time_units == 'samples':
+			pass
+		elif time_units == 'seconds':
+			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		else:
+			print 'ERROR: invalid time_units'
+			sys.exit()
+
+		return sig[crop[0]: crop[1]]
+
 
 def slide_window(
 		in_filename,
@@ -23,45 +35,53 @@ def slide_window(
 		ds_rate=1,
 		m=2,  # embed dimension
 		save_movie=True,
-		crop=None
+		crop=None,
+		title=None,
+		framerate=1
 	):
 
+	title_info = {
+		'fname': in_filename,
+		'tau': tau,
+		'm': m,
+		'crop': crop,
+		'time_units': time_units,
+		'window_size': window_size,
+		'window_step': window_step,
+		'title': title
+	}
 
 	if save_movie: remove_old_frames()
 
-	if isinstance(in_filename, basestring): sig = np.loadtxt(in_filename)
-	else: sig = in_filename
+	if isinstance(in_filename, basestring):
+		full_sig = np.loadtxt(in_filename)
+	else:
+		full_sig = in_filename
 
-	if crop:
-		if time_units == 'samples':
-			pass
-		elif time_units == 'seconds':
-			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
-		else:
-			print 'ERROR: invalid time_units'
-			sys.exit()
-		sig = sig[crop[0] : crop[1]]
+	sig = crop_sig(crop, full_sig, time_units)
 
-	if time_units == 'seconds': worm_length = len(sig) / WAV_SAMPLE_RATE
-	else: worm_length = len(sig)
+	if time_units == 'seconds':
+		worm_length = len(sig) / WAV_SAMPLE_RATE
+	else:
+		worm_length = len(sig)
 
-	num_frames = worm_length / window_step
+	frame_fname = 'DCE/frames/frame%03d.png'
 
 	trajs = []
 
 	for i, start in enumerate(np.arange(0, worm_length, window_step)):
-		print 'frame %i of %i' % (i, num_frames)
+		print 'frame %i of %i' % (i, worm_length / window_step)
 
-		crop = [start, start + window_size]
-		# DCE.embed_v1(sig, 'DCE/temp_data/embedded_coords.txt', crop, tau, m, ds_rate=ds_rate)
-		traj = DCE.embed(sig, tau, m, crop=crop, ds_rate=ds_rate, time_units=time_units)
+		window = [start, start + window_size]
+		traj = DCE.embed(sig, tau, m, crop=window, ds_rate=ds_rate, time_units=time_units)
 		trajs.append(traj)
 
 		if save_movie:
-			Plots.make_frame(traj, in_filename, 'DCE/frames/frame%03d.png' % i, crop, tau, m)
+			Plots.make_frame(traj, sig, window, frame_fname % i, title_info)
 
 	if save_movie:
-		frames_to_movie(out_filename, framerate=1)
+		import Utilities
+		Utilities.frames_to_movie(out_filename, frame_fname, framerate=framerate, aspect=(10,8))
 
 	return trajs
 

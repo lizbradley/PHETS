@@ -4,32 +4,27 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import FormatStrFormatter
+import TitleBox
+from config import WAV_SAMPLE_RATE
 
-WAV_SAMPLE_RATE = 44100.
 
-
-
-def plot_dce(ax, in_file_name):
+def plot_dce(fig, ax, dce_data):
 	# print 'plotting dce...'
 
-	if isinstance(in_file_name, basestring):
-		dce_data = np.loadtxt(in_file_name)
-	else:
-		dce_data = np.asarray(in_file_name)
+	# ax.set_aspect('equal', adjustable='box', anchor='C')
+	# ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	# ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	# ax.use_sticky_edges = False
+
+
 
 	amb_dim = dce_data.shape[1]
 
 	if amb_dim == 2:
 
-		x = dce_data[:,0]
-		y = dce_data[:,1]
+		x = dce_data[:, 0]
+		y = dce_data[:, 1]
 		ax.scatter(x, y, color='black', s=.1)
-		# subplot.set_aspect('equal')
-		ax.set(adjustable='box-forced', aspect='equal')
-
-		ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-		ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-
 
 	elif amb_dim == 3:
 		x = dce_data[:, 0]
@@ -37,17 +32,37 @@ def plot_dce(ax, in_file_name):
 		z = dce_data[:, 2]
 
 		ax.scatter(x, y, z, color='black', s=.1)
-		# subplot.set_aspect('equal')
-		ax.set(adjustable='box-forced', aspect='equal')
-		# ax.axis('off')
+		# ax.set_axis('off')
 
 
-	else:
-		print 'ERROR: invalid amb_dim (m)'
-		sys.exit()
+	ax.set_aspect('equal', adjustable='datalim')
+
+	ymin, ymax = ax.get_ylim()
+	ylim = max(abs(ymin), abs(ymax))
+	xmin, xmax = ax.get_xlim()
+	xlim = max(abs(xmin), abs(xmax))
+
+	lim = max(xlim, ylim)
+	ax.set_ylim([-lim, lim])
+	ax.set_xlim([-lim, lim])
+	# print 'ylim: {}, xlim: {}'.format(ylim, xlim)
+
+	ax.set_xticks([])
+	# ax.set_yticks([])
+	ymin, ymax = ax.get_ylim()
+	ax.set_yticks([-lim, 0, lim])
+	# ax.set_xticks([-lim, 0, lim])
+	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+
+	# pos = ax.get_position()
+	# fig.text(pos.x0, pos.y0 + pos.height,	'{:.3f}'.format(ylim), 	ha='right', va='bottom')
+	# fig.text(pos.x0, pos.y0, 				'{:.3f}'.format(-ylim), ha='right', va='top')
+
+	fig.subplots_adjust(left=.07, bottom=.07, right=.93, top=.93, wspace=.5, hspace=.5)
 
 
-def plot_signal(out, waveform_data, crop=None, time_units='seconds'):
+
+def plot_signal(out, waveform_data, crop=None, time_units='seconds', offset=None):
 	
 	if isinstance(out, basestring):
 		fig = plt.figure(figsize=(4, 1))
@@ -63,6 +78,8 @@ def plot_signal(out, waveform_data, crop=None, time_units='seconds'):
 
 	else: 			# seconds
 		x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
+		if offset:
+			x = x + offset
 		ax.set_xlabel('time (seconds)')
 
 	ax.plot(x, y, color='k', zorder=0, lw= .5)
@@ -73,10 +90,13 @@ def plot_signal(out, waveform_data, crop=None, time_units='seconds'):
 			ax.axvline(crop[0], color='r', alpha=0.7, zorder=1)
 		ax.axvspan(crop[0], crop[1], facecolor='r', alpha=0.5, zorder=1)
 
-	y0,y1 = ax.get_ylim()
-	ylim = abs(y0) if abs(y0) >= abs(y1) else abs(y1)
+	ymin, ymax = ax.get_ylim()
+	ylim = abs(ymin) if abs(ymin) >= abs(ymax) else abs(ymax)
 	ax.set_ylim([-ylim, ylim])
-	
+	ax.set_yticks([-ylim, 0, ylim])
+	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+
+
 	if isinstance(out, basestring): plt.savefig(out)
 
 
@@ -100,41 +120,38 @@ def plot_signal_zoom(ax, full_sig, crop, time_units='seconds', sig=None):
 	ax.plot(x, y, color='k', zorder=0, lw= .5)
 
 
-def plot_title(subplot, in_file_name, tau):
+def plot_title(fname_ax, param_ax, title_info):
 	""" for slide window movies """
-	subplot.axis('off')
-	subplot.set_xlim([0,1])
-	subplot.set_ylim([0,1])
 
-	tau_str = r'$\tau = %d$' % tau
-	subplot.text(.5,.5 , tau_str,
-				 horizontalalignment='center',
-				 verticalalignment='center',
-				 size=14,
-				 bbox=dict(facecolor='none')
-				 )
+	TitleBox.add_fname_table(fname_ax, title_info)
+	TitleBox.add_param_table(param_ax, title_info)
 
 
-def make_frame(coords_file_name, wave_file_name, out_file_name, embed_crop, tau, m):
-	fig = plt.figure(figsize=(9, 9), tight_layout=False)
+
+def make_frame(traj, sig, window, frame_fname, title_info):
+	fig = plt.figure(figsize=(10, 8), tight_layout=False)
 	fig.subplots_adjust(hspace=.5)
-	fig.suptitle(wave_file_name)
-	title_subplot = 	plt.subplot2grid((4, 4), (0, 3), rowspan=3)
-	if m == 2:
-		dce_subplot =	plt.subplot2grid((4, 4), (0, 0), colspan=3, rowspan=3)
-	elif m == 3:
-		dce_subplot = 	plt.subplot2grid((4, 4), (0, 0), colspan=3, rowspan=3, projection='3d')
+	m = title_info['m']
+
+	fname_ax = 				plt.subplot2grid((8, 10), (0, 0), colspan=3)
+	param_ax =				plt.subplot2grid((8, 10), (1, 0), colspan=3, rowspan=3)
+	sig_ax = 				plt.subplot2grid((8, 10), (6, 0), colspan=10, rowspan=2)
+	if m == 2: dce_ax =		plt.subplot2grid((8, 10), (0, 4), colspan=6, rowspan=6)
+	else: dce_ax = 			plt.subplot2grid((8, 10), (0, 4), colspan=6, rowspan=6, projection='3d')
+
+	# if m == 2: dce_ax =		fig.add_axes([.4, .3, .6, .6])
+	# elif m == 3: dce_ax =	fig.add_axes([.4, .3, .6, .6], projection='3d')
+
+	if title_info['crop']:
+		t_offset = title_info['crop'][0]
 	else:
-		print 'ERROR: m must be 2 or 3'
-		sys.exit()
-	wavform_subplot = 	plt.subplot2grid((4, 4), (3, 0), colspan=4)
+		t_offset = 0
 
-	wave_data = np.loadtxt(wave_file_name)
 
-	plot_dce(dce_subplot, coords_file_name)
-	plot_signal(wavform_subplot, wave_data, embed_crop)
-	plot_title(title_subplot, wave_file_name, tau)
-	plt.savefig(out_file_name)
+	plot_title(fname_ax, param_ax, title_info)
+	plot_dce(fig, dce_ax, traj)
+	plot_signal(sig_ax, sig, window, offset=t_offset)
+	plt.savefig(frame_fname)
 	plt.close(fig)
 
 

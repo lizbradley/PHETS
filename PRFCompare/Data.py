@@ -430,7 +430,7 @@ def get_variance_data(filename, kwargs):
 			if kwargs['quiet']:
 				sys.stdout.write('\r		vary_param_1: {}		vary_param_2: {}		'.format(val_1, val_2))
 				sys.stdout.flush()
-				# get PRFs at evenly spaced intervals along input -- 'prf evolution'
+				# get PRFs at evenly spaced intervals along input -- a 'prf evolution'
 				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=True)
 
 			else:

@@ -594,11 +594,10 @@ def plot_variance(
 	from Data import get_variance_data, process_variance_data
 
 	in_weight_func = weight_func
-
 	def sqrt_weight_func(x, y):
 		return in_weight_func(x, y) ** .5
-
 	weight_func = sqrt_weight_func
+
 	# plot_trajectory(sig)
 	plot_weight_functions()
 	prf_evo_array, filt_evo_array = get_variance_data(filename, kwargs)

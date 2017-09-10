@@ -6,16 +6,15 @@ from DCE.Movies import slide_window, vary_tau
 from PH import Filtration, make_movie, make_PD
 from config import default_filtration_params as filt_params
 
+# the following vars are passed the functions below, defined here for convenience
 
-time_units = 'seconds'					# so you don't have to re-type
-crop = (1, 2)						 	# range of the signal that you want to play with
+time_units = 'seconds'					# 'seconds' or 'samples'
+crop = (1, 3)						 	# range of the signal that you want to play with
 tau = (1 / idx_to_freq(49)) / np.pi		# embedding delay
-# could specify tau = 0.1 if wanted 0.1 sec (or 2 if wanted 2 sample intervals, but would then need to set time units to 'samples'
 m = 2 									# embedding dimension
 
 # loads the data
 sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
-
 
 
 # the call, which includes setting where it puts the results
@@ -26,10 +25,12 @@ trajs = slide_window(
 	sig,
 	'output/demo/embed_movie.mp4',
 	tau=tau,
-	m=2,
-	window_size=.05,  # this is in seconds
-	window_step=.1,
-	crop=crop
+	m=m,
+	window_size=.05,  			# this is in seconds
+	window_step=.05,
+	crop=crop,
+	title='49-C135B.txt',		# optional, for labelling. will be obsolete when Signal class is implemented
+	framerate=3
 )
 
 traj = trajs[5]		# take embedding from 5th frame of movie
@@ -53,7 +54,7 @@ filt_params.update(
 )
 
 # build the filtration:
-filt = Filtration(traj, filt_params)
-
-make_movie(filt, 'output/demo/filt_movie.mp4')
-make_PD(filt, 'output/demo/PD.png')  # make the persistence diagram
+# filt = Filtration(traj, filt_params)
+#
+# make_movie(filt, 'output/demo/filt_movie.mp4')
+# make_PD(filt, 'output/demo/PD.png')  # make the persistence diagram

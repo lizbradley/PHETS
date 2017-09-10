@@ -54,6 +54,32 @@ pip install -r requirements.txt
 
 
 ## Usage
+```python
+import numpy as np
+from Tools import idx_to_freq
+from DCE.Movies import slide_window, vary_tau
+
+time_units = 'seconds'					# 'seconds' or 'samples'
+crop = (1, 3)						 	# range of the signal that you want to play with
+tau = (1 / idx_to_freq(49)) / np.pi		# embedding delay
+m = 2 									# embedding dimension
+
+sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
+
+trajs = slide_window(
+	sig,
+	'output/demo/embed_movie.mp4',
+	tau=tau,
+	m=m,
+	window_size=.05,  			# this is in seconds
+	window_step=.05,
+	crop=crop,
+	title='49-C135B.txt'		# optional, for labelling. will be obsolete when Signal class is implemented
+
+)
+```
+
+
 
 See demo.py and reference.pdf. 
 
