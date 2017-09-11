@@ -15,7 +15,7 @@ default_filtration_params = {
 	"max_filtration_param": -20,
 	"min_filtration_param": 0,
 	"start": 0,
-	"worm_length": 10000,
+	"worm_length": None,
 	"ds_rate": 50,
 	"landmark_selector": "maxmin",
 	"use_ne_for_maxmin": False,

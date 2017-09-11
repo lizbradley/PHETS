@@ -151,7 +151,7 @@ def get_PRFs(
 			print '=============================================\n'
 
 			# blockPrint()
-			filt = (Filtration(worm, filt_params, filename=filename))
+			filt = (Filtration(worm, filt_params, title=filename))
 			# enablePrint()
 
 			filts.append(filt)

@@ -76,6 +76,8 @@ def slide_window(
 		traj = DCE.embed(sig, tau, m, crop=window, ds_rate=ds_rate, time_units=time_units)
 		trajs.append(traj)
 
+		title_info.update({'frame #': i})
+
 		if save_movie:
 			Plots.make_frame(traj, sig, window, frame_fname % i, title_info)
 

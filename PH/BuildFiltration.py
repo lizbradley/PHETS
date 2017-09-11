@@ -389,6 +389,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 		eps = []
 		filt_diffs = []
+
 		for line in lines:
 			e, filt_diff_str = line.split(': ')
 			eps.append(float(e))
@@ -403,7 +404,6 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		for i, row in enumerate(filt_diffs):
 			for j, simp in enumerate(row):
 				filt_diffs[i][j] = wit_ids_2_land_ids(simp)
-
 
 		simplexes = []
 		for i, row in enumerate(filt_diffs):

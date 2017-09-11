@@ -38,7 +38,7 @@ class PDData:
 
 class Filtration:
 
-	def __init__(self, traj, params, filename='none', silent=False, out_fname=None):
+	def __init__(self, traj, params, title='none', silent=False, out_fname=None):
 		caller_dir = os.getcwd()
 
 		if isinstance(traj, basestring):			# is filename
@@ -47,7 +47,7 @@ class Filtration:
 			self.filename = caller_dir + '/' + traj
 		else:										# is array
 			self.sig = traj
-			self.filename = filename
+			self.filename = title
 
 		os.chdir(SCRIPT_DIR)
 
@@ -94,6 +94,9 @@ class Filtration:
 
 
 		if not silent: print "building filtration..."
+
+		if params['worm_length'] is None:
+			params['worm_length'] = len(self.sig)
 
 		if len(self.sig.shape) == 1:
 			print "ERROR: Filtration input 'sig' is one dimensional"

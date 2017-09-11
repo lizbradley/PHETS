@@ -3,7 +3,7 @@ from Tools import idx_to_freq
 from DCE import embed, plot_signal
 from DCE.Plots import plot_dce
 from DCE.Movies import slide_window, vary_tau
-from PH import Filtration, make_movie, make_PD
+from PH import Filtration, make_movie, make_PD, make_PRF_plot
 from config import default_filtration_params as filt_params
 
 # the following vars are passed the functions below, defined here for convenience
@@ -29,32 +29,31 @@ trajs = slide_window(
 	window_size=.05,  			# this is in seconds
 	window_step=.02,
 	crop=crop,
-	title='49-C135B.txt',		# optional, for labelling. will be obsolete when Signal class is implemented
-	framerate=5
+	title='piano demo',
+	framerate=10,
+	save_movie=False
 )
 
-traj = trajs[5]		# take embedding from 5th frame of movie
+traj = trajs[100]		# take embedding from 5th frame of movie
 
 # traj = embed(sig, tau, m, crop=crop, time_units=time_units)		# alternatively, embed explicitly
 
-# plot_dce()
 
 # parameters used to build the filtration:
 filt_params.update(
 	{
-		'worm_length': 2000,
-		'ds_rate': 50,
-		'num_divisions': 10,  # number of epsilon vals in filtration
+		'ds_rate': 25,
+		'num_divisions': 25,  # number of epsilon vals in filtration
 		# 'max_filtration_param': .05,  # if positive, explicit;
 		'max_filtration_param': -10,  # if negative, cuts off filtration when finds a 10 dim simplex
 		'use_cliques': True,
-
 
 	}
 )
 
 # build the filtration:
-# filt = Filtration(traj, filt_params)
-#
-# make_movie(filt, 'output/demo/filt_movie.mp4')
-# make_PD(filt, 'output/demo/PD.png')  # make the persistence diagram
+filt = Filtration(traj, filt_params, title='piano demo')
+
+make_movie(filt, 'output/demo/filt_movie.mp4')
+make_PD(filt, 'output/demo/PD.png')  # make the persistence diagram
+make_PRF_plot(filt, 'output/demo/PRF.png')
