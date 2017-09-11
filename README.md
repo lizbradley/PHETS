@@ -78,6 +78,8 @@ trajs = slide_window(
 
 )
 ```
+![well actually this is a gif](https://github.com/eeshugerman/PHETS/docs/readme/embed_movie.gif "embed_movie.mp4")
+
 
 
 

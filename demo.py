@@ -9,7 +9,7 @@ from config import default_filtration_params as filt_params
 # the following vars are passed the functions below, defined here for convenience
 
 time_units = 'seconds'					# 'seconds' or 'samples'
-crop = (1, 3)						 	# range of the signal that you want to play with
+crop = (0, 5)						 	# range of the signal that you want to play with
 tau = (1 / idx_to_freq(49)) / np.pi		# embedding delay
 m = 2 									# embedding dimension
 
@@ -27,10 +27,10 @@ trajs = slide_window(
 	tau=tau,
 	m=m,
 	window_size=.05,  			# this is in seconds
-	window_step=.05,
+	window_step=.02,
 	crop=crop,
 	title='49-C135B.txt',		# optional, for labelling. will be obsolete when Signal class is implemented
-	framerate=3
+	framerate=5
 )
 
 traj = trajs[5]		# take embedding from 5th frame of movie
