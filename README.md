@@ -105,7 +105,7 @@ make_movie(filt, 'output/demo/filt_movie.mp4')
 
 ![filtration movie](docs/readme/filt_movie.gif "filt_movie.mp4")
 
-```
+
 This filtration can be summarized by its homology, which may be expressed as a persistence diagram or persistence rank function:
 python
 
