@@ -106,8 +106,7 @@ make_movie(filt, 'output/demo/filt_movie.mp4')
 ![filtration movie](docs/readme/filt_movie.gif "filt_movie.mp4")
 
 
-This filtration can be summarized by its homology, which may be expressed as a persistence diagram or persistence rank function:
-python
+This filtration can be summarized by its homology, which may be expressed as a persistence diagram:
 
 ```python
 make_PD(filt, 'output/demo/PD.png')  # make the persistence diagram
@@ -115,6 +114,7 @@ make_PD(filt, 'output/demo/PD.png')  # make the persistence diagram
 
 ![perseistence diagram](docs/readme/PD.png "PD.png")
 
+Or as a persistence rank function:
 ```python
 make_PRF_plot(filt, 'output/demo/PRF.png')  # make persistence rank function
 ```
