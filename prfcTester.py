@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 13			 # set test number here or with command line argument
+set_test = 8003			 # set test number here or with command line argument
 
 
 

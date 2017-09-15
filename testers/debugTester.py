@@ -8,7 +8,7 @@ from config import default_filtration_params as parameter_set
 from matplotlib.pyplot import ioff
 ioff()
 
-test = 3
+test = 1
 
 
 def movie_fname(test, str=''):
@@ -33,7 +33,7 @@ if test == 1:
 		})
 
 	filt = Filtration(in_fname, params)		# BUG: filtration only has 7 steps !!
-	make_movie(filt, movie_fname(test))
+	make_movie(filt, movie_fname(test), color_scheme='highlight new')
 	make_PD(filt, pd_fname(test))
 
 
@@ -88,6 +88,6 @@ if test == 3:
 		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
 
 		normalize_volume=True,
-		see_samples=1,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=3,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
 		quiet=True
 	)

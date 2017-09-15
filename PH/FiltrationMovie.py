@@ -33,6 +33,7 @@ def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_tim
 
 	else:
 		print 'ERROR:', scheme, 'is not a valid color scheme'
+		sys.exit()
 
 	return facecolor, edgecolor
 
@@ -63,6 +64,7 @@ def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
 
 	complex_data = filtration.get_complex_plot_data()
 
+
 	for j, simplexes_coords in enumerate(complex_data[:i + 1]):
 
 		f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
@@ -78,6 +80,8 @@ def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
 			antialiased=True)
 
 		subplot.add_collection(simplexes)
+
+
 
 
 def plot_all_3D(subplot, filtration, i, camera_angle):
@@ -262,7 +266,7 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 
 
 def make_movie(
-		filtration,
+		filt,
 		out_filename,
 		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
 		camera_angle=(70, 45),  		# for 3D mode. [azimuthal, elevation]
@@ -280,38 +284,43 @@ def make_movie(
 	filt_params_ax = pyplot.subplot2grid((12, 8), (6, 0), rowspan=6, colspan=2)
 	plot_ax = pyplot.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
 
-	add_filename_table(fname_ax, filtration.filename)
+	add_filename_table(fname_ax, filt.filename)
 	add_movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
-	add_filt_params_table(filt_params_ax, filtration.params)
+	add_filt_params_table(filt_params_ax, filt.params)
 
-	witness_data = filtration.witness_coords
-	landmark_data = filtration.landmark_coords
+	witness_data = filt.witness_coords
+	landmark_data = filt.landmark_coords
 
-	amb_dim = filtration.ambient_dim
+	amb_dim = filt.ambient_dim
 	if amb_dim not in (2, 3):
 		print 'ERROR: invalid ambient dimension {}, must be 2 or 3'.format(amb_dim)
 		sys.exit()
 
-	for i, eps in enumerate(filtration.epsilons):
-		sys.stdout.write('\rplotting frame {} of {}'.format(i + 1, filtration.num_div))
+	for i, eps in enumerate(filt.epsilons):
+		sys.stdout.write('\rplotting frame {} of {}'.format(i + 1, filt.num_div))
 		sys.stdout.flush()
 
 		if amb_dim == 2:
 			plot_witnesses_2D(plot_ax, witness_data)
 			plot_landmarks_2D(plot_ax, landmark_data)
-			plot_complex_2D(plot_ax, filtration, i, color_scheme, alpha)
-			# plot_all_2D_gnuplot(plot_ax, filtration, i)			# to test consistency of gnuplot and matplotlib results
+			plot_complex_2D(plot_ax, filt, i, color_scheme, alpha)
+			# plot_all_2D_gnuplot(plot_ax, filt, i)		# to test consistency
 		else:
-			plot_all_3D(plot_ax, filtration, i, camera_angle)		# uses gnuplot
+			plot_all_3D(plot_ax, filt, i, camera_angle)	# uses gnuplot
 
 		update_epsilon(epsilon_ax, eps)
 
 		pyplot.savefig('PH/frames/frame%03d.png' % i)
-		pyplot.close(fig)
+		plot_ax.clear()
 
+
+	pyplot.close(fig)
 	print ''
 	frames_to_movie(out_filename, 'PH/frames/frame%03d.png')
 	clear_temp_files('PH/temp/')
+
+
+
 
 
 
