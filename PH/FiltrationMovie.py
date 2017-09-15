@@ -307,6 +307,7 @@ def make_movie(
 		update_epsilon(epsilon_ax, eps)
 
 		pyplot.savefig('PH/frames/frame%03d.png' % i)
+		pyplot.close(fig)
 
 	print ''
 	frames_to_movie(out_filename, 'PH/frames/frame%03d.png')

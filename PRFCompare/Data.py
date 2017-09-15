@@ -398,7 +398,6 @@ def crop_sig(sig, crop, time_units):
 
 def get_variance_data(filename, kwargs):
 
-	# PRF_res, time_units, normalize_volume, num_windows, window_size, see_samples = options
 
 	if kwargs['load_saved_filts']:
 		print 'WARNING: loading saved data'

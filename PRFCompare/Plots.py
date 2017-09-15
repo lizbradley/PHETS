@@ -34,6 +34,30 @@ def plot_dists_vs_ref(
 ):
 	""" plots distance from reference rank function over a range of trajectories input files"""
 
+	def main():
+		clear_old_files('output/PRFCompare/ref/see_samples/', see_samples)
+
+		if load_saved_PRFs:
+			print 'WARNING: loading saved filtration'
+			funcs = np.load('PRFCompare/funcs.npy')
+			ref_func = np.load('PRFCompare/ref_func.npy')
+		else:
+			funcs = get_PRFs()  # also makes PDs and movies
+			ref_filt = Filtration(get_in_filename(i_ref), filt_params)
+			if see_samples: show_samples(ref_filt, i_ref, ref=True)
+			ref_func = ref_filt.get_PRF()
+			np.save('PRFCompare/funcs.npy', funcs)
+			np.save('PRFCompare/ref_func.npy', ref_func)
+
+		make_PRF_plot(ref_func, 'output/PRFCompare/ref/PRF_REFERENCE.png',
+					  params=filt_params, in_filename='REF')
+
+		funcs_z = funcs[:, 2]
+		ref_func_z = ref_func[2]
+		dists = get_dists_from_ref(funcs_z, ref_func_z, metric, dist_scale)
+		plot_distances(i_ref, i_arr, dists, out_filename)
+
+
 	def plot_distances(i_ref, i_arr, dists, out_filename):
 		fig = plt.figure(figsize=(10, 5))
 		ax = fig.add_subplot(111)
@@ -50,6 +74,7 @@ def plot_dists_vs_ref(
 		plt.savefig(out_filename)
 		plt.close(fig)
 
+
 	def get_in_filename(i):
 		if fname_format == 'i base':
 			filename = '{}/{}{}'.format(dir, i, base_filename)
@@ -59,6 +84,7 @@ def plot_dists_vs_ref(
 			print "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
 			sys.exit()
 		return filename
+
 
 	def show_samples(filt, i, ref=False):
 		base_name = base_filename.split('/')[-1].split('.')[0]
@@ -90,37 +116,32 @@ def plot_dists_vs_ref(
 
 		return np.asarray(funcs)
 
-	# ===================================================== #
-	# 				MAIN:	plot_dists_vs_ref()				#
-	# ===================================================== #
 
-	clear_old_files('output/PRFCompare/ref/see_samples/', see_samples)
-
-	if load_saved_PRFs:
-		print 'WARNING: loading saved filtration'
-		funcs = np.load('PRFCompare/funcs.npy')
-		ref_func = np.load('PRFCompare/ref_func.npy')
-	else:
-		funcs = get_PRFs()  # also makes PDs and movies
-		ref_filt = Filtration(get_in_filename(i_ref), filt_params)
-		if see_samples: show_samples(ref_filt, i_ref, ref=True)
-		ref_func = ref_filt.get_PRF()
-		np.save('PRFCompare/funcs.npy', funcs)
-		np.save('PRFCompare/ref_func.npy', ref_func)
-
-	make_PRF_plot(ref_func, 'output/PRFCompare/ref/PRF_REFERENCE.png',
-				  params=filt_params, in_filename='REF')
-
-	funcs_z = funcs[:, 2]
-	ref_func_z = ref_func[2]
-	dists = get_dists_from_ref(funcs_z, ref_func_z, metric, dist_scale)
-	plot_distances(i_ref, i_arr, dists, out_filename)
+	main()
 
 
 
 def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 
-	def plot():
+	def main():
+		filename_1, filename_2, out_filename, filt_params = args
+
+		sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
+
+		plot_main_fig()
+
+		base_filename_1 = filename_1.split('/')[-1].split('.')[0]
+		base_filename_2 = filename_2.split('/')[-1].split('.')[0]
+		out_fname_1 = 'output/PRFCompare/mean/' + base_filename_1 + '_mean_PRF.png'
+		out_fname_2 = 'output/PRFCompare/mean/' + base_filename_2 + '_mean_PRF.png'
+		ref_func_1, ref_func_2 = refs
+		make_PRF_plot(ref_func_1, out_fname_1, params=filt_params,
+					  in_filename='MEAN: ' + base_filename_1)
+		make_PRF_plot(ref_func_2, out_fname_2, params=filt_params,
+					  in_filename='MEAN: ' + base_filename_2)
+
+	def plot_main_fig(sigs_full, crops, sigs, dists):
+
 		def plot_dists_pane(ax, d, mean, crop):
 			t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
 			ticks = np.linspace(crop[0], crop[1], num_windows + 1, endpoint=True)
@@ -132,10 +153,15 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 
 		print 'plotting distances...'
 
-		d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
-		crop_1, crop_2 = crops
+		time_units = kwargs['time_units']
+		num_windows = kwargs['num_windows']
+
+		filename_1, filename_2, out_filename, filt_params = args
+
 		sig_1_full, sig_2_full = sigs_full
+		crop_1, crop_2 = crops
 		sig_1, sig_2 = sigs
+		d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
 
 		fig = plt.figure(figsize=(18, 9), tight_layout=True)
 
@@ -178,7 +204,6 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 		plt.setp(ax5.get_yticklines(), visible=False)
 
 
-
 		ax6 = fig.add_subplot(426, sharex=ax2)
 		plot_signal_zoom(ax6, None, crop_2, time_units=time_units, sig=sig_2)
 		ax6.grid(axis='x', zorder=0)
@@ -216,24 +241,6 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 
 		plt.close(fig)
 
-	filename_1, filename_2, out_filename, filt_params = args
-	time_units = kwargs['time_units']
-	num_windows = kwargs['num_windows']
-
-	sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
-
-	plot()
-
-	base_filename_1 = filename_1.split('/')[-1].split('.')[0]
-	base_filename_2 = filename_2.split('/')[-1].split('.')[0]
-	out_fname_1 = 'output/PRFCompare/mean/' + base_filename_1 + '_mean_PRF.png'
-	out_fname_2 = 'output/PRFCompare/mean/' + base_filename_2 + '_mean_PRF.png'
-	ref_func_1, ref_func_2 = refs
-	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params,
-				  in_filename='MEAN: ' + base_filename_1)
-	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params,
-				  in_filename='MEAN: ' + base_filename_2)
-
 
 
 def plot_clusters(*args, **kwargs):
@@ -243,56 +250,55 @@ def plot_clusters(*args, **kwargs):
 	sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
 
 
-	def plot():
 
-		def add_filename_table(ax, filenames):
-			ax.axis('off')
-			filenames = [f.split('/')[-1] for f in filenames]  # remove leading "datasets/"
-			arr = [
-				['A', filenames[0]],
-				['B', filenames[1]]
-			]
+	print 'plotting clusters...'
+	d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
 
-			title_table = ax.table(
-				cellText=arr,
-				bbox=[0, 0, 1, 1],
-				cellLoc='center',
-				# rowColours=['C0', 'C1'],
-				colWidths=[.5, 1]
-			)
+	fig = plt.figure(figsize=(10, 6), tight_layout=True)
+	fname_ax = plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
+	params_ax = plt.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
+	plot_ax = plt.subplot2grid((6, 10), (0, 4), rowspan=6, colspan=6)
 
-		print 'plotting clusters...'
-		d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
+	def add_filename_table(ax, filenames):
+		ax.axis('off')
+		filenames = [f.split('/')[-1] for f in filenames]  # remove leading "datasets/"
+		arr = [
+			['A', filenames[0]],
+			['B', filenames[1]]
+		]
 
-		fig = plt.figure(figsize=(10, 6), tight_layout=True)
-		fname_ax = plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
-		params_ax = plt.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
-		plot_ax = plt.subplot2grid((6, 10), (0, 4), rowspan=6, colspan=6)
+		title_table = ax.table(
+			cellText=arr,
+			bbox=[0, 0, 1, 1],
+			cellLoc='center',
+			# rowColours=['C0', 'C1'],
+			colWidths=[.5, 1]
+		)
 
-		add_filename_table(fname_ax, [filename_1, filename_2])
-		add_filt_params_table(params_ax, filt_params)
+	add_filename_table(fname_ax, [filename_1, filename_2])
+	add_filt_params_table(params_ax, filt_params)
 
-		plot_ax.set_aspect('equal')
-		plot_ax.set_xlabel('distance to A')
-		plot_ax.set_ylabel('distance to B')
+	plot_ax.set_aspect('equal')
+	plot_ax.set_xlabel('distance to A')
+	plot_ax.set_ylabel('distance to B')
 
-		A = [d_1_vs_1, d_1_vs_2]
-		B = [d_2_vs_1, d_2_vs_2]
-		plot_ax.scatter(*A, c='C0', label='A')
-		plot_ax.scatter(*B, c='C1', label='B')
+	A = [d_1_vs_1, d_1_vs_2]
+	B = [d_2_vs_1, d_2_vs_2]
+	plot_ax.scatter(*A, c='C0', label='A')
+	plot_ax.scatter(*B, c='C1', label='B')
 
-		plot_ax.legend()
+	plot_ax.legend()
 
-		max_lim = np.max([plot_ax.get_xlim()[1], plot_ax.get_ylim()[1]])
+	max_lim = np.max([plot_ax.get_xlim()[1], plot_ax.get_ylim()[1]])
 
-		plot_ax.set_xlim([0, max_lim])
-		plot_ax.set_ylim([0, max_lim])
+	plot_ax.set_xlim([0, max_lim])
+	plot_ax.set_ylim([0, max_lim])
 
-		fig.savefig(out_filename)
-
-	plot()
+	fig.savefig(out_filename)
 
 
+
+from Data import get_variance_data, process_variance_data
 
 def plot_variance(
 		filename,
@@ -324,6 +330,22 @@ def plot_variance(
 		annot_hm=False
 ):
 
+	def main(args_dict):
+
+		def sqrt_weight_func(x, y):
+			return weight_func(x, y) ** .5
+
+		# plot_trajectory(sig)
+		plot_weight_functions()
+		prf_evo_array, filt_evo_array = get_variance_data(filename, args_dict)
+		stats_data, hmap_data, hmap_data_pw = process_variance_data(
+			prf_evo_array, metric, sqrt_weight_func, vary_param_2
+		)
+		plot_main_fig(stats_data, out_filename)
+		plot_heatmaps(hmap_data, hmap_data_pw)
+		if see_samples: show_samples(filt_evo_array)
+
+
 	def plot_trajectory(sig):
 		print 'plotting trajectory...'
 		fig = plt.figure(figsize=(7, 7))
@@ -344,7 +366,7 @@ def plot_variance(
 
 		else:
 			funcs = [weight_func]
-			fnames = 'f'
+			fnames = ['f']
 
 		for fname, func in zip(fnames, funcs):
 			fig = plt.figure()
@@ -456,7 +478,6 @@ def plot_variance(
 
 	def show_samples(filt_evo_array):
 		base_name = filename.split('/')[-1].split('.')[0]
-
 		dir = 'output/PRFCompare/variance/see_samples/{}/'.format(base_name)
 
 		if os.path.exists(dir):
@@ -482,7 +503,6 @@ def plot_variance(
 						val_1, val_2))
 
 					for k, filt in enumerate(filt_evo[::see_samples]):
-
 						comp_name = '{}_{}__{}_{}_#{}'.format(
 							vary_param_1[0], val_1,
 							vary_param_2[0], val_2,
@@ -498,10 +518,9 @@ def plot_variance(
 
 		else:
 			filt_evo_array = filt_evo_array[0]
+
 			for j, val_1 in enumerate(vary_param_1[1]):
-
 				filt_evo = filt_evo_array[j]
-
 				print_title('vary_param_1 : {} '.format(val_1))
 
 				for k, filt in enumerate(filt_evo[::see_samples]):
@@ -517,7 +536,7 @@ def plot_variance(
 					make_movie(filt, movie_filename)
 
 
-	def make_main_fig(data, out_filename):
+	def plot_main_fig(data, out_filename):
 		print 'plotting variance curves...'
 		fig = plt.figure(figsize=(14, 8), tight_layout=True)
 
@@ -584,29 +603,5 @@ def plot_variance(
 		fig.savefig(out_filename)
 
 
-
-	# ===========================================================================
-	# 		MAIN: plot_variance()
-	# ===========================================================================
-
-	# options = [PRF_res, time_units, normalize_volume, mean_samp_num,
-	# num_windows, window_size, see_samples]
-
-	kwargs = locals()
-
-	from Data import get_variance_data, process_variance_data
-
-	in_weight_func = weight_func
-	def sqrt_weight_func(x, y):
-		return in_weight_func(x, y) ** .5
-	weight_func = sqrt_weight_func
-
-	# plot_trajectory(sig)
-	plot_weight_functions()
-	prf_evo_array, filt_evo_array = get_variance_data(filename, kwargs)
-	stats_data, hmap_data, hmap_data_pw = process_variance_data(
-		prf_evo_array, metric, weight_func, vary_param_2
-	)
-	make_main_fig(stats_data, out_filename)
-	plot_heatmaps(hmap_data, hmap_data_pw)
-	if see_samples: show_samples(filt_evo_array)
+	args_dict = locals()
+	main(args_dict)

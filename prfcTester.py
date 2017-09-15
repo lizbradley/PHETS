@@ -4,7 +4,7 @@ from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 8003			 # set test number here or with command line argument
+set_test = 13			 # set test number here or with command line argument
 
 
 
@@ -415,7 +415,6 @@ if test == 13:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
