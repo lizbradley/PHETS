@@ -8,7 +8,7 @@ from config import default_filtration_params as parameter_set
 from matplotlib.pyplot import ioff
 ioff()
 
-test = 1
+test = 3
 
 
 def movie_fname(test, str=''):
