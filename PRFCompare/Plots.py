@@ -439,7 +439,9 @@ def plot_variance(
 					fig.suptitle(filename.split('/')[-1])
 					if legend_labels:
 						val_2 = legend_labels[i]
-					fname = '{}_{}__{}_{}.png'.format(vary_param_2[0], val_2, vary_param_1[0], val_1)
+					fname = '{}_{}__{}_{}.png'.format(
+						vary_param_2[0], val_2, vary_param_1[0], val_1
+					)
 					fig.savefig(out_dir + fname)
 					plt.close(fig)
 
@@ -480,18 +482,22 @@ def plot_variance(
 
 					filt_evo = filt_evo_array[i, j]
 
-					print_title('vary_param_1 : {} \t vary_param_2: {}'.format(val_1, val_2))
+					print_title('vary_param_1 : {} \t vary_param_2: {}'.format(
+						val_1, val_2))
 
-					for i, filt in enumerate(filt_evo[::see_samples]):
+					for k, filt in enumerate(filt_evo[::see_samples]):
 
-						worm_num = i * see_samples
-						comp_name = '{}_{}__{}_{}_#{}'.format(vary_param_1[0], val_1, vary_param_2[0], val_2, worm_num)
+						comp_name = '{}_{}__{}_{}_#{}'.format(
+							vary_param_1[0], val_1,
+							vary_param_2[0], val_2,
+							k * see_samples
+						)
 						PD_filename = dir + comp_name + 'PD.png'
 						PRF_filename = dir + comp_name + 'PRF.png'
 						movie_filename = dir + comp_name + 'movie.mp4'
 
 						make_PD(filt, PD_filename)
-						make_PRF_plot(filt, PRF_filename, PRF_res=filt_params['num_divisions'])
+						make_PRF_plot(filt, PRF_filename)
 						make_movie(filt, movie_filename)
 
 		else:
@@ -502,15 +508,16 @@ def plot_variance(
 
 				print_title('vary_param_1 : {} '.format(val_1))
 
-				for i, filt in enumerate(filt_evo[::see_samples]):
-					worm_num = i * see_samples
-					comp_name = '{}_{}_#{}'.format(vary_param_1[0], val_1, worm_num)
+				for k, filt in enumerate(filt_evo[::see_samples]):
+					comp_name = '{}_{}_#{}'.format(
+						vary_param_1[0], val_1, k * see_samples
+					)
 					PD_filename = dir + comp_name + 'PD.png'
 					PRF_filename = dir + comp_name + 'PRF.png'
 					movie_filename = dir + comp_name + 'movie.mp4'
 
 					make_PD(filt, PD_filename)
-					make_PRF_plot(filt, PRF_filename, PRF_res=filt_params['num_divisions'])
+					make_PRF_plot(filt, PRF_filename)
 					make_movie(filt, movie_filename)
 
 
@@ -586,7 +593,8 @@ def plot_variance(
 	# 		MAIN: plot_variance()
 	# ===========================================================================
 
-	# options = [PRF_res, time_units, normalize_volume, mean_samp_num, num_windows, window_size, see_samples]
+	# options = [PRF_res, time_units, normalize_volume, mean_samp_num,
+	# num_windows, window_size, see_samples]
 
 	PRF_res = filt_params['num_divisions']
 	kwargs = locals()
@@ -601,7 +609,9 @@ def plot_variance(
 	# plot_trajectory(sig)
 	plot_weight_functions()
 	prf_evo_array, filt_evo_array = get_variance_data(filename, kwargs)
-	stats_data, hmap_data, hmap_data_pw = process_variance_data(prf_evo_array, metric, weight_func, vary_param_2)
+	stats_data, hmap_data, hmap_data_pw = process_variance_data(
+		prf_evo_array, metric, weight_func, vary_param_2
+	)
 	make_main_fig(stats_data, out_filename)
 	plot_heatmaps(hmap_data, hmap_data_pw)
 	if see_samples: show_samples(filt_evo_array)

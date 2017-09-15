@@ -101,7 +101,7 @@ def make_PD(filt, out_filename):
 
 
 	pyplot.savefig(out_filename)
-	pyplot.clf()
+	pyplot.close(fig)
 
 
 import matplotlib

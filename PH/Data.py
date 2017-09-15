@@ -34,11 +34,17 @@ class PDData:
 		self.immortal = immortal
 		self.lim = lim
 
+		if np.array_equal(self.mortal, np.empty(0)) and \
+				np.array_equal(self.immortal, np.empty(0)):
+			self.empty = True
+		else:
+			self.empty = False
+
 
 
 class Filtration:
 
-	def __init__(self, traj, params, title='none', silent=False, out_fname=None):
+	def __init__(self, traj, params, title='', silent=False, out_fname=None):
 		caller_dir = os.getcwd()
 
 		if isinstance(traj, basestring):			# is filename
@@ -55,14 +61,14 @@ class Filtration:
 
 		arr = self._build(params, silent)
 
+		self.epsilons = arr[3]
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
 		if not silent: print 'unpacking...'
-		self.complexes = self._unpack_complexes(arr[2])
-		self.epsilons = arr[3]
-
-		self.ambient_dim = len(self.witness_coords[0])
+		self.complexes = self._unpack_complexes(arr[2], silent)
+		self.ambient_dim = self.witness_coords.shape[1]
 		self.num_div = len(self.complexes)
+		assert(self.num_div == len(self.epsilons))
 
 		self.intervals = None
 		self.PD_data = None
@@ -95,8 +101,19 @@ class Filtration:
 
 		if not silent: print "building filtration..."
 
-		if params['worm_length'] is None:
-			params['worm_length'] = len(self.sig)
+		sig_length = len(self.sig)
+		if params['worm_length'] is None and sig_length > 10000:
+			r = raw_input(
+				'''WARNING: You have not specified a 'worm_length'. Default 
+				'worm_length' has been changed from 10,000 to len(self.sig).
+				len(self.sig) = {}. (This operation occurs at PH/Data.py:109.)
+				 Proceed? (y/n)'''.format(sig_length)
+			)
+			if r != 'y':
+				print 'Goodbye'
+				sys.exit()
+				
+			params['worm_length'] = sig_length
 
 		if len(self.sig.shape) == 1:
 			print "ERROR: Filtration input 'sig' is one dimensional"
@@ -114,37 +131,25 @@ class Filtration:
 
 		os.remove('temp/worm_data.txt')
 
-		witness_coords = filtration[1][1]
-		landmark_coords = filtration[1][0]
+		witness_coords = np.array(filtration[1][1])
+		landmark_coords = np.array(filtration[1][0])
 		abstract_filtration = sorted(list(filtration[0]))
 		epsilons = filtration[2]		# add to build_filtration return
 
 		if not silent: print("build_filtration() time elapsed: {} seconds \n".format(time.time() - start_time))
 		return [witness_coords, landmark_coords, abstract_filtration, epsilons]
 
-	def _unpack_complexes(self, filt_ID_list):
 
-		def group_by_birth_time(ID_list):
+	def _unpack_complexes(self, simplex_list, silent):
+
+		def group_by_birth_time(simplex_list):
 
 			"""Reformats 1D list of SimplexBirth objects into 2D array of
 			landmark_set lists, where 2nd index is  birth time (? see below)"""
 
-			ID_array = []  # list of complex_at_t lists
-			complex_at_t = []  # list of simplices with same birth_time
-			i = 0
-			time = 0
-			list_length = len(ID_list)
-			while i < list_length:
-				birth_time = ID_list[i].birth_time
-				if birth_time == time:
-					complex_at_t.append(ID_list[i].landmark_set)
-					if i == list_length - 1:
-						ID_array.append(complex_at_t)
-					i += 1
-				else:
-					ID_array.append(complex_at_t)
-					complex_at_t = []
-					time += 1
+			ID_array = [[] for i in self.epsilons]
+			for simplex in simplex_list:
+				ID_array[simplex.birth_time].append(simplex.landmark_set)
 			return ID_array
 
 
@@ -210,13 +215,13 @@ class Filtration:
 			f.close()
 
 
-		# print 'group by birth time'
-		ID_array = group_by_birth_time(filt_ID_list)		# 1d list -> 2d array
-		# print 'expand to 2-simplexes'
+		if not silent: print 'grouping by birth time...'
+		ID_array = group_by_birth_time(simplex_list)		# 1d list -> 2d array
+		if not silent: print 'expanding to 2-simplexes...'
 		ID_array = expand_to_2simplexes(ID_array)
-		# print 'remove duplicates'
+		if not silent: print 'removing duplicates...'
 		ID_array = remove_duplicates_all(ID_array)
-		# print 'count triangles'
+		if not silent: print 'counting triangles...'
 		count_triangles(ID_array)
 		return ID_array
 
@@ -236,6 +241,7 @@ class Filtration:
 						str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
 					out_file.write(line_str)
 			out_file.close()
+
 
 		def call_perseus():
 
@@ -265,12 +271,11 @@ class Filtration:
 			os.chdir('..')
 
 		def load_perseus_out_file():
-			with warnings.catch_warnings():
-				warnings.simplefilter("ignore")
+			try:
 				self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
-			if len(self.intervals) == 0:
-				if not silent: print 'WARNING: no homology for this window!'
-				self.intervals = 'empty'
+			except IOError:
+				self.intervals = np.empty(0)
+				if not silent: print "WARNING: no homology for this window"
 
 		if self.intervals is not None:
 			return
@@ -300,10 +305,6 @@ class Filtration:
 		if self.PD_data:
 			return
 
-		if isinstance(self.intervals, basestring):
-			if self.intervals == 'empty':
-				self.PD_data = 'empty'
-				return
 
 		epsilons = self.epsilons
 		lim = np.max(epsilons)
@@ -316,7 +317,11 @@ class Filtration:
 		def t_to_eps(t):
 			return epsilons[int(t - 1)]
 
-		if len(self.intervals.shape) == 1:		# one interval
+		if np.array_equal(self.intervals, np.empty(0)): 	# no intervals
+			immortal = []
+			mortal = []
+
+		elif len(self.intervals.shape) == 1:					# one interval
 			birth_t, death_t = self.intervals
 			if death_t == -1:
 				immortal = np.array([[t_to_eps(birth_t)], [1]])
@@ -325,7 +330,7 @@ class Filtration:
 				immortal = []
 				mortal = np.array([[t_to_eps(birth_t)], [t_to_eps(death_t)], [1]])
 
-		else:
+		else:												# many intervals
 			birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
 			for interval in zip(birth_t, death_t):
 				if interval[1] == -1:							# immortal
@@ -357,32 +362,33 @@ class Filtration:
 		if self.PRF:
 			return
 
-		if self.PD_data == 'empty':
+		if self.PD_data.empty:
 			eps = np.asarray(self.epsilons)
 			self.PRF = [eps, eps, np.zeros([num_div, num_div]), eps[-1]]
 			return
+
 		max_lim = self.PD_data.lim
 		min_lim = 0
 
 		x_ = y_ = np.linspace(min_lim, max_lim, num_div)
 		xx, yy = np.meshgrid(x_, y_)
 
-		try:
+		try:                           				# many mortal intervals
 			x, y, z = self.get_PD_data().mortal
 			try:
 				pts = zip(x, y, z)
-			except TypeError: 			# one interval
+			except TypeError: 						# one mortal interval
 				pts = [[x, y, z]]
-		except ValueError:				# no intervals
+		except ValueError:					   		# no mortal intervals
 			pts = []
 
-		try:
+		try:                                    	# many immortal intervals
 			x_imm, z_imm = self.get_PD_data().immortal
 			try:
 				pts_imm = zip(x_imm, z_imm)
-			except TypeError:
+			except TypeError:                    	# one immortal interval
 				pts_imm = [[x_imm, z_imm]]
-		except ValueError:
+		except ValueError:                       	# no immortal intervals
 			pts_imm = []
 
 
@@ -404,7 +410,7 @@ class Filtration:
 
 
 	# public #
-	def get_complex_plot_data(self, remove_dups=False):
+	def get_complex_plot_data(self):
 
 		def IDs_to_coords(ID_array):
 			"""Replaces each landmark_ID with corresponding coordinates"""
@@ -420,12 +426,7 @@ class Filtration:
 				coords_array.append(new_row)
 			return np.asarray(coords_array)
 
-
-
-		ID_array = self.complexes
-		# if remove_dups: ID_array = remove_duplicates(ID_array)
-		coords_array = IDs_to_coords(ID_array)
-		return coords_array
+		return IDs_to_coords(self.complexes)
 
 
 	def get_PD_data(self):
@@ -435,6 +436,7 @@ class Filtration:
 		self._build_PD_data()		# sets self.PD_data, returns PD_data
 		os.chdir(caller_dir)
 		return self.PD_data
+
 
 	def get_PRF(self, num_div, silent=False):
 		caller_dir = os.getcwd()
