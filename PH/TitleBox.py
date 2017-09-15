@@ -49,6 +49,7 @@ def add_filt_params_table(subplot, filt_params):
 		"m2_d",
 		"straight_VB",
 		"dimension_cutoff",
+		"graph_induced"
 	)
 	param_data = np.array([[key, filt_params[key]] for key in display_params])
 	param_table = subplot.table(

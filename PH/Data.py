@@ -357,10 +357,12 @@ class Filtration:
 		self.PD_data = data
 
 
-	def _build_PRF(self, num_div):
+	def _build_PRF(self):
 
 		if self.PRF:
 			return
+
+		num_div = self.num_div
 
 		if self.PD_data.empty:
 			eps = np.asarray(self.epsilons)
@@ -438,12 +440,12 @@ class Filtration:
 		return self.PD_data
 
 
-	def get_PRF(self, num_div, silent=False):
+	def get_PRF(self, silent=False):
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
 		self._get_intervals(silent=silent)
 		self._build_PD_data()
-		self._build_PRF(num_div)
+		self._build_PRF()
 		os.chdir(caller_dir)
 		return self.PRF
 

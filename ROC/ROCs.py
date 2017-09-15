@@ -80,11 +80,11 @@ def get_prfs(trajs, filt_params, window_length, num_landmarks, label='none', loa
 		filt_frame = filt_params['num_divisions'] - 1
 		# filt_frame = 2
 		plot_filtration_pub(filt, filt_frame, fname_filt)
-		make_PRF_plot(filt, fname_prf, PRF_res=res, annot_hm=False)
+		make_PRF_plot(filt, fname_prf, annot_hm=False)
 
 		filts.append(filt)
 
-	prfs = [f.get_PRF(res) for f in filts]
+	prfs = [f.get_PRF() for f in filts]
 	prfs = [prf[2] for prf in prfs]
 	np.save(fname, prfs)
 	return prfs

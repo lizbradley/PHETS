@@ -107,7 +107,7 @@ def get_PRFs(
 		movie_filename = 'output/PRFCompare/mean/see_samples/' + comp_name + 'movie.mp4'
 
 		make_PD(filt, PD_filename)
-		make_PRF_plot(filt, PRF_filename, PRF_res=PRF_res)
+		make_PRF_plot(filt, PRF_filename)
 		make_movie(filt, movie_filename)
 
 
@@ -169,7 +169,7 @@ def get_PRFs(
 			print '\n============================================='
 			print filename.split('/')[-1], 'worm #', i
 			print '=============================================\n'
-			funcs.append(filt.get_PRF(PRF_res))
+			funcs.append(filt.get_PRF())
 		return np.asarray(funcs)
 
 
@@ -336,7 +336,7 @@ def dists_compare(
 
 
 
-def get_prf_evo(sig, filt_params, num_windows, PRF_res, silent=True):
+def get_prf_evo(sig, filt_params, num_windows, silent=True):
 
 	def slice_sig(sig, num_windows, window_len_samp):
 		start_pts = np.floor(np.linspace(0, len(sig), num_windows, endpoint=False)).astype(int)
@@ -365,10 +365,10 @@ def get_prf_evo(sig, filt_params, num_windows, PRF_res, silent=True):
 		funcs = []
 		for i, filt in enumerate(filts):
 			if silent:
-				funcs.append(filt.get_PRF(PRF_res, silent=True))
+				funcs.append(filt.get_PRF(silent=True))
 			else:
 				print_title('window # {}'.format(i))
-				funcs.append(filt.get_PRF(PRF_res, silent=False))
+				funcs.append(filt.get_PRF(silent=False))
 
 		return np.asarray(funcs)
 
@@ -431,12 +431,16 @@ def get_variance_data(filename, kwargs):
 				sys.stdout.write('\r		vary_param_1: {}		vary_param_2: {}		'.format(val_1, val_2))
 				sys.stdout.flush()
 				# get PRFs at evenly spaced intervals along input -- a 'prf evolution'
-				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=True)
+				prf_evo, filt_evo = get_prf_evo(sig, filt_params,
+												kwargs['num_windows'],
+												silent=True)
 
 			else:
 				print_title('{}: {}'.format(vary_param_1[0], val_1))
 				if title_str: print_title(title_str)
-				prf_evo, filt_evo = get_prf_evo(sig, filt_params,  kwargs['num_windows'], kwargs['PRF_res'], silent=False)
+				prf_evo, filt_evo = get_prf_evo(sig, filt_params,
+												kwargs['num_windows'],
+												silent=False)
 
 			filt_arr.append(filt_evo)
 			prf_arr.append(prf_evo)

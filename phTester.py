@@ -39,12 +39,7 @@ if test == 14:
 		'output/PH/test14.mp4',
 	)
 
-	make_PRF_plot(
-		filtration,
-		'output/PH/test14_PRF.png',
-		PRF_res=50
-
-	)
+	make_PRF_plot(filtration, 'output/PH/test14_PRF.png')
 
 	make_PD(
 		filtration,
@@ -70,12 +65,7 @@ if test == 15:
 		'output/PH/test15.mp4',
 	)
 
-	make_PRF_plot(
-		filtration,
-		'output/PH/test15_PRF.png',
-		PRF_res=50
-
-	)
+	make_PRF_plot(filtration, 'output/PH/test15_PRF.png')
 
 	make_PD(
 		filtration,
@@ -103,12 +93,7 @@ if test == 16:
 		'output/PH/test16.mp4',
 	)
 
-	make_PRF_plot(
-		filtration,
-		'output/PH/test16_PRF.png',
-		PRF_res=50
-
-	)
+	make_PRF_plot(filtration, 'output/PH/test16_PRF.png')
 
 	make_PD(
 		filtration,
@@ -135,14 +120,7 @@ if test == 17:
 
 	filtration = Filtration(in_filename, filt_params)
 
-
-
-	make_PRF_plot(
-		filtration,
-		'output/PH/test17_PRF.png',
-		PRF_res=50
-
-	)
+	make_PRF_plot(filtration, 'output/PH/test17_PRF.png')
 
 	make_PD(
 		filtration,

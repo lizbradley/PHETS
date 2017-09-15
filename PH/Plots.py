@@ -154,7 +154,8 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 	return cmap
 
 
-def make_PRF_plot(filtration, out_filename, PRF_res='auto', params=None, in_filename=None, annot_hm=False):
+def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
+				  annot_hm=False):
 	print "plotting PRF..."
 
 	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
@@ -166,9 +167,7 @@ def make_PRF_plot(filtration, out_filename, PRF_res='auto', params=None, in_file
 
 
 	if isinstance(filtration, Filtration):
-		if PRF_res == 'auto':
-			PRF_res = filtration.num_div
-		func = filtration.get_PRF(PRF_res)
+		func = filtration.get_PRF()
 		in_filename = filtration.filename
 		params = filtration.params
 	else:

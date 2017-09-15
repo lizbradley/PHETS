@@ -27,7 +27,6 @@ def plot_dists_vs_ref(
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', or 'a + b'
 
-		PRF_res=50,  # number of divisions used for PRF
 
 		load_saved_PRFs=False,
 
@@ -82,7 +81,7 @@ def plot_dists_vs_ref(
 			print filename
 			print '==================================================\n'
 			filt = Filtration(filename, filt_params)
-			func = filt.get_PRF(PRF_res)
+			func = filt.get_PRF()
 			funcs.append(func)
 
 			if see_samples:
@@ -105,16 +104,12 @@ def plot_dists_vs_ref(
 		funcs = get_PRFs()  # also makes PDs and movies
 		ref_filt = Filtration(get_in_filename(i_ref), filt_params)
 		if see_samples: show_samples(ref_filt, i_ref, ref=True)
-		ref_func = ref_filt.get_PRF(PRF_res)
+		ref_func = ref_filt.get_PRF()
 		np.save('PRFCompare/funcs.npy', funcs)
 		np.save('PRFCompare/ref_func.npy', ref_func)
 
-	make_PRF_plot(
-		ref_func,
-		'output/PRFCompare/ref/PRF_REFERENCE.png',
-		params=filt_params,
-		in_filename='REF'
-	)
+	make_PRF_plot(ref_func, 'output/PRFCompare/ref/PRF_REFERENCE.png',
+				  params=filt_params, in_filename='REF')
 
 	funcs_z = funcs[:, 2]
 	ref_func_z = ref_func[2]
@@ -224,7 +219,6 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 	filename_1, filename_2, out_filename, filt_params = args
 	time_units = kwargs['time_units']
 	num_windows = kwargs['num_windows']
-	PRF_res = kwargs['PRF_res']
 
 	sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
 
@@ -235,8 +229,10 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 	out_fname_1 = 'output/PRFCompare/mean/' + base_filename_1 + '_mean_PRF.png'
 	out_fname_2 = 'output/PRFCompare/mean/' + base_filename_2 + '_mean_PRF.png'
 	ref_func_1, ref_func_2 = refs
-	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params, in_filename='MEAN: ' + base_filename_1, PRF_res=PRF_res)
-	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params, in_filename='MEAN: ' + base_filename_2, PRF_res=PRF_res)
+	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params,
+				  in_filename='MEAN: ' + base_filename_1)
+	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params,
+				  in_filename='MEAN: ' + base_filename_2)
 
 
 
@@ -596,7 +592,6 @@ def plot_variance(
 	# options = [PRF_res, time_units, normalize_volume, mean_samp_num,
 	# num_windows, window_size, see_samples]
 
-	PRF_res = filt_params['num_divisions']
 	kwargs = locals()
 
 	from Data import get_variance_data, process_variance_data
