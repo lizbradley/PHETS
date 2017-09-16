@@ -75,7 +75,7 @@ if test == 3:
 		'output/PRFCompare/variance/testing.png', 		 	 # out filename
 		params,
 
-		('worm_length', (500, 1000, 1500)),		 # vary param 1
+		('worm_length', (500, 700, 1000)),		 # vary param 1
 
 		('ds_rate', (20, 30, 40)),
 
@@ -89,5 +89,5 @@ if test == 3:
 
 		normalize_volume=True,
 		see_samples=3,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
-		quiet=True
+		quiet=False
 	)
