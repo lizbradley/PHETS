@@ -167,12 +167,27 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 
 
 	write_gnup_script()
-	p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'],
+
+	try:
+		p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'],
 						 stdout=subprocess.PIPE)
+	except OSError:
+		print "ERROR: Unable to open gnuplot. Ensure that 'gnuplot_str' in " \
+			  "config.py is set to the appropriate command to launch gnuplot" \
+			  " on your system."
+		sys.exit()
 
 	out, err = p.communicate()
 	f = io.BytesIO(out)
-	img = mpimg.imread(f, format='png')
+
+	try:
+		img = mpimg.imread(f, format='png')
+	except ValueError as e:
+		print e
+		print "ERROR: Invalid PNG header. Ensure that you are using a recent" \
+			  " version of gnuplot (5+) and 'gnuplot_str' in config.py is " \
+			  "the command to launch this version."
+		sys.exit()
 
 	subplot.axis('off')
 	subplot.imshow(img)
