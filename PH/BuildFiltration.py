@@ -117,10 +117,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			number_of_vertices)
 			sys.exit()
 
-	num_threads = 2
 	# for more information about these parameters type ./find_landmarks --help in the terminal
 	# the distance calculations are calculated and outputted to a file called find_landmarks.txt
-	print os.getcwd()
 
 	if ls=="EST":
 		if always_euclidean:
@@ -345,7 +343,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			distances = [float(i) for i in f.split(":")[1].split(",")]
 
 			for witness_index in range(0, len(distances)):
-				d[witness_index].append(LandmarkDistance(landmark_index, distances[witness_index]))
+				d[witness_index].append(LandmarkDistance(landmark_index,
+														 distances[witness_index]))
 
 			landmarks.append(witnesses[landmark])
 			landmark_indices.append(landmark)

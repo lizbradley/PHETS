@@ -7,7 +7,7 @@ import warnings
 
 import numpy as np
 import itertools
-from numba import jit
+# from numba import jit
 import BuildFiltration
 from Utilities import blockPrint, enablePrint
 
@@ -57,7 +57,7 @@ class Filtration:
 
 		os.chdir(SCRIPT_DIR)
 
-		self.params = params
+		self.params = params.copy()
 
 		arr = self._build(params, silent)
 

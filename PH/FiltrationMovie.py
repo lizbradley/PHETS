@@ -5,8 +5,11 @@ import matplotlib.markers
 import matplotlib.pyplot as pyplot
 import numpy as np
 from matplotlib import collections
+pyplot.ioff()
 
-from TitleBox import add_filename_table, add_filt_params_table, update_epsilon, add_movie_params_table
+
+from TitleBox import add_filename_table, add_filt_params_table, update_epsilon
+from TitleBox import add_movie_params_table
 from Utilities import remove_old_frames, frames_to_movie, clear_temp_files
 from config import gnuplot_str
 
@@ -148,7 +151,8 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 
 
 		# plot witnesses and landmarks
-		wits_arg = '"PH/temp/witnesses.txt" with points pt 7 ps .1 lc "black" notitle'
+		wits_arg = '"PH/temp/witnesses.txt" with points pt 7 ps .1 ' \
+				   'lc "black" notitle'
 		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 notitle'
 		cmds.append('splot {}, {}'.format(wits_arg, lands_arg))
 
@@ -163,7 +167,8 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 
 
 	write_gnup_script()
-	p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+	p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'],
+						 stdout=subprocess.PIPE)
 
 	out, err = p.communicate()
 	f = io.BytesIO(out)
@@ -238,7 +243,8 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 		cmds.append('q')
 
 		# plot witnesses and landmarks
-		wits_arg = '"PH/temp/witnesses.txt" with points pt 7 ps .1 lc "black" notitle'
+		wits_arg = '"PH/temp/witnesses.txt" with points pt 7 ps .1 ' \
+				   'lc "black" notitle'
 		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 notitle'
 		cmds.append('plot {}, {}'.format(wits_arg, lands_arg))
 
@@ -250,7 +256,8 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 
 
 	write_gnup_script()
-	p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'], stdout=subprocess.PIPE)
+	p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'],
+						 stdout=subprocess.PIPE)
 
 	out, err = p.communicate()
 	f = io.BytesIO(out)
@@ -268,10 +275,10 @@ def plot_all_2D_gnuplot(subplot, filtration, i):
 def make_movie(
 		filt,
 		out_filename,
-		color_scheme='none',		  	# as of now, 'none', 'highlight new', or 'birth_time gradient'
-		camera_angle=(70, 45),  		# for 3D mode. [azimuthal, elevation]
-		alpha=1, 					 	# opacity (float, 0...1 : transparent...opaque)
-		dpi=200,  						# dots per inch (resolution)
+		color_scheme='none',
+		camera_angle=(70, 45),
+		alpha=1,
+		dpi=200,
 
 ):
 	print 'building movie...'

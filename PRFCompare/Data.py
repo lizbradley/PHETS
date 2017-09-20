@@ -180,8 +180,6 @@ def get_PRFs(
 		return np.asarray(funcs)
 
 
-
-
 	# =========================================================================
 	# 		MAIN: get_PRFs()
 	# =========================================================================
@@ -206,9 +204,9 @@ def get_PRFs(
 		filename=fname
 
 	crop, sig_full, sig = crop_sig(sig, crop_cmd, auto_crop_length)
-	f_ideal, f_disp, tau = auto_tau(tau_cmd, sig, note_index, tau_T, None,
-									filename)
-
+	f_ideal, f_disp, tau = auto_tau(
+		tau_cmd, sig, note_index, tau_T, None, filename
+	)
 
 	sigs = slice_sig(sig)
 	if type(sig[0]) is np.ndarray:
@@ -327,8 +325,8 @@ def dists_compare(
 
 
 	# for plotting ref PRFs #
-	ref_func_1 = funcs_1[0]  # get xx, yy
-	ref_func_2 = funcs_2[0]  # get xx, yy
+	ref_func_1 = funcs_1[0]  	 # get xx, yy
+	ref_func_2 = funcs_2[0] 	 # get xx, yy
 	ref_func_1[2] = funcs_1_avg_z
 	ref_func_2[2] = funcs_2_avg_z
 
@@ -348,6 +346,8 @@ def dists_compare(
 
 
 ###################################################################
+# plot_variance() stuff
+###################################################################
 
 
 
@@ -358,8 +358,8 @@ def get_prf_evo(sig, filt_params, num_windows, silent=True):
 		start_pts = np.floor(
 			np.linspace(0, len(sig), num_windows, endpoint=False)
 		).astype(int)
-		windows = [np.asarray(sig[pt : pt + filt_params['worm_length']])
-				   for pt in start_pts]
+		windows = [np.asarray(sig[pt : pt + filt_params['worm_length']]) for
+				   		pt in start_pts]
 		# TODO: add normalize sub volume here
 		return windows
 
@@ -392,9 +392,6 @@ def get_prf_evo(sig, filt_params, num_windows, silent=True):
 		return np.asarray(funcs)
 
 
-
-
-
 	sigs = slice_sig(sig, num_windows, filt_params['worm_length'])
 	filts = get_filtrations(sigs, filt_params)
 	prfs = get_prfs(filts)
@@ -417,7 +414,6 @@ def crop_sig(sig, crop, time_units):
 
 
 def get_variance_data(filename, kwargs):
-
 
 	if kwargs['load_saved_filts']:
 		print 'WARNING: loading saved data'
@@ -442,8 +438,9 @@ def get_variance_data(filename, kwargs):
 	sig = crop_sig(sig_full, kwargs['crop'], kwargs['time_units'])
 
 	def vary_evos_over_param(sig, vary_param, filt_params, title_str=None):
-		prf_arr = []
-		filt_arr = []
+		prf_evo_arr_ = []
+		filt_evo_arr_ = []
+		# import pdb; pdb.set_trace()
 		for val_1 in vary_param[1]:
 			filt_params.update({vary_param[0]: val_1})
 
@@ -454,8 +451,6 @@ def get_variance_data(filename, kwargs):
 					)
 				)
 				sys.stdout.flush()
-				# get PRFs at evenly spaced intervals along input
-				# ie a 'prf evolution'
 				prf_evo, filt_evo = get_prf_evo(
 					sig, filt_params, kwargs['num_windows'], silent=True
 				)
@@ -467,50 +462,49 @@ def get_variance_data(filename, kwargs):
 					sig, filt_params, kwargs['num_windows'], silent=False
 				)
 
-			filt_arr.append(filt_evo)
-			prf_arr.append(prf_evo)
+			filt_evo_arr_.append(filt_evo)
+			prf_evo_arr_.append(prf_evo)
 
-		return prf_arr, filt_arr
+		return prf_evo_arr_, filt_evo_arr_
 
 
 	print 'generating data...\n'
 
 	if vary_param_2 is None or vary_param_2[0] == 'weight_func':
 		val_2 = ''		# for status indicator
-		prf_evos, filt_evos = vary_evos_over_param(
+		prf_evo_arr_1d, filt_evo_arr_1d = vary_evos_over_param(
 			sig, vary_param_1, filt_params
 		)
-		sys.stdout.write('\r	done \n\n')
-		sys.stdout.flush()
-		prf_evos, filt_evos = [prf_evos], [filt_evos]
+		prf_evo_arr, filt_evo_arr = [prf_evo_arr_1d], [filt_evo_arr_1d]
 
 	elif vary_param_2[0] in filt_params:
-		prf_arr = []
-		filt_arr = []
+		prf_evo_arr_2d = []
+		filt_evo_arr_2d = []
 		for val_2 in vary_param_2[1]:
 			filt_params.update({vary_param_2[0]: val_2})
 			t_str = '{}: {}'.format(vary_param_2[0], val_2)
-			prf_evos, filt_evos = vary_evos_over_param(
+			prf_evo_arr_1d, filt_evo_arr_1d = vary_evos_over_param(
 				sig, vary_param_1, filt_params, title_str=t_str
 			)
+			prf_evo_arr_2d.append(prf_evo_arr_1d)
+			filt_evo_arr_2d.append(filt_evo_arr_1d)
 
-			prf_arr.append(prf_evos)
-			filt_arr.append(filt_evos)
-
-		prf_evos = prf_arr
-		filt_evos = filt_arr
-		sys.stdout.write('\r	done \n\n')
-		sys.stdout.flush()
+		prf_evo_arr = prf_evo_arr_2d
+		filt_evo_arr = filt_evo_arr_2d
 
 	else:
 		print 'ERROR: invalid vary_param_2 '
 		sys.exit()
 
-	prf_evos = np.asarray(prf_evos)
-	filt_evos = np.asarray(filt_evos)
-	np.save('PRFCompare/PRFs.npy', prf_evos)
-	np.save('PRFCompare/filts.npy', filt_evos)
-	return prf_evos, filt_evos
+	if kwargs['quiet']:
+		sys.stdout.write('\r	...done. \n\n')
+		sys.stdout.flush()
+
+	prf_evo_arr = np.asarray(prf_evo_arr)		# should probably be replaced, just use filt evos
+	filt_evo_arr = np.asarray(filt_evo_arr)
+	np.save('PRFCompare/PRFs.npy', prf_evo_arr)
+	np.save('PRFCompare/filts.npy', filt_evo_arr)
+	return prf_evo_arr, filt_evo_arr
 
 
 

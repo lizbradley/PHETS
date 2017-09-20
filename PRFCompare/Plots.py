@@ -4,6 +4,7 @@ import warnings
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+plt.ioff()
 
 from DCE.Plots import plot_signal_zoom, plot_signal
 from PH import make_PD, make_PRF_plot, make_movie, Filtration
@@ -547,8 +548,8 @@ def plot_variance(
 			'labelpad': 10,
 		}
 
-		fname_ax =  plt.subplot2grid((5, 9), (0, 0), rowspan=1, colspan=2)
-		params_ax = plt.subplot2grid((5, 9), (1, 0), rowspan=3, colspan=2)
+		fname_ax =  plt.subplot2grid((5, 9), (0, 0), rowspan=1, colspan=3)
+		params_ax = plt.subplot2grid((5, 9), (1, 0), rowspan=3, colspan=3)
 
 		ax1 = plt.subplot2grid((5, 9), (0, 3), colspan=6)
 		ax2 = plt.subplot2grid((5, 9), (1, 3), colspan=6, sharex=ax1)

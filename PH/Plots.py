@@ -1,5 +1,7 @@
 import matplotlib.colors as colors
 import matplotlib.pyplot as pyplot
+pyplot.ioff()
+
 import numpy as np
 
 from Data import Filtration
