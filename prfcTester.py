@@ -2972,6 +2972,37 @@ if test == 8003:
 	)
 
 
+if test == 9000:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 4, 				# 5 complexes in the filtration
+			'worm_length': 1000,
+
+		})
+
+
+	plot_variance(
+		'datasets/trajectories/REALDEAL/StandardLorenz63_IC123.txt',
+		'output/PRFCompare/variance/StdL63.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (100, 50)),		 # vary param 1
+		('d_use_hamiltonian', (1, 2, 10)),
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(5000, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=5,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=5,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
