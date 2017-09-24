@@ -12,7 +12,7 @@ crop = (0, 5)						 	# range of the signal that you want to play with
 tau = (1 / idx_to_freq(49)) / np.pi		# embedding delay
 m = 2 									# embedding dimension
 
-# loads the data
+print 'loading data...'
 sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 
 
