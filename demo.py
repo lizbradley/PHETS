@@ -5,7 +5,6 @@ from DCE.Plots import plot_dce
 from DCE.Movies import slide_window, vary_tau
 from PH import Filtration, make_movie, make_PD, make_PRF_plot
 from config import default_filtration_params as filt_params
-
 # the following vars are passed the functions below, defined here for convenience
 
 time_units = 'seconds'					# 'seconds' or 'samples'
