@@ -27,14 +27,14 @@ trajs = slide_window(
 	tau=tau,
 	m=m,
 	window_size=.05,  			# this is in seconds
-	window_step=.02,
+	window_step=.5,
 	crop=crop,
 	title='piano demo',
-	framerate=10,
-	save_movie=False
+	framerate=1,
+	save_movie=True,
 )
 
-traj = trajs[100]		# take embedding from 5th frame of movie
+traj = trajs[5]		# take embedding from 5th frame of movie
 
 # traj = embed(sig, tau, m, crop=crop, time_units=time_units)		# alternatively, embed explicitly
 
