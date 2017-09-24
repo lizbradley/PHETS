@@ -134,7 +134,7 @@ def plot_title(fname_ax, param_ax, title_info):
 
 
 def make_frame(traj, sig, window, frame_fname, title_info):
-	fig = plt.figure(figsize=(10, 8), tight_layout=False, dpi=300)
+	fig = plt.figure(figsize=(10, 8), tight_layout=False, dpi=100)
 	# fig.subplots_adjust(hspace=.5)
 	m = title_info['m']
 
