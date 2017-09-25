@@ -68,7 +68,7 @@ float            straight_VB=0.0;
 float            stretch = 1.0;
 float            max_filtration_param = 0.0;
 float            num_divs = 0.0;
-float			 ham_parama = 1.0;
+float			 ham_param = 1.0;
 float			 or_param = 1.0;
 
 char            *file;
