@@ -3004,6 +3004,409 @@ if test == 9000:
 		quiet=True
 	)
 
+if test == 9010:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 4, 				# 5 complexes in the filtration
+			'ds_rate': 100,
+
+		})
+
+
+	plot_variance(
+		'datasets/trajectories/REALDEAL/StandardLorenz63_IC123.txt',
+		'output/PRFCompare/variance/StdL63.png', 		 	 # out filename
+		params,
+
+		('worm_length', (1000, 2000, 5000, 10000, 20000)),		 # vary param 1
+		('d_use_hamiltonian', (1, 2, 10)),
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(5000, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=5,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=5,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+##### Nikki Sunday 9/24
+
+if test == 10000:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 4, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+		
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_an1.txt',
+		'output/PRFCompare/variance/NewHopf_an1.png', 		 	 # out filename
+		params,
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		None,
+		
+		load_saved_filts=False,
+		
+		time_units='samples',
+		crop=(5000, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+if test == 10001:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 4, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+
+
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_anp1.txt',
+		'output/PRFCompare/variance/NewHopf_anp1.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (10, 50, 100, 200)),		 # vary param 1
+		None,
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(5000, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+if test == 10002:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+
+
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_anp01.txt',
+		'output/PRFCompare/variance/NewHopf_anp01.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		None,
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(5000, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+# Hopf - testing new WR - for max epsilon / epsilon death / norm betti 1 / GF / LF 
+
+if test == 10010:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+		
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_an1.txt',
+		'output/PRFCompare/variance/NewHopf_an1.png', 		 	 # out filename
+		params,
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		('d_use_hamiltonian', (1, -1, -1.1, -2, -5, -10, -100)),
+		
+		load_saved_filts=False,
+		
+		time_units='samples',
+		crop=(500, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+if test == 10011:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+
+
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_anp1.txt',
+		'output/PRFCompare/variance/NewHopf_anp1.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		('d_use_hamiltonian', (1, -1, -1.1, -2, -5, -10, -100)),
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(500, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+if test == 10012:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+
+
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_anp01.txt',
+		'output/PRFCompare/variance/NewHopf_anp01.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		('d_use_hamiltonian', (1, -1, -1.1,-2, -5, -10, -100)),
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(500, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+if test == 10014:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+		
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_a0.txt',
+		'output/PRFCompare/variance/NewHopf_a0.png', 		 	 # out filename
+		params,
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		('d_use_hamiltonian', (1, -1,-1.1, -2, -5, -10, -100)),
+		
+		load_saved_filts=False,
+		
+		time_units='samples',
+		crop=(500, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+if test == 10015:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+
+
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_app01.txt',
+		'output/PRFCompare/variance/NewHopf_ap01.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		('d_use_hamiltonian', (1,-1, -1.1,-2, -5, -10, -100)),
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(500, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+if test == 10016:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+
+
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_app1.txt',
+		'output/PRFCompare/variance/NewHopf_app1.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		('d_use_hamiltonian', (1, -1, -1.1,-2, -5, -10, -100)),
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(500, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+	
+
+if test == 10017:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			'landmark_selector': 'EST'
+
+		})
+
+
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_ap1.txt',
+		'output/PRFCompare/variance/TEST_NewHopf_ap1.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (10, 100, 200)),		 # vary param 1
+		('d_use_hamiltonian', (1, -1, -1.1,-2, -5, -10, -100)),
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(500, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=10,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
+
+
+###################### trying to figure out whats going on
+if test == 10018:
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8, 		# no simplexes larger than 5-simplex
+			'num_divisions': 10, 				# 5 complexes in the filtration
+			'worm_length': 2000,
+			#'landmark_selector': 'EST'
+
+		})
+
+
+	plot_variance(
+		'ClassicBifurcationData/NewHopf_ap1.txt',
+		'output/PRFCompare/variance/NewHopf_ap1.png', 		 	 # out filename
+		params,
+
+		('ds_rate', (50, 100)),		 # vary param 1
+		('d_use_hamiltonian', (1, -1, -2, -100)),
+
+		load_saved_filts=False,
+
+		time_units='samples',
+		crop=(500, 2005000),    		# (start, stop) in time_units, or 'auto'
+		num_windows=4,			  		# evenly spaced
+
+		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
+
+		normalize_volume=True,
+		see_samples=2,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		quiet=True
+	)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 

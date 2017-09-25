@@ -58,7 +58,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	d_cov = get_param("d_cov")
 	graph_induced = get_param("graph_induced")
 
-	always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == 1.0 and use_hamiltonian == d_cov == 0.
+	always_euclidean = speed_amplify == orientation_amplify == stretch == ray_distance_amplify == use_hamiltonian == 1.0 and d_cov == 0.
 	filtration = Set()
 	extra_data = None
 	min_filtration_param = float(get_param("min_filtration_param"))

@@ -68,6 +68,8 @@ float            straight_VB=0.0;
 float            stretch = 1.0;
 float            max_filtration_param = 0.0;
 float            num_divs = 0.0;
+float			 ham_parama = 1.0;
+float			 or_param = 1.0;
 
 char            *file;
 char            *wfile;
@@ -386,7 +388,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 	}
 	
-	else if(use_hamiltonian!=0.0){ 
+	else if(use_hamiltonian!=1.0){ 
 		printf("Calculating hamiltonian distance...");
 		fflush(stdout);
 		float dhamil=0.,deuc=0.;
@@ -402,8 +404,9 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 						for(k=0;k<wit_pts;k++){
 							sum+=(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k])*(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k]);
 						}
-						dhamil = -1*use_hamiltonian*sqrt(sum);
-						distances[i*num_wits+j] = sqrt(deuc*deuc+(dhamil*dhamil));
+						dhamil = sqrt(sum);
+						ham_param = use_hamiltonian*use_hamiltonian - 1;
+						distances[i*num_wits+j] = sqrt(deuc*deuc+(ham_param*dhamil*dhamil));
 					}
 				}
 			}
@@ -420,8 +423,9 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 						for(k=0;k<wit_pts;k++){
 							sum+=(velocities[i*wit_pts+k]-velocities[j*wit_pts+k])*(velocities[i*wit_pts+k]-velocities[j*wit_pts+k]);
 						}
-						dhamil = use_hamiltonian*sqrt(sum);
-						distances[i*num_wits+j] = sqrt(deuc*deuc+(dhamil*dhamil));
+						dhamil = sqrt(sum);
+						ham_param = use_hamiltonian*use_hamiltonian - 1;
+						distances[i*num_wits+j] = sqrt(deuc*deuc+(ham_param*dhamil*dhamil));
 					}
 				}
 			}
@@ -621,9 +625,10 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 					for(k=0;k<wit_pts;k++){
 						sum+=(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k])*(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k]);
 					}
-					dot = orientation_amplify*(1+sqrt(sum))/2.;
+					dot = sqrt(sum);
+					or_param = orientation_amplify*orientation_amplify - 1;
 					de = euc_distance[i*num_wits+j];
-					distances[i*num_wits+j] = de*de+dot*dot;	
+					distances[i*num_wits+j] = sqrt(de*de+(or_param*dot*de));	
 				}
 			}
 		}
