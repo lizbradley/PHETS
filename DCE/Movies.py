@@ -4,7 +4,7 @@ import Plots
 import numpy as np
 import sys
 
-from Utilities import pwd
+from Utilities import frames_to_movie
 
 from Tools import auto_tau, auto_crop
 from config import WAV_SAMPLE_RATE
@@ -54,6 +54,7 @@ def slide_window(
 	if save_movie: remove_old_frames()
 
 	if isinstance(in_filename, basestring):
+		print 'loading signal...'
 		full_sig = np.loadtxt(in_filename)
 	else:
 		full_sig = in_filename
@@ -69,6 +70,7 @@ def slide_window(
 
 	trajs = []
 
+	print 'building movie...'
 	for i, start in enumerate(np.arange(0, worm_length, window_step)):
 		print 'frame %i of %i' % (i, worm_length / window_step)
 
@@ -82,8 +84,7 @@ def slide_window(
 			Plots.make_frame(traj, sig, window, frame_fname % i, title_info)
 
 	if save_movie:
-		import Utilities
-		Utilities.frames_to_movie(out_filename, frame_fname, framerate=framerate, aspect=(10,8))
+		frames_to_movie(out_filename, frame_fname, framerate=framerate, aspect=(10,8))
 
 	return trajs
 

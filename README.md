@@ -53,7 +53,7 @@ pip install -r requirements.txt
 
 
 
-## Usage
+## Demo
 ```python
 import numpy as np
 import DCE, Tools

@@ -128,6 +128,7 @@ def frames_to_movie(out_filename, frame_path, framerate=1, aspect=None):
 			pass
 		else:
 			sys.exit()
+
 	print 'consolidating frames...'
 	cmd = [
 		'ffmpeg',

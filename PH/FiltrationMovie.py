@@ -293,7 +293,7 @@ def make_movie(
 		color_scheme='none',
 		camera_angle=(70, 45),
 		alpha=1,
-		dpi=200,
+		dpi=100,
 
 ):
 	print 'building movie...'

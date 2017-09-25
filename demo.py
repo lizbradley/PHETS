@@ -8,33 +8,34 @@ from config import default_filtration_params as filt_params
 
 # the following vars are passed the functions below, defined here for convenience
 
-time_units = 'seconds'					# 'seconds' or 'samples'
-crop = (0, 5)						 	# range of the signal that you want to play with
+time_units = 'seconds'				# 'seconds' or 'samples'
+crop = (0, 5)				 	# range of the signal that you want to play with
 tau = (1 / idx_to_freq(49)) / np.pi		# embedding delay
-m = 2 									# embedding dimension
+m = 2 						# embedding dimension
 
-# loads the data
+print 'loading data...'
 sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 
-
-# the call, which includes setting where it puts the results
+# see signal.png for a plot of the full signal and region that will be cropped
 plot_signal('output/demo/signal.png', sig, window=crop, time_units=time_units)
-# following line does the right thing with axis labels
 
+# the following function creates a movie of the embeddings over a sliding window
+# returns a list of the embeddings (trajectories), one for each window 
 trajs = slide_window(
 	sig,
 	'output/demo/embed_movie.mp4',
 	tau=tau,
 	m=m,
 	window_size=.05,  			# this is in seconds
-	window_step=.02,
+	window_step=.5,
 	crop=crop,
-	title='piano demo',
-	framerate=10,
-	save_movie=False
 )
 
-traj = trajs[100]		# take embedding from 5th frame of movie
+np.save('output/demo/trajs.npy', trajs)         # lets save trajs to file, so we don't have to call slide_window() every time we want to do PH on the data
+                                                # after the inital run, the preceeding lines "trajs = slide_window(" to "np.save(...)" can be commented out 
+trajs = np.load('output/demo/trajs.npy')
+
+traj = trajs[5]		                        # take embedding from 5th window of movie
 
 # traj = embed(sig, tau, m, crop=crop, time_units=time_units)		# alternatively, embed explicitly
 
@@ -43,9 +44,9 @@ traj = trajs[100]		# take embedding from 5th frame of movie
 filt_params.update(
 	{
 		'ds_rate': 25,
-		'num_divisions': 25,  # number of epsilon vals in filtration
-		# 'max_filtration_param': .05,  # if positive, explicit;
-		'max_filtration_param': -10,  # if negative, cuts off filtration when finds a 10 dim simplex
+		'num_divisions': 25,                # number of epsilon vals in filtration
+		# 'max_filtration_param': .05,      # if positive, explicit
+		'max_filtration_param': -10,        # if negative, cuts off filtration when finds a 10 dim simplex
 		'use_cliques': True,
 
 	}
