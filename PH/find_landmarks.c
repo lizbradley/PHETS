@@ -60,7 +60,7 @@ float            max_speed=-1000000;
 
 
 //distance calculation options
-float            use_hamiltonian = 0.0;
+float            use_hamiltonian = 1.0;
 float            speed_amplify = 1.0;
 float            orientation_amplify = 1.0;
 float            ray_distance_amplify = 1.0;
@@ -379,8 +379,12 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 			for(i=0;i<num_wits;i++){		
 				for(j=0;j<num_wits;j++){
 					sum = 0;
+					
+					printf("\ni, j: %d , %d \n", i, j);		        //debugging
+
 					for(k=0;k<wit_pts;k++){
 						sum+=(witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k])*(witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k]);
+						printf("k = %d: sum = %f \n", k, sum);		//debugging
 					}
 					distances[i*num_wits+j] = sqrt(sum);
 				}
