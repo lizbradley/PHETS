@@ -347,6 +347,11 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	for(j=0;j<wit_pts;j++){
 		norm_velocity[(num_wits-1)*wit_pts+j] = norm_velocity[(num_wits-2)*wit_pts+j];
 	}
+
+    printf("\n");
+	for(i=0; i < 16; i++){      //debugging
+	    printf("%f \n", norm_velocity[i]);
+	}
 	
 	printf("done\n");
 	fflush(stdout);

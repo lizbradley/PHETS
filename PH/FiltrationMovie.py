@@ -54,6 +54,8 @@ def plot_witnesses_2D(subplot, attractor_data):
 		facecolor='black',
 		s=.1)
 
+	subplot.set_aspect('equal')
+	# lims = max(subplot.get_xlims(),
 
 def plot_landmarks_2D(subplot, landmark_data):
 	landmark_data = np.array(landmark_data)
