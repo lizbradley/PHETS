@@ -4,7 +4,7 @@ MEMORY_PROFILE_ON = False
 
 find_landmarks_c_compile_str = {
 	# 'linux': '/usr/bin/gcc-5 -fopenmp -lpopt find_landmarks.c -o find_landmarks -lm -lpopt',
-        'linux': 'gcc -fopenmp -lpopt -lm -o find_landmarks find_landmarks.c',
+    'linux': 'gcc -fopenmp -lpopt -lm -o find_landmarks find_landmarks.c',
 
 	'macOS': '/usr/local/bin/gcc-5 -fopenmp -lpopt -o find_landmarks find_landmarks.c'
 }
@@ -24,7 +24,7 @@ default_filtration_params = {
 	"d_orientation_amplify": 1,
 	"d_stretch": 1,
 	"d_ray_distance_amplify": 1,
-	"d_use_hamiltonian": 0,
+	"d_use_hamiltonian": 1,
 	"d_cov" : 0,
 	"simplex_cutoff": 0,
 	"weak": False,
