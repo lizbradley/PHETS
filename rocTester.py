@@ -1,3 +1,4 @@
+import sys, time
 from ROC import PRF_vs_FFT, PRF_vs_FFT_v2
 from Tools import sec_to_samp
 from config import default_filtration_params as filt_params
@@ -8,11 +9,22 @@ from config import default_filtration_params as filt_params
 # TODO time_units
 # TODO FFT ROC accuracy vs FT_bins (logspace)
 
+
+set_test = 7
+
+
+
+
+if len(sys.argv) > 1: test = int(sys.argv[1])
+else: test = set_test
+print 'running test %d...' % test
+start_time = time.time()
+
+
 def out_fname():
 	return 'output/ROC/test_{}.png'.format(test)
 
 
-test = 7
 
 
 if test == 1:
