@@ -348,10 +348,10 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		norm_velocity[(num_wits-1)*wit_pts+j] = norm_velocity[(num_wits-2)*wit_pts+j];
 	}
 
-    printf("\n");
-	for(i=0; i < 16; i++){      //debugging
-	    printf("%f \n", norm_velocity[i]);
-	}
+//    printf("\n");
+//	for(i=0; i < 16; i++){      //debugging
+//	    printf("%f \n", norm_velocity[i]);
+//	}
 	
 	printf("done\n");
 	fflush(stdout);
@@ -385,11 +385,9 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 				for(j=0;j<num_wits;j++){
 					sum = 0;
 					
-					printf("\ni, j: %d , %d \n", i, j);		        //debugging
-
-					for(k=0;k<wit_pts;k++){
+//					printf("\ni, j: %d , %d \n", i, j);		        //debugging					for(k=0;k<wit_pts;k++){
 						sum+=(witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k])*(witnesses[i*wit_pts+k]-witnesses[j*wit_pts+k]);
-						printf("k = %d: sum = %f \n", k, sum);		//debugging
+//						printf("k = %d: sum = %f \n", k, sum);		//debugging
 					}
 					distances[i*num_wits+j] = sqrt(sum);
 				}
