@@ -129,7 +129,7 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		np.savetxt('PH/temp/landmarks.txt', landmark_data)
 
 
-		cmds = ['set terminal pngcairo size 700, 700',
+		cmds = ['set terminal pngcairo size 800, 800',
 				'set view {}, {}'.format(*camera_angle),
 				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
 				# 'set size ratio - 1',

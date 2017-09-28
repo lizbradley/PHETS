@@ -460,8 +460,6 @@ def PRF_vs_FFT_v2(
 		spec_data_2 = [spec_2_fpr, spec_2_tpr]
 
 
-
-
 		data.append((spec_data_1, spec_data_2, prf_data_1, prf_data_2))
 
 		print_data_spec.append((mean_spec_1, var_spec_1, label_1, mean_spec_2, var_spec_2, label_2))
