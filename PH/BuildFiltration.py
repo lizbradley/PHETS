@@ -131,7 +131,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-w {}-{}".format(start,stop),
 					"-i{}".format(input_file_name),
 					"-olandmark_outputs.txt",
-					"-m {}".format(int(m2_d)),
+					"-m }".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
 					"-h {}".format(use_hamiltonian),

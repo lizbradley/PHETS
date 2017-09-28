@@ -120,6 +120,13 @@ def remove_old_frames(dir):
 			os.remove(dir + f)
 
 
+def remove_files_by_type(dir, ftype):
+	for f in os.listdir(dir):
+		if f.endswith(ftype):
+			os.remove(dir + f)
+			print 'removed {}'.format(dir + f)
+
+
 def frames_to_movie(out_filename, frame_path, framerate=1, aspect=None):
 
 	if os.path.exists(out_filename):

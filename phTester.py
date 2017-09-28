@@ -7,9 +7,6 @@ from PubPlots import plot_PD_pub, plot_filtration_pub
 from config import default_filtration_params as parameter_set
 
 
-import time
-
-
 set_test = 16		# set test number here or with command line argument
 
 
@@ -402,6 +399,9 @@ if test == 110:
 		})
 
 	filtration = Filtration(in_filename, filt_params)
+
+	make_movie(filtration, 'output/PH/test_110.mp4')
+
 
 
 

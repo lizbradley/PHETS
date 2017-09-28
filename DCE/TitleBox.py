@@ -1,8 +1,8 @@
 
 def add_fname_table(ax, title_info):
+	ax.axis('off')
 
 	if title_info['title']:
-		ax.axis('off')
 		title_table = ax.table(
 			cellText=[
 				[title_info['title'].split('/')[-1]],   # remove leading "datasets/"
@@ -12,7 +12,6 @@ def add_fname_table(ax, title_info):
 		)
 
 	elif isinstance(title_info['fname'], basestring):
-		ax.axis('off')
 		title_table = ax.table(
 			cellText=[
 				[title_info['fname'].split('/')[-1]],   # remove leading "datasets/"

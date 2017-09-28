@@ -2832,11 +2832,11 @@ if test == 8000:
 
 	plot_variance(
 		'datasets/trajectories/REALDEAL/L63_2mil.txt',
-		'output/PRFCompare/variance/joetest.png', 		 	 # out filename
+		'output/PRFCompare/variance/joetest.png', 		 	# out filename
 		params,
 
-		('worm_length', [200, 500, 1000, 2000]),		 # vary param 1
-		None,												 # vary param 2
+		('worm_length', [200, 500, 1000, 2000]),		    # vary param 1
+		None,												# vary param 2
 
 		load_saved_filts=True,
 
@@ -2958,7 +2958,7 @@ if test == 8003:
 		('worm_length', (200, 500, 1000, 2000)),		 # vary param 1
 		None,
 
-		load_saved_filts=True,
+		load_saved_filts=False,
 
 		time_units='samples',
 		crop=(5000, 2005000),    		# (start, stop) in time_units, or 'auto'
@@ -2967,7 +2967,7 @@ if test == 8003:
 		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
 
 		normalize_volume=True,
-		see_samples=10,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		see_samples=1,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
 		quiet=True
 	)
 

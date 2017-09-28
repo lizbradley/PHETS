@@ -272,7 +272,9 @@ class Filtration:
 
 		def load_perseus_out_file():
 			try:
-				self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
+				with warnings.catch_warnings():
+					warnings.simplefilter('ignore')
+					self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
 			except IOError:
 				self.intervals = np.empty(0)
 				if not silent: print "WARNING: no homology for this window"

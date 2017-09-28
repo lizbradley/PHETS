@@ -8,7 +8,8 @@ from config import default_filtration_params as parameter_set
 from matplotlib.pyplot import ioff
 ioff()
 
-test = 6
+
+test = 8
 
 
 
@@ -195,3 +196,63 @@ if test == 6:
 		# interval to build filt movies and PDs. 0 means no PDs or movies.
 		quiet=True
 	)
+
+
+
+if test == 7:
+
+	in_fname = 'datasets/trajectories/jittery_circle.txt'
+
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -3,
+			'num_divisions': 5,
+			'ds_rate': 2,
+			'd_use_hamiltonian': -2
+
+
+		})
+
+	filt = Filtration(in_fname, params)		# BUG: filtration only has 5 steps !!
+	make_movie(filt, movie_fname(test), alpha=.5)
+
+
+if test == 8:
+
+	in_fname = 'datasets/trajectories/hopf/NewHopf_ap1.txt'
+
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+			'ds_rate': 100,
+			'd_use_hamiltonian': -2,
+			'worm_length': 2000
+
+
+		})
+
+	filt = Filtration(in_fname, params)
+	make_movie(filt, movie_fname(test), alpha=.5)
+
+
+if test == 9:
+
+	in_fname = 'datasets/trajectories/Ellipse200.txt'
+
+	params = parameter_set
+	params.update(
+		{
+			'max_filtration_param': -3,
+			'num_divisions': 5,
+			'ds_rate': 20,
+			'd_use_hamiltonian': -2,
+			# 'worm_length': 2000
+
+
+		})
+
+	filt = Filtration(in_fname, params)
+	make_movie(filt, movie_fname(test), alpha=.5)
