@@ -29,11 +29,11 @@ def slide_window(
 		in_filename,
 		out_filename,
 		time_units='seconds',
-		window_size=.5,    # seconds
-		window_step=.1,      # seconds
+		window_size=.5,    	# seconds
+		window_step=.1,     # seconds
 		tau=10,
 		ds_rate=1,
-		m=2,  # embed dimension
+		m=2,  				# embed dimension
 		save_movie=True,
 		crop=None,
 		title=None,
@@ -60,31 +60,29 @@ def slide_window(
 		full_sig = in_filename
 
 	sig = crop_sig(crop, full_sig, time_units)
-
 	if time_units == 'seconds':
 		worm_length = len(sig) / WAV_SAMPLE_RATE
 	else:
 		worm_length = len(sig)
 
 	frame_fname = 'DCE/frames/frame%03d.png'
-
 	trajs = []
-
 	print 'building movie...'
 	for i, start in enumerate(np.arange(0, worm_length, window_step)):
 		print 'frame %i of %i' % (i, worm_length / window_step)
-
 		window = [start, start + window_size]
-		traj = DCE.embed(sig, tau, m, crop=window, ds_rate=ds_rate, time_units=time_units)
+		traj = DCE.embed(
+			sig, tau, m, crop=window, ds_rate=ds_rate, time_units=time_units
+		)
 		trajs.append(traj)
-
 		title_info.update({'frame #': i})
 
 		if save_movie:
 			Plots.make_frame(traj, sig, window, frame_fname % i, title_info)
 
 	if save_movie:
-		frames_to_movie(out_filename, frame_fname, framerate=framerate, aspect=(10,8))
+		frames_to_movie(out_filename, frame_fname,
+						framerate=framerate, aspect=(10,8))
 
 	return trajs
 
