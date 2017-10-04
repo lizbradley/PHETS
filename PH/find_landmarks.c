@@ -313,7 +313,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 	fflush(stdout);
 	for(i=0;i<num_wits-1;i++){
 		for(j=0;j<wit_pts;j++){
-			v = (witnesses[i*wit_pts+wit_pts]-witnesses[i*wit_pts+j]);	
+			v = (witnesses[i*wit_pts+wit_pts+j]-witnesses[i*wit_pts+j]);
 			velocities[i*wit_pts+j] = v;
 		}
 	}

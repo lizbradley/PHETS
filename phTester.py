@@ -403,6 +403,28 @@ if test == 110:
 	make_movie(filtration, 'output/PH/test_110.mp4')
 
 
+# test = 200
+if test == 200:
+	in_filename = "datasets/trajectories/Ellipse200.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 200,
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+			'd_use_hamiltonian': -10
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/joetests/Ellipse200_j2.mp4',
+	)
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

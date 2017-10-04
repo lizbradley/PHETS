@@ -1,5 +1,6 @@
 import sys, time
-from ROC import PRF_vs_FFT, PRF_vs_FFT_v2
+from ROC import PRF_vs_FFT_v2
+from ROC.ROCs import classifier_ROC
 from Tools import sec_to_samp
 from config import default_filtration_params as filt_params
 
@@ -10,7 +11,7 @@ from config import default_filtration_params as filt_params
 # TODO FFT ROC accuracy vs FT_bins (logspace)
 
 
-set_test = 7
+set_test = 22
 
 
 
@@ -321,5 +322,78 @@ if test == 20:
 		k=(0, 5, .01),		# min, max, int
 		load_saved_filts=True,
 		normalize_volume=True
+
+	)
+
+
+
+if test == 21:
+
+	filt_params.update(
+		{
+			'max_filtration_param': -8,
+			'num_divisions': 30,
+			'use_cliques': True,
+		}
+	)
+
+	classifier_ROC(
+		'datasets/time_series/Clarinet/40-clarinet.txt',
+		'datasets/time_series/viol/40-viol.txt',
+		out_fname(),
+
+		'clarinet',
+		'viol',
+
+		crop_1=sec_to_samp((2, 4)),
+		crop_2=sec_to_samp((1, 3)),
+
+		tau=311,  # samples
+		m=2,
+
+		window_length=2205,
+		# window_length=(1000, 8000, 24000),
+		num_windows=10,
+		num_landmarks=55,
+		k=(0, 5, .01),		# min, max, int
+		load_saved_filts=False,
+		normalize_volume=True,
+		save_samps=False
+
+	)
+
+
+if test == 22:
+
+	filt_params.update(
+		{
+			'max_filtration_param': -8,
+			'num_divisions': 30,
+			'use_cliques': True,
+		}
+	)
+
+	classifier_ROC(
+		'ClassicBifurcationData/HomoHyper_anp01.txt',
+		'ClassicBifurcationData/HomoHyper_anp5.txt',
+		out_fname(),
+
+		'a = -0.01',
+		'a = -0.5',
+
+		crop_1=sec_to_samp((2, 4)),
+		crop_2=sec_to_samp((1, 3)),
+
+		tau=311,  # samples
+		m=2,
+
+		window_length=2205,
+		# window_length=(1000, 8000, 24000),
+		num_windows=10,
+		num_landmarks=55,
+		k=(0, 5, .01),		# min, max, int
+		load_saved_filts=True,
+		normalize_volume=True,
+		save_samps=False
 
 	)
