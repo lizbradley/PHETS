@@ -15,10 +15,9 @@ higher dimensional trajectories as .txt files.
 
 ### Dependencies
 * Python 2.7
-* GCC 5
-* popt.h
+* popt
 * ffmpeg
-* gnuplot
+* gnuplot (with pngcairo)
 
 
 ### Setup
@@ -40,7 +39,7 @@ export LD_RUN_PATH="/usr/lib"
 ###### ffmpeg and gnuplot
 ```bash
 sudo apt-get install ffmpeg
-sudo apt-get install gnuplot
+sudo apt-get install gnuplot-x11
 ```
 
 #### Install PHETS
