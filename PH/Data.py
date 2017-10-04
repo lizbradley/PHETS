@@ -93,7 +93,7 @@ class Filtration:
 				print 'Sorry, PHETS requires linux or macOS.'
 				sys.exit()
 			subprocess.call(compile_str, shell=True)
-			print "find_landmarks recompilation attempt complete. If successful (ignore warnings), please repeat your test."
+			print "find_landmarks recompilation attempt complete. If successful, please repeat your test."
 			print 'If problem persists, you will need to manually compile PH/find_landmarks.c. See config.py for default GCC commands.'
 
 			sys.exit()

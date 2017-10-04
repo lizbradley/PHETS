@@ -7,8 +7,22 @@ import matplotlib.pyplot as plt
 import math
 from scipy.signal import butter, lfilter, freqz
 
-WAV_SAMPLE_RATE = 44100.
+from config import WAV_SAMPLE_RATE
 
+
+def crop_sig(sig, crop, time_units):
+	if crop is not None:
+		if time_units == 'samples':
+			pass
+		elif time_units == 'seconds':
+			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		else:
+			print 'ERROR: invalid time_units'
+			sys.exit()
+
+		sig = sig[crop[0]: crop[1]]
+
+	return sig
 
 def auto_crop(crop_cmd, sig, length, time_units='seconds'):
 	"""

@@ -28,8 +28,12 @@ def add_param_table(ax, params):
 	ax.set_xlim([0,1])
 	ax.set_ylim([0,1])
 
-	if isinstance(params['tau'], float):
-		params['tau'] = '{:6f}'.format(params['tau'])
+	try:
+		if isinstance(params['tau'], float):
+			params['tau'] = '{:6f}'.format(params['tau'])
+	except:
+		pass
+
 
 
 	param_data = [[key, params[key]] for key in params if key not in ('fname', 'title')]

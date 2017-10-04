@@ -6,29 +6,27 @@ import sys
 
 from Utilities import frames_to_movie
 
-from Tools import auto_tau, auto_crop
+from Tools import auto_tau, auto_crop, crop_sig
+
 from config import WAV_SAMPLE_RATE
 
 from MovieTools import remove_old_frames
-from MovieTools import prep_save_worms_single, save_worms_single, prep_save_worms_double, save_worms_double
+from MovieTools import prep_save_worms_double, save_worms_double
 
-def crop_sig(crop, sig, time_units):
-	if crop:
-		if time_units == 'samples':
-			pass
-		elif time_units == 'seconds':
-			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
-		else:
-			print 'ERROR: invalid time_units'
-			sys.exit()
 
-		return sig[crop[0]: crop[1]]
+
+def get_data(fname):
+	if isinstance(fname, basestring):
+		print 'loading signal...'
+		return np.loadtxt(fname)
+	else:
+		return fname	# is array
 
 
 def slide_window(
 		in_filename,
 		out_filename,
-		time_units='seconds',
+		time_units='samples',
 		window_size=.5,    	# seconds
 		window_step=.1,     # seconds
 		tau=10,
@@ -53,13 +51,10 @@ def slide_window(
 
 	if save_movie: remove_old_frames()
 
-	if isinstance(in_filename, basestring):
-		print 'loading signal...'
-		full_sig = np.loadtxt(in_filename)
-	else:
-		full_sig = in_filename
+	full_sig = get_data(in_filename)
 
-	sig = crop_sig(crop, full_sig, time_units)
+	sig = crop_sig(full_sig, crop, time_units)
+
 	if time_units == 'seconds':
 		worm_length = len(sig) / WAV_SAMPLE_RATE
 	else:
@@ -94,29 +89,49 @@ def vary_tau(
 		out_filename,
 		tau_lims=(1, 15),
 		tau_inc=1,
-		embed_crop=(1, 2),
+		crop=(1, 2),
+		time_units='samples',
 		ds_rate=1,
-		m=2,  # embed dimension
+		m=2,  			# embed dimension
 		save_movie=True,
+		title=None,
+		framerate=1
+		
 	):
 
-	if save_movie: remove_old_frames()
+		title_info = {
+			'fname': in_filename,
+			'tau_lims': tau_lims,
+			'tau_inc': tau_inc,
+			'm': m,
+			'crop': crop,
+			'time_units': time_units,
+			'title': title,
+		}
 
-	trajs = []
+		if save_movie: remove_old_frames()
+		full_sig = get_data(in_filename)
+		sig = crop_sig(full_sig, crop, time_units)
 
+		frame_fname = 'DCE/frames/frame%03d.png'
+		trajs = []
+		num_frames = int(np.floor((tau_lims[1] - tau_lims[0]) / tau_inc))
+		print 'building movie...'
+		for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
+			print 'frame {} of {}'.format(i, num_frames)
+			traj = DCE.embed(sig, tau, m,
+							 ds_rate=ds_rate, time_units=time_units)
+			trajs.append(traj)
+			title_info.update({'frame #': i})
+			title_info.update({'tau': tau})
 
-	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
-		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
-		sig = np.loadtxt(in_filename)
-		DCE.embed_v1(sig, 'DCE/temp/embedded_coords.txt', embed_crop, tau, m,  ds_rate=ds_rate)
-		traj = DCE.embed(sig, tau, m, crop=embed_crop, ds_rate=ds_rate, time_units='seconds')
-		trajs.append(traj)
-		if save_movie: Plots.make_frame(traj, in_filename, 'DCE/frames/frame%03d.png' % i, embed_crop, tau, m)
+			if save_movie:
+				Plots.make_frame(traj, sig, crop, frame_fname % i, title_info)
 
-	if save_movie: frames_to_movie(out_filename, framerate=1)
+		if save_movie:
+			frames_to_movie(out_filename, frame_fname, framerate=framerate)
 
-	return trajs
-
+		return trajs
 
 def compare_vary_tau(
 		in_filename_1,
