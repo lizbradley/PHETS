@@ -9,7 +9,6 @@ class BaseTrajectory:
             num_windows=1,
             window_length=None,
             normalize_volume=None,      # 'window', 'crop', 'full' or None
-            time_units='seconds'        # 'seconds' or 'samples'
 
 
     ):
@@ -21,28 +20,35 @@ class BaseTrajectory:
             self.fname = fname
 
 
-        self.time_units = time_units
-
-        self.crop = crop
-        self.data = self.apply_crop()
-
+        self.norm_vol = normalize_volume
+        self.crop_lim = crop
         self.num_windows=num_windows,
         self.window_length=window_length
 
-        self.norm_vol = normalize_volume
+        self.data = self.crop()
+        self.windows, self.start_pts = self.slice()
 
-    def apply_crop(self, crop):
-        if self.crop is None:
+    def crop(self):
+        if self.crop_lim is None:
             return self.data_full
         else:
-            # do crop
-            pass
+            return self.data_full[self.crop_lim[0]:self.crop_lim[1]]
+
+
 
     def slice(self):
-        pass
+        start_pts = np.floor(
+            np.linspace(0, len(self.data), self.num_windows, endpoint=False)
+        ).astype(int)
+        windows = np.asarray(
+            [self.data[pt:pt + self.window_length]
+             for pt in start_pts]
+        )
+        if self.norm_vol[2]:
+            windows = [np.true_divide(w, np.max(np.abs(w))) for w in windows]
 
-    def apply_vol_norm(self):
-        pass
+        return windows, start_pts
+
 
 
 
@@ -57,4 +63,7 @@ class TimeSeries(BaseTrajectory):
 
 
 
+class Trajectory(BaseTrajectory):
 
+    def __init__(self, data, fname=None):
+        BaseTrajectory.__init__(self, data, fname)

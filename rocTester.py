@@ -188,8 +188,8 @@ if test == 22:
 	)
 
 	classifier_ROC(
-		'ClassicBifurcationData/NewHopf_anp01.txt',
-		'ClassicBifurcationData/NewHopf_a0.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_anp01.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_a0.txt',
 		out_fname(),
 
 		'a = NewHopf -0.01',

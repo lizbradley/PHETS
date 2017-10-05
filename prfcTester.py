@@ -3051,7 +3051,7 @@ if test == 10000:
 		})
 		
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_an1.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_an1.txt',
 		'output/PRFCompare/variance/NewHopf_an1.png', 		 	 # out filename
 		params,
 		('ds_rate', (10, 100, 200)),		 # vary param 1
@@ -3084,7 +3084,7 @@ if test == 10001:
 
 
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_anp1.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_anp1.txt',
 		'output/PRFCompare/variance/NewHopf_anp1.png', 		 	 # out filename
 		params,
 
@@ -3118,7 +3118,7 @@ if test == 10002:
 
 
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_anp01.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_anp01.txt',
 		'output/PRFCompare/variance/NewHopf_anp01.png', 		 	 # out filename
 		params,
 
@@ -3152,7 +3152,7 @@ if test == 10010:
 		})
 		
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_an1.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_an1.txt',
 		'output/PRFCompare/variance/NewHopf_an1.png', 		 	 # out filename
 		params,
 		('ds_rate', (10, 100, 200)),		 # vary param 1
@@ -3185,7 +3185,7 @@ if test == 10011:
 
 
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_anp1.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_anp1.txt',
 		'output/PRFCompare/variance/NewHopf_anp1.png', 		 	 # out filename
 		params,
 
@@ -3219,7 +3219,7 @@ if test == 10012:
 
 
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_anp01.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_anp01.txt',
 		'output/PRFCompare/variance/NewHopf_anp01.png', 		 	 # out filename
 		params,
 
@@ -3252,7 +3252,7 @@ if test == 10014:
 		})
 		
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_a0.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_a0.txt',
 		'output/PRFCompare/variance/NewHopf_a0.png', 		 	 # out filename
 		params,
 		('ds_rate', (10, 100, 200)),		 # vary param 1
@@ -3285,7 +3285,7 @@ if test == 10015:
 
 
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_app01.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_app01.txt',
 		'output/PRFCompare/variance/NewHopf_ap01.png', 		 	 # out filename
 		params,
 
@@ -3319,7 +3319,7 @@ if test == 10016:
 
 
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_app1.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_app1.txt',
 		'output/PRFCompare/variance/NewHopf_app1.png', 		 	 # out filename
 		params,
 
@@ -3353,7 +3353,7 @@ if test == 10017:
 
 
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_ap1.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_ap1.txt',
 		'output/PRFCompare/variance/TEST_NewHopf_ap1.png', 		 	 # out filename
 		params,
 
@@ -3388,7 +3388,7 @@ if test == 10018:
 
 
 	plot_variance(
-		'ClassicBifurcationData/NewHopf_ap1.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_ap1.txt',
 		'output/PRFCompare/variance/NewHopf_ap1.png', 		 	 # out filename
 		params,
 
