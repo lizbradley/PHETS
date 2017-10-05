@@ -373,7 +373,7 @@ def PRF_vs_FFT_v2(
 		print_data_prf.append((mean_prf_1, var_prf_1, label_1, mean_prf_2, var_prf_2, label_2))
 
 	print 'plotting...'
-	plot_fig(data, k, label_1, label_2, window_length, out_filename, pub)
+	plot_fig(data, k, label_1, label_2, window_length, out_filename)
 
 	print_stats_multi(print_data_spec, print_data_prf, window_length)
 
@@ -440,10 +440,13 @@ def classifier_ROC(
 		plt.savefig(fname)
 
 	def plot_fig(data, k, label_1, label_2, window_length, fname):
-		fig = plt.figure(figsize=(10, 4), dpi=100)
+		fig = plt.figure(
+			figsize=(10, 4),
+			dpi=100
+		)
 
-		ax1 = fig.add_subplot(221)
-		ax2 = fig.add_subplot(222)
+		ax1 = fig.add_subplot(121)
+		ax2 = fig.add_subplot(122)
 
 
 		fig.subplots_adjust(right=0.8)
@@ -455,8 +458,8 @@ def classifier_ROC(
 			prf_data_1, prf_data_2 = data_wl
 
 
-			plot_roc(ax1, prf_data_1, k, roc_title(label_1, 'PRF'))
-			l, cm = plot_roc(ax2, prf_data_2, k, roc_title(label_2, 'PRF'))
+			plot_roc(ax1, prf_data_1, k, roc_title(label_1, ''))
+			l, cm = plot_roc(ax2, prf_data_2, k, roc_title(label_2, ''))
 			lines.append(l)
 
 		bounds = np.arange(k[0], k[1] + .5, .5)
@@ -501,16 +504,16 @@ def classifier_ROC(
 		windows_2, st_pts_2 = slice_sig(sig_2, l=wl, n=num_windows, normalize=normalize_volume)
 
 		if save_samps:
-			plot_sig(sig_full_1, crop_1, windows_1, st_pts_1, 'output/ROC/sig1_wl{}.png'.format(wl))
-			plot_sig(sig_full_2, crop_2, windows_2, st_pts_2, 'output/ROC/sig2_wl{}.png'.format(wl))
+			plot_sig(sig_full_1, crop_1, windows_1, st_pts_1, 'output/ROC/sig1.png'.format(wl))
+			plot_sig(sig_full_2, crop_2, windows_2, st_pts_2, 'output/ROC/sig2.png'.format(wl))
 
 
 		if len(windows_1[0].shape) == 1:
 			trajs_1 = [embed(w, tau, m) for w in windows_1]
 			trajs_2 = [embed(w, tau, m) for w in windows_2]
 		else:
-			trajs_1 = [w for w in windows_1]
-			trajs_2 = [w for w in windows_2]
+			trajs_1 = windows_1
+			trajs_2 = windows_2
 
 
 		prfs_1 = get_prfs(trajs_1, filt_params, wl, num_landmarks, load_saved=load_saved_filts, label=label_1)

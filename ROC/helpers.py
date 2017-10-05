@@ -11,7 +11,7 @@ from config import WAV_SAMPLE_RATE
 def crop_sig(sig, crop):
 	if crop is None:
 		return sig
-	return sig[crop[0] : crop[1]]
+	return sig[crop[0]: crop[1]]
 
 
 def slice_sig(sig, l, n, normalize=True):

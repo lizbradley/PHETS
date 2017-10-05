@@ -92,7 +92,7 @@ def vary_tau(
 		crop=(1, 2),
 		time_units='samples',
 		ds_rate=1,
-		m=2,  			# embed dimension
+		m=2,
 		save_movie=True,
 		title=None,
 		framerate=1
