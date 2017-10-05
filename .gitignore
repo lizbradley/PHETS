@@ -1,6 +1,8 @@
 .idea/
-output/**
-!output/**/*.gitkeep
+#output/**
+*.png
+*.mp4
+!docs/*
 *.pyc
-witnesses.txt
-landmarks.txt
+*.npy
+ROC/data/.gitignore
