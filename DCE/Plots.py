@@ -37,28 +37,24 @@ def plot_dce(fig, ax, dce_data):
 		# ax.set_axis('off')
 
 
-	ax.set_aspect('equal', adjustable='datalim')
+	ax.set(aspect='equal', adjustable='datalim', anchor='C')
 
-	ymin, ymax = ax.get_ylim()
-	ylim = max(abs(ymin), abs(ymax))
-	xmin, xmax = ax.get_xlim()
-	xlim = max(abs(xmin), abs(xmax))
+	# downsample auto ticks
+	# yticks = ax.get_yticks()
+	# yticks = yticks[::2]
+	# xticks = ax.get_xticks()
+	# xticks = xticks[::2]
+	# ax.set_yticks(yticks)
+	# ax.set_xticks(xticks)
 
-	lim = max(xlim, ylim)
-	ax.set_ylim([-lim, lim])
-	ax.set_xlim([-lim, lim])
-	# print 'ylim: {}, xlim: {}'.format(ylim, xlim)
+	# choose second outermost auto ticks
+	yticks = ax.get_yticks()
+	ymin, ymax = yticks[1], yticks[-2]
+	xticks = ax.get_xticks()
+	xmin, xmax = xticks[1], xticks[-2]
+	ax.set_yticks([ymin, ymax])
+	ax.set_xticks([xmin, xmax])
 
-	ax.set_xticks([])
-	# ax.set_yticks([])
-	ymin, ymax = ax.get_ylim()
-	ax.set_yticks([-lim, 0, lim])
-	# ax.set_xticks([-lim, 0, lim])
-	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-
-	# pos = ax.get_position()
-	# fig.text(pos.x0, pos.y0 + pos.height,	'{:.3f}'.format(ylim), 	ha='right', va='bottom')
-	# fig.text(pos.x0, pos.y0, 				'{:.3f}'.format(-ylim), ha='right', va='top')
 
 	fig.subplots_adjust(left=.07, bottom=.07, right=.93, top=.93, wspace=.5, hspace=.5)
 
@@ -80,7 +76,6 @@ def plot_signal(out, waveform_data, window=None, time_units='seconds', offset=No
 
 	else: 			# seconds
 		x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
-
 		ax.set_xlabel('time (seconds)')
 
 	if offset:
@@ -133,7 +128,7 @@ def plot_title(fname_ax, param_ax, title_info):
 
 
 
-def make_frame(traj, sig, window, frame_fname, title_info):
+def make_frame(traj, sig, window, frame_fname, title_info, time_units=None):
 	fig = plt.figure(figsize=(10, 8), tight_layout=False, dpi=100)
 	# fig.subplots_adjust(hspace=.5)
 	m = title_info['m']
@@ -145,7 +140,7 @@ def make_frame(traj, sig, window, frame_fname, title_info):
 	else: dce_ax = 			plt.subplot2grid((8, 10), (0, 4), colspan=6, rowspan=6, projection='3d')
 
 	# if m == 2: dce_ax =		fig.add_axes([.4, .3, .6, .6])
-	# elif m == 3: dce_ax =	fig.add_axes([.4, .3, .6, .6], projection='3d')
+	# else: dce_ax =			fig.add_axes([.4, .3, .6, .6], projection='3d')
 
 	if title_info['crop']:
 		t_offset = title_info['crop'][0]
@@ -155,7 +150,7 @@ def make_frame(traj, sig, window, frame_fname, title_info):
 
 	plot_title(fname_ax, param_ax, title_info)
 	plot_dce(fig, dce_ax, traj)
-	plot_signal(sig_ax, sig, window, offset=t_offset)
+	plot_signal(sig_ax, sig, window, offset=t_offset, time_units=time_units)
 	plt.savefig(frame_fname)
 	plt.close(fig)
 

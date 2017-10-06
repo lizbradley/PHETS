@@ -16,13 +16,13 @@ m = 2 						# embedding dimension
 print 'loading data...'
 # load data from text file. you can use skiprows=1 to skip a header.
 sig = np.loadtxt('datasets/time_series/WAIS_age_dD_d18O_xs.txt',
-                 skiprows=0,
+                 skiprows=1,
                  delimiter=','   # takes whitespace by default
 )
 
 sig = sig[:,2]
 # see signal.png for a plot of the full signal and region that will be cropped
-plot_signal('output/demo/signal.png', sig, window=crop, time_units=time_units)
+plot_signal('output/liz/signal.png', sig, window=crop, time_units=time_units)
 
 # the following function creates a movie of the embeddings over a sliding window
 # returns a list of the embeddings (trajectories), one for each window
@@ -31,18 +31,18 @@ plot_signal('output/demo/signal.png', sig, window=crop, time_units=time_units)
 # this code puts the frames in PHETS/DCE/frames if you want them
 trajs = slide_window(
 	sig,
-	'output/demo/embed_movie.mp4',
+	'output/liz/embed_movie.mp4',
 	tau=tau,
 	m=m,
 	window_size=2000,
-	window_step=1000,
+	window_step=2000,
 	crop=crop,
 )
 # ...down to here
 
-np.save('output/demo/trajs.npy', trajs)         # lets save trajs to file, so we don't have to call slide_window() every time we want to do PH on the data
+np.save('output/liz/trajs.npy', trajs)         # lets save trajs to file, so we don't have to call slide_window() every time we want to do PH on the data
                                                 # after the inital run, the preceeding lines "trajs = slide_window(" to "np.save(...)" can be commented out 
-trajs = np.load('output/demo/trajs.npy')
+trajs = np.load('output/liz/trajs.npy')
 
 traj = trajs[3]		                        # take embedding from 3rd window of movie
 
@@ -62,8 +62,8 @@ filt_params.update(
 )
 
 # build the filtration:
-filt = Filtration(traj, filt_params, title='piano demo')
-
-make_movie(filt, 'output/demo/filt_movie.mp4')
-make_PD(filt, 'output/demo/PD.png')  # make the persistence diagram
-make_PRF_plot(filt, 'output/demo/PRF.png')
+# filt = Filtration(traj, filt_params, title='piano demo')
+#
+# make_movie(filt, 'output/liz/filt_movie.mp4')
+# make_PD(filt, 'output/liz/PD.png')  # make the persistence diagram
+# make_PRF_plot(filt, 'output/liz/PRF.png')

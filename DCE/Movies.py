@@ -73,7 +73,7 @@ def slide_window(
 		title_info.update({'frame #': i})
 
 		if save_movie:
-			Plots.make_frame(traj, sig, window, frame_fname % i, title_info)
+			Plots.make_frame(traj, sig, window, frame_fname % i, title_info, time_units=time_units)
 
 	if save_movie:
 		frames_to_movie(out_filename, frame_fname,
