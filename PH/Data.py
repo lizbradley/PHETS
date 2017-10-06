@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-import pickle
+import pickle, cPickle
 import subprocess
 import warnings
 
@@ -18,7 +18,8 @@ def load_filtration(in_file):
 	print 'loading saved filtration...'
 	caller_dir = os.getcwd()
 	os.chdir(SCRIPT_DIR)
-	filtration = pickle.load(open('filtrations/' + in_file))
+	# filtration = pickle.load(open('filtrations/' + in_file))
+	filtration = cPickle.load(open('filtrations/' + in_file))
 	os.chdir(caller_dir)
 	return filtration
 
@@ -76,7 +77,8 @@ class Filtration:
 
 		if out_fname:
 			if not silent: print 'pickling...'
-			pickle.dump(self, open('filtrations/' + out_fname, 'wb'))
+			# pickle.dump(self, open('filtrations/' + out_fname, 'wb'))
+			cPickle.dump(self, open('filtrations/' + out_fname, 'wb'))
 
 		os.chdir(caller_dir)
 
