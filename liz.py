@@ -34,14 +34,16 @@ trajs = slide_window(
 	'output/liz/embed_movie.mp4',
 	tau=tau,
 	m=m,
-	window_size=2000,
-	window_step=2000,
+	window_size=1000,
+	window_step=1000,
 	crop=crop,
 )
 # ...down to here
 
-np.save('output/liz/trajs.npy', trajs)         # lets save trajs to file, so we don't have to call slide_window() every time we want to do PH on the data
-                                                # after the inital run, the preceeding lines "trajs = slide_window(" to "np.save(...)" can be commented out 
+# save trajs to file, so we don't have to call slide_window() every time we want to do PH on the data
+# after the inital run, the preceeding lines "trajs = slide_window(" to "np.save(...)" can be commented out
+np.save('output/liz/trajs.npy', trajs)
+
 trajs = np.load('output/liz/trajs.npy')
 
 traj = trajs[3]		                        # take embedding from 3rd window of movie
@@ -52,7 +54,7 @@ traj = trajs[3]		                        # take embedding from 3rd window of mov
 # parameters used to build the filtration:
 filt_params.update(
 	{
-		'ds_rate': 25,
+		'ds_rate': 10,
 		'num_divisions': 15,                # number of epsilon vals in filtration
 		# 'max_filtration_param': .05,      # if positive, explicit
 		'max_filtration_param': -5,        # if negative, cuts off filtration when finds a 5 dim simplex
@@ -62,8 +64,8 @@ filt_params.update(
 )
 
 # build the filtration:
-# filt = Filtration(traj, filt_params, title='piano demo')
-#
-# make_movie(filt, 'output/liz/filt_movie.mp4')
-# make_PD(filt, 'output/liz/PD.png')  # make the persistence diagram
-# make_PRF_plot(filt, 'output/liz/PRF.png')
+filt = Filtration(traj, filt_params, title='piano demo')
+
+make_movie(filt, 'output/liz/filt_movie.mp4')
+make_PD(filt, 'output/liz/PD.png')  # make the persistence diagram
+make_PRF_plot(filt, 'output/liz/PRF.png')
