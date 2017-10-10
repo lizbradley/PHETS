@@ -1,3 +1,7 @@
+import os
+os.chdir('..')
+# move this script to parent directory to run #
+
 import sys, time
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
@@ -10,7 +14,6 @@ from PH import Filtration, make_movie, load_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
 from Tools import normalize_volume, sec_to_samp
 
-# move this script to parent directory to run #
 
 piano_sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 
@@ -26,7 +29,7 @@ piano_traj = embed(
 eps_bins = 20
 simps_cutoff = -21
 
-paper_path = '/home/elliott/Desktop/IDA 2017/figs/'
+paper_path = 'paper/figs__no_labels/'
 ticks = [-1, -.33, .33, 1]
 # ticks = None
 
@@ -45,7 +48,7 @@ def fig1():
 		ax1,
 		piano_sig,
 		crop=(1.72132, 1.77132),
-		label=' a ',
+		# label=' a ',
 		normalize_crop=True,
 		yticks=ticks
 	)
@@ -54,7 +57,7 @@ def fig1():
 		ax2,
 		piano_traj,
 		ticks=ticks,
-		label=' b '
+		# label=' b '
 	)
 
 	plt.savefig(paper_path + 'fig1.png')
@@ -82,7 +85,7 @@ def fig2():
 			'use_cliques': False
 		})
 
-	filtration = Filtration(piano_traj, filt_params, out_fname='temp/fig2a.p')
+	filtration = Filtration(piano_traj, filt_params, out_fname='fig2a.p')
 	# filtration = load_filtration(in_file='temp/fig2a.p')
 
 	plot_filtration_pub(
@@ -91,7 +94,7 @@ def fig2():
 		landmark_size=3,
 		line_width=.3,
 		show_eps=False,
-		label=' a ',
+		# label=' a ',
 		ticks=ticks
 	)
 
@@ -114,7 +117,7 @@ def fig2():
 		ax2,
 		landmark_size=10,
 		show_eps=False,
-		label=' b ',
+		# label=' b ',
 		ticks=ticks,
 
 	)
@@ -138,7 +141,7 @@ def fig2():
 		ax3,
 		landmark_size=15,
 		show_eps=False,
-		label=' c ',
+		# label=' c ',
 		ticks=ticks,
 	)
 
@@ -170,7 +173,8 @@ def fig3():
 	plot_filtration_pub(
 		# filtration, 1, ax1,
 		filtration, 2, ax1,
-		label='a) $\epsilon \\approx 0.013$',
+		# label='a) $\epsilon \\approx 0.013$',
+		label='$\epsilon \\approx 0.013$',
 		show_eps=False,
 		ticks=ticks,
 	)
@@ -178,8 +182,8 @@ def fig3():
 	plot_filtration_pub(
 		# filtration, 2, ax2,
 		filtration, 4, ax2,
-		# label='b) $\epsilon \\approx 0.025$',
-		label='b) $\epsilon \\approx 0.026$',
+		# label='b) $\epsilon \\approx 0.026$',
+		label='$\epsilon \\approx 0.026$',
 		show_eps=False,
 		ticks=ticks
 	)
@@ -187,12 +191,15 @@ def fig3():
 	plot_filtration_pub(
 		# filtration, 4, ax3,
 		filtration, 8, ax3,
-		label='c) $\epsilon  \\approx 0.050$',
+		# label='c) $\epsilon  \\approx 0.050$',
+		label='$\epsilon  \\approx 0.050$',
 		show_eps=False,
 		ticks=ticks
 	)
 
-	plot_PD_pub(filtration, ax4, label=' d ')
+	plot_PD_pub(filtration, ax4,
+				# label=' d '
+				)
 
 	plt.savefig(paper_path + 'fig3.png')
 
@@ -236,11 +243,13 @@ def fig4():
 	filtration = Filtration(traj, filt_params)
 
 	plot_filtration_pub(filtration, 4, ax1,
-						label='a) $\epsilon  \\approx 0.099$',
+						# label='a) $\epsilon  \\approx 0.099$',
 						ticks=ticks,
 						show_eps=False
 						)
-	plot_PD_pub(filtration, ax3, label=' c ')
+	plot_PD_pub(filtration, ax3,
+				# label=' c '
+				)
 
 
 	# VIOL #
@@ -261,11 +270,13 @@ def fig4():
 	filtration = Filtration(traj, filt_params)
 
 	plot_filtration_pub(filtration, 4, ax2,
-						label='b) $\epsilon  \\approx 0.114$',
+						# label='b) $\epsilon  \\approx 0.114$',
 						ticks=ticks,
 						show_eps=False
 						)
-	plot_PD_pub(filtration, ax4, label=' d ')
+	plot_PD_pub(filtration, ax4,
+				# label=' d '
+				)
 
 
 
@@ -307,7 +318,7 @@ def fig5():
 		normalize_volume=True,
 
 		pub=True,
-		save_samps=True
+		save_samps=False
 
 	)
 
@@ -344,7 +355,9 @@ def fig6():
 		})
 
 	filtration = Filtration(traj, filt_params)
-	plot_PD_pub(filtration, ax1, label=' a ', cbar=True)
+	plot_PD_pub(filtration, ax1,
+				# label=' a ',
+				cbar=True)
 
 
 	# figure 6b, PD grand piano #
@@ -366,16 +379,18 @@ def fig6():
 		})
 
 	filtration = Filtration(traj, filt_params)
-	plot_PD_pub(filtration, ax2, label=' b ', cbar=True)
+	plot_PD_pub(filtration, ax2,
+				# label=' b ',
+				cbar=True)
 
 	plt.savefig(paper_path + 'fig6.png')
 
 
 if __name__ == '__main__':
 	pass
-	fig1()
-	fig2()
-	fig3()
-	fig4()
+	# fig1()
+	# fig2()
+	# fig3()
+	# fig4()
 	fig5()
-	fig6()
+	# fig6()

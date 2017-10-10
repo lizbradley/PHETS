@@ -143,10 +143,10 @@ def plot_fig(data, k, label_1, label_2, window_length, fname):
 	ax3 = fig.add_subplot(223)
 	ax4 = fig.add_subplot(224)
 
-	letter_label(ax1, ' a ')
-	letter_label(ax2, ' b ')
-	letter_label(ax3, ' c ')
-	letter_label(ax4, ' d ')
+	# letter_label(ax1, ' a ')
+	# letter_label(ax2, ' b ')
+	# letter_label(ax3, ' c ')
+	# letter_label(ax4, ' d ')
 
 
 	fig.subplots_adjust(right=0.8)
@@ -176,8 +176,8 @@ def plot_fig(data, k, label_1, label_2, window_length, fname):
 	cb.set_ticklabels([int(l) for l in labels])
 	cb.ax.tick_params(labelsize=14)
 
-	fig.suptitle('k = range({}, {}, {})'.format(*k), fontsize=16)
-	fig.legend(lines, labels=window_length)
+	# fig.suptitle('k = range({}, {}, {})'.format(*k), fontsize=16)
+	# fig.legend(lines, labels=window_length)
 
 	fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 

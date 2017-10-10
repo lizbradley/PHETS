@@ -37,13 +37,9 @@ class BaseTrajectory:
 
 
     def slice(self):
-        start_pts = np.floor(
-            np.linspace(0, len(self.data), self.num_windows, endpoint=False)
-        ).astype(int)
-        windows = np.asarray(
-            [self.data[pt:pt + self.window_length]
-             for pt in start_pts]
-        )
+        # use np.slice_array
+        # start pts?
+
         if self.norm_vol[2]:
             windows = [np.true_divide(w, np.max(np.abs(w))) for w in windows]
 

@@ -189,7 +189,7 @@ def plot_filtration_pub(
 		alpha=1,
 		dpi=700,
 		show_eps=True,
-		label=None,
+		label=False,
 		ticks=None
 ):
 
@@ -261,13 +261,7 @@ def plot_filtration_pub(
 		ax.set_title('$\epsilon = {:.7f}$'.format(eps[i]))
 
 	if label:
-		# ax.text(.95, .95, label,
-		# 		horizontalalignment='right',
-		# 		verticalalignment='center',
-		# 		transform=ax.transAxes)
-
-		if label:
-			letter_label(ax, label)
+		letter_label(ax, label)
 
 	if ticks:
 		ax.xaxis.set_ticks(ticks)
