@@ -3,8 +3,7 @@ import sys
 from matplotlib import pyplot as plt
 from scipy import fftpack, interpolate
 
-
-from DCE.Plots import plot_signal
+from DCE import plot_signal
 from config import WAV_SAMPLE_RATE
 
 

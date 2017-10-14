@@ -1,11 +1,11 @@
 import math
 import sys
 
-
-
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
+
 import TitleBox
 from config import WAV_SAMPLE_RATE
 
@@ -59,45 +59,6 @@ def plot_dce(fig, ax, dce_data):
 	fig.subplots_adjust(left=.07, bottom=.07, right=.93, top=.93, wspace=.5, hspace=.5)
 
 
-
-def plot_signal(out, waveform_data, window=None, time_units='seconds', offset=None):
-	
-	if isinstance(out, basestring):
-		fig = plt.figure(figsize=(4, 1))
-		ax = fig.add_subplot(111)
-	else:
-		ax = out
-	
-	y = waveform_data
-
-	if time_units == 'samples':
-		x = np.arange(0, len(y))
-		ax.set_xlabel('time (samples)')
-
-	else: 			# seconds
-		x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
-		ax.set_xlabel('time (seconds)')
-
-	if offset:
-		x = x + offset
-		window = np.array(window) + offset
-
-	ax.plot(x, y, color='k', zorder=0, lw= .5)
-	ax.axis('tight')
-
-	if window is not None:
-		if math.fabs(window[0] - window[1]) < .01:
-			ax.axvline(window[0], color='r', alpha=0.7, zorder=1)
-		ax.axvspan(window[0], window[1], facecolor='r', alpha=0.5, zorder=1)
-
-	ymin, ymax = ax.get_ylim()
-	ylim = abs(ymin) if abs(ymin) >= abs(ymax) else abs(ymax)
-	ax.set_ylim([-ylim, ylim])
-	ax.set_yticks([-ylim, 0, ylim])
-	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-
-
-	if isinstance(out, basestring): plt.savefig(out)
 
 
 
@@ -274,6 +235,41 @@ def compare_multi_frame(frame_idx, sig1, sig2, crop_1, crop_2, dpi, title_tables
 	plt.close(fig)
 
 
+def plot_signal(out, waveform_data, window=None, time_units='seconds', offset=None):
+
+	if isinstance(out, basestring):
+		fig = plt.figure(figsize=(4, 1))
+		ax = fig.add_subplot(111)
+	else:
+		ax = out
+
+	y = waveform_data
+
+	if time_units == 'samples':
+		x = np.arange(0, len(y))
+		ax.set_xlabel('time (samples)')
+
+	else: 			# seconds
+		x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
+		ax.set_xlabel('time (seconds)')
+
+	if offset:
+		x = x + offset
+		window = np.array(window) + offset
+
+	ax.plot(x, y, color='k', zorder=0, lw= .5)
+	ax.axis('tight')
+
+	if window is not None:
+		if math.fabs(window[0] - window[1]) < .01:
+			ax.axvline(window[0], color='r', alpha=0.7, zorder=1)
+		ax.axvspan(window[0], window[1], facecolor='r', alpha=0.5, zorder=1)
+
+	ymin, ymax = ax.get_ylim()
+	ylim = abs(ymin) if abs(ymin) >= abs(ymax) else abs(ymax)
+	ax.set_ylim([-ylim, ylim])
+	ax.set_yticks([-ylim, 0, ylim])
+	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
 
-
+	if isinstance(out, basestring): plt.savefig(out)

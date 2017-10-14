@@ -1,3 +1,3 @@
 from DCE import embed
-from Plots import plot_signal
+from DCE.Plots import plot_signal
 import Movies
