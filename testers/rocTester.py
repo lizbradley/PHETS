@@ -1,3 +1,6 @@
+import os
+os.chdir('..')
+
 import sys, time
 from ROC import PRF_vs_FFT_v2
 from ROC.ROCs import classifier_ROC

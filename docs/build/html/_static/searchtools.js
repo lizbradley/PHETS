@@ -396,7 +396,7 @@ var Search = {
    */
   performSearch : function(query) {
     // create the required interface elements
-    this.out = $('#search-results');
+    this.out = $('#search-ref');
     this.title = $('<h2>' + _('Searching') + '</h2>').appendTo(this.out);
     this.dots = $('<span></span>').appendTo(this.title);
     this.status = $('<p style="display: none"></p>').appendTo(this.out);

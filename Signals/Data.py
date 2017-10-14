@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class BaseTrajectory:
+class Signal:
 
 	def __init__(
 			self, data,
@@ -55,7 +55,7 @@ class BaseTrajectory:
 			return None, None
 		else:
 			start_idxs = np.floor(
-				np.linspace(0, len(self.data), num_windows)
+				np.linspace(0, len(self.data), num_windows, endpoint=False)
 			).astype(int)
 
 			if window_length is None:
@@ -69,17 +69,3 @@ class BaseTrajectory:
 
 
 
-class TimeSeries(BaseTrajectory):
-
-	def __init__(self, data, fname=None):
-		BaseTrajectory.__init__(self, data, fname)
-
-
-
-
-
-
-class Trajectory(BaseTrajectory):
-
-	def __init__(self, data, fname=None):
-		BaseTrajectory.__init__(self, data, fname)
