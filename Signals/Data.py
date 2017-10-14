@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Signal:
+class BaseTrajectory(object):
 
 	def __init__(
 			self, data,
@@ -19,7 +19,6 @@ class Signal:
 		else:                                   # is array
 			self.data_full = data
 			self.fname = fname
-
 
 		self.norm_vol = vol_norm
 		self.crop_lim = crop
@@ -45,7 +44,8 @@ class Signal:
 
 		if self.norm_vol[1]:
 			data = self.normalize(data)
-			self.data = data
+
+		self.data = data
 		return data
 
 
@@ -64,8 +64,21 @@ class Signal:
 
 		if self.norm_vol[2]:
 			windows = [self.normalize(w) for w in windows]
-			self.windows, self.win_start_idxs = windows, start_idxs
+
+		self.windows, self.win_start_idxs = windows, start_idxs
 		return windows, start_idxs
 
 
 
+class TimeSeries(BaseTrajectory):
+
+	def __init__(self, data, **kwargs):
+		super(TimeSeries, self).__init__(data, **kwargs)
+
+
+
+
+class Trajectory(BaseTrajectory):
+
+	def __init__(self, data, **kwargs):
+		super(Trajectory, self).__init__(data, **kwargs)
