@@ -8,7 +8,8 @@ from sklearn import svm
 import sys
 import random
 
-from DCE.Plots import plot_signal, plot_signal_zoom
+from DCE.Plots import plot_signal_zoom
+from DCE import plot_signal
 
 WAV_SAMPLE_RATE = 44100.
 

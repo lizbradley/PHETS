@@ -29,7 +29,7 @@ piano_traj = embed(
 eps_bins = 20
 simps_cutoff = -21
 
-paper_path = 'paper/figs__no_labels/'
+paper_path = 'paper/talk/'
 ticks = [-1, -.33, .33, 1]
 # ticks = None
 
@@ -169,6 +169,9 @@ def fig3():
 	ax2 = fig.add_subplot(222)
 	ax3 = fig.add_subplot(223)
 	ax4 = fig.add_subplot(224)
+
+	# make_movie(filtration, paper_path + 'fig3_movie.avi')
+
 
 	plot_filtration_pub(
 		# filtration, 1, ax1,
@@ -322,7 +325,8 @@ def fig5():
 
 	)
 
-from DCE.Plots import plot_signal
+
+from DCE import plot_signal
 
 
 def fig6():
@@ -390,7 +394,7 @@ if __name__ == '__main__':
 	pass
 	# fig1()
 	# fig2()
-	# fig3()
+	fig3()
 	# fig4()
-	fig5()
+	# fig5()
 	# fig6()

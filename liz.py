@@ -9,7 +9,8 @@ from config import default_filtration_params as filt_params
 # the following vars are passed the functions below, defined here for convenience
 
 time_units = 'samples'				# 'seconds' or 'samples'
-crop = (20000, 40000)			        # range of the signal that you want to play with
+# crop = (20000, 40000)			        # range of the signal that you want to play with
+crop = None			        # range of the signal that you want to play with
 tau = 200                                       #embedding delay
 m = 2 						# embedding dimension
 
@@ -34,8 +35,8 @@ trajs = slide_window(
 	'output/liz/embed_movie.mp4',
 	tau=tau,
 	m=m,
-	window_size=1000,
-	window_step=1000,
+	window_size=20000,
+	window_step=20000,
 	crop=crop,
 )
 # ...down to here
@@ -64,8 +65,8 @@ filt_params.update(
 )
 
 # build the filtration:
-filt = Filtration(traj, filt_params, title='piano demo')
+# filt = Filtration(traj, filt_params, title='piano demo')
 
-make_movie(filt, 'output/liz/filt_movie.mp4')
-make_PD(filt, 'output/liz/PD.png')  # make the persistence diagram
-make_PRF_plot(filt, 'output/liz/PRF.png')
+# make_movie(filt, 'output/liz/filt_movie.mp4')
+# make_PD(filt, 'output/liz/PD.png')  # make the persistence diagram
+# make_PRF_plot(filt, 'output/liz/PRF.png')

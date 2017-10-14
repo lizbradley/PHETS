@@ -6,7 +6,8 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 plt.ioff()
 
-from DCE.Plots import plot_signal_zoom, plot_signal
+from DCE.Plots import plot_signal_zoom
+from DCE import plot_signal
 from PH import make_PD, make_PRF_plot, make_movie, Filtration
 from PH.Plots import plot_heatmap
 from PH.TitleBox import add_filenames_table, add_filt_params_table
