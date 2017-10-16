@@ -1,11 +1,15 @@
 import numpy as np
+import sys
+
+from DCE import embed
+from PH import Filtration
 
 
 class BaseTrajectory(object):
 
-	def __init__(
-			self, data,
-			fname=None,
+	def __init__(self,
+	        data,
+	        fname=None,
 			crop=None,
 			num_windows=None,
 			window_length=None,
@@ -20,6 +24,11 @@ class BaseTrajectory(object):
 			self.data_full = data
 			self.fname = fname
 
+		if fname is not None:
+			self.name = self.fname.split('/')[-1]
+		else:
+			self.name = None
+
 		self.norm_vol = vol_norm
 		self.crop_lim = crop
 		self.num_windows = num_windows
@@ -31,6 +40,9 @@ class BaseTrajectory(object):
 		self.windows, self.win_start_idxs = self.slice(
 			 num_windows, window_length
 		)
+
+
+
 
 	@staticmethod
 	def normalize(data):
@@ -75,10 +87,45 @@ class TimeSeries(BaseTrajectory):
 	def __init__(self, data, **kwargs):
 		super(TimeSeries, self).__init__(data, **kwargs)
 
+		self.TimeSeries = None
+		self.embed_params = None
 
+
+	def embed(self, tau, m):
+		data = embed(self.data_full, tau, m)
+		traj = Trajectory(
+			data,
+			fname=self.fname,
+			crop=self.crop_lim,
+			num_windows=self.num_windows,
+			window_length=self.window_length + tau  # + 1 ??
+		)
+
+		return traj
 
 
 class Trajectory(BaseTrajectory):
 
 	def __init__(self, data, **kwargs):
 		super(Trajectory, self).__init__(data, **kwargs)
+
+		self.filts = None
+
+
+	def filtrations(self, filt_params, quiet):
+		if self.windows is None:
+			print 'ERROR: self.windows is None'
+			sys.exit()
+
+		print 'building filtrations for {}...'.format(self.name)
+		filts = []
+		for i, t in enumerate(self.windows):
+			sys.stdout.write(
+				'\rwindow {} of {}...'.format(i + 1, len(self.windows)))
+			sys.stdout.flush()
+			filts.append(Filtration(t, filt_params, silent=quiet))
+		print 'done.'
+		self.filts = filts
+		return filts
+
+
