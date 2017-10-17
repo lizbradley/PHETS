@@ -29,7 +29,7 @@ piano_traj = embed(
 eps_bins = 20
 simps_cutoff = -21
 
-paper_path = 'paper/figs__no_labels/'
+paper_path = 'paper/testing/'
 ticks = [-1, -.33, .33, 1]
 # ticks = None
 
@@ -314,7 +314,7 @@ def fig5():
 		FT_bins=2033,
 		FT_bin_mode='log',
 		k=(0, 5.01, .01),  # min, max, int
-		load_saved_filts=True,
+		load_saved_filts=False,
 		normalize_volume=True,
 
 		pub=True,
