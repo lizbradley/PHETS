@@ -43,7 +43,7 @@ def plot_dual_roc_fig(data, k, label_1, label_2, fname):
 	ax2 = fig.add_subplot(122)
 
 
-	fig.subplots_adjust(right=0.8)
+	fig.subplots_adjust(right=0.85)
 	cax = fig.add_axes([0.92, 0.05, 0.03, 0.9])
 
 	lines = []
@@ -70,6 +70,6 @@ def plot_dual_roc_fig(data, k, label_1, label_2, fname):
 	# fig.suptitle('k = range({}, {}, {})'.format(*k), fontsize=16)
 	# fig.legend(lines, labels=window_length)
 
-	fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+	# fig.tight_layout(rect=[0, 0, 1, 0.9])
 
 	plt.savefig(fname)

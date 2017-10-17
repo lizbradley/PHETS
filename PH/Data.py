@@ -412,7 +412,8 @@ class Filtration:
 				grid_vals[i] = np.nan
 		grid_vals = np.reshape(grid_vals, xx.shape)
 
-		self.PRF = [xx, yy, grid_vals, max_lim]
+		# self.PRF = [xx, yy, grid_vals, max_lim]
+		self.PRF = grid_vals
 
 
 	# public #

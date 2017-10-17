@@ -34,20 +34,21 @@ class L2MeanPRF(object):
 		self.var = np.var(prfs, axis=0)                # local
 
 		self.dists = [get_dist(self.mean, prf) for prf in prfs]
-		self.gvar = np.mean(self.dists)                     # global
+		# self.gvar = np.mean(self.dists)                     # global
+		self.gstddev = np.mean(np.power(self.dists, 2)) ** .5
 
 		self.test_dists = []
 
 
 
-	def predict(self, test, k):
+	def predict(self, tests, k):
 
 		var_norm = norm(self.var)
-		dists = [get_dist(self.mean, prf) for prf in test]
+		dists = [get_dist(prf, self.mean) for prf in tests]
 
-		self.test_dists.extend(dists)
-
-		return [dist <= var_norm * k for dist in dists]
+		# return [dist <= var_norm * k for dist in dists]
+		# return [dist <= self.gvar * k for dist in dists]
+		return [dist <= self.gstddev * k for dist in dists]
 
 
 

@@ -3,6 +3,7 @@ import sys
 
 from DCE import embed
 from PH import Filtration
+from Utilities import print_title
 
 
 class BaseTrajectory(object):
@@ -46,7 +47,7 @@ class BaseTrajectory(object):
 
 	@staticmethod
 	def normalize(data):
-		return np.true_divide(data, np.max(data))
+		return np.true_divide(data, np.max(np.abs(data)))
 
 	def crop(self, lim):
 		if lim is None:
@@ -66,8 +67,9 @@ class BaseTrajectory(object):
 		if num_windows is None:
 			return None, None
 		else:
+			# TODO: once ROCs are replicated, remove -1 below
 			start_idxs = np.floor(
-				np.linspace(0, len(self.data), num_windows, endpoint=False)
+				np.linspace(0, len(self.data) - 1, num_windows, endpoint=False)
 			).astype(int)
 
 			if window_length is None:
@@ -98,12 +100,14 @@ class TimeSeries(BaseTrajectory):
 			fname=self.fname,
 			crop=self.crop_lim,
 			num_windows=self.num_windows,
-			window_length=self.window_length + tau  # + 1 ??
+			# window_length=self.window_length + tau  # + 1 ??
+			window_length=self.window_length,
+			vol_norm=self.norm_vol
 		)
 
 		return traj
 
-
+from PubPlots import plot_filtration_pub
 class Trajectory(BaseTrajectory):
 
 	def __init__(self, data, **kwargs):
@@ -117,13 +121,22 @@ class Trajectory(BaseTrajectory):
 			print 'ERROR: self.windows is None'
 			sys.exit()
 
-		print 'building filtrations for {}...'.format(self.name)
+		print_title('building filtrations for {}...'.format(self.name))
 		filts = []
 		for i, t in enumerate(self.windows):
-			sys.stdout.write(
-				'\rwindow {} of {}...'.format(i + 1, len(self.windows)))
-			sys.stdout.flush()
-			filts.append(Filtration(t, filt_params, silent=quiet))
+			if quiet:
+				sys.stdout.write('\rwindow {} of {}...'.format(
+					i + 1, len(self.windows))
+				)
+				sys.stdout.flush()
+			else:
+				print_title('{} window {} of {}...'.format(
+						self.name, i + 1, len(self.windows))
+				)
+			f = Filtration(t, filt_params, silent=quiet)
+			filt_frame = filt_params['num_divisions'] - 1
+			plot_filtration_pub(f, filt_frame, 'output/classify/samples/{}.png'.format(i))
+			filts.append(f)
 		print 'done.'
 		self.filts = filts
 		return filts

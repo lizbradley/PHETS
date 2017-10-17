@@ -1,3 +1,4 @@
+import cPickle
 import numpy as np
 import sys
 
@@ -32,28 +33,36 @@ def L2MeanPRF_ROCs(
 		traj1, traj2,
 		label1, label2,
 		out_fname,
-
-		k,
 		filt_params,
-		tau=None, m=None,
-
-		load_saved_filts=False,
+		k,
+		load_saved=False,
 		see_samples=True,
 		quiet=True
 ):
 
 
-	filts1 = traj1.filtrations(filt_params, quiet)
-	filts2 = traj2.filtrations(filt_params, quiet)
+	if load_saved:
+		filts1 = cPickle.load(open('Classify/data/filts1.p'))
+		filts2 = cPickle.load(open('Classify/data/filts2.p'))
+	else:
+		filts1 = traj1.filtrations(filt_params, quiet)
+		filts2 = traj2.filtrations(filt_params, quiet)
 
-	train1, test1 = filts1[1::2], filts1[::2]
-	train2, test2 = filts2[1::2], filts2[::2]
+		cPickle.dump(filts1, open('Classify/data/filts1.p', 'wb'))
+		cPickle.dump(filts2, open('Classify/data/filts2.p', 'wb'))
+
+
+	prfs1 = [f.get_PRF(silent=quiet) for f in filts1]
+	prfs2 = [f.get_PRF(silent=quiet) for f in filts2]
+
+	train1, test1 = prfs1[1::2], prfs1[::2]
+	train2, test2 = prfs2[1::2], prfs2[::2]
 
 	print 'training classifiers...'
 	clf1 = L2MeanPRF(train1)
 	clf2 = L2MeanPRF(train2)
 
-	print 'running tests'
+	print 'running tests...'
 	k_arr = np.arange(*k)
 	roc1 = roc_data(clf1, test1, test2, k_arr)
 	roc2 = roc_data(clf2, test2, test1, k_arr)

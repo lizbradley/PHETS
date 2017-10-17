@@ -295,6 +295,7 @@ def PRF_vs_FFT_v2(
 		windows_1, st_pts_1 = slice_sig(sig_1, l=wl, n=num_windows, normalize=normalize_volume)
 		windows_2, st_pts_2 = slice_sig(sig_2, l=wl, n=num_windows, normalize=normalize_volume)
 
+
 		if save_samps and not pub:
 			plot_sig(sig_full_1, crop_1, windows_1, st_pts_1, 'output/ROC/sig1_wl{}.png'.format(wl))
 			plot_sig(sig_full_2, crop_2, windows_2, st_pts_2, 'output/ROC/sig2_wl{}.png'.format(wl))
