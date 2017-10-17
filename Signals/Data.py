@@ -67,9 +67,8 @@ class BaseTrajectory(object):
 		if num_windows is None:
 			return None, None
 		else:
-			# TODO: once ROCs are replicated, remove -1 below
 			start_idxs = np.floor(
-				np.linspace(0, len(self.data) - 1, num_windows, endpoint=False)
+				np.linspace(0, len(self.data), num_windows, endpoint=False)
 			).astype(int)
 
 			if window_length is None:
