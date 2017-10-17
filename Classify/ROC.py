@@ -69,6 +69,8 @@ def L2MeanPRF_ROCs(
 
 	plot_dual_roc_fig([[roc1, roc2]], k, label1, label2, out_fname)
 
+	return roc1, roc2
+
 
 
 

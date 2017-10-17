@@ -1,0 +1,3 @@
+from home dir, run
+echo 'export PYTHONPATH=$PYTHONPATH:/path/to/PHETS' >> .bashrc
+replacing /path/to/PHETS with actual path

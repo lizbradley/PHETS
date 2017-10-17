@@ -107,6 +107,9 @@ class TimeSeries(BaseTrajectory):
 		return traj
 
 from PubPlots import plot_filtration_pub
+
+
+
 class Trajectory(BaseTrajectory):
 
 	def __init__(self, data, **kwargs):
