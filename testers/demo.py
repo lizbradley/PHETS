@@ -1,5 +1,8 @@
+import os
+os.chdir('..')
+
 import numpy as np
-from Tools import idx_to_freq
+from Utilities import idx_to_freq
 from DCE import embed, plot_signal
 from DCE.Plots import plot_dce
 from DCE.Movies import slide_window, vary_tau

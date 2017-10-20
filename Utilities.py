@@ -12,6 +12,18 @@ def mem_profile(f, flag):
 	else: return lambda x: x
 
 
+def normalize_volume(sig):
+	return np.true_divide(sig, np.max(np.abs(sig)))
+
+
+def idx_to_freq(idx):
+	return np.power(2, (40 - float(idx)) / 12) * 440
+
+
+def sec_to_samp(crop):
+	return (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+
+
 
 # consolidate following three functions
 
@@ -138,7 +150,8 @@ def frames_to_movie(out_filename, frame_path, framerate=1, aspect=None):
 		else:
 			sys.exit()
 
-	print 'consolidating frames...'
+	sys.stdout.write('\rconsolidating frames...')
+	sys.stdout.flush()
 	cmd = [
 		'ffmpeg',
 		'-loglevel', 'panic',
@@ -151,8 +164,7 @@ def frames_to_movie(out_filename, frame_path, framerate=1, aspect=None):
 
 	]
 	subprocess.call(cmd)
-	print out_filename, 'complete.'
-
+	print 'done.'
 
 
 # BELOW ARE MIGRATED FROM DCE MODULE, NEED CLEANUP #
@@ -169,8 +181,10 @@ from scipy.signal import butter, lfilter, freqz
 
 from config import WAV_SAMPLE_RATE
 
+
 def pwd():
 	print os.getcwd()
+
 
 def wav_to_txt(wav_file_name, output_file_name, crop=(0, 1)):
 	print "converting wav to txt..."
@@ -178,9 +192,6 @@ def wav_to_txt(wav_file_name, output_file_name, crop=(0, 1)):
 	bounds = len(sig) * np.array(crop)
 	sig = sig[int(bounds[0]):int(bounds[1])]
 	np.savetxt(output_file_name, sig)
-
-
-
 
 
 def rename_files():
@@ -218,3 +229,5 @@ def batch_flac_to_wav(dir):
 			data, samplerate = sf.read(f)
 			sf.write(out_file, data, samplerate)
 			os.remove(f)
+
+

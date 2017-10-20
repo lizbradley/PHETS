@@ -1,3 +1,6 @@
+import os
+os.chdir('..')
+
 import sys
 import time
 import math

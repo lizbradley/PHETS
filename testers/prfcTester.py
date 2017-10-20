@@ -1,10 +1,13 @@
+import os
+os.chdir('..')
+
 import sys, time
 import numpy as np
 from config import default_filtration_params as parameter_set
 
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 8003			 # set test number here or with command line argument
+set_test = 10018       # set test number here or with command line argument
 
 
 
@@ -40,7 +43,7 @@ if test == 1:
 		weight_func=lambda i, j: .1 * (j - i),  						# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=20,  								# num divisions
+
 
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -140,7 +143,7 @@ if test == 4:
 		metric='L1',								# 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='a + b', 						# 'none', 'a', or 'a + b'
 
-		PRF_res=20,									# num divisions
+
 
 		see_samples=0,								# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -183,7 +186,7 @@ if test == 5:
 
 		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
 
-		PRF_res=50,						# num divisions
+
 
 		metric='L2', 					# 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  			# 'none', 'a', 'b', or 'a + b'
@@ -227,7 +230,7 @@ if test == 6:
 
 		weight_func=lambda i, j: 1,		# no weighting (constant). see test 4 for other examples
 
-		PRF_res=50,						# num divisions
+
 
 		metric='L2', 					# 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  			# 'none', 'a', 'b', or 'a + b'
@@ -272,7 +275,7 @@ if test == 7:
 
 		weight_func=lambda i, j: 1,  	# no weighting (constant). see test 4 for other examples
 
-		PRF_res=50,						# num divisions
+
 
 		metric='L2', 					# 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  			# 'none', 'a', 'b', or 'a + b'
@@ -316,7 +319,7 @@ if test == 11:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -359,7 +362,7 @@ if test == 12:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -459,7 +462,7 @@ if test == 14:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=10,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -508,10 +511,9 @@ if test == 15:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
-		dist_scale='a + b',  # 'none', 'a', 'b', or 'a + b'
 		# a is magnitude of window PRF, b is magnitude of ref PRF
 
 		normalize_volume=True,
@@ -552,7 +554,7 @@ if test == 16:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -602,7 +604,7 @@ if test == 50:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -648,7 +650,7 @@ if test == 51:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -694,7 +696,7 @@ if test == 60:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -739,7 +741,7 @@ if test == 61:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -786,7 +788,7 @@ if test == 70:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -831,7 +833,7 @@ if test == 71:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -879,7 +881,7 @@ if test == 150:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -925,7 +927,7 @@ if test == 151:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -973,7 +975,7 @@ if test == 160:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1018,7 +1020,7 @@ if test == 161:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1065,7 +1067,7 @@ if test == 170:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1110,7 +1112,7 @@ if test == 171:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1158,7 +1160,7 @@ if test == 250:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1204,7 +1206,7 @@ if test == 251:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1252,7 +1254,7 @@ if test == 260:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1297,7 +1299,7 @@ if test == 261:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1344,7 +1346,7 @@ if test == 270:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1389,7 +1391,7 @@ if test == 271:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1437,7 +1439,7 @@ if test == 350:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1483,7 +1485,7 @@ if test == 351:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1531,7 +1533,7 @@ if test == 360:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1576,7 +1578,7 @@ if test == 361:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1624,7 +1626,7 @@ if test == 370:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1669,7 +1671,7 @@ if test == 371:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1716,7 +1718,7 @@ if test == 450:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1762,7 +1764,7 @@ if test == 451:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1809,7 +1811,7 @@ if test == 460:
 
 		weight_func=lambda i, j: 5 * (j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1854,7 +1856,7 @@ if test == 461:
 
 		weight_func=lambda i, j: 5 *(j - i),
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1901,7 +1903,7 @@ if test == 470:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -1946,7 +1948,7 @@ if test == 471:
 
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) ,
 
-		PRF_res=20,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -1970,7 +1972,7 @@ if test == 1001:
 		{
 			'ds_rate': 50,
 			'worm_length': 5000,
-			'max_filtration_param':-10,
+			'max_filtration_param': -10,
 			'num_divisions': 25,
 			'use_cliques': True,
 
@@ -1993,7 +1995,7 @@ if test == 1001:
 		weight_func=lambda i, j: 1, 									# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2021,7 +2023,7 @@ if test == 1011:
 		params,
 
 		#load_saved_PRFs=True,
-		load_saved_filtrations=False,
+		load_saved_PRFs=False,
 
 		i_ref=18,
 		i_arr=np.arange(2, 50, 1),
@@ -2030,7 +2032,7 @@ if test == 1011:
 		weight_func=lambda i, j: 1, 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2066,7 +2068,7 @@ if test == 1101:
 		weight_func=lambda i, j: 5 * (j - i), 						# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2102,7 +2104,7 @@ if test == 1111:
 		weight_func=lambda i, j: np.divide(1, 5 * (j - i)), 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2137,7 +2139,7 @@ if test == 1201:
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)), 						# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2173,7 +2175,7 @@ if test == 1211:
 		weight_func= lambda i, j: np.power(np.e, -5 * (j - i)) , 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2211,7 +2213,7 @@ if test == 1002:
 		weight_func=lambda i, j: 1, 						# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2247,7 +2249,7 @@ if test == 1012:
 		weight_func=lambda i, j: 1, 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2284,7 +2286,7 @@ if test == 1102:
 		weight_func=lambda i, j: 5 * (j - i), 							# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2320,7 +2322,7 @@ if test == 1112:
 		weight_func=lambda i, j: np.divide(1,5 * (j - i)), 							# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2333,7 +2335,7 @@ if test == 1202:
 		{
 			'ds_rate': 50,
 			'worm_length': 5000,
-			'max_filtration_param':-10,
+			'max_filtration_param': -10,
 			'num_divisions': 25,
 			'use_cliques': True,
 			'd_use_hamiltonian': -10
@@ -2356,7 +2358,7 @@ if test == 1202:
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)), 							# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2392,7 +2394,7 @@ if test == 1212:
 		weight_func= lambda i, j: np.power(np.e, -5 * (j - i)), 							# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2430,7 +2432,7 @@ if test == 1003:
 		weight_func=lambda i, j: 1,  						# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2467,7 +2469,7 @@ if test == 1013:
 		weight_func=lambda i, j: 1,  						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=3,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2503,7 +2505,7 @@ if test == 1103:
 		weight_func=lambda i, j: 5 * (j - i),   						# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2540,7 +2542,7 @@ if test == 1113:
 		weight_func=lambda i, j: np.divide(1,5 * (j - i)), 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2576,7 +2578,7 @@ if test == 1203:
 		weight_func= lambda i, j: np.power(np.e, 5 * (j - i)) , 	  						# linear, k = .1
 
 		dist_scale='none',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=1,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2613,7 +2615,7 @@ if test == 1213:
 		weight_func= lambda i, j: np.power(np.e, -5 * (j - i)), 						# linear, k = .1
 
 		dist_scale='b',							# 'none', 'a', or 'a + b'
-		PRF_res=25,  								# num divisions
+
 
 		see_samples=0,  							# interval to build filt movies and PDs. 0 means no PDs or movies.
 
@@ -2649,7 +2651,7 @@ if test == 5000:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=5,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -2699,7 +2701,7 @@ if test == 5001:
 
 		weight_func=lambda i, j: 1,  # no weighting (constant). see test 4 for other examples
 
-		PRF_res=5,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',  # 'none', 'a', 'b', or 'a + b'
@@ -2757,7 +2759,7 @@ if test == 5002:
 
 		weight_func=lambda i, j: 1,  	# no weighting (constant). see test 4 for other examples
 
-		PRF_res=5,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'
@@ -2803,7 +2805,7 @@ if test == 5003:
 
 		weight_func=lambda i, j: 1,
 
-		PRF_res=30,  # num divisions
+
 
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', 'b', or 'a + b'

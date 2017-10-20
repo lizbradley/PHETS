@@ -32,6 +32,7 @@ def plot_dists_vs_ref(
 		load_saved_PRFs=False,
 
 		see_samples=5,
+
 ):
 	""" plots distance from reference rank function over a range of trajectories input files"""
 
@@ -323,6 +324,7 @@ def plot_variance(
 		normalize_volume=True,
 
 		metric='L2', 		 		# 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',
 		weight_func=lambda i, j: 1,
 
 		see_samples=5,
@@ -340,7 +342,7 @@ def plot_variance(
 		plot_weight_functions()
 		prf_evo_array, filt_evo_array = get_variance_data(filename, args_dict)
 		stats_data, hmap_data, hmap_data_pw = process_variance_data(
-			prf_evo_array, metric, sqrt_weight_func, vary_param_2
+			prf_evo_array, metric, dist_scale, sqrt_weight_func, vary_param_2
 		)
 		plot_main_fig(stats_data, out_filename)
 		plot_heatmaps(hmap_data, hmap_data_pw)
@@ -482,7 +484,7 @@ def plot_variance(
 		dir = 'output/PRFCompare/variance/see_samples/{}/'.format(base_name)
 
 		if os.path.exists(dir):
-			r = raw_input('Overwrite {} (y/n/q)? '.format(dir))
+			r = raw_input('Overwrite {} (y/n/q)? \n'.format(dir))
 			if r == 'y':
 				pass
 			else:

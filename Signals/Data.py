@@ -106,7 +106,6 @@ class TimeSeries(BaseTrajectory):
 
 		return traj
 
-from PubPlots import plot_filtration_pub
 
 
 

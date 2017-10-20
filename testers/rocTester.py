@@ -3,8 +3,7 @@ os.chdir('..')
 
 import sys, time
 from ROC import PRF_vs_FFT_v2
-from ROC.ROCs import classifier_ROC
-from Tools import sec_to_samp
+from Utilities import sec_to_samp
 from config import default_filtration_params as filt_params
 
 

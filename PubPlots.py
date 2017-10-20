@@ -12,7 +12,7 @@ from DCE.Tools import auto_crop
 
 from config import WAV_SAMPLE_RATE
 
-from Tools import normalize_volume
+from Utilities import normalize_volume
 
 
 def letter_label(ax, label, nudge_r=0.):

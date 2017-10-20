@@ -12,8 +12,8 @@ from config import default_filtration_params as filt_params
 from DCE.DCE import embed
 from PH import Filtration, make_movie, load_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
-from Tools import normalize_volume, sec_to_samp
-
+from Tools import normalize_volume
+from Utilities import sec_to_samp
 
 piano_sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 
@@ -29,7 +29,7 @@ piano_traj = embed(
 eps_bins = 20
 simps_cutoff = -21
 
-paper_path = 'paper/testing/'
+paper_path = 'IDA2017/testing/'
 ticks = [-1, -.33, .33, 1]
 # ticks = None
 

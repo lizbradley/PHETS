@@ -1,14 +1,13 @@
 import os
-
-from DCE import embed
-
 os.chdir('..')
 
 import sys, time
 
 from Signals import TimeSeries
-from Classify.ROC import L2MeanPRF_ROCs
+from PRFStats.ROC import L2MeanPRF_ROCs
 from config import default_filtration_params as filt_params
+
+
 set_test = 2
 
 
@@ -20,7 +19,7 @@ start_time = time.time()
 
 
 def out_fname():
-	return 'output/classify/test_{}.png'.format(test)
+	return 'output/PRFStats/test_{}.png'.format(test)
 
 
 if test == 1:
@@ -58,8 +57,9 @@ if test == 1:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved=False,
-		quiet=False
+		load_saved=True,
+		quiet=False,
+		see_samples=5
 	)
 
 
@@ -100,7 +100,7 @@ if test == 2:
 		load_saved=True,
 		quiet=True,
 		vary_param=('max_filtration_param', (-3, -6)),
-		samples=5
+		see_samples=5
 
 	)
 

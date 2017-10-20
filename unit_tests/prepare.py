@@ -7,7 +7,7 @@ from config import default_filtration_params as dfp
 
 from Signals import TimeSeries
 from Signals import Trajectory
-from Classify.ROC import L2MeanPRF_ROCs
+from PRFStats.ROC import L2MeanPRF_ROCs
 
 
 # test_TS #

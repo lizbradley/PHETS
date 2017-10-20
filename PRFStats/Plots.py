@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from PH import make_PD, make_PRF_plot, make_movie
+from Utilities import print_title
 
 
 def plot_roc_ax(ax, data, k, title):
@@ -81,7 +82,7 @@ def plot_dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
 	plt.savefig(fname)
 
 
-def save_samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
+def plot_samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
 
 	if vary_param_1 is None and vary_param_2 is None:
 		filts = [[filts]]
@@ -97,13 +98,22 @@ def save_samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
 		for j, filts_v2 in enumerate(filts_v1):
 			for k, filt in enumerate(filts_v2[::interval]):
 
-				base_name = '{}/{}'.format(dir, filt.name)
+				base_name = '{}/{}__'.format(dir, filt.name)
 
 				if vary_param_1 is not None:
-					base_name = '{}__{}_{}__'.format(base_name, vary_param_1[0], vary_param_1[1][i])
+					base_name = '{}{}_{}__'.format(
+						base_name,
+						vary_param_1[0], vary_param_1[1][i]
+					)
 
 				if vary_param_2 is not None:
-					base_name = '{}__{}_{}__'.format(base_name, vary_param_2[0], vary_param_2[1][j])
+					base_name = '{}{}_{}__'.format(
+						base_name,
+						vary_param_2[0], vary_param_2[1][j]
+					)
+
+
+				print_title(base_name.split('/')[-1][:-2])
 
 				PD_filename = base_name + 'PD.png'
 				PRF_filename = base_name + 'PRF.png'

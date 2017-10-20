@@ -124,7 +124,7 @@ htmlhelp_basename = 'PHETSdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
+    # The IDA2017 size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
 

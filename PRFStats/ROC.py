@@ -2,9 +2,8 @@ import cPickle
 import numpy as np
 import sys
 
-from Classify.Plots import plot_dual_roc_fig, save_samples
-from Data import L2MeanPRF
-from Signals import TimeSeries, Trajectory
+from Plots import plot_dual_roc_fig, plot_samples
+from Classify import L2MeanPRF
 from Utilities import clear_old_files
 
 
@@ -38,14 +37,14 @@ def L2MeanPRF_ROCs(
 		filt_params,
 		k,
 		load_saved=False,
-		samples=0,
+		see_samples=0,
 		quiet=True,
 		vary_param=None
 ):
 
 	if load_saved:
-		filts1 = cPickle.load(open('Classify/data/filts1.p'))
-		filts2 = cPickle.load(open('Classify/data/filts2.p'))
+		filts1 = cPickle.load(open('PRFStats/data/filts1.p'))
+		filts2 = cPickle.load(open('PRFStats/data/filts2.p'))
 
 	else:
 		filts1 = []
@@ -64,8 +63,8 @@ def L2MeanPRF_ROCs(
 			filts1.append(traj1.filtrations(filt_params, quiet))
 			filts2.append(traj2.filtrations(filt_params, quiet))
 
-		cPickle.dump(filts1, open('Classify/data/filts1.p', 'wb'))
-		cPickle.dump(filts2, open('Classify/data/filts2.p', 'wb'))
+		cPickle.dump(filts1, open('PRFStats/data/filts1.p', 'wb'))
+		cPickle.dump(filts2, open('PRFStats/data/filts2.p', 'wb'))
 
 	data = []
 
@@ -89,11 +88,16 @@ def L2MeanPRF_ROCs(
 		data.append([roc1, roc2])
 
 	plot_dual_roc_fig(data, k, label1, label2, out_fname,  vary_param)
-	if samples:
-		dir = 'output/classify/samples'
-		clear_old_files(dir, samples)
-		save_samples(filts1, samples, dir, vary_param)
-		save_samples(filts2, samples, dir, vary_param)
+
+	if see_samples:
+		dir = 'output/PRFStats/samples'
+		clear_old_files(dir, see_samples)
+
+		if vary_param is None:
+			filts1, filts2 = filts1[0], filts2[0]
+
+		plot_samples(filts1, see_samples, dir, vary_param)
+		plot_samples(filts2, see_samples, dir, vary_param)
 
 	return data
 

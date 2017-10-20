@@ -110,7 +110,7 @@ class Filtration:
 			r = raw_input(
 				'''WARNING: You have not specified a 'worm_length'. Default 
 				'worm_length' has been changed from 10,000 to len(self.sig).
-				len(self.sig) = {}. (This operation occurs at PH/Data.py:109.)
+				len(self.sig) = {}. (This operation occurs at PH/PRFStats.py:109.)
 				 Proceed? (y/n)'''.format(sig_length)
 			)
 			if r != 'y':
@@ -415,7 +415,6 @@ class Filtration:
 		grid_vals = np.reshape(grid_vals, xx.shape)
 
 		self.PRF = [xx, yy, grid_vals, max_lim]
-		# self.PRF = grid_vals
 
 
 	# public #

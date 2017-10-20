@@ -527,7 +527,7 @@ class HeatmapData:
 
 
 
-def process_variance_data(prf_evo_array, metric, weight_func, vary_param_2):
+def process_variance_data(prf_evo_array, metric, dist_scale, weight_func, vary_param_2):
 
 	def apply_weight_to_evo(prf_evo, weight_f):
 		weighted_prf_evo = []
@@ -580,7 +580,7 @@ def process_variance_data(prf_evo_array, metric, weight_func, vary_param_2):
 			var_data.variance.append(variance)
 
 			scaled_dists = get_dists_from_ref(
-				prf_evo, pointwise_mean, metric, 'b'
+				prf_evo, pointwise_mean, metric, dist_scale
 			)
 			scaled_variance = np.mean(np.power(scaled_dists, 2))    # plot as data point
 			var_data.scaled_variance.append(scaled_variance)

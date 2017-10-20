@@ -41,7 +41,7 @@ def add_persistence_plot(ax, filtration):
 	p_ms_scale = 30
 	color = 'C0'
 
-	# BIG for IDA paper #
+	# BIG for IDA IDA2017 #
 	# min_size = 300
 	# t_ms_scale = 150
 	# p_ms_scale = 60
