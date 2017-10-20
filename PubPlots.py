@@ -1,3 +1,7 @@
+"""
+publication / latex appropriate plotting function duplicates for IDA paper
+called by ida_figs
+"""
 import sys
 
 import matplotlib
