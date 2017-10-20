@@ -64,7 +64,7 @@ filt_params.update(
 )
 
 # build the filtration:
-filt = Filtration(traj, filt_params, title='piano demo')
+filt = Filtration(traj, filt_params, name='piano demo')
 
 make_movie(filt, 'output/liz/filt_movie.mp4')
 make_PD(filt, 'output/liz/PD.png')  # make the persistence diagram

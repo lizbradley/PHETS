@@ -2,9 +2,11 @@ import cPickle
 import numpy as np
 import sys
 
-from Classify.Plots import plot_dual_roc_fig
+from Classify.Plots import plot_dual_roc_fig, save_samples
 from Data import L2MeanPRF
 from Signals import TimeSeries, Trajectory
+from Utilities import clear_old_files
+
 
 def prep_data(samps):
 	samps_train = samps[1::2]
@@ -36,34 +38,41 @@ def L2MeanPRF_ROCs(
 		filt_params,
 		k,
 		load_saved=False,
-		see_samples=True,
+		samples=0,
 		quiet=True,
 		vary_param=None
 ):
 
-	data = []
-	iterator = 1
-	if vary_param is not None:
-		iterator=len(vary_param[1])
+	if load_saved:
+		filts1 = cPickle.load(open('Classify/data/filts1.p'))
+		filts2 = cPickle.load(open('Classify/data/filts2.p'))
 
-	for i in xrange(0,iterator):
+	else:
+		filts1 = []
+		filts2 = []
 
-		if vary_param is not None:
-			filt_params.update({vary_param[0] : vary_param[1][i]})
-
-		if load_saved:
-			filts1 = cPickle.load(open('Classify/data/filts1.p'))
-			filts2 = cPickle.load(open('Classify/data/filts2.p'))
+		if vary_param is None:
+			iterator = 1
 		else:
-			filts1 = traj1.filtrations(filt_params, quiet)
-			filts2 = traj2.filtrations(filt_params, quiet)
+			iterator = len(vary_param[1])
 
-			cPickle.dump(filts1, open('Classify/data/filts1.p', 'wb'))
-			cPickle.dump(filts2, open('Classify/data/filts2.p', 'wb'))
+		for i in xrange(0, iterator):
 
+			if vary_param is not None:
+				filt_params.update({vary_param[0]: vary_param[1][i]})
 
-		prfs1 = [f.get_PRF(silent=quiet) for f in filts1]
-		prfs2 = [f.get_PRF(silent=quiet) for f in filts2]
+			filts1.append(traj1.filtrations(filt_params, quiet))
+			filts2.append(traj2.filtrations(filt_params, quiet))
+
+		cPickle.dump(filts1, open('Classify/data/filts1.p', 'wb'))
+		cPickle.dump(filts2, open('Classify/data/filts2.p', 'wb'))
+
+	data = []
+
+	for f1, f2 in zip(filts1, filts2):
+
+		prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in f1]
+		prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in f2]
 
 		train1, test1 = prfs1[1::2], prfs1[::2]
 		train2, test2 = prfs2[1::2], prfs2[::2]
@@ -77,9 +86,14 @@ def L2MeanPRF_ROCs(
 		roc1 = roc_data(clf1, test1, test2, k_arr)
 		roc2 = roc_data(clf2, test2, test1, k_arr)
 
-		data.append([roc1,roc2])
+		data.append([roc1, roc2])
 
 	plot_dual_roc_fig(data, k, label1, label2, out_fname,  vary_param)
+	if samples:
+		dir = 'output/classify/samples'
+		clear_old_files(dir, samples)
+		save_samples(filts1, samples, dir, vary_param)
+		save_samples(filts2, samples, dir, vary_param)
 
 	return data
 

@@ -34,6 +34,8 @@ def clear_old_files(path, see_samples):
 		if ans == 'y':
 			for f in old_files:
 				if f != '.gitkeep':
+					if not path.endswith('/'):
+						path = path + '/'
 					os.remove(path + f)
 		elif ans == 'q':
 			print 'Goodbye'

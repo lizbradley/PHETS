@@ -9,7 +9,7 @@ import sys, time
 from Signals import TimeSeries
 from Classify.ROC import L2MeanPRF_ROCs
 from config import default_filtration_params as filt_params
-set_test = 1
+set_test = 2
 
 
 
@@ -88,7 +88,7 @@ if test == 2:
 
 	filt_params.update({
 		'ds_rate': 200,
-		'num_divisions': 20
+		'num_divisions': 10,
 	})
 
 	L2MeanPRF_ROCs(
@@ -97,9 +97,10 @@ if test == 2:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved=False,
-		quiet=False,
-		vary_param=('max_filtration_param',(-3, -6))
+		load_saved=True,
+		quiet=True,
+		vary_param=('max_filtration_param', (-3, -6)),
+		samples=5
 
 	)
 

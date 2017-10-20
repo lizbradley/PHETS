@@ -26,7 +26,7 @@ class BaseTrajectory(object):
 			self.fname = fname
 
 		if fname is not None:
-			self.name = self.fname.split('/')[-1][:-4]  #[:-4] removes .txt from filename
+			self.name = self.fname.split('/')[-1].split('.')[0]
 		else:
 			self.name = None
 
@@ -135,9 +135,8 @@ class Trajectory(BaseTrajectory):
 				print_title('{} window {} of {}...'.format(
 						self.name, i + 1, len(self.windows))
 				)
-			f = Filtration(t, filt_params, silent=quiet)
-			filt_frame = filt_params['num_divisions'] - 1
-			plot_filtration_pub(f, filt_frame, 'output/classify/samples/{}_{}.png'.format(self.name,i))
+			f = Filtration(t, filt_params, silent=quiet,
+			               name='{}__window_{}'.format(self.name, i))
 			filts.append(f)
 		print 'done.'
 		self.filts = filts

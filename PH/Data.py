@@ -45,7 +45,7 @@ class PDData:
 
 class Filtration:
 
-	def __init__(self, traj, params, title='', silent=False, out_fname=None):
+	def __init__(self, traj, params, name='', silent=False, out_fname=None):
 		caller_dir = os.getcwd()
 
 		if isinstance(traj, basestring):			# is filename
@@ -54,7 +54,9 @@ class Filtration:
 			self.filename = caller_dir + '/' + traj
 		else:										# is array
 			self.sig = traj
-			self.filename = title
+			self.filename = name
+
+		self.name = self.filename.split('/')[-1].split('.')[0]
 
 		os.chdir(SCRIPT_DIR)
 
@@ -363,7 +365,7 @@ class Filtration:
 
 	def _build_PRF(self):
 
-		if self.PRF:
+		if self.PRF is not None:
 			return
 
 		num_div = self.num_div
@@ -412,8 +414,8 @@ class Filtration:
 				grid_vals[i] = np.nan
 		grid_vals = np.reshape(grid_vals, xx.shape)
 
-		# self.PRF = [xx, yy, grid_vals, max_lim]
-		self.PRF = grid_vals
+		self.PRF = [xx, yy, grid_vals, max_lim]
+		# self.PRF = grid_vals
 
 
 	# public #
@@ -445,12 +447,16 @@ class Filtration:
 		return self.PD_data
 
 
-	def get_PRF(self, silent=False):
+	def get_PRF(self, silent=False, new_format=False):
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
 		self._get_intervals(silent=silent)
 		self._build_PD_data()
 		self._build_PRF()
 		os.chdir(caller_dir)
-		return self.PRF
+
+		if new_format:
+			return self.PRF[2]
+		else:
+			return self.PRF
 

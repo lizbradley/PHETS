@@ -1,6 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+from PH import make_PD, make_PRF_plot, make_movie
+
 
 def plot_roc_ax(ax, data, k, title):
 	fpr, tpr = data
@@ -77,3 +79,36 @@ def plot_dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
 	# fig.tight_layout(rect=[0, 0, 1, 0.9])
 
 	plt.savefig(fname)
+
+
+def save_samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
+
+	if vary_param_1 is None and vary_param_2 is None:
+		filts = [[filts]]
+	elif vary_param_1 is not None and vary_param_2 is None:
+		filts = [[fs] for fs in filts]
+	elif vary_param_1 is not None and vary_param_2 is not None:
+		pass
+	else:
+		print 'ERROR: vary_param_1 is None, but vary_param_2 is not None'
+
+
+	for i, filts_v1 in enumerate(filts):
+		for j, filts_v2 in enumerate(filts_v1):
+			for k, filt in enumerate(filts_v2[::interval]):
+
+				base_name = '{}/{}'.format(dir, filt.name)
+
+				if vary_param_1 is not None:
+					base_name = '{}__{}_{}__'.format(base_name, vary_param_1[0], vary_param_1[1][i])
+
+				if vary_param_2 is not None:
+					base_name = '{}__{}_{}__'.format(base_name, vary_param_2[0], vary_param_2[1][j])
+
+				PD_filename = base_name + 'PD.png'
+				PRF_filename = base_name + 'PRF.png'
+				movie_filename = base_name + 'movie.mp4'
+
+				make_PD(filt, PD_filename)
+				make_PRF_plot(filt, PRF_filename)
+				make_movie(filt, movie_filename)
