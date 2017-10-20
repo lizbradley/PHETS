@@ -33,7 +33,7 @@ def plot_roc_ax(ax, data, k, title):
 	return l, cm
 
 
-def plot_dual_roc_fig(data, k, label_1, label_2, fname):
+def plot_dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
 	fig = plt.figure(
 		figsize=(10, 4),
 		dpi=100
@@ -55,6 +55,7 @@ def plot_dual_roc_fig(data, k, label_1, label_2, fname):
 		l, cm = plot_roc_ax(ax2, prf_data_2, k, 'is it a {}?'.format(label_2))
 		lines.append(l)
 
+
 	bounds = np.arange(k[0], k[1] + .5, .5)
 	# bounds = np.arange(k[0], k[1] + 1, 1)
 	cb = fig.colorbar(cm, cax=cax, boundaries=bounds)
@@ -68,7 +69,10 @@ def plot_dual_roc_fig(data, k, label_1, label_2, fname):
 	cb.ax.tick_params(labelsize=14)
 
 	# fig.suptitle('k = range({}, {}, {})'.format(*k), fontsize=16)
-	# fig.legend(lines, labels=window_length)
+	if vary_param is not None:
+		fig.legend(lines, vary_param[1], loc=3)
+		fig.suptitle('varying parameter '+vary_param[0])
+		fig.subplots_adjust(top = 0.85)
 
 	# fig.tight_layout(rect=[0, 0, 1, 0.9])
 

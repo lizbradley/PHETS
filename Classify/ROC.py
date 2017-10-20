@@ -37,39 +37,51 @@ def L2MeanPRF_ROCs(
 		k,
 		load_saved=False,
 		see_samples=True,
-		quiet=True
+		quiet=True,
+		vary_param=None
 ):
 
+	data = []
+	iterator = 1
+	if vary_param is not None:
+		iterator=len(vary_param[1])
 
-	if load_saved:
-		filts1 = cPickle.load(open('Classify/data/filts1.p'))
-		filts2 = cPickle.load(open('Classify/data/filts2.p'))
-	else:
-		filts1 = traj1.filtrations(filt_params, quiet)
-		filts2 = traj2.filtrations(filt_params, quiet)
+	for i in xrange(0,iterator):
 
-		cPickle.dump(filts1, open('Classify/data/filts1.p', 'wb'))
-		cPickle.dump(filts2, open('Classify/data/filts2.p', 'wb'))
+		if vary_param is not None:
+			filt_params.update({vary_param[0] : vary_param[1][i]})
+
+		if load_saved:
+			filts1 = cPickle.load(open('Classify/data/filts1.p'))
+			filts2 = cPickle.load(open('Classify/data/filts2.p'))
+		else:
+			filts1 = traj1.filtrations(filt_params, quiet)
+			filts2 = traj2.filtrations(filt_params, quiet)
+
+			cPickle.dump(filts1, open('Classify/data/filts1.p', 'wb'))
+			cPickle.dump(filts2, open('Classify/data/filts2.p', 'wb'))
 
 
-	prfs1 = [f.get_PRF(silent=quiet) for f in filts1]
-	prfs2 = [f.get_PRF(silent=quiet) for f in filts2]
+		prfs1 = [f.get_PRF(silent=quiet) for f in filts1]
+		prfs2 = [f.get_PRF(silent=quiet) for f in filts2]
 
-	train1, test1 = prfs1[1::2], prfs1[::2]
-	train2, test2 = prfs2[1::2], prfs2[::2]
+		train1, test1 = prfs1[1::2], prfs1[::2]
+		train2, test2 = prfs2[1::2], prfs2[::2]
 
-	print 'training classifiers...'
-	clf1 = L2MeanPRF(train1)
-	clf2 = L2MeanPRF(train2)
+		print 'training classifiers...'
+		clf1 = L2MeanPRF(train1)
+		clf2 = L2MeanPRF(train2)
 
-	print 'running tests...'
-	k_arr = np.arange(*k)
-	roc1 = roc_data(clf1, test1, test2, k_arr)
-	roc2 = roc_data(clf2, test2, test1, k_arr)
+		print 'running tests...'
+		k_arr = np.arange(*k)
+		roc1 = roc_data(clf1, test1, test2, k_arr)
+		roc2 = roc_data(clf2, test2, test1, k_arr)
 
-	plot_dual_roc_fig([[roc1, roc2]], k, label1, label2, out_fname)
+		data.append([roc1,roc2])
 
-	return roc1, roc2
+	plot_dual_roc_fig(data, k, label1, label2, out_fname,  vary_param)
+
+	return data
 
 
 
