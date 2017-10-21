@@ -3,12 +3,12 @@ os.chdir('..')
 
 import sys, time
 
-from Signals import TimeSeries
+from Signals import TimeSeries, Trajectory
 from PRFStats.ROC import L2MeanPRF_ROCs
 from config import default_filtration_params as filt_params
 
 
-set_test = 2
+set_test = 3
 
 
 
@@ -106,3 +106,41 @@ if test == 2:
 
 
 
+if test == 3:
+	# testing the vary_param capabilities #
+
+	traj1 = Trajectory(
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau35.txt',
+		crop=(100, 9100),
+		num_windows=5,
+		window_length=1500,
+		vol_norm=(0, 0, 1)      # (full, crop, window)
+	)
+
+
+	traj2 = Trajectory(
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau50.txt',
+		crop=(100, 9100),
+		num_windows=5,
+		window_length=1500,
+		vol_norm=(0, 0, 1)
+	)
+
+
+	filt_params.update({
+		'ds_rate': 200,
+		'num_divisions': 10,
+	})
+
+	L2MeanPRF_ROCs(
+		traj1, traj2,
+		'clarinet', 'viol',
+		out_fname(),
+		filt_params,
+		k=(0, 5.01, .01),
+		load_saved=False,
+		quiet=True,
+		vary_param=('max_filtration_param', (-3, -6)),
+		see_samples=5
+
+	)

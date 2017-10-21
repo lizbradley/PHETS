@@ -25,7 +25,7 @@ class BaseTrajectory(object):
 			self.data_full = data
 			self.fname = fname
 
-		if fname is not None:
+		if self.fname is not None:
 			self.name = self.fname.split('/')[-1].split('.')[0]
 		else:
 			self.name = None
