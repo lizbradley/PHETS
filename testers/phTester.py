@@ -1,13 +1,13 @@
-import os
+import os, sys, time
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 os.chdir('..')
-
-import sys
-import time
 
 from PH import Filtration, load_filtration
 from PH import make_movie, make_PD, make_PRF_plot
 from PubPlots import plot_PD_pub, plot_filtration_pub
 from config import default_filtration_params as parameter_set
+
+
 
 
 set_test = 16		# set test number here or with command line argument
@@ -45,7 +45,6 @@ if test == 14:
 		filtration,
 		'output/PH/test14_PD.png'
 	)
-
 if test == 15:
 	in_filename = 'datasets/trajectories/49/C134C.txt'
 	filt_params = parameter_set
@@ -85,8 +84,8 @@ if test == 16:
 		})
 
 
-	# filtration = Filtration(in_filename, filt_params, out_fname='test16.p')
-	filtration = load_filtration('test16.p')
+	filtration = Filtration(in_filename, filt_params, out_fname='test16.p')
+	# filtration = load_filtration('test16.p')
 
 	make_movie(
 		filtration,
