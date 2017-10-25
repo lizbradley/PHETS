@@ -8,11 +8,12 @@ from Data import Filtration
 from TitleBox import add_filename_table, add_filt_params_table
 
 # from Utilities import mem_profile
-
-f=open("output/run_info/group_by_birth_time_memory.txt","wb")
-f2=open("output/run_info/expand_to_2simplexes_memory.txt","wb")
-f3=open("output/run_info/build_perseus_in_file_memory.txt","wb")
-f4=open("output/run_info/make_figure_memory.txt","wb")
+import os
+print os.getcwd()
+# f=open("output/run_info/group_by_birth_time_memory.txt","wb")
+# f2=open("output/run_info/expand_to_2simplexes_memory.txt","wb")
+# f3=open("output/run_info/build_perseus_in_file_memory.txt","wb")
+# f4=open("output/run_info/make_figure_memory.txt","wb")
 
 # @mem_profile(f, MEMORY_PROFILE_ON)
 # @profile(stream=f)

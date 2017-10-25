@@ -90,6 +90,7 @@ def plot_dists_vs_ref(
 
 
 	def show_samples(filt, i, ref=False):
+		os.chdir('..')
 		base_name = base_filename.split('/')[-1].split('.')[0]
 		comp_name = '{:s}_{:d}_'.format(base_name, i)
 		if ref: comp_name += '_REFERENCE_'
@@ -100,6 +101,7 @@ def plot_dists_vs_ref(
 		make_PD(filt, PD_filename)
 		make_PRF_plot(filt, PRF_filename)
 		make_movie(filt, movie_filename)
+		os.chdir('PRFCompare')
 
 
 	def get_PRFs():
@@ -244,7 +246,7 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 
 		plt.close(fig)
 
-
+	main()
 
 def plot_clusters(*args, **kwargs):
 
