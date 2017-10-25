@@ -133,7 +133,7 @@ def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
 
 		sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
 
-		plot_main_fig()
+		plot_main_fig(sigs_full, crops, sigs, dists)
 
 		base_filename_1 = filename_1.split('/')[-1].split('.')[0]
 		base_filename_2 = filename_2.split('/')[-1].split('.')[0]
