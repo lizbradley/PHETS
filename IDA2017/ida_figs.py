@@ -1,6 +1,6 @@
-import os
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 os.chdir('..')
-# move this script to parent directory to run #
 
 import sys, time
 import matplotlib.pyplot as plt
@@ -12,7 +12,6 @@ from config import default_filtration_params as filt_params
 from DCE.DCE import embed
 from PH import Filtration, make_movie, load_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
-from Tools import normalize_volume
 from Utilities import sec_to_samp
 
 piano_sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
@@ -29,11 +28,9 @@ piano_traj = embed(
 eps_bins = 20
 simps_cutoff = -21
 
-<<<<<<< HEAD:IDA2017/ida_figs.py
-paper_path = 'IDA2017/testing/'
-=======
-paper_path = 'paper/talk/'
->>>>>>> master:paper/ida_figs.py
+
+paper_path = ''
+
 ticks = [-1, -.33, .33, 1]
 # ticks = None
 
@@ -275,6 +272,7 @@ def fig4():
 		})
 
 	filtration = Filtration(traj, filt_params)
+	make_movie(filtration, 'IDA2017/talk/viol_movie.mp4')
 
 	plot_filtration_pub(filtration, 4, ax2,
 						# label='b) $\epsilon  \\approx 0.114$',
@@ -398,7 +396,7 @@ if __name__ == '__main__':
 	pass
 	# fig1()
 	# fig2()
-	fig3()
-	# fig4()
+	# fig3()
+	fig4()
 	# fig5()
 	# fig6()
