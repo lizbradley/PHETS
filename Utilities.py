@@ -141,7 +141,7 @@ def remove_files_by_type(dir, ftype):
 			print 'removed {}'.format(dir + f)
 
 
-def frames_to_movie(out_filename, frame_path, framerate=1, aspect=None):
+def frames_to_movie(out_filename, frame_path, framerate=1, loglevel='panic'):
 
 	if os.path.exists(out_filename):
 		overwrite = raw_input(out_filename + " already exists. Overwrite? (y/n)\n")
@@ -154,7 +154,7 @@ def frames_to_movie(out_filename, frame_path, framerate=1, aspect=None):
 	sys.stdout.flush()
 	cmd = [
 		'ffmpeg',
-		'-loglevel', 'panic',
+		'-loglevel', loglevel,
 		'-y',
 		'-framerate', str(framerate),
 		'-i', frame_path,
@@ -165,6 +165,7 @@ def frames_to_movie(out_filename, frame_path, framerate=1, aspect=None):
 	]
 	subprocess.call(cmd)
 	print 'done.'
+	print 'see {}'.format(out_filename)
 
 
 # BELOW ARE MIGRATED FROM DCE MODULE, NEED CLEANUP #

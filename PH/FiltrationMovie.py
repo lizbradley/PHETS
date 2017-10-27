@@ -340,7 +340,7 @@ def make_movie(
 
 	pyplot.close(fig)
 	print ''
-	frames_to_movie(out_filename, 'PH/frames/frame%03d.png')
+	frames_to_movie(out_filename, 'PH/frames/frame%03d.png', loglevel='error')
 	clear_temp_files('PH/temp/')
 
 
