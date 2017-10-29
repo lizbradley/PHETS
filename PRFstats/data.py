@@ -21,7 +21,7 @@ def get_dist(a, b):
 
 
 
-class L2MeanPRF(object):
+class L2Classifier(object):
 
 	def __init__(self, train):		# training data as ndarray
 		"""

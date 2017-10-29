@@ -1,10 +1,11 @@
 import cPickle
-import numpy as np
-import sys
 
-from Plots import plot_dual_roc_fig, plot_samples
-from Classify import L2MeanPRF
+import numpy as np
+
+from PRFStats.plots import dists_vs_means_fig
 from Utilities import clear_old_files
+from data import L2Classifier
+from plots import dual_roc_fig, samples
 
 
 def prep_data(samps):
@@ -30,7 +31,7 @@ def roc_data(clf, tests_true, tests_false, k_arr):
 	return [fpr, tpr]
 
 
-def L2MeanPRF_ROCs(
+def L2ROCs(
 		traj1, traj2,
 		label1, label2,
 		out_fname,
@@ -50,13 +51,8 @@ def L2MeanPRF_ROCs(
 		filts1 = []
 		filts2 = []
 
-		if vary_param is None:
-			iterator = 1
-		else:
-			iterator = len(vary_param[1])
-
-		for i in xrange(0, iterator):
-
+		iterator = 1 if vary_param is None else len(vary_param[1])
+		for i in range(iterator):
 			if vary_param is not None:
 				filt_params.update({vary_param[0]: vary_param[1][i]})
 
@@ -77,8 +73,8 @@ def L2MeanPRF_ROCs(
 		train2, test2 = prfs2[1::2], prfs2[::2]
 
 		print 'training classifiers...'
-		clf1 = L2MeanPRF(train1)
-		clf2 = L2MeanPRF(train2)
+		clf1 = L2Classifier(train1)
+		clf2 = L2Classifier(train2)
 
 		print 'running tests...'
 		k_arr = np.arange(*k)
@@ -87,7 +83,7 @@ def L2MeanPRF_ROCs(
 
 		data.append([roc1, roc2])
 
-	plot_dual_roc_fig(data, k, label1, label2, out_fname,  vary_param)
+	dual_roc_fig(data, k, label1, label2, out_fname, vary_param)
 
 	if see_samples:
 		dir = 'output/PRFStats/samples'
@@ -96,11 +92,29 @@ def L2MeanPRF_ROCs(
 		if vary_param is None:
 			filts1, filts2 = filts1[0], filts2[0]
 
-		plot_samples(filts1, see_samples, dir, vary_param)
-		plot_samples(filts2, see_samples, dir, vary_param)
+		samples(filts1, see_samples, dir, vary_param)
+		samples(filts2, see_samples, dir, vary_param)
 
 	return data
 
 
 
+
+def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
+
+	filename_1, filename_2, out_filename, filt_params = args
+
+	sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
+
+	dists_vs_means_fig(kwargs, args, sigs_full, crops, sigs, dists)
+
+	base_filename_1 = filename_1.split('/')[-1].split('.')[0]
+	base_filename_2 = filename_2.split('/')[-1].split('.')[0]
+	out_fname_1 = 'output/PRFCompare/mean/' + base_filename_1 + '_mean_PRF.png'
+	out_fname_2 = 'output/PRFCompare/mean/' + base_filename_2 + '_mean_PRF.png'
+	ref_func_1, ref_func_2 = refs
+	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params,
+				  in_filename='MEAN: ' + base_filename_1)
+	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params,
+				  in_filename='MEAN: ' + base_filename_2)
 
