@@ -110,7 +110,7 @@ class Filtration:
 			r = raw_input(
 				'''WARNING: You have not specified a 'worm_length'. Default 
 				'worm_length' has been changed from 10,000 to len(self.sig).
-				len(self.sig) = {}. (This operation occurs at PH/PRFStats.py:109.)
+				len(self.sig) = {}. (This operation occurs at PH/PRFstats.py:109.)
 				 Proceed? (y/n)'''.format(sig_length)
 			)
 			if r != 'y':

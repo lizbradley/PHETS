@@ -75,6 +75,10 @@ def plot_signal_zoom(ax, full_sig, crop, time_units='seconds', sig=None):
 		elif time_units == 'seconds':
 			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
 			x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
+		else:
+			print 'ERROR: invalid time_units'
+			sys.exit()
+
 		y = full_sig[crop[0]:crop[1]]
 
 

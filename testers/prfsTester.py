@@ -4,8 +4,8 @@ os.chdir('..')
 
 import sys, time
 
-from Signals import TimeSeries, Trajectory
-from PRFStats.ROC import L2MeanPRF_ROCs
+from signals import TimeSeries, Trajectory
+from PRFstats.interface import L2ROCs
 from config import default_filtration_params as filt_params
 
 
@@ -20,7 +20,7 @@ start_time = time.time()
 
 
 def out_fname():
-	return 'output/PRFStats/test_{}.png'.format(test)
+	return 'output/PRFstats/test_{}.png'.format(test)
 
 
 if test == 1:
@@ -52,13 +52,13 @@ if test == 1:
 		'ds_rate': 20
 	})
 
-	L2MeanPRF_ROCs(
+	L2ROCs(
 		traj1, traj2,
 		'clarinet', 'viol',
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved=True,
+		load_saved_filts=True,
 		quiet=False,
 		see_samples=5
 	)
@@ -92,13 +92,13 @@ if test == 2:
 		'num_divisions': 10,
 	})
 
-	L2MeanPRF_ROCs(
+	L2ROCs(
 		traj1, traj2,
 		'clarinet', 'viol',
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved=True,
+		load_saved_filts=True,
 		quiet=True,
 		vary_param=('max_filtration_param', (-3, -6)),
 		see_samples=5
@@ -133,13 +133,13 @@ if test == 3:
 		'num_divisions': 10,
 	})
 
-	L2MeanPRF_ROCs(
+	L2ROCs(
 		traj1, traj2,
 		'clarinet', 'viol',
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved=False,
+		load_saved_filts=False,
 		quiet=True,
 		vary_param=('max_filtration_param', (-3, -6)),
 		see_samples=5

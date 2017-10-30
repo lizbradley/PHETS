@@ -42,12 +42,10 @@ class BaseTrajectory(object):
 			 num_windows, window_length
 		)
 
-
-
-
 	@staticmethod
 	def normalize(data):
 		return np.true_divide(data, np.max(np.abs(data)))
+
 
 	def crop(self, lim):
 		if lim is None:
@@ -60,7 +58,6 @@ class BaseTrajectory(object):
 
 		self.data = data
 		return data
-
 
 
 	def slice(self, num_windows, window_length):
@@ -88,9 +85,8 @@ class TimeSeries(BaseTrajectory):
 	def __init__(self, data, **kwargs):
 		super(TimeSeries, self).__init__(data, **kwargs)
 
-		self.TimeSeries = None
-		self.embed_params = None
-
+		self.source_traj = None
+		self.project_axis = None
 
 	def embed(self, tau, m):
 		data = embed(self.data_full, tau, m)
@@ -104,6 +100,9 @@ class TimeSeries(BaseTrajectory):
 			vol_norm=self.norm_vol
 		)
 
+		traj.source_ts = self
+		traj.embed_params = {'tau': tau, 'm': m}
+
 		return traj
 
 
@@ -113,6 +112,9 @@ class Trajectory(BaseTrajectory):
 
 	def __init__(self, data, **kwargs):
 		super(Trajectory, self).__init__(data, **kwargs)
+
+		self.source_ts = None
+		self.embed_params = None
 
 		self.filts = None
 
@@ -140,5 +142,22 @@ class Trajectory(BaseTrajectory):
 		print 'done.'
 		self.filts = filts
 		return filts
+
+
+	def project(self, axis=0):
+		data = self.data_full[:, axis]
+
+		ts = TimeSeries(
+			data,
+			fname=self.fname,
+			crop=self.crop_lim,
+			num_windows=self.num_windows,
+			# window_length=self.window_length + tau  # + 1 ??
+			window_length=self.window_length,
+			vol_norm=self.norm_vol
+		)
+
+		ts.source_traj = self
+		ts.project_axis = axis
 
 

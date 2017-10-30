@@ -2,7 +2,7 @@ import numpy
 import numpy as np
 from matplotlib import pyplot as plt
 
-import Signals
+import signals
 from PH import make_PD, make_PRF_plot, make_movie
 from Utilities import print_title
 
@@ -132,7 +132,7 @@ def plot_dists_ax(ax, d, mean, crop):
 	ax.grid(axis='x')
 	ax.set_xticks(ticks)
 
-def dists_vs_means_fig(kwargs, args, sigs_full, crops, sigs, dists):
+def dists_vs_means_fig(refs, dists):
 
 
 	print 'plotting distances...'
@@ -182,14 +182,14 @@ def dists_vs_means_fig(kwargs, args, sigs_full, crops, sigs, dists):
 	plt.setp(ax4.get_xticklines(), visible=False)
 
 	ax5 = fig.add_subplot(425, sharex=ax1)
-	Signals.plots.ts(ax5, None, crop_1, time_units=time_units, sig=sig_1)
+	signals.plots.ts_zoom(ax5, None, crop_1, time_units=time_units, sig=sig_1)
 	ax5.grid(axis='x', zorder=0)
 	plt.setp(ax5.get_yticklabels(), visible=False)
 	plt.setp(ax5.get_yticklines(), visible=False)
 
 
 	ax6 = fig.add_subplot(426, sharex=ax2)
-	Signals.plots.ts(ax6, None, crop_2, time_units=time_units, sig=sig_2)
+	signals.plots.ts_zoom(ax6, None, crop_2, time_units=time_units, sig=sig_2)
 	ax6.grid(axis='x', zorder=0)
 	plt.setp(ax6.get_yticklabels(), visible=False)
 	plt.setp(ax6.get_yticklines(), visible=False)
@@ -199,12 +199,12 @@ def dists_vs_means_fig(kwargs, args, sigs_full, crops, sigs, dists):
 	ax6.set_ylim(-ylim, ylim)
 
 	ax7 = fig.add_subplot(427)
-	plot_signal(ax7, sig_1_full, crop_1, time_units=time_units)
+	signals.plots.ts(ax7, sig_1_full, crop_1, time_units=time_units)
 	plt.setp(ax7.get_yticklabels(), visible=False)
 	plt.setp(ax7.get_yticklines(), visible=False)
 
 	ax8 = fig.add_subplot(428, sharey=ax7)
-	plot_signal(ax8, sig_2_full, crop_2, time_units=time_units)
+	signals.plots.ts(ax8, sig_2_full, crop_2, time_units=time_units)
 	plt.setp(ax8.get_yticklabels(), visible=False)
 	plt.setp(ax8.get_yticklines(), visible=False)
 

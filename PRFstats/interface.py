@@ -2,9 +2,9 @@ import cPickle
 
 import numpy as np
 
-from PRFStats.plots import dists_vs_means_fig
+from PRFstats.plots import dists_vs_means_fig
 from Utilities import clear_old_files
-from data import L2Classifier
+from data import L2Classifier, prf_dists_compare
 from plots import dual_roc_fig, samples
 
 
@@ -37,15 +37,15 @@ def L2ROCs(
 		out_fname,
 		filt_params,
 		k,
-		load_saved=False,
+		load_saved_filts=False,
 		see_samples=0,
 		quiet=True,
 		vary_param=None
 ):
 
-	if load_saved:
-		filts1 = cPickle.load(open('PRFStats/data/filts1.p'))
-		filts2 = cPickle.load(open('PRFStats/data/filts2.p'))
+	if load_saved_filts:
+		filts1 = cPickle.load(open('PRFstats/data/filts1.p'))
+		filts2 = cPickle.load(open('PRFstats/data/filts2.p'))
 
 	else:
 		filts1 = []
@@ -59,8 +59,8 @@ def L2ROCs(
 			filts1.append(traj1.filtrations(filt_params, quiet))
 			filts2.append(traj2.filtrations(filt_params, quiet))
 
-		cPickle.dump(filts1, open('PRFStats/data/filts1.p', 'wb'))
-		cPickle.dump(filts2, open('PRFStats/data/filts2.p', 'wb'))
+		cPickle.dump(filts1, open('PRFstats/data/filts1.p', 'wb'))
+		cPickle.dump(filts2, open('PRFstats/data/filts2.p', 'wb'))
 
 	data = []
 
@@ -86,7 +86,7 @@ def L2ROCs(
 	dual_roc_fig(data, k, label1, label2, out_fname, vary_param)
 
 	if see_samples:
-		dir = 'output/PRFStats/samples'
+		dir = 'output/PRFstats/samples'
 		clear_old_files(dir, see_samples)
 
 		if vary_param is None:
@@ -100,21 +100,49 @@ def L2ROCs(
 
 
 
-def plot_dists_vs_means(*args, **kwargs):		# see dists_compare for arg format
+def plot_dists_vs_means(
+	traj1,
+	traj2,
+	out_filename,
+	filt_params,
 
-	filename_1, filename_2, out_filename, filt_params = args
+	load_saved_filts=False,
 
-	sigs_full, crops, sigs, refs, dists = dists_compare(*args, **kwargs)
+	dist_scale='none',  # 'none', 'a', or 'a + b'
+	weight_func=lambda i, j: 1,
+	see_samples=5,
+	quiet=True
 
-	dists_vs_means_fig(kwargs, args, sigs_full, crops, sigs, dists)
+	):
 
-	base_filename_1 = filename_1.split('/')[-1].split('.')[0]
-	base_filename_2 = filename_2.split('/')[-1].split('.')[0]
-	out_fname_1 = 'output/PRFCompare/mean/' + base_filename_1 + '_mean_PRF.png'
-	out_fname_2 = 'output/PRFCompare/mean/' + base_filename_2 + '_mean_PRF.png'
+
+	if load_saved_filts:
+		filts1 = cPickle.load(open('PRFstats/data/filts1.p'))
+		filts2 = cPickle.load(open('PRFstats/data/filts2.p'))
+
+	else:
+		filts1 = []
+		filts2 = []
+
+		filts1.append(traj1.filtrations(filt_params, quiet))
+		filts2.append(traj2.filtrations(filt_params, quiet))
+
+		cPickle.dump(filts1, open('PRFstats/data/filts1.p', 'wb'))
+		cPickle.dump(filts2, open('PRFstats/data/filts2.p', 'wb'))
+
+
+
+	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
+	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
+
+	refs, dists = prf_dists_compare(prfs1, prfs2)
+
+	dists_vs_means_fig(refs, dists)
+
+	out_fname = 'output/PRFCompare/mean/{}_mean_PRF.png'
 	ref_func_1, ref_func_2 = refs
-	make_PRF_plot(ref_func_1, out_fname_1, params=filt_params,
-				  in_filename='MEAN: ' + base_filename_1)
-	make_PRF_plot(ref_func_2, out_fname_2, params=filt_params,
-				  in_filename='MEAN: ' + base_filename_2)
+	make_PRF_plot(ref_func_1, out_fname.format(traj1.name), params=filt_params,
+				  in_filename='MEAN: ' + traj1.name)
+	make_PRF_plot(ref_func_2, out_fname.format(traj2.name), params=filt_params,
+				  in_filename='MEAN: ' + traj2.name)
 

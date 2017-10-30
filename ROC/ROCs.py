@@ -237,7 +237,7 @@ def PRF_vs_FFT_v2(
 ):
 	"""
 	This function was used to generate fig 5 of the IDA 2017 IDA2017. It is
-	depricated; use PRFStats.L2MeanPRF_ROCs instead.
+	depricated; use PRFstats.L2MeanPRF_ROCs instead.
 	"""
 
 	def get_dists(mean, tests):
