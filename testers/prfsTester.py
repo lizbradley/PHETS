@@ -5,11 +5,11 @@ os.chdir('..')
 import sys, time
 
 from signals import TimeSeries, Trajectory
-from PRFstats.interface import L2ROCs
+from PRFstats.interface import L2ROCs, plot_dists_vs_means
 from config import default_filtration_params as filt_params
 
 
-set_test = 3
+set_test = 4
 
 
 
@@ -75,7 +75,6 @@ if test == 2:
 		vol_norm=(0, 0, 1)
 	)
 
-
 	ts2 = TimeSeries(
 		'datasets/time_series/viol/40-viol.txt',
 		crop=(35000, 140000),
@@ -118,7 +117,6 @@ if test == 3:
 		vol_norm=(0, 0, 1)      # (full, crop, window)
 	)
 
-
 	traj2 = Trajectory(
 		'datasets/trajectories/L63_x_m2/L63_x_m2_tau50.txt',
 		crop=(100, 9100),
@@ -126,7 +124,6 @@ if test == 3:
 		window_length=1500,
 		vol_norm=(0, 0, 1)
 	)
-
 
 	filt_params.update({
 		'ds_rate': 200,
@@ -144,4 +141,36 @@ if test == 3:
 		vary_param=('max_filtration_param', (-3, -6)),
 		see_samples=5
 
+	)
+
+
+if test == 4:
+
+	traj1 = Trajectory(
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau35.txt',
+		crop=(100, 9100),
+		num_windows=5,
+		window_length=1500,
+		vol_norm=(0, 0, 1)      # (full, crop, window)
+	)
+
+	traj2 = Trajectory(
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau50.txt',
+		crop=(100, 9100),
+		num_windows=5,
+		window_length=1500,
+		vol_norm=(0, 0, 1)
+	)
+
+	filt_params.update({
+		'ds_rate': 200,
+		'num_divisions': 10,
+		'max_filtration_param': -5
+	})
+
+	plot_dists_vs_means(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		quiet=False
 	)

@@ -2,6 +2,7 @@ import cPickle
 
 import numpy as np
 
+from PH import make_PRF_plot
 from PRFstats.plots import dists_vs_means_fig
 from Utilities import clear_old_files
 from data import L2Classifier, prf_dists_compare
@@ -101,18 +102,19 @@ def L2ROCs(
 
 
 def plot_dists_vs_means(
-	traj1,
-	traj2,
-	out_filename,
-	filt_params,
+		traj1,
+		traj2,
+		out_filename,
+		filt_params,
 
-	load_saved_filts=False,
+		load_saved_filts=False,
 
-	dist_scale='none',  # 'none', 'a', or 'a + b'
-	weight_func=lambda i, j: 1,
-	see_samples=5,
-	quiet=True
-
+		time_units='samples',
+		metric='L2',
+		dist_scale='none',  # 'none', 'a', or 'a + b'
+		weight_func=lambda i, j: 1,
+		see_samples=5,
+		quiet=True
 	):
 
 
@@ -121,28 +123,24 @@ def plot_dists_vs_means(
 		filts2 = cPickle.load(open('PRFstats/data/filts2.p'))
 
 	else:
-		filts1 = []
-		filts2 = []
-
-		filts1.append(traj1.filtrations(filt_params, quiet))
-		filts2.append(traj2.filtrations(filt_params, quiet))
+		filts1 = traj1.filtrations(filt_params, quiet)
+		filts2 = traj2.filtrations(filt_params, quiet)
 
 		cPickle.dump(filts1, open('PRFstats/data/filts1.p', 'wb'))
 		cPickle.dump(filts2, open('PRFstats/data/filts2.p', 'wb'))
 
 
-
 	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
 	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
 
-	refs, dists = prf_dists_compare(prfs1, prfs2)
+	refs, dists = prf_dists_compare(prfs1, prfs2, metric, dist_scale)
 
-	dists_vs_means_fig(refs, dists)
+	dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename)
 
-	out_fname = 'output/PRFCompare/mean/{}_mean_PRF.png'
-	ref_func_1, ref_func_2 = refs
-	make_PRF_plot(ref_func_1, out_fname.format(traj1.name), params=filt_params,
-				  in_filename='MEAN: ' + traj1.name)
-	make_PRF_plot(ref_func_2, out_fname.format(traj2.name), params=filt_params,
-				  in_filename='MEAN: ' + traj2.name)
+	# out_fname = 'output/PRFCompare/mean/{}_mean_PRF.png'
+	# ref_func_1, ref_func_2 = refs
+	# make_PRF_plot(ref_func_1, out_fname.format(traj1.name), params=filt_params,
+	# 			  in_filename='MEAN: ' + traj1.name)
+	# make_PRF_plot(ref_func_2, out_fname.format(traj2.name), params=filt_params,
+	# 			  in_filename='MEAN: ' + traj2.name)
 

@@ -123,7 +123,9 @@ def samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
 				make_movie(filt, movie_filename)
 
 
-def plot_dists_ax(ax, d, mean, crop):
+def plot_dists_ax(ax, d, mean, traj):
+	crop = traj.crop_lim
+	num_windows = traj.num_windows
 	t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
 	ticks = np.linspace(crop[0], crop[1], num_windows + 1, endpoint=True)
 	offset = (t[1] - t[0]) / 2
@@ -132,19 +134,13 @@ def plot_dists_ax(ax, d, mean, crop):
 	ax.grid(axis='x')
 	ax.set_xticks(ticks)
 
-def dists_vs_means_fig(refs, dists):
-
-
+def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 	print 'plotting distances...'
 
-	time_units = kwargs['time_units']
-	num_windows = kwargs['num_windows']
 
-	filename_1, filename_2, out_filename, filt_params = args
+	sig_1 = traj1.project()
+	sig_2 = traj2.project()
 
-	sig_1_full, sig_2_full = sigs_full
-	crop_1, crop_2 = crops
-	sig_1, sig_2 = sigs
 	d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
 
 	fig = plt.figure(figsize=(18, 9), tight_layout=True)
@@ -156,25 +152,25 @@ def dists_vs_means_fig(refs, dists):
 
 
 	ax1 = fig.add_subplot(421)
-	plot_dists_ax(ax1, d_1_vs_1, mean_1, crop_1)
+	plot_dists_ax(ax1, d_1_vs_1, mean_1, traj1)
 	plt.setp(ax1.get_xticklabels(), visible=False)
 	plt.setp(ax1.get_xticklines(), visible=False)
 	ax1.set_ylim(bottom=0)
 
 	ax2 = fig.add_subplot(422, sharey=ax1)
-	plot_dists_ax(ax2, d_2_vs_1, mean_2, crop_2)
+	plot_dists_ax(ax2, d_2_vs_1, mean_2, traj2)
 	plt.setp(ax2.get_yticklabels(), visible=False)
 	# plt.setp(ax2.get_yticklines(), visible=False)
 	plt.setp(ax2.get_xticklabels(), visible=False)
 	plt.setp(ax2.get_xticklines(), visible=False)
 
 	ax3 = fig.add_subplot(423, sharey=ax1, sharex=ax1)
-	plot_dists_ax(ax3, d_1_vs_2, mean_3, crop_1)
+	plot_dists_ax(ax3, d_1_vs_2, mean_3, traj1)
 	plt.setp(ax3.get_xticklabels(), visible=False)
 	plt.setp(ax3.get_xticklines(), visible=False)
 
 	ax4 = fig.add_subplot(424, sharey=ax1, sharex=ax2)
-	plot_dists_ax(ax4, d_2_vs_2, mean_4, crop_2)
+	plot_dists_ax(ax4, d_2_vs_2, mean_4, traj2)
 	plt.setp(ax4.get_yticklabels(), visible=False)
 	# plt.setp(ax4.get_yticklines(), visible=False)
 
@@ -182,14 +178,14 @@ def dists_vs_means_fig(refs, dists):
 	plt.setp(ax4.get_xticklines(), visible=False)
 
 	ax5 = fig.add_subplot(425, sharex=ax1)
-	signals.plots.ts_zoom(ax5, None, crop_1, time_units=time_units, sig=sig_1)
+	signals.plots.ts_zoom(ax5, sig_1)
 	ax5.grid(axis='x', zorder=0)
 	plt.setp(ax5.get_yticklabels(), visible=False)
 	plt.setp(ax5.get_yticklines(), visible=False)
 
 
 	ax6 = fig.add_subplot(426, sharex=ax2)
-	signals.plots.ts_zoom(ax6, None, crop_2, time_units=time_units, sig=sig_2)
+	signals.plots.ts_zoom(ax6, sig_2)
 	ax6.grid(axis='x', zorder=0)
 	plt.setp(ax6.get_yticklabels(), visible=False)
 	plt.setp(ax6.get_yticklines(), visible=False)
@@ -198,27 +194,27 @@ def dists_vs_means_fig(refs, dists):
 	ax5.set_ylim(-ylim, ylim)
 	ax6.set_ylim(-ylim, ylim)
 
-	ax7 = fig.add_subplot(427)
-	signals.plots.ts(ax7, sig_1_full, crop_1, time_units=time_units)
-	plt.setp(ax7.get_yticklabels(), visible=False)
-	plt.setp(ax7.get_yticklines(), visible=False)
+	# ax7 = fig.add_subplot(427)
+	# signals.plots.ts(ax7, sig_1)
+	# plt.setp(ax7.get_yticklabels(), visible=False)
+	# plt.setp(ax7.get_yticklines(), visible=False)
+	#
+	# ax8 = fig.add_subplot(428, sharey=ax7)
+	# signals.plots.ts(ax8, sig_2)
+	# plt.setp(ax8.get_yticklabels(), visible=False)
+	# plt.setp(ax8.get_yticklines(), visible=False)
 
-	ax8 = fig.add_subplot(428, sharey=ax7)
-	signals.plots.ts(ax8, sig_2_full, crop_2, time_units=time_units)
-	plt.setp(ax8.get_yticklabels(), visible=False)
-	plt.setp(ax8.get_yticklines(), visible=False)
-
-	ax1.set_title(filename_1.split('/')[-1])
-	ax2.set_title(filename_2.split('/')[-1])
+	ax1.set_title(traj1.name)
+	ax2.set_title(traj2.name)
 
 	del_12 = mean_2 - mean_1
 	del_34 = mean_4 - mean_3
 
 	ax1.set_ylabel(
-		'\n \n ref: ' + filename_1.split('/')[-1].split('.')[0] + ' \n \n $\Delta$: {:.3f}'.format(del_12),
+		'\n \n ref: ' + traj1.name + ' \n \n $\Delta$: {:.3f}'.format(del_12),
 		rotation=0, size='large', labelpad=50)
 	ax3.set_ylabel(
-		'\n \n ref: ' + filename_2.split('/')[-1].split('.')[0] + ' \n \n $\Delta$: {:.3f}'.format(del_34),
+		'\n \n ref: ' + traj2.name + ' \n \n $\Delta$: {:.3f}'.format(del_34),
 		rotation=0, size='large', labelpad=50)
 
 	plt.savefig(out_filename)

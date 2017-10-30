@@ -160,4 +160,6 @@ class Trajectory(BaseTrajectory):
 		ts.source_traj = self
 		ts.project_axis = axis
 
+		return ts
+
 
