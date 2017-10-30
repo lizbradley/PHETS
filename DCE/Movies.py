@@ -14,7 +14,6 @@ from MovieTools import remove_old_frames
 from MovieTools import prep_save_worms_double, save_worms_double
 
 
-
 def get_data(fname):
 	if isinstance(fname, basestring):
 		print 'loading signal...'
@@ -76,8 +75,7 @@ def slide_window(
 			Plots.make_frame(traj, sig, window, frame_fname % i, title_info, time_units=time_units)
 
 	if save_movie:
-		frames_to_movie(out_filename, frame_fname,
-						framerate=framerate, aspect=(10,8))
+		frames_to_movie(out_filename, frame_fname, framerate=framerate)
 
 	return trajs
 

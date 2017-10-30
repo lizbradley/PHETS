@@ -1,24 +1,9 @@
-import os, sys, time
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-os.chdir('..')
+import time, math
 
-import sys
-import time
-import math
-
-
-from Utilities import wav_to_txt, batch_wav_to_txt
+from Utilities import wav_to_txt, batch_wav_to_txt, tester_boilerplate
 from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
 
-
-set_test = 4		# set here or with command line argument
-
-
-
-if len(sys.argv) > 1: test = int(sys.argv[1])
-else: test = set_test
-print 'running test %d...' % test
-start_time = time.time()
+test, start_time = tester_boilerplate(set_test=4)
 
 
 if test == 0:

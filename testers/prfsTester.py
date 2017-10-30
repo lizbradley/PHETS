@@ -1,22 +1,12 @@
 import os, sys, time
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-os.chdir('..')
 
-import sys, time
+from Utilities import tester_boilerplate
 
 from signals import TimeSeries, Trajectory
 from PRFstats.interface import L2ROCs, plot_dists_vs_means
 from config import default_filtration_params as filt_params
 
-
-set_test = 4
-
-
-
-if len(sys.argv) > 1: test = int(sys.argv[1])
-else: test = set_test
-print 'running test %d...' % test
-start_time = time.time()
+test, start_time = tester_boilerplate(set_test=4)
 
 
 def out_fname():

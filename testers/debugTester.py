@@ -1,18 +1,10 @@
-import os, sys, time
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-os.chdir('..')
-
-from PRFCompare.Plots import plot_variance
+from matplotlib.pyplot import ioff; ioff()
 from PH import Filtration, make_movie, make_PD
+from PRFCompare.Plots import plot_variance
+from Utilities import tester_boilerplate
 from config import default_filtration_params as parameter_set
 
-from matplotlib.pyplot import ioff
-ioff()
-
-
-test = 8
-
-
+test, start_time = tester_boilerplate(set_test=6)
 
 def movie_fname(test, str=''):
 	return 'output/debug/test_{}_{}_movie.mp4'.format(test, str)
@@ -142,9 +134,8 @@ if test == 5:
 
 		})
 
-
 	plot_variance(
-		'ClassicBifurcations/NewHopf_anp01.txt',
+		'datasets/trajectories/ClassicBifurcationData/NewHopf_anp01.txt',
 		'output/PRFCompare/variance/NewHopf_anp01.png', 			# out filename
 		params,
 
@@ -161,7 +152,7 @@ if test == 5:
 
 		normalize_volume=False,
 		see_samples=5,					# interval to build filt movies and PDs. 0 means no PDs or movies.
-		quiet=True
+		quiet=False
 	)
 
 if test == 6:
@@ -178,12 +169,12 @@ if test == 6:
 
 	plot_variance(
 		'datasets/Lorenz/StandardLorenz63_IC123.txt',
-		'outputs/PRFCompare/variance/Lorenztest.png',
+		'output/PRFCompare/variance/Lorenztest.png',
 		params,
 		('max_filtration_param', (-2, -5, -10)),
 		('landmark_selector', ("EST", "maxmin")),
 
-		load_saved_filts=False,
+		load_saved_filts=True,
 
 		time_units='samples',
 		crop=(5000, 2005000),  # (start, stop) in time_units, or 'auto'

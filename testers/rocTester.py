@@ -1,10 +1,6 @@
-import os, sys, time
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-os.chdir('..')
-
-import sys, time
+import time
 from ROC import PRF_vs_FFT_v2
-from Utilities import sec_to_samp
+from Utilities import sec_to_samp, tester_boilerplate
 from config import default_filtration_params as filt_params
 
 
@@ -14,15 +10,9 @@ from config import default_filtration_params as filt_params
 # TODO FFT ROC accuracy vs FT_bins (logspace)
 
 
-set_test = 22
 
+test, start_time = tester_boilerplate(set_test=22)
 
-
-
-if len(sys.argv) > 1: test = int(sys.argv[1])
-else: test = set_test
-print 'running test %d...' % test
-start_time = time.time()
 
 
 def out_fname():

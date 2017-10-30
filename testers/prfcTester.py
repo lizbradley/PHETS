@@ -1,21 +1,11 @@
-import os, sys, time
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-os.chdir('..')
-
-import sys, time
+import time
 import numpy as np
+from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
+from Utilities import tester_boilerplate
 from config import default_filtration_params as parameter_set
 
-from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
 
-set_test = 10018       # set test number here or with command line argument
-
-
-
-if len(sys.argv) > 1: test = int(sys.argv[1])
-else: test = set_test
-print 'running test %d...' % test
-start_time = time.time()
+test, start_time = tester_boilerplate(set_test=10018)
 
 
 if test == 1:

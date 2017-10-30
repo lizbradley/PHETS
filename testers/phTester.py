@@ -1,24 +1,12 @@
-import os, sys, time
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-os.chdir('..')
+import time
 
 from PH import Filtration, load_filtration
 from PH import make_movie, make_PD, make_PRF_plot
-from PubPlots import plot_PD_pub, plot_filtration_pub
 from config import default_filtration_params as parameter_set
+from Utilities import tester_boilerplate
 
+test, start_time = tester_boilerplate(set_test=16)
 
-
-
-set_test = 16		# set test number here or with command line argument
-
-
-
-
-if len(sys.argv) > 1: test = int(sys.argv[1])
-else: test = set_test
-print 'running test %d...' % test
-start_time = time.time()
 
 if test == 14:
 	in_filename = 'datasets/trajectories/49/C134C.txt'

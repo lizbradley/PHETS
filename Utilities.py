@@ -2,6 +2,7 @@
 
 import os, sys, inspect
 import subprocess
+import time
 
 from memory_profiler import profile
 
@@ -232,3 +233,16 @@ def batch_flac_to_wav(dir):
 			os.remove(f)
 
 
+def tester_boilerplate(set_test):
+	root_path = os.path.dirname(os.path.realpath(__file__))
+	sys.path.append(root_path)
+	os.chdir(root_path)
+
+	if len(sys.argv) > 1:
+		test = int(sys.argv[1])
+	else:
+		test = set_test
+	print 'running test %d...' % test
+	start_time = time.time()
+
+	return test, start_time
