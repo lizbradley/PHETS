@@ -106,17 +106,7 @@ class Filtration:
 		if not silent: print "building filtration..."
 
 		sig_length = len(self.sig)
-		if params['worm_length'] is None and sig_length > 10000:
-			r = raw_input(
-				'''WARNING: You have not specified a 'worm_length'. Default 
-				'worm_length' has been changed from 10,000 to len(self.sig).
-				len(self.sig) = {}. (This operation occurs at PH/PRFstats.py:109.)
-				 Proceed? (y/n)'''.format(sig_length)
-			)
-			if r != 'y':
-				print 'Goodbye'
-				sys.exit()
-				
+		if params['worm_length'] is None:
 			params['worm_length'] = sig_length
 
 		if len(self.sig.shape) == 1:
@@ -172,7 +162,6 @@ class Filtration:
 				row[:] = expanded_row
 			return np.asarray(ID_arr)
 
-		# @jit
 		def remove_duplicates_all(ID_arr):
 			"""Omit simplexes that have been already added to the filtration or are
 			repeated within a row
