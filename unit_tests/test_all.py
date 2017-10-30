@@ -32,7 +32,7 @@ def test_Traj():
 	assert np.array_equal(sig.windows, np.load('unit_tests/ref/Traj.npy'))
 
 
-def test_L2MeanPRF_ROCs():
+def test_L2ROCs():
 	filt_params = dfp.copy()
 	ts1 = TimeSeries(
 		'unit_tests/data/40-clarinet.txt',
@@ -56,7 +56,7 @@ def test_L2MeanPRF_ROCs():
 		'num_divisions': 5,
 		'ds_rate': 120
 	})
-	out = L2ROCs(
+	result = L2ROCs(
 		traj1, traj2,
 		'clarinet', 'viol',
 		'unit_tests/output/L2MeanPRF.png',
@@ -65,4 +65,6 @@ def test_L2MeanPRF_ROCs():
 		load_saved_filts=False,
 		quiet=True
 	)
-	assert np.array_equal(out, np.load('unit_tests/ref/L2MeanPRF_ROC.npy'))
+
+	ref = np.load('unit_tests/ref/L2ROCs.npy')
+	assert np.array_equal(result, ref)

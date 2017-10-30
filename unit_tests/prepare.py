@@ -1,5 +1,4 @@
-import os
-os.chdir('..')
+import os, sys
 
 import numpy as np
 
@@ -9,8 +8,9 @@ from signals import TimeSeries
 from signals import Trajectory
 from PRFstats.interface import L2ROCs
 
+os.chdir('..')
+sys.path.append(os.path.dirname(__file__))
 
-# test_TS #
 def prepare_TS():
 	sig = TimeSeries(
 		'unit_tests/data/40-clarinet.txt',
@@ -21,7 +21,6 @@ def prepare_TS():
 	np.save('unit_tests/ref/TS.npy', sig.windows)
 
 
-# test_Traj #
 def prepare_Traj():
 	sig = Trajectory(
 		'unit_tests/data/ellipse-test.txt',
@@ -31,8 +30,7 @@ def prepare_Traj():
 	)
 	np.save('unit_tests/ref/Traj.npy', sig.windows)
 
-# test_L2MeanPRF_ROCs #
-def prepare_L2MeanPRF_ROCs():
+def prepare_L2ROCs():
 	filt_params = dfp.copy()
 	ts1 = TimeSeries(
 		'unit_tests/data/40-clarinet.txt',
@@ -59,15 +57,16 @@ def prepare_L2MeanPRF_ROCs():
 	out = L2ROCs(
 		traj1, traj2,
 		'clarinet', 'viol',
-		'unit_tests/output/L2MeanPRF.png',
+		'unit_tests/output/L2ROCs.png',
 		filt_params,
 		k=(0, 5.01, .1),
 		load_saved_filts=False,
 		quiet=True
 	)
-	np.save('unit_tests/ref/L2MeanPRF_ROC.npy', out)
+	np.save('unit_tests/ref/L2ROCs.npy', out)
 
 
 if __name__ == '__main__':
-	# prepare_L2MeanPRF_ROCs()
+	prepare_L2ROCs()
 	pass
+
