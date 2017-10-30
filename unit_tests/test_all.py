@@ -1,16 +1,16 @@
+import os, sys
 import numpy as np
-
-import os
-print os.getcwd()
 
 from config import default_filtration_params as dfp
 
-from Signals import TimeSeries
-from Signals import Trajectory
-from PRFStats.ROC import L2MeanPRF_ROCs
+
+from signals import TimeSeries
+from signals import Trajectory
+from PRFstats.interface import L2ROCs
 
 
 def test_TS():
+
 	sig = TimeSeries(
 		'unit_tests/data/40-clarinet.txt',
 		crop=(1000, 10000),
@@ -56,13 +56,13 @@ def test_L2MeanPRF_ROCs():
 		'num_divisions': 5,
 		'ds_rate': 120
 	})
-	out = L2MeanPRF_ROCs(
+	out = L2ROCs(
 		traj1, traj2,
 		'clarinet', 'viol',
 		'unit_tests/output/L2MeanPRF.png',
 		filt_params,
 		k=(0, 5.01, .1),
-		load_saved=False,
+		load_saved_filts=False,
 		quiet=True
 	)
 	assert np.array_equal(out, np.load('unit_tests/ref/L2MeanPRF_ROC.npy'))
