@@ -7,7 +7,7 @@ from PRFstats.interface import L2ROCs, plot_dists_vs_means
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=4)
+test, start_time = get_test(set_test=5)
 
 
 def out_fname():
@@ -170,19 +170,19 @@ if test == 5:
 
 	ts1 = TimeSeries(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
-		crop=(100, 9100),
+		crop=(1, 2),
 		num_windows=5,
-		window_length=1500,
-		vol_norm=(0, 0, 1),      # (full, crop, window)
+		window_length=.01,
+		vol_norm=(0, 1, 1),      # (full, crop, window)
 		time_units='seconds'
 	)
 
 	ts2 = TimeSeries(
 		'datasets/time_series/viol/40-viol.txt',
-		crop=(100, 9100),
+		crop=(1, 2),
 		num_windows=5,
-		window_length=1500,
-		vol_norm=(0, 0, 1),
+		window_length=.01,
+		vol_norm=(0, 1, 1),
 		time_units='seconds'
 	)
 
@@ -191,7 +191,7 @@ if test == 5:
 	traj2 = ts2.embed(tau=tau, m=2)
 
 	filt_params.update({
-		'ds_rate': 200,
+		'ds_rate': 20,
 		'num_divisions': 10,
 		'max_filtration_param': -5
 	})
