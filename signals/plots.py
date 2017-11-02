@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 def ts_zoom(ax, ts):
 
@@ -30,7 +30,7 @@ def ts(out, waveform_data, window=None, time_units='seconds', offset=None):
 		ax.set_xlabel('time (samples)')
 
 	else: 			# seconds
-		x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
+		x = np.linspace(0, len(y) / SAMPLE_RATE, len(y))
 		ax.set_xlabel('time (seconds)')
 
 	if offset:

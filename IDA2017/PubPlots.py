@@ -14,7 +14,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from DCE.Plots import plot_signal_zoom
 from DCE.Tools import auto_crop
 
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 from utilities import normalize_volume
 
@@ -297,13 +297,13 @@ def plot_waveform_sec(
 
 
 	if crop:
-		c0, c1 = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		c0, c1 = (np.array(crop) * SAMPLE_RATE).astype(int)
 		sig = sig[c0: c1]
 		t = np.linspace(crop[0], crop[1], num=len(sig))
 
 
 	else:
-		t = np.true_divide(np.arange(0, len(sig)), WAV_SAMPLE_RATE)
+		t = np.true_divide(np.arange(0, len(sig)), SAMPLE_RATE)
 
 	if normalize_crop: sig = normalize_volume(sig)
 

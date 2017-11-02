@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import math
 from scipy.signal import butter, lfilter, freqz
 
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 
 def crop_sig(sig, crop, time_units):
@@ -15,7 +15,7 @@ def crop_sig(sig, crop, time_units):
 		if time_units == 'samples':
 			pass
 		elif time_units == 'seconds':
-			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+			crop = (np.array(crop) * SAMPLE_RATE).astype(int)
 		else:
 			print 'ERROR: invalid time_units'
 			sys.exit()
@@ -71,7 +71,7 @@ def auto_crop(crop_cmd, sig, length, time_units='seconds'):
 
 	if crop_cmd == 'auto':
 		sig_abs = np.abs(sig)
-		order, fs, cutoff = 1, WAV_SAMPLE_RATE, 1  # filter params
+		order, fs, cutoff = 1, SAMPLE_RATE, 1  # filter params
 		envelope = butter_lowpass_filter(sig_abs, cutoff, fs, order)
 
 		n = len(sig)
@@ -87,7 +87,7 @@ def auto_crop(crop_cmd, sig, length, time_units='seconds'):
 				st_arg = i
 				break
 
-		st_t = st_arg/WAV_SAMPLE_RATE
+		st_t = st_arg / SAMPLE_RATE
 		crop = (st_t, st_t + length)
 		print 'auto crop: ({:.3f}, {:.3f})'.format(crop[0], crop[1])
 
@@ -96,10 +96,10 @@ def auto_crop(crop_cmd, sig, length, time_units='seconds'):
 		crop = crop_cmd
 
 	if time_units == 'seconds':
-		crop_end = crop[1] * WAV_SAMPLE_RATE
+		crop_end = crop[1] * SAMPLE_RATE
 	elif time_units == 'samples':
 		crop_end = crop_end =  crop[1]
-		crop = np.true_divide(crop, WAV_SAMPLE_RATE)
+		crop = np.true_divide(crop, SAMPLE_RATE)
 	else:
 		print 'ERROR: invalid sample time_units.'
 		sys.exit()
@@ -159,7 +159,7 @@ def auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename):
 
 
 
-	print 'tau: {:.5f} (sec), {:d} (samples)'.format(tau, int(tau * WAV_SAMPLE_RATE))
+	print 'tau: {:.5f} (sec), {:d} (samples)'.format(tau, int(tau * SAMPLE_RATE))
 	return ideal_freq, f_disp, tau
 
 
@@ -199,7 +199,7 @@ def plot_power_spectrum(sig, out_file, crop=(1,2)):
 
 
 def get_fund_freq(sig, expected, window=None, tol=10):
-	samp_freq = WAV_SAMPLE_RATE
+	samp_freq = SAMPLE_RATE
 	window_sec = window
 	window = np.array(window) * samp_freq
 

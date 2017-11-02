@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 
 

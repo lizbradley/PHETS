@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
 import TitleBox
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 
 def plot_dce(fig, ax, dce_data):
@@ -73,8 +73,8 @@ def plot_signal_zoom(ax, full_sig, crop, time_units='seconds', sig=None):
 		if time_units == 'samples':
 			x = np.arange(crop[0], crop[1])
 		elif time_units == 'seconds':
-			crop = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
-			x = np.linspace(0, len(full_sig) / WAV_SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
+			crop = (np.array(crop) * SAMPLE_RATE).astype(int)
+			x = np.linspace(0, len(full_sig) / SAMPLE_RATE, len(full_sig))[crop[0]:crop[1]]
 		else:
 			print 'ERROR: invalid time_units'
 			sys.exit()
@@ -254,7 +254,7 @@ def plot_signal(out, waveform_data, window=None, time_units='seconds', offset=No
 		ax.set_xlabel('time (samples)')
 
 	else: 			# seconds
-		x = np.linspace(0, len(y) / WAV_SAMPLE_RATE, len(y))
+		x = np.linspace(0, len(y) / SAMPLE_RATE, len(y))
 		ax.set_xlabel('time (seconds)')
 
 	if offset:

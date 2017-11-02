@@ -13,7 +13,7 @@ from PH.Data import Filtration
 from PH.FiltrationMovie import make_movie
 from PH.Plots import make_PD, make_PRF_plot
 from utilities import clear_old_files, blockPrint, enablePrint, print_title
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 def apply_weight_func(f, weight_func):
 
@@ -117,7 +117,7 @@ def get_PRFs(
 
 	def crop_sig(sig_full, crop_cmd, auto_crop_len):
 		crop = auto_crop(crop_cmd, sig_full, auto_crop_length, time_units)
-		crop_samp = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		crop_samp = (np.array(crop) * SAMPLE_RATE).astype(int)
 		sig = sig_full[crop_samp[0]:crop_samp[1]]
 		if normalize_volume: sig = sig / np.max(sig)
 		return crop, sig_full, sig
@@ -188,7 +188,7 @@ def get_PRFs(
 		if time_units == 'samples':
 			window_size_samp = window_size
 		else:
-			window_size_samp = int(window_size * WAV_SAMPLE_RATE)
+			window_size_samp = int(window_size * SAMPLE_RATE)
 		filt_params.update({'worm_length': window_size_samp})
 
 	else:
@@ -406,7 +406,7 @@ def crop_sig(sig, crop, time_units):
 	elif time_units == 'samples':
 		return sig[crop[0]: crop[1]]
 	elif time_units == 'seconds':
-		crop_samp = (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+		crop_samp = (np.array(crop) * SAMPLE_RATE).astype(int)
 		return sig[crop_samp[0]:crop_samp[1]]
 	else:
 		print "ERROR: invalid 'crop' or 'time_units'"

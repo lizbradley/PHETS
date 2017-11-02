@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from scipy import fftpack, interpolate
 
 from DCE import plot_signal
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 
 def crop_sig(sig, crop):
@@ -26,7 +26,7 @@ def get_spec(sig):
 	sig_fft = fftpack.rfft(sig)
 	spec = 20 * np.log10(np.abs(sig_fft))
 	n = sig_fft.size
-	timestep = 1 / WAV_SAMPLE_RATE
+	timestep = 1 / SAMPLE_RATE
 	freq = fftpack.rfftfreq(n, d=timestep)
 
 	return [freq, spec]

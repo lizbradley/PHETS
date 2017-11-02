@@ -8,7 +8,7 @@ from utilities import frames_to_movie
 
 from Tools import auto_tau, auto_crop, crop_sig
 
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 from MovieTools import remove_old_frames
 from MovieTools import prep_save_worms_double, save_worms_double
@@ -55,7 +55,7 @@ def slide_window(
 	sig = crop_sig(full_sig, crop, time_units)
 
 	if time_units == 'seconds':
-		sig_length = len(sig) / WAV_SAMPLE_RATE
+		sig_length = len(sig) / SAMPLE_RATE
 	else:
 		sig_length = len(sig)
 
@@ -195,12 +195,12 @@ def get_comp_tables(*args):
 
 	table_1 = [['f detect (Hz)', f_detect_1],
 			   ['tau (sec)', '{:.5f}'.format(args[5])],
-			   ['tau (samp)', int(args[5] * WAV_SAMPLE_RATE)],
+			   ['tau (samp)', int(args[5] * SAMPLE_RATE)],
 			   ['crop (sec)', '({:.3f}, {:.3f})'.format(args[7][0], args[7][1])]]
 
 	table_2 = [['f detect (Hz)', f_detect_2],
 			   ['tau (sec)', '{:.5f}'.format(args[6])],
-			   ['tau (samp)', int(args[6] * WAV_SAMPLE_RATE)],
+			   ['tau (samp)', int(args[6] * SAMPLE_RATE)],
 			   ['crop (sec)', '({:.3f}, {:.3f})'.format(args[8][0], args[8][1])]]
 
 	return [ideal_table, title_1, title_2, table_1, table_2]

@@ -23,7 +23,7 @@ def idx_to_freq(idx):
 
 
 def sec_to_samp(crop):
-	return (np.array(crop) * WAV_SAMPLE_RATE).astype(int)
+	return (np.array(crop) * SAMPLE_RATE).astype(int)
 
 
 
@@ -177,7 +177,7 @@ import os
 import numpy as np
 from scipy.io import wavfile
 
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 
 
 def pwd():
