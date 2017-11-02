@@ -152,7 +152,7 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 		return x, y
 
 
-	if None not in (x, y):
+	if x is not None and y is not None:
 		x, y = extend_domain(x, y)
 		plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
 		if annot: annotate()
@@ -216,7 +216,6 @@ def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
 	####### to here ###########
 	# should eventually be replaced by PRF_ax
 
-	PRF_ax(filtration, plot_ax, cbar_ax, annot_hm)
 	filename_table(fname_ax, in_filename)
 	filt_params_table(params_ax, params)
 

@@ -75,7 +75,7 @@ if test == 16:
 
 
 	filtration = Filtration(in_filename, filt_params, out_fname='test16.p')
-	# filtration = load_filtration('test16.p')
+	filtration = load_filtration('test16.p')
 
 	make_movie(
 		filtration,
