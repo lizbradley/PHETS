@@ -1,5 +1,8 @@
 import matplotlib.colors as colors
 import matplotlib.pyplot as pyplot
+import sys
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 pyplot.ioff()
 
 import numpy as np
@@ -123,7 +126,7 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 
 	zm = ma.masked_where(np.isnan(z), z)
 
-	if annot:		# print values on grid
+	def annotate():
 		offset = (1.41 / (len(x) - 1)) / 2
 		for i, x_ in enumerate(x):
 			for j, y_ in enumerate(y):
@@ -149,12 +152,37 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 		return x, y
 
 
-	x, y = extend_domain(x, y)
+	if None not in (x, y):
+		x, y = extend_domain(x, y)
+		plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
+		if annot: annotate()
+	elif x is None and y is None:
+		plot_ax.pcolormesh(zm, cmap=cmap, norm=norm, clip_on=False)
+	else:
+		print 'ERROR: plot_heatmap: x and y must both be None or array-like'
+		sys.exit()
 
-	plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
 	colorbar.ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels, extend='max')
 
 	return cmap
+
+
+def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
+
+
+	if cbar_ax is None:
+		divider = make_axes_locatable(ax)
+		cbar_ax = divider.append_axes('right', size='5%', pad=0.05)
+
+	if isinstance(filtration, Filtration):
+		z = filtration.get_PRF()
+		x = y = filtration.epsilons
+		plot_heatmap(ax, cbar_ax, x, y, z, annot_hm)
+	else:   # 2d array
+		z = filtration
+		plot_heatmap(ax, cbar_ax, None, None, z, annot_hm)
+
+
 
 
 def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
@@ -168,6 +196,7 @@ def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
 	plot_ax = 		pyplot.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		pyplot.subplot2grid((6, 10), (0, 9), rowspan=6)
 
+	######## from here ##########
 
 	if isinstance(filtration, Filtration):
 		func = filtration.get_PRF()
@@ -176,7 +205,6 @@ def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
 	else:
 		func = filtration
 
-
 	x, y, z, max_lim = func
 
 	if len(x.shape) == 2: 			# meshgrid format
@@ -184,6 +212,11 @@ def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
 
 
 	plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=annot_hm)
+
+	####### to here ###########
+	# should eventually be replaced by PRF_ax
+
+	PRF_ax(filtration, plot_ax, cbar_ax, annot_hm)
 	add_filename_table(fname_ax, in_filename)
 	add_filt_params_table(params_ax, params)
 

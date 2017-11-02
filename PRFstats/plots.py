@@ -2,7 +2,7 @@ import numpy
 import numpy as np
 from matplotlib import pyplot as plt
 
-import signals
+import signals, PH
 from PH import make_PD, make_PRF_plot, make_movie
 from utilities import print_title
 
@@ -134,6 +134,8 @@ def plot_dists_ax(ax, d, mean, traj):
 	ax.grid(axis='x')
 	ax.set_xticks(ticks)
 
+
+
 def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 	print 'plotting distances...'
 
@@ -142,80 +144,78 @@ def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 	sig_2 = traj2.project()
 
 	d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
-
+	mean_prf_1, mean_prf_2 = refs
 	fig = plt.figure(figsize=(18, 9), tight_layout=True)
 
-	mean_1 = np.mean(d_1_vs_1)
-	mean_2 = np.mean(d_2_vs_1)
-	mean_3 = np.mean(d_1_vs_2)
-	mean_4 = np.mean(d_2_vs_2)
+	mean_11 = np.mean(d_1_vs_1)
+	mean_21 = np.mean(d_2_vs_1)
+	mean_12 = np.mean(d_1_vs_2)
+	mean_22 = np.mean(d_2_vs_2)
 
 
-	ax1 = fig.add_subplot(421)
-	plot_dists_ax(ax1, d_1_vs_1, mean_1, traj1)
+	ax1 = fig.add_subplot(331)
+	plot_dists_ax(ax1, d_1_vs_1, mean_11, traj1)
 	plt.setp(ax1.get_xticklabels(), visible=False)
 	plt.setp(ax1.get_xticklines(), visible=False)
 	ax1.set_ylim(bottom=0)
 
-	ax2 = fig.add_subplot(422, sharey=ax1)
-	plot_dists_ax(ax2, d_2_vs_1, mean_2, traj2)
+	ax2 = fig.add_subplot(332, sharey=ax1)
+	plot_dists_ax(ax2, d_2_vs_1, mean_21, traj2)
 	plt.setp(ax2.get_yticklabels(), visible=False)
 	# plt.setp(ax2.get_yticklines(), visible=False)
 	plt.setp(ax2.get_xticklabels(), visible=False)
 	plt.setp(ax2.get_xticklines(), visible=False)
 
-	ax3 = fig.add_subplot(423, sharey=ax1, sharex=ax1)
-	plot_dists_ax(ax3, d_1_vs_2, mean_3, traj1)
-	plt.setp(ax3.get_xticklabels(), visible=False)
-	plt.setp(ax3.get_xticklines(), visible=False)
-
-	ax4 = fig.add_subplot(424, sharey=ax1, sharex=ax2)
-	plot_dists_ax(ax4, d_2_vs_2, mean_4, traj2)
-	plt.setp(ax4.get_yticklabels(), visible=False)
-	# plt.setp(ax4.get_yticklines(), visible=False)
-
+	ax4 = fig.add_subplot(334, sharey=ax1, sharex=ax1)
+	plot_dists_ax(ax4, d_1_vs_2, mean_12, traj1)
 	plt.setp(ax4.get_xticklabels(), visible=False)
 	plt.setp(ax4.get_xticklines(), visible=False)
 
-	ax5 = fig.add_subplot(425, sharex=ax1)
-	signals.plots.ts_zoom(ax5, sig_1)
-	ax5.grid(axis='x', zorder=0)
+	ax5 = fig.add_subplot(335, sharey=ax1, sharex=ax2)
+	plot_dists_ax(ax5, d_2_vs_2, mean_22, traj2)
 	plt.setp(ax5.get_yticklabels(), visible=False)
-	plt.setp(ax5.get_yticklines(), visible=False)
+	# plt.setp(ax5.get_yticklines(), visible=False)
+	plt.setp(ax5.get_xticklabels(), visible=False)
+	plt.setp(ax5.get_xticklines(), visible=False)
 
 
-	ax6 = fig.add_subplot(426, sharex=ax2)
-	signals.plots.ts_zoom(ax6, sig_2)
-	ax6.grid(axis='x', zorder=0)
-	plt.setp(ax6.get_yticklabels(), visible=False)
-	plt.setp(ax6.get_yticklines(), visible=False)
 
-	ylim = np.max(np.abs(np.append(ax5.get_ylim(), ax6.get_ylim())))
-	ax5.set_ylim(-ylim, ylim)
-	ax6.set_ylim(-ylim, ylim)
+	ax7 = fig.add_subplot(337, sharex=ax1)
+	signals.plots.ts_zoom(ax7, sig_1)
+	ax7.grid(axis='x', zorder=0)
+	plt.setp(ax7.get_yticklabels(), visible=False)
+	plt.setp(ax7.get_yticklines(), visible=False)
 
-	# ax7 = fig.add_subplot(427)
-	# signals.plots.ts(ax7, sig_1)
-	# plt.setp(ax7.get_yticklabels(), visible=False)
-	# plt.setp(ax7.get_yticklines(), visible=False)
-	#
-	# ax8 = fig.add_subplot(428, sharey=ax7)
-	# signals.plots.ts(ax8, sig_2)
-	# plt.setp(ax8.get_yticklabels(), visible=False)
-	# plt.setp(ax8.get_yticklines(), visible=False)
+	ax8 = fig.add_subplot(338, sharex=ax2)
+	signals.plots.ts_zoom(ax8, sig_2)
+	ax8.grid(axis='x', zorder=0)
+	plt.setp(ax8.get_yticklabels(), visible=False)
+	plt.setp(ax8.get_yticklines(), visible=False)
+
+
+	ax3 = fig.add_subplot(333)
+	PH.Plots.PRF_ax(mean_prf_1, ax3, annot_hm=True)
+
+	ax6 = fig.add_subplot(336)
+	PH.Plots.PRF_ax(mean_prf_2, ax6, annot_hm=True)
+
+
+	ylim = np.max(np.abs(np.append(ax7.get_ylim(), ax8.get_ylim())))
+	ax7.set_ylim(-ylim, ylim)
+	ax8.set_ylim(-ylim, ylim)
 
 	ax1.set_title(traj1.name)
 	ax2.set_title(traj2.name)
 
-	del_12 = mean_2 - mean_1
-	del_34 = mean_4 - mean_3
+	del_12 = mean_21 - mean_11
+	del_34 = mean_22 - mean_12
 
 	ax1.set_ylabel(
 		'\n \n ref: ' + traj1.name + ' \n \n $\Delta$: {:.3f}'.format(del_12),
-		rotation=0, size='large', labelpad=50)
-	ax3.set_ylabel(
+		rotation=90, size='large', labelpad=10)
+	ax4.set_ylabel(
 		'\n \n ref: ' + traj2.name + ' \n \n $\Delta$: {:.3f}'.format(del_34),
-		rotation=0, size='large', labelpad=50)
+		rotation=90, size='large', labelpad=10)
 
 	plt.savefig(out_filename)
 

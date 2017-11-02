@@ -137,10 +137,4 @@ def plot_dists_vs_means(
 
 	dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename)
 
-	# out_fname = 'output/PRFCompare/mean/{}_mean_PRF.png'
-	# ref_func_1, ref_func_2 = refs
-	# make_PRF_plot(ref_func_1, out_fname.format(traj1.name), params=filt_params,
-	# 			  in_filename='MEAN: ' + traj1.name)
-	# make_PRF_plot(ref_func_2, out_fname.format(traj2.name), params=filt_params,
-	# 			  in_filename='MEAN: ' + traj2.name)
 

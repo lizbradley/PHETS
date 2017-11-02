@@ -7,7 +7,7 @@ from PRFstats.interface import L2ROCs, plot_dists_vs_means
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=5)
+test, start_time = get_test(set_test=4)
 
 
 def out_fname():
