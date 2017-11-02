@@ -1,11 +1,13 @@
+from boilerplate import change_dir, get_test
+change_dir()
+
 import time
 
 from PH import Filtration, load_filtration
 from PH import make_movie, make_PD, make_PRF_plot
 from config import default_filtration_params as parameter_set
-from Utilities import tester_boilerplate
 
-test, start_time = tester_boilerplate(set_test=16)
+test, start_time = get_test(set_test=16)
 
 
 if test == 14:

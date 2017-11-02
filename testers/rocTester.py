@@ -1,6 +1,9 @@
 import time
+from boilerplate import change_dir, get_test
+change_dir()
+
 from ROC import PRF_vs_FFT_v2
-from Utilities import sec_to_samp, tester_boilerplate
+from Utilities import sec_to_samp
 from config import default_filtration_params as filt_params
 
 
@@ -11,7 +14,7 @@ from config import default_filtration_params as filt_params
 
 
 
-test, start_time = tester_boilerplate(set_test=22)
+test, start_time = get_test(set_test=22)
 
 
 

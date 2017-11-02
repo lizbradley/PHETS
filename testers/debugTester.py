@@ -1,10 +1,12 @@
+from boilerplate import change_dir, get_test
+change_dir()
+
 from matplotlib.pyplot import ioff; ioff()
 from PH import Filtration, make_movie, make_PD
 from PRFCompare.Plots import plot_variance
-from Utilities import tester_boilerplate
 from config import default_filtration_params as parameter_set
 
-test, start_time = tester_boilerplate(set_test=6)
+test, start_time = get_test(set_test=6)
 
 def movie_fname(test, str=''):
 	return 'output/debug/test_{}_{}_movie.mp4'.format(test, str)

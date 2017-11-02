@@ -1,12 +1,14 @@
+from boilerplate import change_dir, get_test
+change_dir()
+
 import numpy as np
-from Utilities import idx_to_freq, tester_boilerplate
 from DCE import embed, plot_signal
 from DCE.Plots import plot_dce
 from DCE.Movies import slide_window, vary_tau
 from PH import Filtration, make_movie, make_PD, make_PRF_plot
 from config import default_filtration_params as filt_params
 
-test, start_time = tester_boilerplate(set_test=0)
+test, start_time = get_test(set_test=0)
 
 # the following vars are passed the functions below, defined here for convenience
 

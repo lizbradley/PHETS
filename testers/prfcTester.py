@@ -1,11 +1,12 @@
+from boilerplate import change_dir, get_test
+change_dir()
 import time
 import numpy as np
 from PRFCompare.Plots import plot_dists_vs_ref, plot_dists_vs_means, plot_variance, plot_clusters
-from Utilities import tester_boilerplate
 from config import default_filtration_params as parameter_set
 
 
-test, start_time = tester_boilerplate(set_test=10018)
+test, start_time = get_test(set_test=10018)
 
 
 if test == 1:

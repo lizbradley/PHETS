@@ -1,12 +1,13 @@
 import os, sys, time
 
-from Utilities import tester_boilerplate
+from boilerplate import change_dir, get_test
+change_dir()
 
 from signals import TimeSeries, Trajectory
 from PRFstats.interface import L2ROCs, plot_dists_vs_means
 from config import default_filtration_params as filt_params
 
-test, start_time = tester_boilerplate(set_test=4)
+test, start_time = get_test(set_test=4)
 
 
 def out_fname():
