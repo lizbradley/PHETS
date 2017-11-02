@@ -1,7 +1,7 @@
 import sys
 import os
 import subprocess
-from Utilities import remove_files_by_type
+from utilities import remove_files_by_type
 from config import find_landmarks_c_compile_str
 
 

@@ -2,7 +2,7 @@ from boilerplate import change_dir, get_test
 change_dir()
 
 import numpy as np
-from Utilities import idx_to_freq
+from utilities import idx_to_freq
 from DCE import embed, plot_signal
 from DCE.Plots import plot_dce
 from DCE.Movies import slide_window, vary_tau

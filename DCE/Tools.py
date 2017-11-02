@@ -199,14 +199,14 @@ def plot_power_spectrum(sig, out_file, crop=(1,2)):
 
 
 def get_fund_freq(sig, expected, window=None, tol=10):
-	samp_freq = 44100.
+	samp_freq = WAV_SAMPLE_RATE
 	window_sec = window
 	window = np.array(window) * samp_freq
 
 	if window is None: sig_crop = sig[int(window[0]): int(window[1])]
 	else: sig_crop = sig
 
-	window_len_sec = window_sec[1] - window_sec[0]
+	window_len_sec = window_sec[1] - window_sec[0]      # TODO: clean this up using code in PRF_vs_FFT as example
 	spec_prec = int(100000 / (samp_freq * window_len_sec))  # hz ?
 
 	FFT_x = scipy.fftpack.fftfreq(sig_crop.size * spec_prec, d=1/samp_freq)
@@ -216,15 +216,20 @@ def get_fund_freq(sig, expected, window=None, tol=10):
 	FFT_pos = FFT[1:len(FFT)/2]
 	FFT_neg = FFT[(len(FFT)/2):]
 
-	if len(FFT_pos) > len(FFT_neg): FFT_pos = FFT_pos[:len(FFT_neg)]	# trim to shorter of two so arrays may be added
-	elif len(FFT_pos) < len(FFT_neg): FFT_neg = FFT_neg[:len(FFT_pos)]
+	# trim to shorter of two so arrays may be added
+	if len(FFT_pos) > len(FFT_neg):
+		FFT_pos = FFT_pos[:len(FFT_neg)]
+	elif len(FFT_pos) < len(FFT_neg):
+		FFT_neg = FFT_neg[:len(FFT_pos)]
 
 
 	spec = FFT_pos + FFT_neg[::-1]
 	spec_x = FFT_x[1:len(FFT_x)/2]
 
+	# TODO: low pass FFT before finding peaks. see code for lowpass in auto_crop
+
 	freq_window_idx = [i for i, x in enumerate(spec_x) if np.abs(expected - x) < tol]
-	if len(freq_window_idx) ==0:
+	if len(freq_window_idx) == 0:
 		print("ERROR: No fundamental frequency found. Increase 'tol'.")
 		sys.exit()
 	freq_window_freq = spec_x[freq_window_idx]

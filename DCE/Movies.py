@@ -4,7 +4,7 @@ import Plots
 import numpy as np
 import sys
 
-from Utilities import frames_to_movie
+from utilities import frames_to_movie
 
 from Tools import auto_tau, auto_crop, crop_sig
 
@@ -55,15 +55,15 @@ def slide_window(
 	sig = crop_sig(full_sig, crop, time_units)
 
 	if time_units == 'seconds':
-		worm_length = len(sig) / WAV_SAMPLE_RATE
+		sig_length = len(sig) / WAV_SAMPLE_RATE
 	else:
-		worm_length = len(sig)
+		sig_length = len(sig)
 
 	frame_fname = 'DCE/frames/frame%03d.png'
 	trajs = []
 	print 'building movie...'
-	for i, start in enumerate(np.arange(0, worm_length, window_step)):
-		print 'frame %i of %i' % (i, worm_length / window_step)
+	for i, start in enumerate(np.arange(0, sig_length, window_step)):
+		print 'frame %i of %i' % (i, sig_length / window_step)
 		window = [start, start + window_size]
 		traj = DCE.embed(
 			sig, tau, m, crop=window, ds_rate=ds_rate, time_units=time_units

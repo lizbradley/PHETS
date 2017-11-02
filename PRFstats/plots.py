@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 import signals
 from PH import make_PD, make_PRF_plot, make_movie
-from Utilities import print_title
+from utilities import print_title
 
 
 def roc_ax(ax, data, k, title):

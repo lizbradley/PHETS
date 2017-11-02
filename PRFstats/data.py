@@ -1,13 +1,5 @@
-import time
-
 import numpy as np
 import sys
-
-from DCE import embed
-from PH import Filtration
-from PubPlots import plot_filtration_pub
-from Utilities import print_title
-from signals import TimeSeries, Trajectory
 
 
 # def norm(f):

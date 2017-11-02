@@ -10,7 +10,7 @@ pyplot.ioff()
 
 from TitleBox import add_filename_table, add_filt_params_table, update_epsilon
 from TitleBox import add_movie_params_table
-from Utilities import remove_old_frames, frames_to_movie, clear_temp_files
+from utilities import remove_old_frames, frames_to_movie, clear_temp_files
 from config import gnuplot_str
 
 

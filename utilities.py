@@ -1,11 +1,12 @@
 ''' helpers for miscellaneous tasks eg file management '''
 
-import os, sys, inspect
+import inspect
 import subprocess
-import time
 
 from memory_profiler import profile
 
+def root_path():
+	return os.path.dirname(__file__)
 
 def mem_profile(f, flag):
 	if flag: return profile(stream=f)
@@ -143,7 +144,6 @@ def remove_files_by_type(dir, ftype):
 
 
 def frames_to_movie(out_filename, frame_path, framerate=1, loglevel='panic'):
-
 	if os.path.exists(out_filename):
 		overwrite = raw_input(out_filename + " already exists. Overwrite? (y/n)\n")
 		if overwrite == "y":
@@ -175,11 +175,7 @@ def frames_to_movie(out_filename, frame_path, framerate=1, loglevel='panic'):
 import sys
 import os
 import numpy as np
-import scipy.fftpack
 from scipy.io import wavfile
-import matplotlib.pyplot as pyplot
-import math
-from scipy.signal import butter, lfilter, freqz
 
 from config import WAV_SAMPLE_RATE
 
@@ -233,16 +229,3 @@ def batch_flac_to_wav(dir):
 			os.remove(f)
 
 
-def tester_boilerplate(set_test):
-	root_path = os.path.dirname(os.path.realpath(__file__))
-	sys.path.append(root_path)
-	os.chdir(root_path)
-
-	if len(sys.argv) > 1:
-		test = int(sys.argv[1])
-	else:
-		test = set_test
-	print 'running test %d...' % test
-	start_time = time.time()
-
-	return test, start_time

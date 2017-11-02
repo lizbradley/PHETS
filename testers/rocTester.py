@@ -3,7 +3,7 @@ from boilerplate import change_dir, get_test
 change_dir()
 
 from ROC import PRF_vs_FFT_v2
-from Utilities import sec_to_samp
+from utilities import sec_to_samp
 from config import default_filtration_params as filt_params
 
 

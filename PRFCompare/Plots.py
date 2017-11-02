@@ -12,7 +12,7 @@ from PH import make_PD, make_PRF_plot, make_movie, Filtration
 from PH.Plots import plot_heatmap
 from PH.TitleBox import add_filenames_table, add_filt_params_table
 from PRFCompare.Data import get_dists_from_ref, dists_compare
-from Utilities import clear_old_files, clear_dir, print_title, lambda_to_str, clear_temp_files
+from utilities import clear_old_files, clear_dir, print_title, lambda_to_str, clear_temp_files
 
 
 def plot_dists_vs_ref(

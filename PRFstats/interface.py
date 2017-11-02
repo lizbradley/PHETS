@@ -4,7 +4,7 @@ import numpy as np
 
 from PH import make_PRF_plot
 from PRFstats.plots import dists_vs_means_fig
-from Utilities import clear_old_files
+from utilities import clear_old_files
 from data import L2Classifier, prf_dists_compare
 from plots import dual_roc_fig, samples
 

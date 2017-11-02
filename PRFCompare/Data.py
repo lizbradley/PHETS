@@ -12,7 +12,7 @@ from DCE.Tools import auto_tau
 from PH.Data import Filtration
 from PH.FiltrationMovie import make_movie
 from PH.Plots import make_PD, make_PRF_plot
-from Utilities import clear_old_files, blockPrint, enablePrint, print_title
+from utilities import clear_old_files, blockPrint, enablePrint, print_title
 from config import WAV_SAMPLE_RATE
 
 def apply_weight_func(f, weight_func):

@@ -9,7 +9,7 @@ import numpy as np
 import itertools
 # from numba import jit
 import BuildFiltration
-from Utilities import blockPrint, enablePrint
+from utilities import blockPrint, enablePrint
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 

@@ -7,7 +7,7 @@ import numpy as np
 from DCE.DCE import embed
 from PH import Filtration
 from PubPlots import plot_filtration_pub
-from Utilities import print_title
+from utilities import print_title
 from config import default_filtration_params as filt_params
 from helpers import crop_sig, slice_sig, get_spec, downsample_spec, plot_sig, plot_roc
 
@@ -50,7 +50,7 @@ def get_specs(windows, FT_bins, mode):
 	return specs
 
 from PH import make_PRF_plot
-from Utilities import clear_dir
+from utilities import clear_dir
 
 
 def get_prfs(trajs, filt_params, window_length, num_landmarks, label='none', load_saved=False):

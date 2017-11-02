@@ -12,7 +12,7 @@ from config import default_filtration_params as filt_params
 from DCE.DCE import embed
 from PH import Filtration, make_movie, load_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
-from Utilities import sec_to_samp
+from utilities import sec_to_samp
 
 piano_sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt')
 
