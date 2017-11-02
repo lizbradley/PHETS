@@ -8,8 +8,8 @@ from matplotlib import collections
 pyplot.ioff()
 
 
-from TitleBox import add_filename_table, add_filt_params_table, update_epsilon
-from TitleBox import add_movie_params_table
+from TitleBox import filename_table, filt_params_table, update_epsilon
+from TitleBox import movie_params_table
 from utilities import remove_old_frames, frames_to_movie, clear_temp_files
 from config import gnuplot_str
 
@@ -308,9 +308,9 @@ def make_movie(
 	filt_params_ax = pyplot.subplot2grid((12, 8), (6, 0), rowspan=6, colspan=2)
 	plot_ax = pyplot.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
 
-	add_filename_table(fname_ax, filt.filename)
-	add_movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
-	add_filt_params_table(filt_params_ax, filt.params)
+	filename_table(fname_ax, filt.filename)
+	movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
+	filt_params_table(filt_params_ax, filt.params)
 
 	witness_data = filt.witness_coords
 	landmark_data = filt.landmark_coords

@@ -10,7 +10,7 @@ from DCE.Plots import plot_signal_zoom
 from DCE import plot_signal
 from PH import make_PD, make_PRF_plot, make_movie, Filtration
 from PH.Plots import plot_heatmap
-from PH.TitleBox import add_filenames_table, add_filt_params_table
+from PH.TitleBox import filenames_table, filt_params_table
 from PRFCompare.Data import get_dists_from_ref, dists_compare
 from utilities import clear_old_files, clear_dir, print_title, lambda_to_str, clear_temp_files
 
@@ -281,7 +281,7 @@ def plot_clusters(*args, **kwargs):
 		)
 
 	add_filename_table(fname_ax, [filename_1, filename_2])
-	add_filt_params_table(params_ax, filt_params)
+	filt_params_table(params_ax, filt_params)
 
 	plot_ax.set_aspect('equal')
 	plot_ax.set_xlabel('distance to A')
@@ -562,8 +562,8 @@ def plot_variance(
 		ax4 = plt.subplot2grid((5, 9), (3, 3), colspan=6, sharex=ax1, sharey=ax2)
 		ax5 = plt.subplot2grid((5, 9), (4, 3), colspan=6, sharex=ax1)
 
-		add_filenames_table(fname_ax, [filename, out_filename])
-		add_filt_params_table(params_ax, filt_params)
+		filenames_table(fname_ax, [filename, out_filename])
+		filt_params_table(params_ax, filt_params)
 
 		ax1.set_ylabel('norm of mean', **label_kwargs)
 		ax2.set_ylabel('global variance', **label_kwargs)

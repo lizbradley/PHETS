@@ -8,7 +8,7 @@ pyplot.ioff()
 import numpy as np
 
 from Data import Filtration
-from TitleBox import add_filename_table, add_filt_params_table
+from TitleBox import filename_table, filt_params_table
 
 # from Utilities import mem_profile
 import os
@@ -23,7 +23,7 @@ print os.getcwd()
 
 
 
-def add_persistence_plot(ax, filtration):
+def PD_ax(ax, filtration):
 	ax.set_aspect('equal')
 	min_lim = 0
 	max_lim = np.max(filtration.epsilons)
@@ -101,9 +101,9 @@ def make_PD(filt, out_filename):
 	params_ax = 	pyplot.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
 	plot_ax = 		pyplot.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 
-	add_persistence_plot(plot_ax, filt)
-	add_filename_table(fname_ax, filt.filename)
-	add_filt_params_table(params_ax, filt.params)
+	PD_ax(plot_ax, filt)
+	filename_table(fname_ax, filt.filename)
+	filt_params_table(params_ax, filt.params)
 
 
 	pyplot.savefig(out_filename)
@@ -217,8 +217,8 @@ def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
 	# should eventually be replaced by PRF_ax
 
 	PRF_ax(filtration, plot_ax, cbar_ax, annot_hm)
-	add_filename_table(fname_ax, in_filename)
-	add_filt_params_table(params_ax, params)
+	filename_table(fname_ax, in_filename)
+	filt_params_table(params_ax, params)
 
 
 	fig.savefig(out_filename)

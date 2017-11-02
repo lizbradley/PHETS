@@ -1,6 +1,6 @@
 import numpy as np
 
-def add_filename_table(ax, filename):
+def filename_table(ax, filename):
 	ax.axis('off')
 	title_table = ax.table(
 		cellText=[
@@ -12,7 +12,7 @@ def add_filename_table(ax, filename):
 	# title_table.auto_set_font_size(False)
 	# title_table.auto_set_font_size(8)
 
-def add_filenames_table(ax, filenames):
+def filenames_table(ax, filenames):
 	ax.axis('off')
 	title_table = ax.table(
 		cellText=[
@@ -26,7 +26,7 @@ def add_filenames_table(ax, filenames):
 	# title_table.auto_set_font_size(8)
 
 
-def add_filt_params_table(subplot, filt_params):
+def filt_params_table(subplot, filt_params):
 	subplot.axis('off')
 	subplot.set_xlim([0,1])
 	subplot.set_ylim([0,1])
@@ -77,7 +77,7 @@ def update_epsilon(ax,e):
 
 
 
-def add_movie_params_table(ax, params):
+def movie_params_table(ax, params):
 	ax.axis('off')
 
 	table = ax.table(
