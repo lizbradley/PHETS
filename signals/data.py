@@ -3,7 +3,7 @@ import sys
 
 from DCE import embed
 from PH import Filtration
-from config import WAV_SAMPLE_RATE
+from config import SAMPLE_RATE
 from utilities import print_title
 
 
@@ -46,7 +46,7 @@ class BaseTrajectory(object):
 			self.data_full = self.normalize(self.data_full)
 		self.data = self.crop(crop)
 		self.windows, self.win_start_idxs = self.slice(
-			 num_windows, window_length
+			num_windows, window_length
 		)
 
 
@@ -60,9 +60,15 @@ class BaseTrajectory(object):
 			data = self.data_full
 
 		else:
-			crop_lim = self.crop_lim
+			crop_lim = np.array(self.crop_lim)
+			self.crop_lim = crop_lim
+
 			if self.time_units == 'seconds':
-				crop_lim = np.array(self.crop_lim) / WAV_SAMPLE_RATE
+				crop_lim = (crop_lim * SAMPLE_RATE).astype(int)
+
+			if np.sum(crop_lim) > len(self.data_full):
+				print 'WARNING: crop out of bounds'
+
 			data = self.data_full[crop_lim[0]:crop_lim[1]]
 
 			if self.norm_vol[1]:
@@ -84,7 +90,7 @@ class BaseTrajectory(object):
 				window_length = len(self.data) / num_windows
 
 			if self.time_units == 'seconds':
-				window_length = int(window_length / WAV_SAMPLE_RATE)
+				window_length = int(window_length * SAMPLE_RATE)
 			windows = [self.data[sp:sp + window_length] for sp in start_idxs]
 
 		if self.norm_vol[2]:
@@ -105,7 +111,7 @@ class TimeSeries(BaseTrajectory):
 
 	def embed(self, tau, m):
 		if self.time_units == 'seconds':
-			tau = int(tau * WAV_SAMPLE_RATE)
+			tau = int(tau * SAMPLE_RATE)
 		data = embed(self.data_full, tau, m)
 		traj = Trajectory(
 			data,
@@ -114,7 +120,8 @@ class TimeSeries(BaseTrajectory):
 			num_windows=self.num_windows,
 			# window_length=self.window_length + tau  # + 1 ??
 			window_length=self.window_length,
-			vol_norm=self.norm_vol
+			vol_norm=self.norm_vol,
+			time_units=self.time_units
 		)
 
 		traj.source_ts = self
@@ -171,7 +178,8 @@ class Trajectory(BaseTrajectory):
 			num_windows=self.num_windows,
 			# window_length=self.window_length + tau  # + 1 ??
 			window_length=self.window_length,
-			vol_norm=self.norm_vol
+			vol_norm=self.norm_vol,
+			time_units=self.time_units
 		)
 
 		ts.source_traj = self
