@@ -1,11 +1,11 @@
-import os, sys, time
-
 from boilerplate import change_dir, get_test
 change_dir()
 
+import numpy as np
 from signals import TimeSeries, Trajectory
 from PRFstats.interface import L2ROCs, plot_dists_vs_means
 from config import default_filtration_params as filt_params
+from utilities import idx_to_freq
 
 test, start_time = get_test(set_test=4)
 
@@ -152,6 +152,43 @@ if test == 4:
 		window_length=1500,
 		vol_norm=(0, 0, 1)
 	)
+
+	filt_params.update({
+		'ds_rate': 200,
+		'num_divisions': 10,
+		'max_filtration_param': -5
+	})
+
+	plot_dists_vs_means(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		quiet=False
+	)
+
+if test == 5:
+
+	ts1 = TimeSeries(
+		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
+		crop=(100, 9100),
+		num_windows=5,
+		window_length=1500,
+		vol_norm=(0, 0, 1),      # (full, crop, window)
+		time_units='seconds'
+	)
+
+	ts2 = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(100, 9100),
+		num_windows=5,
+		window_length=1500,
+		vol_norm=(0, 0, 1),
+		time_units='seconds'
+	)
+
+	tau = (1 / idx_to_freq(40)) / np.e
+	traj1 = ts1.embed(tau=tau, m=2)
+	traj2 = ts2.embed(tau=tau, m=2)
 
 	filt_params.update({
 		'ds_rate': 200,

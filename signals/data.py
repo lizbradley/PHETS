@@ -3,7 +3,8 @@ import sys
 
 from DCE import embed
 from PH import Filtration
-from Utilities import print_title
+from config import WAV_SAMPLE_RATE
+from utilities import print_title
 
 
 class BaseTrajectory(object):
@@ -15,6 +16,7 @@ class BaseTrajectory(object):
 			num_windows=None,
 			window_length=None,
 			vol_norm=(False, False, False),     # (full, crop, windows)
+	        time_units='samples'
 
 
 	):
@@ -34,6 +36,11 @@ class BaseTrajectory(object):
 		self.crop_lim = crop
 		self.num_windows = num_windows
 		self.window_length = window_length
+		if time_units in ('samples', 'seconds'):
+			self.time_units = time_units
+		else:
+			print "ERROR: invalid 'time_units'; use 'samples' or 'seconds'"
+			sys.exit()
 
 		if self.norm_vol[0]:
 			self.data_full = self.normalize(self.data_full)
@@ -41,6 +48,7 @@ class BaseTrajectory(object):
 		self.windows, self.win_start_idxs = self.slice(
 			 num_windows, window_length
 		)
+
 
 	@staticmethod
 	def normalize(data):
@@ -50,11 +58,15 @@ class BaseTrajectory(object):
 	def crop(self, lim):
 		if lim is None:
 			data = self.data_full
-		else:
-			data = self.data_full[self.crop_lim[0]:self.crop_lim[1]]
 
-		if self.norm_vol[1]:
-			data = self.normalize(data)
+		else:
+			crop_lim = self.crop_lim
+			if self.time_units == 'seconds':
+				crop_lim = np.array(self.crop_lim) / WAV_SAMPLE_RATE
+			data = self.data_full[crop_lim[0]:crop_lim[1]]
+
+			if self.norm_vol[1]:
+				data = self.normalize(data)
 
 		self.data = data
 		return data
@@ -70,6 +82,9 @@ class BaseTrajectory(object):
 
 			if window_length is None:
 				window_length = len(self.data) / num_windows
+
+			if self.time_units == 'seconds':
+				window_length = int(window_length / WAV_SAMPLE_RATE)
 			windows = [self.data[sp:sp + window_length] for sp in start_idxs]
 
 		if self.norm_vol[2]:
@@ -89,6 +104,8 @@ class TimeSeries(BaseTrajectory):
 		self.project_axis = None
 
 	def embed(self, tau, m):
+		if self.time_units == 'seconds':
+			tau = int(tau * WAV_SAMPLE_RATE)
 		data = embed(self.data_full, tau, m)
 		traj = Trajectory(
 			data,
