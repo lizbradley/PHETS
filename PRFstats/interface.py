@@ -41,8 +41,9 @@ def L2ROCs(
 		load_saved_filts=False,
 		see_samples=0,
 		quiet=True,
-		vary_param=None
+		vary_param=None     # ('param', (100, 150, 200))
 ):
+	# TODO: add weight function
 
 	if load_saved_filts:
 		filts1 = cPickle.load(open('PRFstats/data/filts1.p'))
@@ -111,7 +112,7 @@ def plot_dists_vs_means(
 
 		time_units='samples',
 		metric='L2',
-		dist_scale='none',  # 'none', 'a', or 'a + b'
+		dist_scale='none',              # 'none', 'a', or 'a + b'
 		weight_func=lambda i, j: 1,
 		see_samples=5,
 		quiet=True

@@ -22,7 +22,7 @@ if test == 1:
 		crop=(75000, 180000),
 		num_windows=10,
 		window_length=2000,
-		vol_norm=(0, 0, 1)
+		vol_norm=(0, 0, 1)  # (full, crop, windows)
 	)
 
 
@@ -36,6 +36,7 @@ if test == 1:
 
 	traj1 = ts1.embed(tau=32, m=2)
 	traj2 = ts2.embed(tau=32, m=2)
+
 
 	filt_params.update({
 		'max_filtration_param': -21,
@@ -202,3 +203,5 @@ if test == 5:
 		filt_params,
 		quiet=False
 	)
+
+
