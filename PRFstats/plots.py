@@ -145,33 +145,47 @@ def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 
 	d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
 	mean_prf_1, mean_prf_2 = refs
-	fig = plt.figure(figsize=(18, 9), tight_layout=True)
+	fig = plt.figure(figsize=(18, 8), tight_layout=True)
 
 	mean_11 = np.mean(d_1_vs_1)
 	mean_21 = np.mean(d_2_vs_1)
 	mean_12 = np.mean(d_1_vs_2)
 	mean_22 = np.mean(d_2_vs_2)
 
+	import matplotlib.gridspec as gridspec
 
-	ax1 = fig.add_subplot(331)
+	gs = gridspec.GridSpec(5, 5)
+	# row 1
+	ax1 = plt.subplot(gs[0:2,   0:2])
+	ax2 = plt.subplot(gs[0:2,   2:4])
+	ax3 = plt.subplot(gs[0:2,   4  ])
+
+	# row 2
+	ax4 = plt.subplot(gs[2:4,   0:2])
+	ax5 = plt.subplot(gs[2:4,   2:4])
+	ax6 = plt.subplot(gs[2:4,   4  ])
+
+	# row 3
+	ax7 = plt.subplot(gs[4,     0:2])
+	ax8 = plt.subplot(gs[4,     2:4])
+
+
+
 	plot_dists_ax(ax1, d_1_vs_1, mean_11, traj1)
 	plt.setp(ax1.get_xticklabels(), visible=False)
 	plt.setp(ax1.get_xticklines(), visible=False)
 	ax1.set_ylim(bottom=0)
 
-	ax2 = fig.add_subplot(332, sharey=ax1)
 	plot_dists_ax(ax2, d_2_vs_1, mean_21, traj2)
 	plt.setp(ax2.get_yticklabels(), visible=False)
 	# plt.setp(ax2.get_yticklines(), visible=False)
 	plt.setp(ax2.get_xticklabels(), visible=False)
 	plt.setp(ax2.get_xticklines(), visible=False)
 
-	ax4 = fig.add_subplot(334, sharey=ax1, sharex=ax1)
 	plot_dists_ax(ax4, d_1_vs_2, mean_12, traj1)
 	plt.setp(ax4.get_xticklabels(), visible=False)
 	plt.setp(ax4.get_xticklines(), visible=False)
 
-	ax5 = fig.add_subplot(335, sharey=ax1, sharex=ax2)
 	plot_dists_ax(ax5, d_2_vs_2, mean_22, traj2)
 	plt.setp(ax5.get_yticklabels(), visible=False)
 	# plt.setp(ax5.get_yticklines(), visible=False)
@@ -180,23 +194,21 @@ def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 
 
 
-	ax7 = fig.add_subplot(337, sharex=ax1)
 	signals.plots.ts_zoom(ax7, sig_1)
 	ax7.grid(axis='x', zorder=0)
-	plt.setp(ax7.get_yticklabels(), visible=False)
-	plt.setp(ax7.get_yticklines(), visible=False)
+	ax7.set_xlim(left=0)
+	# plt.setp(ax7.get_yticklabels(), visible=False)
+	# plt.setp(ax7.get_yticklines(), visible=False)
 
-	ax8 = fig.add_subplot(338, sharex=ax2)
 	signals.plots.ts_zoom(ax8, sig_2)
 	ax8.grid(axis='x', zorder=0)
-	plt.setp(ax8.get_yticklabels(), visible=False)
-	plt.setp(ax8.get_yticklines(), visible=False)
+	ax8.set_xlim(left=0)
+	# plt.setp(ax8.get_yticklabels(), visible=False)
+	# plt.setp(ax8.get_yticklines(), visible=False)
 
 
-	ax3 = fig.add_subplot(333)
 	PH.Plots.PRF_ax(mean_prf_1, ax3, annot_hm=True)
 
-	ax6 = fig.add_subplot(336)
 	PH.Plots.PRF_ax(mean_prf_2, ax6, annot_hm=True)
 
 

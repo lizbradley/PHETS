@@ -45,7 +45,7 @@ def PD_ax(ax, filtration):
 	p_ms_scale = 30
 	color = 'C0'
 
-	# BIG for IDA IDA2017 #
+	# BIG for IDA paper #
 	# min_size = 300
 	# t_ms_scale = 150
 	# p_ms_scale = 60
