@@ -13,7 +13,7 @@ os.chdir('..')
 sys.path.append(os.path.dirname(__file__))
 
 clarinet_path = 'unit_tests/data/40-clarinet.txt'
-viol_path = 'unit_tests/data/40-viol.txtSDFS'
+viol_path = 'unit_tests/data/40-viol.txt'
 
 def prepare_TS():
 	sig = TimeSeries(
@@ -72,21 +72,23 @@ def prepare_L2ROCs():
 
 
 
-def prepare_slide_window():
-
-	trajs = slide_window(
-		clarinet_path,
-		'output/demo/embed_movie.mp4',
-		time_units='samples',
-		tau=50,
-		m=2,
-		window_size=100,
-		num_windows=5,
-		crop=(100, 1000),
-	)
+# def prepare_slide_window():
+#
+# 	trajs = slide_window(
+# 		clarinet_path,
+# 		'output/demo/embed_movie.mp4',
+# 		time_units='samples',
+# 		tau=50,
+# 		m=2,
+# 		window_size=100,
+# 		num_windows=5,
+# 		crop=(100, 1000),
+# 	)
 
 
 if __name__ == '__main__':
-	# prepare_L2ROCs()
+	prepare_TS()
+	prepare_Traj()
+	prepare_L2ROCs()
 	pass
 

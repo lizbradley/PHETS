@@ -67,7 +67,8 @@ class BaseTrajectory(object):
 				crop_lim = (crop_lim * SAMPLE_RATE).astype(int)
 
 			if np.sum(crop_lim) > len(self.data_full):
-				print 'WARNING: crop out of bounds'
+				print 'WARNING: crop out of bounds. len(self.data_full) = {}'\
+					.format(len(self.data_full))
 
 			data = self.data_full[crop_lim[0]:crop_lim[1]]
 
