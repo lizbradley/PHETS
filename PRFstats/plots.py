@@ -1,4 +1,3 @@
-import numpy
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -56,7 +55,6 @@ def dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
 		l, cm = roc_ax(ax2, prf_data_2, k, 'is it a {}?'.format(label_2))
 		lines.append(l)
 
-
 	bounds = np.arange(k[0], k[1] + .5, .5)
 	# bounds = np.arange(k[0], k[1] + 1, 1)
 	cb = fig.colorbar(cm, cax=cax, boundaries=bounds)
@@ -74,8 +72,6 @@ def dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
 		fig.legend(lines, vary_param[1], loc=3)
 		fig.suptitle('varying parameter '+vary_param[0])
 		fig.subplots_adjust(top = 0.85)
-
-	# fig.tight_layout(rect=[0, 0, 1, 0.9])
 
 	plt.savefig(fname)
 
@@ -223,20 +219,19 @@ def clusters_fig(dists, filt_params, fname1, fname2, out_fname):
 	def legend(ax, filenames):
 		ax.axis('off')
 		arr = [['A', filenames[0]], ['B', filenames[1]]]
-		title_table = ax.table(
+		ax.table(
 			cellText=arr,
 			bbox=[0, 0, 1, 1],
 			cellLoc='center',
-			# rowColours=['C0', 'C1'],
 			colWidths=[.5, 1]
 		)
 
 	d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
 
 	fig = plt.figure(figsize=(10, 6), tight_layout=True)
-	fname_ax = plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
+	fname_ax =  plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 	params_ax = plt.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
-	plot_ax = plt.subplot2grid((6, 10), (0, 4), rowspan=6, colspan=6)
+	plot_ax =   plt.subplot2grid((6, 10), (0, 4), rowspan=6, colspan=6)
 
 	legend(fname_ax, [fname1, fname2])
 	filt_params_table(params_ax, filt_params)
