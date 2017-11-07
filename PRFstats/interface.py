@@ -2,77 +2,36 @@ import sys
 
 import numpy as np
 
-from PRFstats.data import roc_data, fetch_filts
-from PRFstats.plots import dists_vs_means_fig, clusters_fig
-from data import L2Classifier, prf_dists_compare
+from PRFstats.data import roc_data, fetch_filts, dists_from_ref
+from PRFstats.plots import dists_vs_means_fig, clusters_fig, dists_to_ref_pane
+from data import L2Classifier, mean_dists_compare
 from plots import dual_roc_fig, samples
 from utilities import clear_old_files
 
 
 def plot_dists_vs_ref(
 		dir, base_filename,
-		fname_format,
+		fname_format,   # 'i base' or 'base i'
 		out_filename,
 		filt_params,
 
 		i_ref=15,
 		i_arr=np.arange(10, 20, 1),
-
 		weight_func=lambda i, j: 1,
-
 		metric='L2',  # 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='none',  # 'none', 'a', or 'a + b'
-
-
-		load_saved_PRFs=False,
-
+		load_saved_filts=False,
 		see_samples=5,
+		quiet=True
 
 ):
 	""" plots distance from reference rank function over a range of trajectories input files"""
 
-	def main():
-		clear_old_files('output/PRFCompare/ref/see_samples/', see_samples)
+	from PH import Filtration
+	import cPickle
+	from utilities import print_title
 
-		if load_saved_PRFs:
-			print 'WARNING: loading saved filtration'
-			funcs = np.load('PRFCompare/funcs.npy')
-			ref_func = np.load('PRFCompare/ref_func.npy')
-		else:
-			funcs = get_PRFs()  # also makes PDs and movies
-			ref_filt = Filtration(get_in_filename(i_ref), filt_params)
-			if see_samples: show_samples(ref_filt, i_ref, ref=True)
-			ref_func = ref_filt.get_PRF()
-			np.save('PRFCompare/funcs.npy', funcs)
-			np.save('PRFCompare/ref_func.npy', ref_func)
-
-		make_PRF_plot(ref_func, 'output/PRFCompare/ref/PRF_REFERENCE.png',
-		              params=filt_params, in_filename='REF')
-
-		funcs_z = funcs[:, 2]
-		ref_func_z = ref_func[2]
-		dists = get_dists_from_ref(funcs_z, ref_func_z, metric, dist_scale)
-		plot_distances(i_ref, i_arr, dists, out_filename)
-
-
-	def plot_distances(i_ref, i_arr, dists, out_filename):
-		fig = plt.figure(figsize=(10, 5))
-		ax = fig.add_subplot(111)
-		ax.plot(i_arr, dists)
-		ax.axvline(x=i_ref, linestyle='--', color='k')
-		ax.set_xlabel('$tau \quad (samples)$')
-		# ax.set_ylabel('$distance \quad ({\epsilon}^2 \; \# \; holes)$')
-		ax.set_ylabel('$distance$')
-		ax.xaxis.set_ticks(i_arr[::2])
-		ax.grid()
-		ax.set_ylim(bottom=0)
-		title = ax.set_title(base_filename + ' PRF distances')
-		title.set_position([.5, 1.05])
-		plt.savefig(out_filename)
-		plt.close(fig)
-
-
-	def get_in_filename(i):
+	def win_fname(i):
 		if fname_format == 'i base':
 			filename = '{}/{}{}'.format(dir, i, base_filename)
 		elif fname_format == 'base i':
@@ -82,41 +41,34 @@ def plot_dists_vs_ref(
 			sys.exit()
 		return filename
 
-
-	def show_samples(filt, i, ref=False):
-		os.chdir('..')
-		base_name = base_filename.split('/')[-1].split('.')[0]
-		comp_name = '{:s}_{:d}_'.format(base_name, i)
-		if ref: comp_name += '_REFERENCE_'
-		PD_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PD.png'
-		movie_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'movie.mp4'
-		PRF_filename = 'output/PRFCompare/ref/see_samples/' + comp_name + 'PRF.png'
-
-		make_PD(filt, PD_filename)
-		make_PRF_plot(filt, PRF_filename)
-		make_movie(filt, movie_filename)
-		os.chdir('PRFCompare')
-
-
-	def get_PRFs():
-		funcs = []
+	if load_saved_filts:
+		filts = np.load(open('PRFstats/data/filts.p'))
+		ref_filt = np.load(open('PRFstats/data/ref_filt.p'))
+	else:
+		filts = []
 		for i in i_arr:
-			filename = get_in_filename(i)
-			print '\n=================================================='
-			print filename
-			print '==================================================\n'
-			filt = Filtration(filename, filt_params)
-			func = filt.get_PRF()
-			funcs.append(func)
-
-			if see_samples:
-				if i % see_samples == 0:
-					show_samples(filt, i)
-
-		return np.asarray(funcs)
+			fname = win_fname(i)
+			print_title(fname)
+			filts.append(Filtration(win_fname(i), filt_params, silent=quiet))
+		ref_filt = Filtration(win_fname(i_ref), filt_params, silent=quiet)
+		cPickle.dump(filts, open('PRFstats/data/filts.p', 'wb'))
+		cPickle.dump(ref_filt, open('PRFstats/data/ref_filt.p', 'wb'))
 
 
-	main()
+	prfs = [f.get_PRF(new_format=True) for f in filts]
+	ref_prf = ref_filt.get_PRF(new_format=True)
+
+	dists = dists_from_ref(prfs, ref_prf, metric, dist_scale)
+	dists_to_ref_pane(base_filename, i_ref, i_arr, dists, out_filename)
+
+	if see_samples:
+		dir = 'output/PRFstats/samples'
+		clear_old_files(dir, see_samples)
+
+		samples(filts, see_samples, dir)
+
+
+
 
 def plot_dists_vs_means(
 		traj1,
@@ -142,7 +94,7 @@ def plot_dists_vs_means(
 	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
 	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
 
-	refs, dists = prf_dists_compare(prfs1, prfs2, metric, dist_scale)
+	refs, dists = mean_dists_compare(prfs1, prfs2, metric, dist_scale)
 
 	dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename)
 
@@ -171,7 +123,7 @@ def plot_clusters(
 	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
 	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
 
-	refs, dists = prf_dists_compare(prfs1, prfs2, metric, dist_scale)
+	refs, dists = mean_dists_compare(prfs1, prfs2, metric, dist_scale)
 
 	clusters_fig(dists, filt_params, traj1.name, traj2.name,out_filename)
 

@@ -3,11 +3,12 @@ change_dir()
 
 import numpy as np
 from signals import TimeSeries, Trajectory
-from PRFstats.interface import L2ROCs, plot_dists_vs_means, plot_clusters
+from PRFstats.interface import L2ROCs, plot_dists_vs_means, plot_clusters, \
+	plot_dists_vs_ref
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=6)
+test, start_time = get_test(set_test=7)
 
 
 def out_fname():
@@ -240,4 +241,25 @@ if test == 6:
 		out_fname(),
 		filt_params,
 		quiet=False
+	)
+
+
+if test == 7:
+
+	filt_params.update({
+		'max_filtration_param': -10,
+		'num_divisions': 10,
+		'ds_rate': 500
+	})
+
+	plot_dists_vs_ref(
+		'datasets/trajectories/L63_x_m2',
+		'L63_x_m2_tau',
+		'base i',
+		out_fname(),
+		filt_params,
+		i_ref=15,
+		i_arr=np.arange(2, 30),
+		quiet=False,
+		load_saved_filts=True
 	)
