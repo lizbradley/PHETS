@@ -236,21 +236,10 @@ def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 
 
 def clusters_fig(dists, filt_params, fname1, fname2, out_fname):
-	d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
-
-	fig = plt.figure(figsize=(10, 6), tight_layout=True)
-	fname_ax = plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
-	params_ax = plt.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
-	plot_ax = plt.subplot2grid((6, 10), (0, 4), rowspan=6, colspan=6)
 
 	def legend(ax, filenames):
 		ax.axis('off')
-
-		arr = [
-			['A', filenames[0]],
-			['B', filenames[1]]
-		]
-
+		arr = [['A', filenames[0]], ['B', filenames[1]]]
 		title_table = ax.table(
 			cellText=arr,
 			bbox=[0, 0, 1, 1],
@@ -258,6 +247,13 @@ def clusters_fig(dists, filt_params, fname1, fname2, out_fname):
 			# rowColours=['C0', 'C1'],
 			colWidths=[.5, 1]
 		)
+
+	d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
+
+	fig = plt.figure(figsize=(10, 6), tight_layout=True)
+	fname_ax = plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
+	params_ax = plt.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
+	plot_ax = plt.subplot2grid((6, 10), (0, 4), rowspan=6, colspan=6)
 
 	legend(fname_ax, [fname1, fname2])
 	filt_params_table(params_ax, filt_params)
