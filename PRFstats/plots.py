@@ -40,14 +40,9 @@ def roc_ax(ax, data, k, title):
 
 
 def dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
-	fig = plt.figure(
-		figsize=(10, 4),
-		dpi=100
-	)
-
+	fig = plt.figure(figsize=(10, 4),dpi=100)
 	ax1 = fig.add_subplot(121)
 	ax2 = fig.add_subplot(122)
-
 
 	fig.subplots_adjust(right=0.85)
 	cax = fig.add_axes([0.92, 0.05, 0.03, 0.9])
@@ -136,10 +131,8 @@ def plot_dists_ax(ax, d, mean, traj):
 	ax.set_xticks(ticks)
 
 
-
 def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 	print 'plotting distances...'
-
 
 	sig_1 = traj1.project()
 	sig_2 = traj2.project()
@@ -170,8 +163,6 @@ def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 	ax7 = plt.subplot(gs[4,     0:2])
 	ax8 = plt.subplot(gs[4,     2:4])
 
-
-
 	plot_dists_ax(ax1, d_1_vs_1, mean_11, traj1)
 	plt.setp(ax1.get_xticklabels(), visible=False)
 	plt.setp(ax1.get_xticklines(), visible=False)
@@ -179,9 +170,10 @@ def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 
 	plot_dists_ax(ax2, d_2_vs_1, mean_21, traj2)
 	plt.setp(ax2.get_yticklabels(), visible=False)
-	# plt.setp(ax2.get_yticklines(), visible=False)
 	plt.setp(ax2.get_xticklabels(), visible=False)
 	plt.setp(ax2.get_xticklines(), visible=False)
+
+	PH.Plots.PRF_ax(mean_prf_1, ax3, annot_hm=True)
 
 	plot_dists_ax(ax4, d_1_vs_2, mean_12, traj1)
 	plt.setp(ax4.get_xticklabels(), visible=False)
@@ -189,29 +181,18 @@ def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 
 	plot_dists_ax(ax5, d_2_vs_2, mean_22, traj2)
 	plt.setp(ax5.get_yticklabels(), visible=False)
-	# plt.setp(ax5.get_yticklines(), visible=False)
 	plt.setp(ax5.get_xticklabels(), visible=False)
 	plt.setp(ax5.get_xticklines(), visible=False)
 
-
+	PH.Plots.PRF_ax(mean_prf_2, ax6, annot_hm=True)
 
 	signals.plots.ts_zoom(ax7, sig_1)
 	ax7.grid(axis='x', zorder=0)
 	ax7.set_xlim(left=0)
-	# plt.setp(ax7.get_yticklabels(), visible=False)
-	# plt.setp(ax7.get_yticklines(), visible=False)
 
 	signals.plots.ts_zoom(ax8, sig_2)
 	ax8.grid(axis='x', zorder=0)
 	ax8.set_xlim(left=0)
-	# plt.setp(ax8.get_yticklabels(), visible=False)
-	# plt.setp(ax8.get_yticklines(), visible=False)
-
-
-	PH.Plots.PRF_ax(mean_prf_1, ax3, annot_hm=True)
-
-	PH.Plots.PRF_ax(mean_prf_2, ax6, annot_hm=True)
-
 
 	ylim = np.max(np.abs(np.append(ax7.get_ylim(), ax8.get_ylim())))
 	ax7.set_ylim(-ylim, ylim)
@@ -223,15 +204,17 @@ def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 	del_12 = mean_21 - mean_11
 	del_34 = mean_22 - mean_12
 
+	row_label = '\n \n ref: {} \n \n $\Delta$: {:.3f}'
 	ax1.set_ylabel(
-		'\n \n ref: ' + traj1.name + ' \n \n $\Delta$: {:.3f}'.format(del_12),
-		rotation=90, size='large', labelpad=10)
+		row_label.format(traj1.name, del_12),
+		rotation=90, size='large', labelpad=10
+	)
 	ax4.set_ylabel(
-		'\n \n ref: ' + traj2.name + ' \n \n $\Delta$: {:.3f}'.format(del_34),
-		rotation=90, size='large', labelpad=10)
+		row_label.format(traj2.name, del_34),
+		rotation=90, size='large', labelpad=10
+	)
 
 	plt.savefig(out_filename)
-
 	plt.close(fig)
 
 
