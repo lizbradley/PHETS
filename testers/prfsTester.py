@@ -3,11 +3,11 @@ change_dir()
 
 import numpy as np
 from signals import TimeSeries, Trajectory
-from PRFstats.interface import L2ROCs, plot_dists_vs_means
+from PRFstats.interface import L2ROCs, plot_dists_vs_means, plot_clusters
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=4)
+test, start_time = get_test(set_test=6)
 
 
 def out_fname():
@@ -205,3 +205,39 @@ if test == 5:
 	)
 
 
+if test == 6:
+
+	ts1 = TimeSeries(
+		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
+		crop=(1, 2),
+		num_windows=5,
+		window_length=.01,
+		vol_norm=(0, 1, 1),      # (full, crop, window)
+		time_units='seconds'
+	)
+
+	ts2 = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(1, 2),
+		num_windows=5,
+		window_length=.01,
+		vol_norm=(0, 1, 1),
+		time_units='seconds'
+	)
+
+	tau = (1 / idx_to_freq(40)) / np.e
+	traj1 = ts1.embed(tau=tau, m=2)
+	traj2 = ts2.embed(tau=tau, m=2)
+
+	filt_params.update({
+		'ds_rate': 20,
+		'num_divisions': 10,
+		'max_filtration_param': -5
+	})
+
+	plot_clusters(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		quiet=False
+	)
