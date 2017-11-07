@@ -18,7 +18,6 @@ class BaseTrajectory(object):
 			vol_norm=(False, False, False),     # (full, crop, windows)
 	        time_units='samples'
 
-
 	):
 		if isinstance(data, basestring):        # is filename
 			self.data_full = np.loadtxt(data)

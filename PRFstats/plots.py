@@ -79,17 +79,17 @@ def dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
 def samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
 
 	if vary_param_1 is None and vary_param_2 is None:
-		filts = [[filts]]
+		filts_vv = [[filts]]
 	elif vary_param_1 is not None and vary_param_2 is None:
-		filts = [[fs] for fs in filts]
-	elif vary_param_1 is not None and vary_param_2 is not None:
-		pass
-	else:
-		print 'ERROR: vary_param_1 is None, but vary_param_2 is not None'
+		filts_vv = [[fs] for fs in filts]
+	else:       # neither are None
+		filts_vv = filts
 
-	for i, filts_v1 in enumerate(filts):
-		for j, filts_v2 in enumerate(filts_v1):
-			for k, filt in enumerate(filts_v2[::interval]):
+	del filts
+
+	for i, filts_v in enumerate(filts_vv):
+		for j, filts in enumerate(filts_v):
+			for k, filt in enumerate(filts[::interval]):
 				base_name = '{}/{}__'.format(dir, filt.name)
 
 				if vary_param_1 is not None:
