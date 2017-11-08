@@ -3,3 +3,5 @@
 *.npy
 *.p
 .cache
+!/unit_tests/ref/*
+

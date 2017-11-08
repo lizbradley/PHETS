@@ -8,7 +8,7 @@ from PRFstats.interface import L2ROCs, plot_dists_vs_means, plot_clusters, \
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=7)
+test, start_time = get_test(set_test=1)
 
 
 def out_fname():
@@ -21,7 +21,7 @@ if test == 1:
 	ts1 = TimeSeries(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
 		crop=(75000, 180000),
-		num_windows=10,
+		num_windows=50,
 		window_length=2000,
 		vol_norm=(0, 0, 1)  # (full, crop, windows)
 	)
@@ -30,7 +30,7 @@ if test == 1:
 	ts2 = TimeSeries(
 		'datasets/time_series/viol/40-viol.txt',
 		crop=(35000, 140000),
-		num_windows=10,
+		num_windows=50,
 		window_length=2000,
 		vol_norm=(0, 0, 1)
 	)
@@ -53,7 +53,7 @@ if test == 1:
 		k=(0, 5.01, .01),
 		load_saved_filts=True,
 		quiet=False,
-		see_samples=5
+		see_samples=2
 	)
 
 
