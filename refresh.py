@@ -6,10 +6,10 @@ from config import find_landmarks_c_compile_str
 
 
 
-# remove all .pyc and .npy files
+# remove all .pyc and
 for subdir, dirs, files in os.walk('.'):
     for file in files:
-        if file.endswith('.pyc') or file.endswith('.npy'):
+        if file.endswith('.pyc'):
             fname = os.path.join(subdir, file)
             os.remove(fname)
             print 'removed {}'.format(fname)
