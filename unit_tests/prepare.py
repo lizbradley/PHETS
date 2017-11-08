@@ -87,8 +87,8 @@ def prepare_L2ROCs():
 
 
 if __name__ == '__main__':
-	prepare_TS()
-	prepare_Traj()
-	prepare_L2ROCs()
+	# prepare_TS()
+	# prepare_Traj()
+	# prepare_L2ROCs()
 	pass
 

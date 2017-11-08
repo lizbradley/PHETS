@@ -7,18 +7,18 @@ from PH.TitleBox import filt_params_table
 from utilities import print_title
 
 
-def dists_to_ref_pane(base_filename, i_ref, i_arr, dists, out_filename):
+def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
 	fig = plt.figure(figsize=(10, 5))
 	ax = fig.add_subplot(111)
 	ax.plot(i_arr, dists)
 	ax.axvline(x=i_ref, linestyle='--', color='k')
-	ax.set_xlabel('$tau \quad (samples)$')
+	ax.set_xlabel('i (filename)')
 	# ax.set_ylabel('$distance \quad ({\epsilon}^2 \; \# \; holes)$')
 	ax.set_ylabel('$distance$')
 	ax.xaxis.set_ticks(i_arr[::2])
 	ax.grid()
 	ax.set_ylim(bottom=0)
-	title = ax.set_title(base_filename + ' PRF distances')
+	title = ax.set_title(base_filename)
 	title.set_position([.5, 1.05])
 	plt.savefig(out_filename)
 	plt.close(fig)
@@ -76,7 +76,7 @@ def plot_dists_ax(ax, d, mean, traj):
 	ax.set_xticks(ticks)
 
 
-def dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
+def dists_to_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 	print 'plotting distances...'
 
 	sig_1 = traj1.project()

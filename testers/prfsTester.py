@@ -3,12 +3,12 @@ change_dir()
 
 import numpy as np
 from signals import TimeSeries, Trajectory
-from PRFstats.interface import L2ROCs, plot_dists_vs_means, plot_clusters, \
-	plot_dists_vs_ref
+from PRFstats.interface import L2ROCs, plot_dists_to_means, plot_clusters, \
+	plot_dists_to_ref
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=1)
+test, start_time = get_test(set_test=7)
 
 
 def out_fname():
@@ -162,7 +162,7 @@ if test == 4:
 		'max_filtration_param': -5
 	})
 
-	plot_dists_vs_means(
+	plot_dists_to_means(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -199,7 +199,7 @@ if test == 5:
 		'max_filtration_param': -5
 	})
 
-	plot_dists_vs_means(
+	plot_dists_to_means(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -253,7 +253,7 @@ if test == 7:
 		'ds_rate': 500
 	})
 
-	plot_dists_vs_ref(
+	plot_dists_to_ref(
 		'datasets/trajectories/L63_x_m2',
 		'L63_x_m2_tau',
 		'base i',

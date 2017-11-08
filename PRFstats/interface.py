@@ -3,13 +3,13 @@ import sys
 import numpy as np
 
 from PRFstats.data import roc_data, fetch_filts, dists_from_ref
-from PRFstats.plots import dists_vs_means_fig, clusters_fig, dists_to_ref_pane
+from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig
 from data import L2Classifier, mean_dists_compare
 from plots import dual_roc_fig, samples
 from utilities import clear_old_files
 
 
-def plot_dists_vs_ref(
+def plot_dists_to_ref(
 		dir, base_filename,
 		fname_format,   # 'i base' or 'base i'
 		out_filename,
@@ -25,7 +25,7 @@ def plot_dists_vs_ref(
 		quiet=True
 
 ):
-	""" plots distance from reference rank function over a range of trajectories input files"""
+	""" plots distance from reference prf over a range of trajectory input files"""
 
 	from PH import Filtration
 	import cPickle
@@ -59,18 +59,17 @@ def plot_dists_vs_ref(
 	ref_prf = ref_filt.get_PRF(new_format=True)
 
 	dists = dists_from_ref(prfs, ref_prf, metric, dist_scale)
-	dists_to_ref_pane(base_filename, i_ref, i_arr, dists, out_filename)
+	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
 	if see_samples:
 		dir = 'output/PRFstats/samples'
 		clear_old_files(dir, see_samples)
-
 		samples(filts, see_samples, dir)
 
 
 
 
-def plot_dists_vs_means(
+def plot_dists_to_means(
 		traj1,
 		traj2,
 		out_filename,
@@ -96,7 +95,7 @@ def plot_dists_vs_means(
 
 	refs, dists = mean_dists_compare(prfs1, prfs2, metric, dist_scale)
 
-	dists_vs_means_fig(refs, dists, traj1, traj2, time_units, out_filename)
+	dists_to_means_fig(refs, dists, traj1, traj2, time_units, out_filename)
 
 
 def plot_clusters(
