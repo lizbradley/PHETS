@@ -2,7 +2,7 @@ import sys
 
 import numpy as np
 
-from PRFstats.data import roc_data, fetch_filts_double, dists_to_ref, \
+from PRFstats.data import roc_data, dists_to_ref, \
 	fetch_filts, process_variance_data
 from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig, \
 	plot_weight_functions, plot_heatmaps, plot_variane_fig

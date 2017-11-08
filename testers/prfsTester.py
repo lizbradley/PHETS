@@ -8,7 +8,7 @@ from PRFstats.interface import L2ROCs, plot_dists_to_means, plot_clusters, \
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=7)
+test, start_time = get_test(set_test=9)
 
 
 def out_fname():
@@ -263,4 +263,44 @@ if test == 7:
 		i_arr=np.arange(2, 30),
 		quiet=False,
 		load_saved_filts=False
+	)
+
+if test == 9:
+	# testing the vary_param capabilities #
+
+	ts1 = TimeSeries(
+		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
+		crop=(75000, 180000),
+		num_windows=10,
+		window_length=2000,
+		vol_norm=(0, 0, 1)
+	)
+
+	ts2 = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+		window_length=2000,
+		vol_norm=(0, 0, 1)
+	)
+
+	traj1 = ts1.embed(tau=32, m=2)
+	traj2 = ts2.embed(tau=32, m=2)
+
+	filt_params.update({
+		'ds_rate': 200,
+		'num_divisions': 10,
+	})
+
+	L2ROCs(
+		traj1, traj2,
+		'clarinet', 'viol',
+		out_fname(),
+		filt_params,
+		k=(0, 5.01, .01),
+		load_saved_filts=True,
+		quiet=True,
+		vary_param=('d_use_hamiltonion', (-1, 1)),
+		see_samples=5
+
 	)
