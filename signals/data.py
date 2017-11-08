@@ -84,6 +84,8 @@ class BaseTrajectory(object):
 		else:
 			start_idxs = np.floor(
 				np.linspace(0, len(self.data), num_windows, endpoint=False)
+				# toggle these to reproduce IDA fig 5
+				# np.linspace(0, len(self.data) - 1, num_windows, endpoint=False)
 			).astype(int)
 
 			if window_length is None:

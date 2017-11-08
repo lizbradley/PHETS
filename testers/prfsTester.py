@@ -16,7 +16,8 @@ def out_fname():
 
 
 if test == 1:
-	# replicate IDA figure 5 #
+	# reproduce IDA figure 5 #
+	# toggle lines 86/87 in signals/data.py to reproduce #
 
 	ts1 = TimeSeries(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
@@ -51,7 +52,7 @@ if test == 1:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved_filts=True,
+		load_saved_filts=False,
 		quiet=False,
 		see_samples=2
 	)
