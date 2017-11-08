@@ -26,7 +26,8 @@ def fetch_filts(
 		for j in range(iter_2):
 			if vary_param_2 is not None:
 				params.update({vary_param_2[0]: vary_param_2[1][j]})
-			filts_v.append(traj.filtrations(params, quiet))
+			filts = traj.filtrations(params, quiet)
+			filts_v.append(filts)
 		filts_vv.append(filts_v)
 
 	filts_vv = np.array(filts_vv)

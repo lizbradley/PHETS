@@ -91,7 +91,7 @@ if test == 2:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved_filts=True,
+		load_saved_filts=False,
 		quiet=True,
 		vary_param=('max_filtration_param', (-3, -6)),
 		see_samples=5
@@ -288,8 +288,9 @@ if test == 9:
 	traj2 = ts2.embed(tau=32, m=2)
 
 	filt_params.update({
-		'ds_rate': 200,
+		'ds_rate': 100,
 		'num_divisions': 10,
+		'max_filtration_param': -8
 	})
 
 	L2ROCs(
@@ -298,9 +299,10 @@ if test == 9:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved_filts=True,
-		quiet=True,
+		load_saved_filts=False,
+		quiet=False,
 		vary_param=('d_use_hamiltonion', (-1, 1)),
+		# vary_param=('d_use_hamiltonion', (1, -1)),
 		see_samples=5
 
 	)
