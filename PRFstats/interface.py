@@ -2,8 +2,10 @@ import sys
 
 import numpy as np
 
-from PRFstats.data import roc_data, fetch_filts, dists_from_ref
-from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig
+from PRFstats.data import roc_data, fetch_filts_double, dists_to_ref, \
+	fetch_filts, process_variance_data
+from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig, \
+	plot_weight_functions, plot_heatmaps, plot_variane_fig
 from data import L2Classifier, mean_dists_compare
 from plots import dual_roc_fig, samples
 from utilities import clear_old_files
@@ -26,6 +28,8 @@ def plot_dists_to_ref(
 
 ):
 	""" plots distance from reference prf over a range of trajectory input files"""
+
+	# TODO: weight_func
 
 	from PH import Filtration
 	import cPickle
@@ -58,7 +62,7 @@ def plot_dists_to_ref(
 	prfs = [f.get_PRF(new_format=True) for f in filts]
 	ref_prf = ref_filt.get_PRF(new_format=True)
 
-	dists = dists_from_ref(prfs, ref_prf, metric, dist_scale)
+	dists = dists_to_ref(prfs, ref_prf, metric, dist_scale)
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
 	if see_samples:
@@ -85,10 +89,8 @@ def plot_dists_to_means(
 
 	# TODO: weight_func, see_samples, time_units, unit test
 
-	filts1, filts2 = fetch_filts(
-		traj1, traj2, filt_params,
-		load_saved_filts, quiet
-	)
+	filts1 = fetch_filts(traj1, filt_params, load_saved_filts, quiet)
+	filts2 = fetch_filts(traj2, filt_params, load_saved_filts, quiet)
 
 	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
 	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
@@ -114,10 +116,8 @@ def plot_clusters(
 	# TODO: weight_func, see_samples, unit test
 
 
-	filts1, filts2 = fetch_filts(
-		traj1, traj2, filt_params,
-	    load_saved_filts, quiet
-	)
+	filts1 = fetch_filts(traj1, filt_params, load_saved_filts, quiet)
+	filts2 = fetch_filts(traj2, filt_params, load_saved_filts, quiet)
 
 	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
 	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
@@ -140,12 +140,9 @@ def L2ROCs(
 ):
 	# TODO: add weight function
 
-
-	filts1_v, filts2_v = fetch_filts(     # filts varied over vary_param
-		traj1, traj2, filt_params,
-		load_saved_filts, quiet,
-		vary_param_1=vary_param
-	)
+	args = [filt_params, load_saved_filts, quiet, vary_param]
+	filts1_v = fetch_filts(traj1, *args)
+	filts2_v = fetch_filts(traj2, *args)
 
 	if vary_param is None:
 		filts1_v, filts2_v = [filts1_v], [filts2_v]
@@ -186,3 +183,55 @@ def L2ROCs(
 
 
 # TODO: plot_variance
+def plot_variance(
+		traj,
+		out_filename,
+		filt_params,
+		vary_param_1,
+		vary_param_2,
+
+		metric='L2', 		 		# 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',
+		weight_func=lambda i, j: 1,
+
+		see_samples=5,
+		quiet=True,
+		annot_hm=False,
+		load_saved_filts=False
+):
+
+	def sqrt_weight_func(x, y):
+		return weight_func(x, y) ** .5
+
+	# plot_trajectory(sig)
+	plot_weight_functions(vary_param_2, weight_func, filt_params)
+
+	filt_evo_array = fetch_filts(
+		traj, filt_params,
+		load_saved_filts, quiet,
+		vary_param_1, vary_param_2
+	)
+
+	stats_data, hmap_data, hmap_data_pw = process_variance_data(
+		filt_evo_array,
+		metric,
+		dist_scale,
+		sqrt_weight_func,
+		vary_param_2
+	)
+	plot_variane_fig(
+		stats_data,
+		filt_params,
+		vary_param_1, vary_param_2,
+	    out_filename
+	)
+	plot_heatmaps(
+		hmap_data,
+		hmap_data_pw,
+		filt_params,
+		vary_param_1,
+	    vary_param_2,
+		annot_hm
+	)
+	if see_samples: samples(filt_evo_array)
+

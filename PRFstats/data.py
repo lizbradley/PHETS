@@ -3,57 +3,46 @@ import cPickle
 import numpy as np
 import sys
 
+
 def fetch_filts(
-		traj1, traj2, params, load_saved, quiet,
-		vary_param_1=None, vary_param_2=None
+		traj, params, load_saved, quiet,
+		vary_param_1=None, vary_param_2=None,
+		id=None
 ):
-	"""
-	loads from file, or generates and saves to file
-	if no vary params, return filtration evo
-	if vary_param_1, not vary_param_2, returns 1d array of filt evos
-	if both vary params, return 2d array of filt evos
-	"""
+	fname = 'PRFstats/data/filts{}.p'.format(id if id is not None else '')
 
 	if load_saved:
-		filts1 = cPickle.load(open('PRFstats/data/filts1.p'))
-		filts2 = cPickle.load(open('PRFstats/data/filts2.p'))
-		return filts1, filts2
+		return cPickle.load(open(fname))
 
 	iter_1 = 1 if vary_param_1 is None else len(vary_param_1[1])
 	iter_2 = 1 if vary_param_2 is None else len(vary_param_2[1])
 
-	filts1_vv, filts2_vv = [], []     # filts varied over two params
+	filts_vv = []
 	for i in range(iter_1):
 		if vary_param_1 is not None:
 			params.update({vary_param_1[0]: vary_param_1[1][i]})
 
-		filts1_v, filts2_v = [], []   # filts varied over one param
+		filts_v = []
 		for j in range(iter_2):
 			if vary_param_2 is not None:
 				params.update({vary_param_2[0]: vary_param_2[1][j]})
+			filts_v.append(traj.filtrations(params, quiet))
+		filts_vv.append(filts_v)
 
-			filts1_v.append(traj1.filtrations(params, quiet))
-			filts2_v.append(traj2.filtrations(params, quiet))
-
-		filts1_vv.append(filts1_v)
-		filts2_vv.append(filts2_v)
-
-	filts1_vv, filts2_vv = np.array(filts1_vv), np.array(filts2_vv)
+	filts_vv = np.array(filts_vv)
 
 	if vary_param_1 is None and vary_param_2 is not None:
-		print 'ERROR: vary_param_1 is None, vary_param_1 is not None'
+		print 'ERROR: vary_param_1 is None, vary_param_2 is not None'
 		sys.exit()
 	if vary_param_1 is None and vary_param_2 is None:
-		filts1, filts2 = filts1_vv[0, 0], filts2_vv[0, 0]
+		filts = filts_vv[0, 0]
 	elif vary_param_1 is not None and vary_param_2 is None:
-		filts1, filts2 = filts1_vv[:, 0], filts2_vv[:, 0]
-	else:       # neither are None
-		filts1, filts2 = filts1_vv, filts2_vv
+		filts = filts_vv[:, 0]
+	else:
+		filts = filts_vv
 
-	cPickle.dump(filts1, open('PRFstats/data/filts1.p', 'wb'))
-	cPickle.dump(filts2, open('PRFstats/data/filts2.p', 'wb'))
-
-	return filts1, filts2
+	cPickle.dump(filts, open(fname, 'wb'))
+	return filts
 
 
 def norm(f, metric='L2'):
@@ -88,7 +77,7 @@ def scale_dists(dists, norms, norm_ref, scale):
 		sys.exit()
 
 
-def dists_from_ref(funcs, ref_func, metric, scale):
+def dists_to_ref(funcs, ref_func, metric, scale):
 	dists = [norm(np.subtract(f, ref_func), metric) for f in funcs]
 	norms = [norm(f, metric) for f in funcs]
 	norm_ref = [norm(ref_func, metric)] * len(dists)
@@ -101,10 +90,10 @@ def mean_dists_compare(prfs1, prfs2, metric, dist_scale):
 	mean1 = np.mean(prfs1, axis=0)
 	mean2 = np.mean(prfs2, axis=0)
 
-	dists_1_vs_1 = dists_from_ref(prfs1, mean1, metric, dist_scale)
-	dists_2_vs_1 = dists_from_ref(prfs2, mean1, metric, dist_scale)
-	dists_1_vs_2 = dists_from_ref(prfs1, mean2, metric, dist_scale)
-	dists_2_vs_2 = dists_from_ref(prfs2, mean2, metric, dist_scale)
+	dists_1_vs_1 = dists_to_ref(prfs1, mean1, metric, dist_scale)
+	dists_2_vs_1 = dists_to_ref(prfs2, mean1, metric, dist_scale)
+	dists_1_vs_2 = dists_to_ref(prfs1, mean2, metric, dist_scale)
+	dists_2_vs_2 = dists_to_ref(prfs2, mean2, metric, dist_scale)
 
 	arr = [
 		[mean1, mean2],
@@ -112,6 +101,164 @@ def mean_dists_compare(prfs1, prfs2, metric, dist_scale):
 	]
 
 	return arr
+
+
+
+class VarianceData:
+	"""all data for a fixed value of vary_param_2 -- one curve per plot"""
+	def __init__(self):
+		self.pointwise_mean_norm = []
+		self.variance = []
+		self.scaled_variance = []
+		self.pointwise_variance_norm = []
+		self.functional_COV_norm = []
+
+class HeatmapData:
+
+	def __init__(self):
+		self.pointwise_mean = [[]]
+		self.pointwise_var = [[]]
+		self.functional_COV = [[]]
+
+
+def apply_weight_func(f, weight_func):
+
+	# x, y, max_lim included vs z only
+	f_format_full = len(f.shape) == 1 and f.size == 4
+
+	z = f[2] if f_format_full else f
+
+	x = y = np.linspace(0, 2 ** .5, len(z))
+	xx, yy = np.meshgrid(x, y)
+
+	weight_func = weight_func(xx, yy)
+	if isinstance(weight_func, int):
+		weight_func = xx * 0 + weight_func
+
+	z = np.multiply(z, weight_func)
+
+	if f_format_full:
+		f[2] = z
+		return f
+	else:
+		return z
+
+
+def process_variance_data(prf_evo_array, metric, dist_scale, weight_func, vary_param_2):
+
+	def apply_weight_to_evo(prf_evo, weight_f):
+		weighted_prf_evo = []
+		for prf in prf_evo:
+			weighted_prf_evo.append(apply_weight_func(prf, weight_f))
+		return np.asarray(weighted_prf_evo)
+
+
+	def apply_weight_func_to_array(prf_evo_array, weight_f):
+		for row in prf_evo_array:
+			for evo in row:
+				evo[...] = apply_weight_to_evo(evo, weight_f)
+		return prf_evo_array
+
+
+	def vary_evos_over_weight_func(prf_evos):
+		prf_evos_1d = prf_evos[0]
+		prf_evos_2d = []
+		for prf_evo in prf_evos_1d:
+			prf_evo_vary_2 = []
+			for weight_f in vary_param_2[1]:
+				weighted_prf_evo = apply_weight_to_evo(prf_evo, weight_f)
+				prf_evo_vary_2.append(weighted_prf_evo)
+			prf_evos_2d.append(prf_evo_vary_2)
+
+		prf_evos_2d = np.transpose(np.asarray(prf_evos_2d), (1, 0, 2, 3))
+		return prf_evos_2d
+
+
+	def calculate_stats(prf_evos_1d, apply_weight_to_fcov=True):
+		var_data = VarianceData()
+		hmap_data_arr = []
+
+		for prf_evo in prf_evos_1d:  # for each value of vary_param_1
+
+			hmap_data = HeatmapData()
+			# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
+
+			prf_evo = prf_evo[:, 2]  # take z component only
+			pointwise_mean = np.mean(prf_evo, axis=0)  				# plot as heatmap
+			hmap_data.pointwise_mean = pointwise_mean
+
+			pmn = norm(pointwise_mean, metric)  					# plot as data point
+			var_data.pointwise_mean_norm.append(pmn)
+
+			dists = [norm(np.subtract(PRF, pointwise_mean), metric)
+			         for PRF in prf_evo]
+			variance = np.mean(np.power(dists, 2))  				# plot as data point
+			# variance = np.sum(np.power(dists, 2)) / (len(dists) - 1)
+			var_data.variance.append(variance)
+
+			scaled_dists = dists_to_ref(
+				prf_evo, pointwise_mean, metric, dist_scale
+			)
+			scaled_variance = np.mean(np.power(scaled_dists, 2))    # plot as data point
+			var_data.scaled_variance.append(scaled_variance)
+
+			diffs = [PRF - pointwise_mean for PRF in prf_evo]
+
+			pointwise_variance = np.var(diffs, axis=0) 				# plot as heatmap
+			hmap_data.pointwise_var = pointwise_variance
+
+			pvn = norm(pointwise_variance, metric) 					# plot as data point
+			var_data.pointwise_variance_norm.append(pvn)
+
+			import warnings
+			with warnings.catch_warnings():
+				warnings.simplefilter("ignore")
+				FCOV = pointwise_variance / pointwise_mean  		 # plot as heatmap
+
+			if apply_weight_to_fcov:
+				hmap_data.functional_COV = apply_weight_func(FCOV, weight_func)
+			else:
+				hmap_data.functional_COV = FCOV
+
+			fcovn = norm(FCOV, metric)  # plot as data point
+			var_data.functional_COV_norm.append(fcovn)
+
+			hmap_data_arr.append(hmap_data)
+
+		return var_data, hmap_data_arr
+
+
+
+	print 'processing data...'
+
+	# TODO: edit to take filt_evo_array
+		# compute prf_evo_array here
+
+	prf_evo_array_pre_weight = prf_evo_array
+
+	if vary_param_2 and vary_param_2[0] == 'weight_func':
+		prf_evo_array = vary_evos_over_weight_func(prf_evo_array)
+	elif vary_param_2:
+		prf_evo_array = apply_weight_func_to_array(prf_evo_array, weight_func)
+
+	curve_data = []
+	hmap_data = []
+	for row in prf_evo_array:
+		cd, hmd = calculate_stats(row)
+		curve_data.append(cd)
+		hmap_data.append(hmd)
+
+	hmap_data_pre_weight = []
+	for row in prf_evo_array_pre_weight:
+		cd, hmd_pre_weight = calculate_stats(row, apply_weight_to_fcov=False)
+		hmap_data_pre_weight.append(hmd_pre_weight)
+
+	curve_data = np.asarray(curve_data)
+	hmap_data = np.asarray(hmap_data)
+	hmap_data_pre_weight = np.asarray(hmap_data_pre_weight)
+
+	return curve_data, hmap_data, hmap_data_pre_weight
+
 
 
 class L2Classifier(object):

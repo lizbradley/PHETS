@@ -262,5 +262,5 @@ if test == 7:
 		i_ref=15,
 		i_arr=np.arange(2, 30),
 		quiet=False,
-		load_saved_filts=True
+		load_saved_filts=False
 	)
