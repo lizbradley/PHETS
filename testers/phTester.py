@@ -7,7 +7,7 @@ from PH import Filtration, load_filtration
 from PH import make_movie, make_PD, make_PRF_plot
 from config import default_filtration_params as parameter_set
 
-test, start_time = get_test(set_test=16)
+test, start_time = get_test(set_test=201)
 
 
 if test == 14:
@@ -415,9 +415,75 @@ if test == 200:
 
 	make_movie(
 		filtration,
-		'output/joetests/Ellipse200_j2.mp4',
+		'output/dham1.mp4',
 	)
 
+if test == 201:
+	print 'dham -1'
+	in_filename = "datasets/trajectories/Ellipse200.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 200,
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+			'd_use_hamiltonian': -1
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/dham-1.mp4',
+	)
+
+	print 'dham 1'
+	in_filename = "datasets/trajectories/Ellipse200.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 200,
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+			'd_use_hamiltonian': 1
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/dham1.mp4',
+	)
+
+
+	print 'no dham'
+	in_filename = "datasets/trajectories/Ellipse200.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 200,
+			'max_filtration_param': -8,
+			'num_divisions': 10,
+
+		})
+
+
+	filtration = Filtration(in_filename, filt_params)
+	# filtration = load_saved_filtration()		# reuses previous filtration
+
+	make_movie(
+		filtration,
+		'output/nodham.mp4',
+	)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 

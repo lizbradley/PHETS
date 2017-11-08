@@ -401,7 +401,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		float dhamil=0.,deuc=0.;
 		if(use_hamiltonian<0){
 		
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,k,deuc,dhamil,sum)
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,k,deuc,dhamil,sum,ham_param)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
@@ -420,7 +420,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 
 		else{
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,velocities,distances,wit_pts) private(i,j,k,deuc,dhamil,sum)
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,velocities,distances,wit_pts) private(i,j,k,deuc,dhamil,sum,ham_param)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
