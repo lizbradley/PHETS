@@ -188,7 +188,8 @@ def plot_variance(
 		out_filename,
 		filt_params,
 		vary_param_1,
-		vary_param_2,
+		vary_param_2=None,
+		legend_labels=None,
 
 		metric='L2', 		 		# 'L1' (abs) or 'L2' (euclidean)
 		dist_scale='b',
@@ -204,13 +205,19 @@ def plot_variance(
 		return weight_func(x, y) ** .5
 
 	# plot_trajectory(sig)
-	plot_weight_functions(vary_param_2, weight_func, filt_params)
+	plot_weight_functions(
+		vary_param_2,
+		legend_labels,
+		weight_func,
+		filt_params
+	)
 
 	filt_evo_array = fetch_filts(
 		traj, filt_params,
 		load_saved_filts, quiet,
 		vary_param_1, vary_param_2
 	)
+
 
 	stats_data, hmap_data, hmap_data_pw = process_variance_data(
 		filt_evo_array,
@@ -222,8 +229,11 @@ def plot_variance(
 	plot_variane_fig(
 		stats_data,
 		filt_params,
-		vary_param_1, vary_param_2,
-	    out_filename
+		vary_param_1,
+		vary_param_2,
+	    out_filename,
+		legend_labels,
+		traj.fname
 	)
 	plot_heatmaps(
 		hmap_data,
@@ -231,7 +241,18 @@ def plot_variance(
 		filt_params,
 		vary_param_1,
 	    vary_param_2,
+		legend_labels,
+		out_filename,
 		annot_hm
 	)
-	if see_samples: samples(filt_evo_array)
+	if see_samples:
+		dir = 'output/PRFstats/samples'
+		clear_old_files(dir, see_samples)
+		samples(
+			filt_evo_array,
+			see_samples,
+			'output/PRFstats/samples',
+			vary_param_1,
+			vary_param_2
+		)
 

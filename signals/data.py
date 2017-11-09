@@ -65,6 +65,10 @@ class BaseTrajectory(object):
 			if self.time_units == 'seconds':
 				crop_lim = (crop_lim * SAMPLE_RATE).astype(int)
 
+			if crop_lim[0] > crop_lim[1]:
+				print 'ERROR: crop[0] > crop[1]'
+				sys.exit()
+
 			if np.sum(crop_lim) > len(self.data_full):
 				print 'WARNING: crop out of bounds. len(self.data_full) = {}'\
 					.format(len(self.data_full))

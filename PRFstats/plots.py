@@ -1,11 +1,13 @@
 import numpy
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import signals, PH
 from PH import make_PD, make_PRF_plot, make_movie
-from PH.TitleBox import filt_params_table
-from utilities import print_title
+from PH.Plots import plot_heatmap
+from PH.TitleBox import filt_params_table, filenames_table
+from utilities import print_title, clear_dir, clear_temp_files
 
 
 def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
@@ -274,9 +276,14 @@ def dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
 	plt.savefig(fname)
 
 
-def plot_weight_functions(vary_param_2, weight_func, filt_params):
+def plot_weight_functions(
+		vary_param_2,
+		legend_labels,
+		weight_func,
+		filt_params
+):
 	print 'plotting weight function(s)...'
-	dir = 'output/PRFCompare/variance/weight_functions/'
+	dir = 'output/PRFstats/weight_functions/'
 	clear_temp_files(dir)
 
 	if vary_param_2 and vary_param_2[0] == 'weight_func':
@@ -301,17 +308,25 @@ def plot_weight_functions(vary_param_2, weight_func, filt_params):
 
 		mask = lambda x, y: x > y
 		mask = mask(xx, yy)
-		mask = np.where(mask == True, np.nan, 1)
+		mask = np.where(mask is True, np.nan, 1)
 		z = np.multiply(z, mask)
 
 		plot_heatmap(ax, cax, x, y, z)
 		plt.savefig('{}{}.png'.format(dir, fname))
 
 
-def plot_heatmaps(data_arr, data_arr_pre_weight, filt_params, vary_param_1,
-                  vary_param_2, annot_hm):
+def plot_heatmaps(
+		data_arr,
+		data_arr_pre_weight,
+		filt_params,
+		vary_param_1,
+        vary_param_2,
+		legend_labels,
+		filename,
+		annot_hm,
+):
 
-	out_dir = 'output/PRFCompare/variance/heatmaps/'
+	out_dir = 'output/PRFstats/heatmaps/'
 
 	if not clear_dir(out_dir):
 		print 'skipping heatmaps'
@@ -333,6 +348,7 @@ def plot_heatmaps(data_arr, data_arr_pre_weight, filt_params, vary_param_1,
 
 		cax = fig.add_axes([.935, .1, .025, .78])
 
+		import warnings
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore")
 			fig.tight_layout(pad=3, rect=(.05, 0, .95, .95))
@@ -340,12 +356,12 @@ def plot_heatmaps(data_arr, data_arr_pre_weight, filt_params, vary_param_1,
 
 		x = y = np.linspace(0, np.power(2, .5), filt_params['num_divisions'])
 
-		plot_heatmap(ax1, cax, x, y, hmap_data.pointwise_mean, annot=annot_hm)
-		plot_heatmap(ax2, cax, x, y, hmap_data.pointwise_var, annot=annot_hm)
-		plot_heatmap(ax3, cax, x, y, hmap_data.functional_COV, annot=annot_hm)
-		plot_heatmap(ax4, cax, x, y, hmap_data_pw.pointwise_mean, annot=annot_hm)
-		plot_heatmap(ax5, cax, x, y, hmap_data_pw.pointwise_var, annot=annot_hm)
-		plot_heatmap(ax6, cax, x, y, hmap_data_pw.functional_COV, annot=annot_hm)
+		plot_heatmap(ax1, cax, x, y, hmap_data.pointwise_mean, annot_hm)
+		plot_heatmap(ax2, cax, x, y, hmap_data.pointwise_var, annot_hm)
+		plot_heatmap(ax3, cax, x, y, hmap_data.functional_COV, annot_hm)
+		plot_heatmap(ax4, cax, x, y, hmap_data_pw.pointwise_mean, annot_hm)
+		plot_heatmap(ax5, cax, x, y, hmap_data_pw.pointwise_var, annot_hm)
+		plot_heatmap(ax6, cax, x, y, hmap_data_pw.functional_COV, annot_hm)
 
 
 		ax1.set_title('pointwise mean',		fontsize=12, y=1.05)
@@ -396,8 +412,15 @@ def plot_heatmaps(data_arr, data_arr_pre_weight, filt_params, vary_param_1,
 			plt.close(fig)
 
 
-def plot_variane_fig(data, filt_params, vary_param_1, vary_param_2,
-                     out_filename):
+def plot_variane_fig(
+		data,
+		filt_params,
+		vary_param_1,
+		vary_param_2,
+        out_filename,
+		legend_labels,
+		filename
+):
 	print 'plotting variance curves...'
 	fig = plt.figure(figsize=(14, 8), tight_layout=True)
 

@@ -145,7 +145,13 @@ def apply_weight_func(f, weight_func):
 		return z
 
 
-def process_variance_data(prf_evo_array, metric, dist_scale, weight_func, vary_param_2):
+def process_variance_data(
+		filt_evo_array,
+		metric,
+		dist_scale,
+		weight_func,
+		vary_param_2
+):
 
 	def apply_weight_to_evo(prf_evo, weight_f):
 		weighted_prf_evo = []
@@ -184,7 +190,6 @@ def process_variance_data(prf_evo_array, metric, dist_scale, weight_func, vary_p
 			hmap_data = HeatmapData()
 			# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
 
-			prf_evo = prf_evo[:, 2]  # take z component only
 			pointwise_mean = np.mean(prf_evo, axis=0)  				# plot as heatmap
 			hmap_data.pointwise_mean = pointwise_mean
 
@@ -232,8 +237,16 @@ def process_variance_data(prf_evo_array, metric, dist_scale, weight_func, vary_p
 
 	print 'processing data...'
 
-	# TODO: edit to take filt_evo_array
-		# compute prf_evo_array here
+	if vary_param_2 is None:
+		filt_evo_array = np.asarray([filt_evo_array])
+	else:
+		filt_evo_array = filt_evo_array.transpose((1, 0, 2))
+
+	prf_evo_array = np.asarray(
+		[[[f.get_PRF(new_format=True) for f in evo]
+			for evo in row]
+	            for row in filt_evo_array]
+	)
 
 	prf_evo_array_pre_weight = prf_evo_array
 
