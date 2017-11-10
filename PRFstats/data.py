@@ -9,14 +9,16 @@ def fetch_filts(
 		vary_param_1=None, vary_param_2=None,
 		id=None, filts_fname=None, out_fname=None
 ):
-	default_fname = 'PRFstats/data/filts{}.p'.format(id if id is not None else '')
+	# default_fname = 'PRFstats/data/filts{}.p'.format(id if id is not None else '')
+	default_fname = 'PRFstats/data/filts{}.npy'.format(id if id is not None else '')
 
 	if load_saved:
 		if filts_fname is None:
 			fname = default_fname
 		else:
 			fname = filts_fname
-		return cPickle.load(open(fname))
+		# return cPickle.load(open(fname))
+		return np.load(fname)
 
 	iter_1 = 1 if vary_param_1 is None else len(vary_param_1[1])
 	iter_2 = 1 if vary_param_2 is None else len(vary_param_2[1])
@@ -50,7 +52,8 @@ def fetch_filts(
 		fname = default_fname
 	else:
 		fname = out_fname
-	cPickle.dump(filts, open(fname, 'wb'))
+	# cPickle.dump(filts, open(fname, 'wb'))
+	np.save(fname, filts)
 	return filts
 
 
