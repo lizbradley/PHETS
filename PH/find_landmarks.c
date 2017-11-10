@@ -336,10 +336,25 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		if(speeds[i]<min_speed)
 			min_speed = speeds[i];
 	}
+	for(i=num_wits-2;i>=0;i--){
+		if(speeds[i]==0){
+			speeds[i] = speeds[i+1];
+			for(j=0;j<wit_pts;j++){
+				velocities[i*wit_pts+j] = velocities[(i+1)*wit_pts+j];
+			}
+		}
+	}
 	speeds[num_wits-1] = speeds[num_wits-2];
+
+
 	
 	for(i=0;i<num_wits-1;i++){
+		if(speeds[i]==0){
+			printf("for some reason %d's speed is zero\n",i);
+			fflush(stdout);
+		}
 		for(j=0;j<wit_pts;j++){
+
 			norm_velocity[i*wit_pts+j] = velocities[i*wit_pts+j]/speeds[i];
 		}
 	}
@@ -348,10 +363,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		norm_velocity[(num_wits-1)*wit_pts+j] = norm_velocity[(num_wits-2)*wit_pts+j];
 	}
 
-//    printf("\n");
-//	for(i=0; i < 16; i++){      //debugging
-//	    printf("%f \n", norm_velocity[i]);
-//	}
+
 	
 	printf("done\n");
 	fflush(stdout);
@@ -400,19 +412,25 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		fflush(stdout);
 		float dhamil=0.,deuc=0.;
 		if(use_hamiltonian<0){
-		
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts) private(i,j,k,deuc,dhamil,sum,ham_param)
+
+			ham_param = use_hamiltonian*use_hamiltonian - 1;
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,norm_velocity,distances,wit_pts,ham_param) private(i,j,k,deuc,dhamil,sum)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
 					for(j=0;j<num_wits;j++){
 						deuc = euc_distance[i*num_wits+j];
 						sum=0;
+						
 						for(k=0;k<wit_pts;k++){
 							sum+=(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k])*(norm_velocity[i*wit_pts+k]-norm_velocity[j*wit_pts+k]);
 						}
+						if(isnan(sum)){
+							printf("%d %d: one of the normalized velocities is nan\n",i,j);
+							fflush(stdout);
+						}
 						dhamil = sqrt(sum);
-						ham_param = use_hamiltonian*use_hamiltonian - 1;
+						
 						distances[i*num_wits+j] = sqrt(deuc*deuc+(ham_param*dhamil*dhamil));
 					}
 				}
@@ -420,7 +438,9 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 		}
 
 		else{
-			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,velocities,distances,wit_pts) private(i,j,k,deuc,dhamil,sum,ham_param)
+
+			ham_param = use_hamiltonian*use_hamiltonian - 1;
+			#pragma omp parallel num_threads(num_threads) shared(euc_distance,num_wits,witnesses,use_hamiltonian,velocities,distances,wit_pts,ham_param) private(i,j,k,deuc,dhamil,sum)
 			{
 				#pragma omp for nowait schedule (runtime)
 				for(i=0;i<num_wits;i++){
@@ -431,7 +451,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
 							sum+=(velocities[i*wit_pts+k]-velocities[j*wit_pts+k])*(velocities[i*wit_pts+k]-velocities[j*wit_pts+k]);
 						}
 						dhamil = sqrt(sum);
-						ham_param = use_hamiltonian*use_hamiltonian - 1;
+						
 						distances[i*num_wits+j] = sqrt(deuc*deuc+(ham_param*dhamil*dhamil));
 					}
 				}
