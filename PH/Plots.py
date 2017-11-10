@@ -11,8 +11,6 @@ from Data import Filtration
 from TitleBox import filename_table, filt_params_table
 
 # from Utilities import mem_profile
-import os
-print os.getcwd()
 # f=open("output/run_info/group_by_birth_time_memory.txt","wb")
 # f2=open("output/run_info/expand_to_2simplexes_memory.txt","wb")
 # f3=open("output/run_info/build_perseus_in_file_memory.txt","wb")
@@ -38,18 +36,10 @@ def PD_ax(ax, filtration):
 
 	ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k')		# diagonal line
 
-
-	# normal #
 	min_size = 0
 	t_ms_scale = 50
 	p_ms_scale = 30
 	color = 'C0'
-
-	# BIG for IDA paper #
-	# min_size = 300
-	# t_ms_scale = 150
-	# p_ms_scale = 60
-	# color = 'red'
 
 
 	# add legend #

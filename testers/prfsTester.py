@@ -4,11 +4,11 @@ change_dir()
 import numpy as np
 from signals import TimeSeries, Trajectory
 from PRFstats.interface import L2ROCs, plot_dists_to_means, plot_clusters, \
-	plot_dists_to_ref
+	plot_dists_to_ref, plot_variance
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=10)
+test, start_time = get_test(set_test=11)
 
 
 def out_fname():
@@ -323,12 +323,39 @@ if test == 10:
 		'max_filtration_param': -8
 	})
 
-	from PRFstats import plot_variance
 	plot_variance(
 		traj,
 		out_fname(),
 		filt_params,
 		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
+		quiet=False,
+		annot_hm=False,
+		load_saved_filts=True
+	)
+
+
+if test == 11:
+	ts = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+		window_length=2000,
+		vol_norm=(0, 0, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+	filt_params.update({
+		'ds_rate': 100,
+		'num_divisions': 10,
+		'max_filtration_param': -8
+	})
+
+	plot_variance(
+		traj,
+		out_fname(),
+		filt_params,
+		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
+		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=False,
 		annot_hm=False,
 		load_saved_filts=True

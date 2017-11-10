@@ -84,13 +84,20 @@ def plot_dists_to_means(
 		weight_func=lambda i, j: 1,
 		see_samples=5,
 		load_saved_filts=False,
+		filts_fnames=(None, None),
 		quiet=True
 	):
 
 	# TODO: weight_func, see_samples, time_units, unit test
 
-	filts1 = fetch_filts(traj1, filt_params, load_saved_filts, quiet)
-	filts2 = fetch_filts(traj2, filt_params, load_saved_filts, quiet)
+	filts1 = fetch_filts(
+		traj1, filt_params, load_saved_filts, quiet,
+		id=1, filts_fname=filts_fnames[0]
+	)
+	filts2 = fetch_filts(
+		traj2, filt_params, load_saved_filts, quiet,
+		id=2, filts_fname=filts_fnames[1]
+	)
 
 	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
 	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
@@ -110,14 +117,21 @@ def plot_clusters(
 		weight_func=lambda i, j: 1,
 		see_samples=5,
 		load_saved_filts=False,
+		filts_fnames=(None, None),
 		quiet=True
 ):
 
 	# TODO: weight_func, see_samples, unit test
 
 
-	filts1 = fetch_filts(traj1, filt_params, load_saved_filts, quiet)
-	filts2 = fetch_filts(traj2, filt_params, load_saved_filts, quiet)
+	filts1 = fetch_filts(
+		traj1, filt_params, load_saved_filts, quiet,
+		id=1, filts_fname=filts_fnames[0]
+	)
+	filts2 = fetch_filts(
+		traj2, filt_params, load_saved_filts, quiet,
+		id=2, filts_fname=filts_fnames[1]
+	)
 
 	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
 	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
@@ -134,15 +148,21 @@ def L2ROCs(
 		filt_params,
 		k,
 		load_saved_filts=False,
+		filts_fnames=(None, None),
 		see_samples=0,
 		quiet=True,
 		vary_param=None     # ('param', (100, 150, 200))
 ):
 	# TODO: add weight function
 
-	args = [filt_params, load_saved_filts, quiet, vary_param]
-	filts1_v = fetch_filts(traj1, *args)
-	filts2_v = fetch_filts(traj2, *args)
+	filts1_v = fetch_filts(
+		traj1, filt_params, load_saved_filts, quiet, vary_param,
+		id=1, filts_fname=filts_fnames[0]
+	)
+	filts2_v = fetch_filts(
+		traj2, filt_params, load_saved_filts, quiet, vary_param,
+		id=2, filts_fname=filts_fnames[1]
+	)
 
 	if vary_param is None:
 		filts1_v, filts2_v = [filts1_v], [filts2_v]
@@ -182,7 +202,6 @@ def L2ROCs(
 	return data
 
 
-# TODO: plot_variance
 def plot_variance(
 		traj,
 		out_filename,
@@ -198,7 +217,9 @@ def plot_variance(
 		see_samples=5,
 		quiet=True,
 		annot_hm=False,
-		load_saved_filts=False
+		load_saved_filts=False,
+		filts_fname=None,
+		unit_test=False
 ):
 
 	def sqrt_weight_func(x, y):
@@ -209,13 +230,15 @@ def plot_variance(
 		vary_param_2,
 		legend_labels,
 		weight_func,
-		filt_params
+		filt_params,
+		unit_test
 	)
 
 	filt_evo_array = fetch_filts(
 		traj, filt_params,
 		load_saved_filts, quiet,
-		vary_param_1, vary_param_2
+		vary_param_1, vary_param_2,
+		filts_fname=filts_fname
 	)
 
 
@@ -226,6 +249,7 @@ def plot_variance(
 		sqrt_weight_func,
 		vary_param_2
 	)
+
 	plot_variane_fig(
 		stats_data,
 		filt_params,
@@ -235,6 +259,7 @@ def plot_variance(
 		legend_labels,
 		traj.fname
 	)
+
 	plot_heatmaps(
 		hmap_data,
 		hmap_data_pw,
@@ -243,8 +268,10 @@ def plot_variance(
 	    vary_param_2,
 		legend_labels,
 		out_filename,
-		annot_hm
+		annot_hm,
+		unit_test
 	)
+
 	if see_samples:
 		dir = 'output/PRFstats/samples'
 		clear_old_files(dir, see_samples)
@@ -256,3 +283,4 @@ def plot_variance(
 			vary_param_2
 		)
 
+	return stats_data, hmap_data, hmap_data_pw

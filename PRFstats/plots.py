@@ -280,11 +280,18 @@ def plot_weight_functions(
 		vary_param_2,
 		legend_labels,
 		weight_func,
-		filt_params
+		filt_params,
+		unit_test=False
 ):
+	if unit_test:
+		out_dir = 'output/weight_functions/'
+		import os
+		print os.getcwd()
+	else:
+		out_dir = 'output/PRFstats/weight_functions/'
+
 	print 'plotting weight function(s)...'
-	dir = 'output/PRFstats/weight_functions/'
-	clear_temp_files(dir)
+	clear_temp_files(out_dir)
 
 	if vary_param_2 and vary_param_2[0] == 'weight_func':
 		funcs = vary_param_2[1]
@@ -312,7 +319,7 @@ def plot_weight_functions(
 		z = np.multiply(z, mask)
 
 		plot_heatmap(ax, cax, x, y, z)
-		plt.savefig('{}{}.png'.format(dir, fname))
+		plt.savefig('{}{}.png'.format(out_dir, fname))
 
 
 def plot_heatmaps(
@@ -324,9 +331,14 @@ def plot_heatmaps(
 		legend_labels,
 		filename,
 		annot_hm,
+		unit_test=False
 ):
 
-	out_dir = 'output/PRFstats/heatmaps/'
+	if unit_test:
+		out_dir = 'output/heatmaps/'
+		return
+	else:
+		out_dir = 'output/PRFstats/heatmaps/'
 
 	if not clear_dir(out_dir):
 		print 'skipping heatmaps'

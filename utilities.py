@@ -61,7 +61,7 @@ def clear_old_files(path, see_samples):
 def clear_dir(dir):
 
 	files = os.listdir(dir)
-	if files:
+	if files and not (len(files) == 1 and files[0] in ('.gitignore', '.gitkeep')):
 		r = raw_input('Clear files in {}? (y/n/q) '.format(dir))
 	else:
 		return True
@@ -78,12 +78,19 @@ def clear_dir(dir):
 		print 'Goodbye'
 		sys.exit()
 
+def clear_dir_force(dir):
+	for subdir, dirs, files in os.walk(dir):
+		for file in files:
+			if file not in ('.gitignore', '.gitkeep'):
+				fname = os.path.join(subdir, file)
+				os.remove(fname)
+
 
 def clear_temp_files(dir):
 	if not dir.endswith('/'):
 		dir = dir + '/'
 	for f in os.listdir(dir):
-		if f != '.gitignore':
+		if f not in ('.gitignore', '.gitkeep'):
 			os.remove(dir + f)
 
 
