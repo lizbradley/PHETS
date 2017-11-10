@@ -6,7 +6,7 @@ from config import find_landmarks_c_compile_str
 
 
 
-# remove all .pyc and
+# remove all .pyc
 for subdir, dirs, files in os.walk('.'):
     for file in files:
         if file.endswith('.pyc'):
