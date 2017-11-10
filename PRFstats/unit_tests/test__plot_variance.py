@@ -2,13 +2,12 @@ import cPickle
 import numpy as np
 
 from PRFstats import plot_variance
-from config import default_filtration_params as filt_params
 from utilities import clear_dir_force
 
 from paths import chdir
 chdir()
 
-from common import viol_traj
+from common import filt_params, viol_traj
 
 
 def test__plot_variance_vv():

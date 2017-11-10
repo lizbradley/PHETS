@@ -1,19 +1,16 @@
 import numpy as np
-import sys, os
 
 from PRFstats import L2ROCs
-from config import default_filtration_params as filt_params
 from utilities import clear_dir_force
 
 from paths import chdir
 chdir()
 
-from common import viol_traj, clar_traj
+from common import filt_params, viol_traj, clar_traj
 
 
 def test__L2ROCs_v():
 	chdir()
-	print os.getcwd()
 	clear_dir_force('output')
 	out = L2ROCs(
 		clar_traj, viol_traj,

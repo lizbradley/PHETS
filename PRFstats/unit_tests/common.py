@@ -1,4 +1,4 @@
-from signals import TimeSeries
+from signals import TimeSeries, Trajectory
 from config import default_filtration_params as filt_params
 
 filt_params.update({
@@ -6,6 +6,13 @@ filt_params.update({
 	'num_divisions': 10,
 	'max_filtration_param': -8
 })
+
+ellipse_traj = Trajectory(
+	'data/ellipse.txt',
+	crop=(100, 900),
+	num_windows=5,
+	vol_norm=(1, 1, 1)
+)
 
 clar_traj = TimeSeries(
 	'data/40-clarinet.txt',
