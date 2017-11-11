@@ -242,7 +242,7 @@ if test == 6:
 		out_fname(),
 		filt_params,
 		quiet=False,
-		load_saved_filts=True
+		load_saved_filts=False
 	)
 
 

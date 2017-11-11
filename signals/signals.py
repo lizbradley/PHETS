@@ -1,10 +1,10 @@
-import numpy as np
 import sys
+import numpy as np
 
+import plots
 from DCE import embed
 from PH import Filtration
 from config import SAMPLE_RATE
-from signals import plots
 from utilities import print_title
 
 

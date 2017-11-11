@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt; plt.ioff()
 import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from filtration import Filtration
+import filtration
 from titlebox import filename_table, filt_params_table
 
 # from Utilities import mem_profile
@@ -161,7 +161,7 @@ def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
 		divider = make_axes_locatable(ax)
 		cbar_ax = divider.append_axes('right', size='5%', pad=0.05)
 
-	if isinstance(filtration, Filtration):
+	if isinstance(filtration, filtration.Filtration):
 		z = filtration._PRF()
 		x = y = filtration.epsilons
 		plot_heatmap(ax, cbar_ax, x, y, z, annot_hm)
@@ -185,7 +185,7 @@ def PRF(filtration, out_filename, params=None, in_filename=None,
 
 	######## from here ##########
 
-	if isinstance(filtration, Filtration):
+	if isinstance(filtration, filtration.Filtration):
 		func = filtration.PRF()
 		in_filename = filtration.filename
 		params = filtration.params

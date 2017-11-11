@@ -4,7 +4,6 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import signals, PH
-from PH import PD, PRF, make_movie
 from PH.plots import plot_heatmap
 from PH.titlebox import filt_params_table, filenames_table
 from utilities import print_title, clear_dir, clear_temp_files
@@ -62,9 +61,9 @@ def samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
 				PRF_filename = base_name + 'PRF.png'
 				movie_filename = base_name + 'movie.mp4'
 
-				PD(filt, PD_filename)
-				PRF(filt, PRF_filename)
-				make_movie(filt, movie_filename)
+				filt.plot_PD(PD_filename)
+				filt.plot_PRF(PRF_filename)
+				filt.movie(movie_filename)
 
 
 def plot_dists_ax(ax, d, mean, traj):
