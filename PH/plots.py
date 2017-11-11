@@ -1,13 +1,10 @@
+import numpy as np
 import matplotlib.colors as colors
-import matplotlib.pyplot as pyplot
+import matplotlib.pyplot as plt; plt.ioff()
 import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-pyplot.ioff()
-
-import numpy as np
-
-from data import Filtration
+from filtration import Filtration
 from titlebox import filename_table, filt_params_table
 
 # from Utilities import mem_profile
@@ -84,20 +81,20 @@ def PD_ax(ax, filtration):
 def PD(filt, out_filename):
 	print '\nplotting persistence diagram...'
 
-	fig = pyplot.figure(figsize=(6, 4), tight_layout=True, dpi=700)
+	fig = plt.figure(figsize=(6, 4), tight_layout=True, dpi=700)
 
-	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
+	fname_ax = 		plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)
-	params_ax = 	pyplot.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
-	plot_ax = 		pyplot.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
+	params_ax = 	plt.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
+	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 
 	PD_ax(plot_ax, filt)
 	filename_table(fname_ax, filt.filename)
 	filt_params_table(params_ax, filt.params)
 
 
-	pyplot.savefig(out_filename)
-	pyplot.close(fig)
+	plt.savefig(out_filename)
+	plt.close(fig)
 
 
 import matplotlib
@@ -179,12 +176,12 @@ def PRF(filtration, out_filename, params=None, in_filename=None,
         annot_hm=False):
 	print "plotting PRF..."
 
-	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
-	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
+	fig = plt.figure(figsize=(10, 6), tight_layout=True, dpi=300)
+	fname_ax = 		plt.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)
-	params_ax = 	pyplot.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
-	plot_ax = 		pyplot.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
-	cbar_ax = 		pyplot.subplot2grid((6, 10), (0, 9), rowspan=6)
+	params_ax = 	plt.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
+	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
+	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
 	######## from here ##########
 
@@ -211,6 +208,6 @@ def PRF(filtration, out_filename, params=None, in_filename=None,
 
 
 	fig.savefig(out_filename)
-	pyplot.close(fig)
+	plt.close(fig)
 
 

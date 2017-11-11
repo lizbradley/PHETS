@@ -1,2 +1,2 @@
-from data import *
+from signals import *
 import plots

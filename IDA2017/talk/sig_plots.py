@@ -1,6 +1,6 @@
 import numpy as np
 
-from signals.data import Signal, BaseTrajectory
+from signals.signals import Signal, BaseTrajectory
 from signals.plots import ts
 
 from Tools import sec_to_samp
