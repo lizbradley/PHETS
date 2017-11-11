@@ -1,15 +1,12 @@
 import os
 import sys
 import time
-import pickle, cPickle
-import subprocess
+import cPickle
 import warnings
 
 import numpy as np
 import itertools
-# from numba import jit
-import build_filtration
-import plots
+import build_filtration, plots, filtration_movie
 from utilities import blockPrint, enablePrint
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -449,6 +446,8 @@ class Filtration:
 		else:
 			return self._PRF
 
+	def movie(self, filename, **kwargs):
+		filtration_movie.make_movie(self, filename, **kwargs)
 
 	def plot_PD(self, filename):
 		plots.PD(self, filename)
