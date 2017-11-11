@@ -4,8 +4,8 @@ change_dir()
 import numpy as np
 from DCE import embed, plot_signal
 from DCE.Plots import plot_dce
-from DCE.Movies import slide_window, vary_tau
-from PH import Filtration, make_movie, make_PD, make_PRF_plot
+from DCE.movies_old import slide_window, vary_tau
+from PH import Filtration, make_movie, PD, PRF
 from config import default_filtration_params as filt_params
 
 test, start_time = get_test(set_test=0)

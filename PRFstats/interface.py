@@ -59,8 +59,8 @@ def plot_dists_to_ref(
 		cPickle.dump(ref_filt, open('PRFstats/data/ref_filt.p', 'wb'))
 
 
-	prfs = [f.get_PRF(new_format=True) for f in filts]
-	ref_prf = ref_filt.get_PRF(new_format=True)
+	prfs = [f.PRF(new_format=True) for f in filts]
+	ref_prf = ref_filt.PRF(new_format=True)
 
 	dists = dists_to_ref(prfs, ref_prf, metric, dist_scale)
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
@@ -99,8 +99,8 @@ def plot_dists_to_means(
 		id=2, filts_fname=filts_fnames[1]
 	)
 
-	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
-	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
+	prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
+	prfs2 = [f.PRF(silent=quiet, new_format=True) for f in filts2]
 
 	refs, dists = mean_dists_compare(prfs1, prfs2, metric, dist_scale)
 
@@ -133,8 +133,8 @@ def plot_clusters(
 		id=2, filts_fname=filts_fnames[1]
 	)
 
-	prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
-	prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
+	prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
+	prfs2 = [f.PRF(silent=quiet, new_format=True) for f in filts2]
 
 	refs, dists = mean_dists_compare(prfs1, prfs2, metric, dist_scale)
 
@@ -170,8 +170,8 @@ def L2ROCs(
 
 	for filts1, filts2 in zip(filts1_v, filts2_v):
 
-		prfs1 = [f.get_PRF(silent=quiet, new_format=True) for f in filts1]
-		prfs2 = [f.get_PRF(silent=quiet, new_format=True) for f in filts2]
+		prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
+		prfs2 = [f.PRF(silent=quiet, new_format=True) for f in filts2]
 
 		train1, test1 = prfs1[1::2], prfs1[::2]
 		train2, test2 = prfs2[1::2], prfs2[::2]

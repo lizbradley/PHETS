@@ -5,7 +5,7 @@ from signals import TimeSeries
 import numpy as np
 from utilities import idx_to_freq
 from DCE.movies import slide_window
-from PH import Filtration, make_movie, make_PD, make_PRF_plot
+from PH import Filtration, make_movie, PD, PRF
 from config import default_filtration_params as filt_params
 
 

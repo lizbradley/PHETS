@@ -3,7 +3,7 @@ change_dir()
 
 import time, math
 from utilities import wav_to_txt, batch_wav_to_txt
-from DCE.Movies import vary_tau, slide_window, compare_vary_tau, compare_multi
+from DCE.movies_old import vary_tau, slide_window, compare_vary_tau, compare_multi
 
 test, start_time = get_test(set_test=4)
 

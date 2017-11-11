@@ -64,7 +64,7 @@ def PD_ax(ax, filtration):
 		#edgecolor='k'
 	)
 
-	data = filtration.get_PD_data()
+	data = filtration.PD_data()
 	if data == 'empty':
 		return
 
@@ -81,10 +81,10 @@ def PD_ax(ax, filtration):
 
 
 # @profile(stream=f4)
-def make_PD(filt, out_filename):
+def PD(filt, out_filename):
 	print '\nplotting persistence diagram...'
 
-	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=700)
+	fig = pyplot.figure(figsize=(6, 4), tight_layout=True, dpi=700)
 
 	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)
@@ -165,7 +165,7 @@ def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
 		cbar_ax = divider.append_axes('right', size='5%', pad=0.05)
 
 	if isinstance(filtration, Filtration):
-		z = filtration.get_PRF()
+		z = filtration.PRF()
 		x = y = filtration.epsilons
 		plot_heatmap(ax, cbar_ax, x, y, z, annot_hm)
 	else:   # 2d array
@@ -175,11 +175,11 @@ def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
 
 
 
-def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
-				  annot_hm=False):
+def PRF(filtration, out_filename, params=None, in_filename=None,
+        annot_hm=False):
 	print "plotting PRF..."
 
-	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
+	fig = pyplot.figure(figsize=(6, 4), tight_layout=True, dpi=300)
 	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)
 	params_ax = 	pyplot.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)
@@ -189,7 +189,7 @@ def make_PRF_plot(filtration, out_filename, params=None, in_filename=None,
 	######## from here ##########
 
 	if isinstance(filtration, Filtration):
-		func = filtration.get_PRF()
+		func = filtration.PRF()
 		in_filename = filtration.filename
 		params = filtration.params
 	else:

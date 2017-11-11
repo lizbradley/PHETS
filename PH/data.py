@@ -9,6 +9,7 @@ import numpy as np
 import itertools
 # from numba import jit
 import build_filtration
+from PH import plots
 from utilities import blockPrint, enablePrint
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -371,7 +372,7 @@ class Filtration:
 		xx, yy = np.meshgrid(x_, y_)
 
 		try:                           				# many mortal intervals
-			x, y, z = self.get_PD_data().mortal
+			x, y, z = self.PD_data().mortal
 			try:
 				pts = zip(x, y, z)
 			except TypeError: 						# one mortal interval
@@ -380,7 +381,7 @@ class Filtration:
 			pts = []
 
 		try:                                    	# many immortal intervals
-			x_imm, z_imm = self.get_PD_data().immortal
+			x_imm, z_imm = self.PD_data().immortal
 			try:
 				pts_imm = zip(x_imm, z_imm)
 			except TypeError:                    	# one immortal interval
@@ -426,7 +427,7 @@ class Filtration:
 		return IDs_to_coords(self.complexes)
 
 
-	def get_PD_data(self):
+	def PD_data(self):
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
 		self._get_intervals()		# calls perseus, sets self.intervals
@@ -435,7 +436,7 @@ class Filtration:
 		return self.PD_data
 
 
-	def get_PRF(self, silent=False, new_format=False):
+	def PRF(self, silent=False, new_format=False):
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
 		self._get_intervals(silent=silent)
@@ -448,3 +449,9 @@ class Filtration:
 		else:
 			return self.PRF
 
+
+	def plot_PD(self, filename):
+		plots.PD(self, filename)
+
+	def plot_PRF(self, filename):
+		plots.PRF(self, filename)

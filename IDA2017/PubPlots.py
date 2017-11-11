@@ -12,7 +12,7 @@ from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from DCE.Plots import plot_signal_zoom
-from DCE.Tools import auto_crop
+from DCE.signal_proc import auto_crop
 
 from config import SAMPLE_RATE
 
@@ -53,7 +53,7 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True, fig
 
 		ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k', zorder=0)  # diagonal line
 
-		data = filtration.get_PD_data()
+		data = filtration.PD_data()
 		if data == 'empty':
 			return
 

@@ -2,7 +2,7 @@ from boilerplate import change_dir, get_test
 change_dir()
 
 from matplotlib.pyplot import ioff; ioff()
-from PH import Filtration, make_movie, make_PD
+from PH import Filtration, make_movie, PD
 from PRFCompare.Plots import plot_variance
 from config import default_filtration_params as parameter_set
 
@@ -31,7 +31,7 @@ if test == 1:
 
 	filt = Filtration(in_fname, params)		# BUG: filtration only has 7 steps !!
 	make_movie(filt, movie_fname(test), color_scheme='highlight new')
-	make_PD(filt, pd_fname(test))
+	PD(filt, pd_fname(test))
 
 
 if test == 2:
@@ -50,7 +50,7 @@ if test == 2:
 
 	filt = Filtration(in_fname, params)		# BUG: filtration only has 5 steps !!
 	make_movie(filt, movie_fname(test))
-	make_PD(filt, pd_fname(test))
+	PD(filt, pd_fname(test))
 
 
 

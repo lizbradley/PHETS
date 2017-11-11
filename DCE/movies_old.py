@@ -6,7 +6,7 @@ import sys
 
 from utilities import frames_to_movie
 
-from Tools import auto_tau, auto_crop, crop_sig
+from signal_proc import auto_tau, auto_crop, crop_sig
 
 from config import SAMPLE_RATE
 

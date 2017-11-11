@@ -245,7 +245,7 @@ def process_variance_data(
 		filt_evo_array = filt_evo_array.transpose((1, 0, 2))
 
 	prf_evo_array = np.asarray(
-		[[[f.get_PRF(new_format=True) for f in evo]
+		[[[f.PRF(new_format=True) for f in evo]
 			for evo in row]
 	            for row in filt_evo_array]
 	)
