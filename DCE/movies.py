@@ -1,11 +1,15 @@
-def slide_window(
-		out_filename,
-		tau=10,
-		ds_rate=1,
-		m=2,
-		save_movie=True,
-		framerate=1
-):
-	# implement with using signals module
-	# write new waveform / window / crop plotting stuff in signals
-	pass
+from plots import slide_window_frame
+from utilities import remove_old_frames, print_still, frames_to_movie
+
+
+def slide_window(traj, out_fname, framerate=1):
+	remove_old_frames('DCE/frames/')
+	frame_fname = 'DCE/frames/frame%03d.png'
+
+	for i in range(traj.num_windows):
+		print_still('frame {} of {}'.format(i, traj.num_windows))
+		slide_window_frame(traj, i, frame_fname % i)
+
+	frames_to_movie(out_fname, frame_fname,
+	                framerate=framerate, loglevel='error')
+

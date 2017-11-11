@@ -110,6 +110,9 @@ def print_title(str):
 		print str
 		print '=================================================================='
 
+def print_still(str):
+	sys.stdout.write('\r{}\t\t'.format(str))
+	sys.stdout.flush()
 
 def count_lines(dir, blanks=True):
 

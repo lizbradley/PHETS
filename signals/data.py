@@ -4,6 +4,7 @@ import sys
 from DCE import embed
 from PH import Filtration
 from config import SAMPLE_RATE
+from signals import plots
 from utilities import print_title
 
 
@@ -44,7 +45,7 @@ class BaseTrajectory(object):
 		if self.norm_vol[0]:
 			self.data_full = self.normalize(self.data_full)
 		self.data = self.crop(crop)
-		self.windows, self.win_start_idxs = self.slice(
+		self.windows, self.win_start_pts = self.slice(
 			num_windows, window_length
 		)
 
@@ -99,10 +100,13 @@ class BaseTrajectory(object):
 				window_length = int(window_length * SAMPLE_RATE)
 			windows = [self.data[sp:sp + window_length] for sp in start_idxs]
 
+			if self.time_units == 'seconds':
+				start_idxs = start_idxs / SAMPLE_RATE
+
 		if self.norm_vol[2]:
 			windows = [self.normalize(w) for w in windows]
 
-		self.windows, self.win_start_idxs = windows, start_idxs
+		self.windows, self.win_start_pts = windows, start_idxs
 		return windows, start_idxs
 
 
@@ -134,6 +138,9 @@ class TimeSeries(BaseTrajectory):
 		traj.embed_params = {'tau': tau, 'm': m}
 
 		return traj
+
+	def plot(self, filename):
+		plots.ts(self, filename)
 
 
 

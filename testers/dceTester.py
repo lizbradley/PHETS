@@ -177,3 +177,9 @@ if test == 10:
 		
 	)
 
+if test == 11:
+	from DCE.movies import slide_window
+
+	ts = TimeSeries(
+		'data'
+	)

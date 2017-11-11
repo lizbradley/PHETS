@@ -2,11 +2,12 @@ import math
 import sys
 
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
 import numpy as np
-from matplotlib import pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
-import TitleBox
+import titlebox
 from config import SAMPLE_RATE
 
 
@@ -88,15 +89,14 @@ def plot_signal_zoom(ax, full_sig, crop, time_units='seconds', sig=None):
 def plot_title(fname_ax, param_ax, title_info):
 	""" for slide window movies """
 
-	TitleBox.add_fname_table(fname_ax, title_info)
-	TitleBox.add_param_table(param_ax, title_info)
+	titlebox.title_table(fname_ax, title_info)
+	titlebox.param_table(param_ax, title_info)
 
 
 
-def make_frame(traj, sig, window, frame_fname, title_info, time_units=None):
+def slide_window_frame(data, traj, window):
 	fig = plt.figure(figsize=(10, 8), tight_layout=False, dpi=100)
 	# fig.subplots_adjust(hspace=.5)
-	m = title_info['m']
 
 	fname_ax = 				plt.subplot2grid((8, 10), (0, 0), colspan=3)
 	param_ax =				plt.subplot2grid((8, 10), (1, 0), colspan=3, rowspan=3)
@@ -104,14 +104,7 @@ def make_frame(traj, sig, window, frame_fname, title_info, time_units=None):
 	if m == 2: dce_ax =		plt.subplot2grid((8, 10), (0, 4), colspan=6, rowspan=6)
 	else: dce_ax = 			plt.subplot2grid((8, 10), (0, 4), colspan=6, rowspan=6, projection='3d')
 
-	# if m == 2: dce_ax =		fig.add_axes([.4, .3, .6, .6])
-	# else: dce_ax =			fig.add_axes([.4, .3, .6, .6], projection='3d')
-
-	if title_info['crop']:
-		t_offset = title_info['crop'][0]
-	else:
-		t_offset = 0
-
+	gs = gridspec.GridSpec(8, 10)
 
 	plot_title(fname_ax, param_ax, title_info)
 	plot_dce(fig, dce_ax, traj)

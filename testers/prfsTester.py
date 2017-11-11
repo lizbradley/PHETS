@@ -8,7 +8,7 @@ from PRFstats.interface import L2ROCs, plot_dists_to_means, plot_clusters, \
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=11)
+test, start_time = get_test(set_test=6)
 
 
 def out_fname():
@@ -241,7 +241,8 @@ if test == 6:
 		traj1, traj2,
 		out_fname(),
 		filt_params,
-		quiet=False
+		quiet=False,
+		load_saved_filts=True
 	)
 
 
