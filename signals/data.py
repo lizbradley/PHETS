@@ -36,18 +36,16 @@ class BaseTrajectory(object):
 		self.crop_lim = crop
 		self.num_windows = num_windows
 		self.window_length = window_length
-		if time_units in ('samples', 'seconds'):
-			self.time_units = time_units
-		else:
-			print "ERROR: invalid 'time_units'; use 'samples' or 'seconds'"
-			sys.exit()
+		self.time_units = time_units
 
 		if self.norm_vol[0]:
 			self.data_full = self.normalize(self.data_full)
-		self.data = self.crop(crop)
-		self.windows, self.win_start_pts = self.slice(
-			num_windows, window_length
-		)
+
+		self.data = None
+		self.windows = None
+		self.win_start_pts = None
+		self.crop(crop)
+		self.slice(num_windows, window_length)
 
 
 	@staticmethod
@@ -57,7 +55,7 @@ class BaseTrajectory(object):
 
 	def crop(self, lim):
 		if lim is None:
-			data = self.data_full
+			self.data = self.data_full
 
 		else:
 			crop_lim = np.array(self.crop_lim)
@@ -79,13 +77,26 @@ class BaseTrajectory(object):
 			if self.norm_vol[1]:
 				data = self.normalize(data)
 
-		self.data = data
-		return data
+			self.data = data
 
+
+	def _spawn(self, windows_raw):
+		windows = []
+		kwargs = {
+			'fname': self.fname,
+			'time_units': self.time_units
+		}
+		parent_type = type(self)
+		for w in windows_raw:
+			if parent_type is Trajectory:
+				windows.append(Trajectory(w, **kwargs))
+			elif parent_type is TimeSeries:
+				windows.append(TimeSeries(w, **kwargs))
+		return windows
 
 	def slice(self, num_windows, window_length):
 		if num_windows is None:
-			return None, None
+			return
 		else:
 			start_idxs = np.floor(
 				np.linspace(0, len(self.data), num_windows, endpoint=False)
@@ -106,8 +117,8 @@ class BaseTrajectory(object):
 		if self.norm_vol[2]:
 			windows = [self.normalize(w) for w in windows]
 
-		self.windows, self.win_start_pts = windows, start_idxs
-		return windows, start_idxs
+		self.win_start_pts =  start_idxs
+		self.windows = self._spawn(windows)
 
 
 
@@ -163,15 +174,16 @@ class Trajectory(BaseTrajectory):
 
 		print_title('building filtrations for {}...'.format(self.name))
 		filts = []
-		for i, t in enumerate(self.windows):
+		windows_raw = [w.data for w in self.windows]
+		for i, t in enumerate(windows_raw):
 			if quiet:
 				sys.stdout.write('\rwindow {} of {}...'.format(
-					i + 1, len(self.windows))
+					i + 1, len(windows_raw))
 				)
 				sys.stdout.flush()
 			else:
 				print_title('{} window {} of {}...'.format(
-						self.name, i + 1, len(self.windows))
+						self.name, i + 1, len(windows_raw))
 				)
 			f = Filtration(t, filt_params, silent=quiet,
 			               name='{}__window_{}'.format(self.name, i))

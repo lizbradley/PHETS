@@ -66,7 +66,7 @@ def slide_window_frame(traj, window, out_fname):
 		dce_ax =    fig.add_subplot(gs[0:6,  4:10], projection='3d')
 
 	plot_title(fname_ax, param_ax, traj, window)
-	plot_dce(fig, dce_ax, traj.windows[window])
+	plot_dce(fig, dce_ax, traj.windows[window].data)
 	signals.plots.ts_crop_ax(ts_ax, traj.source_ts, window)
 	plt.savefig(out_fname)
 	plt.close(fig)

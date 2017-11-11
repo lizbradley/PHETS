@@ -60,7 +60,7 @@ def plot_dists_to_ref(
 
 
 	prfs = [f.PRF(new_format=True) for f in filts]
-	ref_prf = ref_filt.PRF(new_format=True)
+	ref_prf = ref_filt._PRF(new_format=True)
 
 	dists = dists_to_ref(prfs, ref_prf, metric, dist_scale)
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)

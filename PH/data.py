@@ -9,7 +9,7 @@ import numpy as np
 import itertools
 # from numba import jit
 import build_filtration
-from PH import plots
+import plots
 from utilities import blockPrint, enablePrint
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -75,8 +75,8 @@ class Filtration:
 		assert(self.num_div == len(self.epsilons))
 
 		self.intervals = None
-		self.PD_data = None
-		self.PRF = None
+		self._PD = None
+		self._PRF = None
 
 		if out_fname:
 			if not silent: print 'pickling...'
@@ -298,7 +298,7 @@ class Filtration:
 			return count
 
 
-		if self.PD_data:
+		if self._PD:
 			return
 
 
@@ -350,29 +350,29 @@ class Filtration:
 
 		data = PDData(mortal, immortal, lim)
 
-		self.PD_data = data
+		self._PD = data
 
 
 	def _build_PRF(self):
 
-		if self.PRF is not None:
+		if self._PRF is not None:
 			return
 
 		num_div = self.num_div
 
-		if self.PD_data.empty:
+		if self._PD.empty:
 			eps = np.asarray(self.epsilons)
-			self.PRF = [eps, eps, np.zeros([num_div, num_div]), eps[-1]]
+			self._PRF = [eps, eps, np.zeros([num_div, num_div]), eps[-1]]
 			return
 
-		max_lim = self.PD_data.lim
+		max_lim = self._PD.lim
 		min_lim = 0
 
 		x_ = y_ = np.linspace(min_lim, max_lim, num_div)
 		xx, yy = np.meshgrid(x_, y_)
 
 		try:                           				# many mortal intervals
-			x, y, z = self.PD_data().mortal
+			x, y, z = self._PD.mortal
 			try:
 				pts = zip(x, y, z)
 			except TypeError: 						# one mortal interval
@@ -381,7 +381,7 @@ class Filtration:
 			pts = []
 
 		try:                                    	# many immortal intervals
-			x_imm, z_imm = self.PD_data().immortal
+			x_imm, z_imm = self._PD.immortal
 			try:
 				pts_imm = zip(x_imm, z_imm)
 			except TypeError:                    	# one immortal interval
@@ -404,7 +404,7 @@ class Filtration:
 				grid_vals[i] = np.nan
 		grid_vals = np.reshape(grid_vals, xx.shape)
 
-		self.PRF = [xx, yy, grid_vals, max_lim]
+		self._PRF = [xx, yy, grid_vals, max_lim]
 
 
 	# public #
@@ -427,13 +427,13 @@ class Filtration:
 		return IDs_to_coords(self.complexes)
 
 
-	def PD_data(self):
+	def PD(self):
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
 		self._get_intervals()		# calls perseus, sets self.intervals
 		self._build_PD_data()		# sets self.PD_data, returns PD_data
 		os.chdir(caller_dir)
-		return self.PD_data
+		return self._PD
 
 
 	def PRF(self, silent=False, new_format=False):
@@ -445,9 +445,9 @@ class Filtration:
 		os.chdir(caller_dir)
 
 		if new_format:
-			return self.PRF[2]
+			return self._PRF[2]
 		else:
-			return self.PRF
+			return self._PRF
 
 
 	def plot_PD(self, filename):

@@ -64,7 +64,7 @@ def PD_ax(ax, filtration):
 		#edgecolor='k'
 	)
 
-	data = filtration.PD_data()
+	data = filtration.PD()
 	if data == 'empty':
 		return
 
@@ -165,7 +165,7 @@ def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
 		cbar_ax = divider.append_axes('right', size='5%', pad=0.05)
 
 	if isinstance(filtration, Filtration):
-		z = filtration.PRF()
+		z = filtration._PRF()
 		x = y = filtration.epsilons
 		plot_heatmap(ax, cbar_ax, x, y, z, annot_hm)
 	else:   # 2d array
@@ -179,7 +179,7 @@ def PRF(filtration, out_filename, params=None, in_filename=None,
         annot_hm=False):
 	print "plotting PRF..."
 
-	fig = pyplot.figure(figsize=(6, 4), tight_layout=True, dpi=300)
+	fig = pyplot.figure(figsize=(10, 6), tight_layout=True, dpi=300)
 	fname_ax = 		pyplot.subplot2grid((6, 10), (0, 0), rowspan=1, colspan=3)
 	# epsilon_ax = 	pyplot.subplot2grid((6, 10), (1, 0), rowspan=1, colspan=3)
 	params_ax = 	pyplot.subplot2grid((6, 10), (2, 0), rowspan=4, colspan=3)

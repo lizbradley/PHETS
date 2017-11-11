@@ -1,6 +1,5 @@
 import DCE
 # from MovieTools import frames_to_movie
-import Plots
 import numpy as np
 import sys
 
@@ -10,8 +9,6 @@ from signal_proc import auto_tau, auto_crop, crop_sig
 
 from config import SAMPLE_RATE
 
-from MovieTools import remove_old_frames
-from MovieTools import prep_save_worms_double, save_worms_double
 
 
 def get_data(fname):

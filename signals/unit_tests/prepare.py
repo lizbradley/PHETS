@@ -9,11 +9,13 @@ os.chdir(current_dir)
 from common import clar_ts, ellipse_traj
 
 def prepare_clar_ts():
-	np.save('ref/clar_ts.npy', clar_ts.windows)
+	raw_windows = [w.data for w in clar_ts.windows]
+	np.save('ref/clar_ts.npy', raw_windows)
 
 
 def prepare_ellipse_traj():
-	np.save('ref/ellipse_traj.npy', ellipse_traj.windows)
+	raw_windows = [w.data for w in ellipse_traj.windows]
+	np.save('ref/ellipse_traj.npy', raw_windows)
 
 if __name__ == '__main__':
 	# prepare_clar_ts()

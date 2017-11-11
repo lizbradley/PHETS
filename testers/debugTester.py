@@ -2,11 +2,11 @@ from boilerplate import change_dir, get_test
 change_dir()
 
 from matplotlib.pyplot import ioff; ioff()
-from PH import Filtration, make_movie, PD
-from PRFCompare.Plots import plot_variance
+from PH import Filtration, make_movie, PD, PRF
+from PRFstats import plot_variance
 from config import default_filtration_params as parameter_set
 
-test, start_time = get_test(set_test=6)
+test, start_time = get_test(set_test=1)
 
 def movie_fname(test, str=''):
 	return 'output/debug/test_{}_{}_movie.mp4'.format(test, str)
@@ -30,8 +30,9 @@ if test == 1:
 		})
 
 	filt = Filtration(in_fname, params)		# BUG: filtration only has 7 steps !!
-	make_movie(filt, movie_fname(test), color_scheme='highlight new')
+	# make_movie(filt, movie_fname(test), color_scheme='highlight new')
 	PD(filt, pd_fname(test))
+	PRF(filt, 'output/debug/test_1_PRF.png')
 
 
 if test == 2:
