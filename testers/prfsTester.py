@@ -3,7 +3,7 @@ change_dir()
 
 import numpy as np
 from signals import TimeSeries, Trajectory
-from PRFstats.interface import L2ROCs, plot_dists_to_means, plot_clusters, \
+from PRFstats import L2ROCs, plot_dists_to_means, plot_clusters, \
 	plot_dists_to_ref, plot_variance
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
