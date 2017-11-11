@@ -1,5 +1,3 @@
-import cPickle
-
 import numpy as np
 import sys
 
