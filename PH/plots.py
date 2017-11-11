@@ -7,8 +7,8 @@ pyplot.ioff()
 
 import numpy as np
 
-from Data import Filtration
-from TitleBox import filename_table, filt_params_table
+from data import Filtration
+from titlebox import filename_table, filt_params_table
 
 # from Utilities import mem_profile
 # f=open("output/run_info/group_by_birth_time_memory.txt","wb")

@@ -21,8 +21,8 @@ def plot_title(fname_ax, param_ax, traj, window):
 
 	titlebox.param_table(param_ax, params)
 
-def plot_dce(fig, ax, dce_data):
 
+def plot_dce(fig, ax, dce_data):
 	amb_dim = dce_data.shape[1]
 
 	if amb_dim == 2:
@@ -56,14 +56,14 @@ def slide_window_frame(traj, window, out_fname):
 
 	gs = gridspec.GridSpec(8, 10)
 
-	fname_ax =      fig.add_subplot(    gs[0,     :3 ]  )
-	param_ax =      fig.add_subplot(    gs[1:4,   :3 ]  )
-	ts_ax =         fig.add_subplot(    gs[6:8,   :10]  )
+	fname_ax =      fig.add_subplot(gs[0,     :3 ])
+	param_ax =      fig.add_subplot(gs[1:4,   :3 ])
+	ts_ax =         fig.add_subplot(gs[6:8,   :10])
 
 	if traj.embed_params['m'] == 2:
-		dce_ax =    fig.add_subplot(    gs[0:6,  4:10]  )
+		dce_ax =    fig.add_subplot(gs[0:6,  4:10])
 	else:
-		dce_ax =    fig.add_subplot(    gs[0:6,  4:10], projection='3d')
+		dce_ax =    fig.add_subplot(gs[0:6,  4:10], projection='3d')
 
 	plot_title(fname_ax, param_ax, traj, window)
 	plot_dce(fig, dce_ax, traj.windows[window])

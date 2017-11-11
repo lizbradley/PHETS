@@ -1,8 +1,4 @@
-import sys
 import numpy as np
-from config import SAMPLE_RATE
-
-
 
 def embed(signal, tau, m):
 
@@ -16,15 +12,3 @@ def embed(signal, tau, m):
 		traj.append(pt)
 
 	return np.asarray(traj)
-
-
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
-	pass

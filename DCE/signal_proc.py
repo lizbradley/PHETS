@@ -24,6 +24,7 @@ def crop_sig(sig, crop, time_units):
 
 	return sig
 
+
 def auto_crop(crop_cmd, sig, length, time_units='seconds'):
 	"""
 		returns crop in seconds. if 'auto':
@@ -165,7 +166,6 @@ def auto_tau(tau_cmd, sig, note_index, tau_T, crop, filename):
 
 
 def plot_power_spectrum(sig, out_file, crop=(1,2)):
-	from DCE import plot_signal
 	samp_freq = 44100.
 
 	if crop != 'none':
@@ -189,8 +189,6 @@ def plot_power_spectrum(sig, out_file, crop=(1,2)):
 	subplots[0].set_xlim([20, 20000])
 	subplots[0].plot(FFT_x[1:len(FFT_x)/2], spec, c='k', lw=.1)
 	subplots[0].set_xlabel('frequency (Hz)')
-
-	plot_signal(subplots[1], sig, window=crop)
 
 
 	plt.savefig(out_file)

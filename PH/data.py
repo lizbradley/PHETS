@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 import itertools
 # from numba import jit
-import BuildFiltration
+import build_filtration
 from utilities import blockPrint, enablePrint
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -117,7 +117,7 @@ class Filtration:
 
 		try:
 			if silent: blockPrint()
-			filtration = BuildFiltration.build_filtration('temp/worm_data.txt', params, silent=silent)
+			filtration = build_filtration.build_filtration('temp/worm_data.txt', params, silent=silent)
 			if silent: enablePrint()
 		except OSError:
 			print "WARNING: invalid PH/find_landmarks binary. Recompiling..."

@@ -8,8 +8,8 @@ from matplotlib import collections
 pyplot.ioff()
 
 
-from TitleBox import filename_table, filt_params_table, update_epsilon
-from TitleBox import movie_params_table
+from titlebox import filename_table, filt_params_table, update_epsilon
+from titlebox import movie_params_table
 from utilities import remove_old_frames, frames_to_movie, clear_temp_files
 from config import gnuplot_str
 
