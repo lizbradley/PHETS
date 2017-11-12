@@ -497,7 +497,9 @@ if test == 202:
 	# f = Filtration(in_filename, filt_params, out_fname='filt.p')
 	f = load_filtration('filt.p')
 
-	f.movie('output/PH/test_110.mp4', dpi=200)
+	f.movie('output/PH/test_110.mp4')
+	f.plot_PD('output/PH/test110PD.png')
+	f.plot_PRF('output/PH/test110PRF.png')
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 

@@ -57,59 +57,6 @@ def plot_PD_pub(filtration, out_filename, label=None, ticks=None, cbar=True, fig
 		if data == 'empty':
 			return
 
-
-		# count by size #
-		#################
-		#
-		# color = 'C3'
-		# t_min = 5
-		# p_min = 5
-		# t_scale = 15
-		# p_scale = 15
-		#
-		# def msize(n, scale, min):
-		# 	return(n * scale) ** 1.2
-		#
-		# add legend #
-		# mark_t_1 = ax.scatter([], [], marker='^', s=msize(1, t_scale, t_min), c=color)
-		# mark_t_3 = ax.scatter([], [], marker='^', s=msize(3, t_scale, t_min), c=color)
-		# mark_t_5 = ax.scatter([], [], marker='^', s=msize(5, t_scale, t_min), c=color)
-		#
-		# mark_p_1 = ax.scatter([], [], s=msize(1, p_scale, p_min), c=color)
-		# mark_p_3 = ax.scatter([], [], s=msize(3, p_scale, p_min), c=color)
-		# mark_p_5 = ax.scatter([], [], s=msize(5, p_scale, p_min), c=color)
-		#
-		# marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
-		# labels = ('', '', '', '1', '3', '5')
-		#
-		# ax.legend(
-		# 	marks, labels, loc='lower right', ncol=2, markerscale=1,
-		# 	borderpad=1,
-		# 	labelspacing=1,
-		# 	framealpha=1,
-		# 	columnspacing=0,
-		# 	borderaxespad=3
-		# 	# edgecolor='k'
-		# )
-
-		# # end add legend #
-
-		# data = filtration.get_PD_data()
-		# if data == 'empty':
-		# 	return
-		#
-		# if len(data.mortal) > 0:
-		# 	x_mor, y_mor, count_mor = data.mortal
-		# 	ax.scatter(x_mor, y_mor, s=msize(count_mor, p_scale, p_min), c=color, clip_on=True, zorder=100)
-		#
-		# if len(data.immortal) > 0:
-		# 	x_imm, count_imm = data.immortal
-		# 	y_imm = [max_lim for i in x_imm]
-		# 	ax.scatter(x_imm, y_imm, marker='^', s=msize(count_imm, t_scale, t_min), c=color, clip_on=False, zorder=100)
-
-		#
-
-		pass
 		import matplotlib.colorbar as colorbar
 
 		# count by color #

@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt; plt.ioff()
 import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import filtration
 from titlebox import filename_table, filt_params_table
 
 # from Utilities import mem_profile
@@ -33,48 +32,43 @@ def PD_ax(ax, filtration):
 
 	ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k')		# diagonal line
 
-	min_size = 0
-	t_ms_scale = 50
-	p_ms_scale = 30
-	color = 'C0'
-
-
-	# add legend #
-	mark_t_1 = ax.scatter([], [], marker='^', s=t_ms_scale, c=color)
-	mark_t_3 = ax.scatter([], [], marker='^', s=t_ms_scale * 3, c=color)
-	mark_t_5 = ax.scatter([], [], marker='^', s=t_ms_scale * 5, c=color)
-
-	mark_p_1 = ax.scatter([], [], s=p_ms_scale, c=color)
-	mark_p_3 = ax.scatter([], [], s=p_ms_scale * 3, c=color)
-	mark_p_5 = ax.scatter([], [], s=p_ms_scale * 5, c=color)
-
-	marks = (mark_t_1, mark_t_3, mark_t_5, mark_p_1, mark_p_3, mark_p_5)
-	labels = ('', '', '', '1', '3', '5')
-
-	ax.legend(
-		marks, labels, loc='lower right', ncol=2, markerscale=1,
-		borderpad=1,
-		labelspacing=1,
-		framealpha=1,
-		columnspacing=0,
-		borderaxespad=3
-		#edgecolor='k'
-	)
 
 	data = filtration.PD()
 	if data == 'empty':
 		return
 
+
+
+	sc = None
+
 	if len(data.mortal) > 0:
 		x_mor, y_mor, count_mor = data.mortal
-		ax.scatter(x_mor, y_mor, s=(count_mor * p_ms_scale) + min_size, clip_on=False, c=color)
+		sc = ax.scatter(x_mor, y_mor, s=70,
+		                c=count_mor, alpha=.8,
+		                clip_on=True, zorder=100,
+		                vmin=1, vmax=5)
+
 
 	if len(data.immortal) > 0:
 		x_imm, count_imm = data.immortal
-		y_imm = [max_lim for i in x_imm]
-		ax.scatter(x_imm, y_imm, marker='^', s=(count_imm * t_ms_scale) + min_size, c=color, clip_on=False)
 
-	# end add legend #
+		y_imm = [max_lim for i in x_imm]
+		sc = ax.scatter(x_imm, y_imm, marker='^', s=120,
+		                c=count_imm, alpha=.8,
+		                clip_on=False, zorder=100,
+		                vmin=1, vmax=5)
+
+	# if cbar and sc:
+	if True:
+		levels = [1, 2, 3, 4, 5]
+
+		cb = plt.colorbar(sc, extend='max', extendrect=True, extendfrac=.2, ax=ax, values=levels)
+
+		cb.ax.text(1.5, 0.10, '1')
+		cb.ax.text(1.5, 0.35, '2')
+		cb.ax.text(1.5, 0.60, '3')
+		cb.ax.text(1.5, 0.85, '4')
+		cb.ax.text(1.5, 1.10, '5+')
 
 
 # @profile(stream=f4)
@@ -171,7 +165,6 @@ def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
 
 
 
-
 def PRF(filtration, out_filename, params=None, in_filename=None,
         annot_hm=False):
 	print "plotting PRF..."
@@ -185,12 +178,9 @@ def PRF(filtration, out_filename, params=None, in_filename=None,
 
 	######## from here ##########
 
-	if isinstance(filtration, filtration.Filtration):
-		func = filtration.PRF()
-		in_filename = filtration.filename
-		params = filtration.params
-	else:
-		func = filtration
+	func = filtration.PRF()
+	in_filename = filtration.filename
+	params = filtration.params
 
 	x, y, z, max_lim = func
 
