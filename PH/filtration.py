@@ -1,30 +1,82 @@
-import os
-import sys
-import time
-import cPickle
-import warnings
-
+import os, sys, time, cPickle, warnings, subprocess, itertools
 import numpy as np
-import itertools
+
 import build_filtration, plots, filtration_movie
 from utilities import blockPrint, enablePrint
+from config import find_landmarks_c_compile_str
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def load_filtration(in_file):
-	print 'loading saved filtration...'
-	caller_dir = os.getcwd()
-	os.chdir(SCRIPT_DIR)
-	# filtration = pickle.load(open('filtrations/' + in_file))
-	filtration = cPickle.load(open('filtrations/' + in_file))
-	os.chdir(caller_dir)
-	return filtration
 
 
+def compile_find_landmarks_c():
+	if sys.platform == "linux" or sys.platform == "linux2":
+		compile_str = find_landmarks_c_compile_str['linux']
+	elif sys.platform == 'darwin':
+		compile_str = find_landmarks_c_compile_str['macOS']
+	else:
+		print 'Sorry, PHETS requires linux or macOS.'
+		sys.exit()
+	subprocess.call(compile_str, shell=True)
+	print '''find_landmarks recompilation attempt complete. If 
+	successful, please repeat your test. If problem persists, you will 
+	need to tweak gnuplot_str in config.py to compile find_landmarks.c
+	on your system'''
 
-import subprocess
-from config import find_landmarks_c_compile_str
+	sys.exit()
+
+
+def build_perseus_in_file(silent, filt_array):
+	if not silent: print 'building perseus_in.txt...'
+	out_file = open('perseus/perseus_in.txt', 'a')
+	out_file.truncate(0)
+	out_file.write('1\n')
+	for idx, row in enumerate(filt_array):
+		for simplex in row:
+			#   format for perseus...
+			line_str = str(len(simplex) - 1) + ' ' + ' '.join(
+				str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
+			out_file.write(line_str)
+	out_file.close()
+
+
+def call_perseus(silent):
+
+	os.chdir('perseus')
+
+	for f in os.listdir('.'):
+		if f.startswith('perseus_out'):
+			os.remove(f)
+
+	perseus_cmd = './{} nmfsimtop perseus_in.txt perseus_out'
+	if sys.platform == 'linux' or sys.platform == 'linux2':
+		perseus_cmd = perseus_cmd.format('perseusLin')
+
+	elif sys.platform == 'darwin':  # macOS
+		perseus_cmd = perseus_cmd.format('perseusMac')
+
+	if silent:
+		p = subprocess.Popen(perseus_cmd, shell=True, stdout=subprocess.PIPE)
+		out, err = p.communicate()
+
+	else:
+		p = subprocess.Popen(perseus_cmd, shell=True)
+		p.communicate()		# wait
+
+	os.chdir('..')
+
+
+def load_perseus_out_file(silent):
+	try:
+		with warnings.catch_warnings():
+			warnings.simplefilter('ignore')
+			intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
+	except IOError:
+		intervals = np.empty(0)
+		if not silent: print "WARNING: no homology for this window"
+	return intervals
+
 
 
 class PDData:
@@ -86,21 +138,6 @@ class Filtration:
 	# private #
 	def _build(self, params, silent):
 
-		def compile_find_landmarks_c():
-			if sys.platform == "linux" or sys.platform == "linux2":
-				compile_str = find_landmarks_c_compile_str['linux']
-			elif sys.platform == 'darwin':
-				compile_str = find_landmarks_c_compile_str['macOS']
-			else:
-				print 'Sorry, PHETS requires linux or macOS.'
-				sys.exit()
-			subprocess.call(compile_str, shell=True)
-			print "find_landmarks recompilation attempt complete. If successful, please repeat your test."
-			print 'If problem persists, you will need to manually compile PH/find_landmarks.c. See config.py for default GCC commands.'
-
-			sys.exit()
-
-
 		if not silent: print "building filtration..."
 
 		sig_length = len(self.sig)
@@ -115,7 +152,9 @@ class Filtration:
 
 		try:
 			if silent: blockPrint()
-			filtration = build_filtration.build_filtration('temp/worm_data.txt', params, silent=silent)
+			filtration = build_filtration.build_filtration(
+				'temp/worm_data.txt', params, silent=silent
+			)
 			if silent: enablePrint()
 		except OSError:
 			print "WARNING: invalid PH/find_landmarks binary. Recompiling..."
@@ -128,17 +167,19 @@ class Filtration:
 		abstract_filtration = sorted(list(filtration[0]))
 		epsilons = filtration[2]		# add to build_filtration return
 
-		if not silent: print("build_filtration() time elapsed: {} seconds \n".format(time.time() - start_time))
+		if not silent:
+			t = time.time() - start_time
+			print("build_filtration() time elapsed: {} seconds \n".format(t))
 		return [witness_coords, landmark_coords, abstract_filtration, epsilons]
 
 
 	def _unpack_complexes(self, simplex_list, silent):
 
 		def group_by_birth_time(simplex_list):
-
-			"""Reformats 1D list of SimplexBirth objects into 2D array of
-			landmark_set lists, where 2nd index is  birth time (? see below)"""
-
+			"""
+			Reformats 1D list of SimplexBirth objects into 2D array of
+			landmark_set lists, where rows are birth times
+			"""
 			ID_array = [[] for i in self.epsilons]
 			for simplex in simplex_list:
 				ID_array[simplex.birth_time].append(simplex.landmark_set)
@@ -146,13 +187,17 @@ class Filtration:
 
 
 		def expand_to_2simplexes(ID_arr):
-			"""for each k-simplex in filtration array, if k > 2, replaces with the
-			component 2-simplexes(i.e. all length-3 subsets of landmark_ID_set) """
+			"""
+			for each k-simplex in filtration array, if k > 2, replaces
+			with the component 2-simplexes(i.e. all length-3 subsets of
+			landmark_ID_set)
+			"""
 			for row in ID_arr:
 				expanded_row = []
 				for landmark_ID_set in row:
 					if len(landmark_ID_set) > 3:
-						expanded_set = itertools.combinations(landmark_ID_set, 3)
+						combinations = itertools.combinations
+						expanded_set = combinations(landmark_ID_set, 3)
 					else:
 						expanded_set = [landmark_ID_set]
 					expanded_row.extend(expanded_set)		# flatten
@@ -161,8 +206,9 @@ class Filtration:
 			return np.asarray(ID_arr)
 
 		def remove_duplicates_all(ID_arr):
-			"""Omit simplexes that have been already added to the filtration or are
-			repeated within a row
+			"""
+			Omit simplexes that have been already added to the filtration or
+			are repeated within a row
 			"""
 			all_tris = set()
 			dups_count = 0
@@ -182,10 +228,10 @@ class Filtration:
 
 
 		def remove_duplicates_row(ID_arr):
-			'''
-			Omit duplicate simplexes within a row.
-			It appears that there are actually no duplicates of this nature
-			'''
+			"""
+			Omit duplicate simplexes within a row. It appears that there are
+			in fact no duplicates of this nature
+			"""
 			dups_count = 0
 			for row in ID_arr:
 				sets_row = [frozenset(tri) for tri in row]
@@ -207,7 +253,7 @@ class Filtration:
 
 
 		if not silent: print 'grouping by birth time...'
-		ID_array = group_by_birth_time(simplex_list)		# 1d list -> 2d array
+		ID_array = group_by_birth_time(simplex_list)    # 1d list -> 2d array
 		if not silent: print 'expanding to 2-simplexes...'
 		ID_array = expand_to_2simplexes(ID_array)
 		if not silent: print 'removing duplicates...'
@@ -220,62 +266,12 @@ class Filtration:
 
 	def _get_intervals(self, silent=False):
 
-		def build_perseus_in_file(filt_array):
-			if not silent: print 'building perseus_in.txt...'
-			out_file = open('perseus/perseus_in.txt', 'a')
-			out_file.truncate(0)
-			out_file.write('1\n')
-			for idx, row in enumerate(filt_array):
-				for simplex in row:
-					#   format for perseus...
-					line_str = str(len(simplex) - 1) + ' ' + ' '.join(
-						str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
-					out_file.write(line_str)
-			out_file.close()
-
-
-		def call_perseus():
-
-			os.chdir('perseus')
-
-			for f in os.listdir('.'):
-				if f.startswith('perseus_out'):
-					os.remove(f)
-
-			if sys.platform == "linux" or sys.platform == "linux2":
-				perseus_cmd = "./perseusLin nmfsimtop perseus_in.txt perseus_out"
-
-			elif sys.platform == "darwin":  # macOS
-				perseus_cmd = "./perseusMac nmfsimtop perseus_in.txt perseus_out"
-
-			else:  # Windows
-				perseus_cmd = "perseusWin.exe nmfsimtop perseus_in.txt perseus_out"
-
-			if silent:
-				p = subprocess.Popen(perseus_cmd, shell=True, stdout=subprocess.PIPE)
-				out, err = p.communicate()
-
-			else:
-				p = subprocess.Popen(perseus_cmd, shell=True)
-				p.communicate()		# wait
-
-			os.chdir('..')
-
-		def load_perseus_out_file():
-			try:
-				with warnings.catch_warnings():
-					warnings.simplefilter('ignore')
-					self.intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
-			except IOError:
-				self.intervals = np.empty(0)
-				if not silent: print "WARNING: no homology for this window"
-
 		if self.intervals is not None:
 			return
 
-		build_perseus_in_file(self.complexes)
-		call_perseus()
-		load_perseus_out_file()
+		build_perseus_in_file(silent, self.complexes)
+		call_perseus(silent)
+		self.intervals = load_perseus_out_file(silent)
 
 
 	def _build_PD_data(self):
@@ -294,41 +290,42 @@ class Filtration:
 						count[i] += 1
 			return count
 
+		def t_to_eps(t):
+			return epsilons[int(t - 1)]
 
 		if self._PD:
 			return
-
 
 		epsilons = self.epsilons
 		lim = np.max(epsilons)
 
 		birth_e_mor = []
 		death_e_mor = []
-
 		birth_e_imm = []
 
-		def t_to_eps(t):
-			return epsilons[int(t - 1)]
-
-		if np.array_equal(self.intervals, np.empty(0)): 	# no intervals
+		if np.array_equal(self.intervals, np.empty(0)): 	    # no intervals
 			immortal = []
 			mortal = []
 
-		elif len(self.intervals.shape) == 1:					# one interval
+		elif len(self.intervals.shape) == 1:				    # one interval
 			birth_t, death_t = self.intervals
 			if death_t == -1:
-				immortal = np.array([[t_to_eps(birth_t)], [1]])
+				immortal = np.array(
+					[[t_to_eps(birth_t)], [1]]
+				)
 				mortal = []
 			else:
 				immortal = []
-				mortal = np.array([[t_to_eps(birth_t)], [t_to_eps(death_t)], [1]])
+				mortal = np.array(
+					[[t_to_eps(birth_t)], [t_to_eps(death_t)], [1]]
+				)
 
-		else:												# many intervals
+		else:											       # many intervals
 			birth_t, death_t = self.intervals[:, 0], self.intervals[:, 1]
 			for interval in zip(birth_t, death_t):
-				if interval[1] == -1:							# immortal
+				if interval[1] == -1:						   # immortal
 					birth_e_imm.append(t_to_eps(interval[0]))
-				else:											# mortal
+				else:										   # mortal
 					birth_e_mor.append(t_to_eps(interval[0]))
 					death_e_mor.append(t_to_eps(interval[1]))
 
@@ -454,3 +451,12 @@ class Filtration:
 
 	def plot_PRF(self, filename):
 		plots.PRF(self, filename)
+
+
+def load_filtration(in_file):
+	print 'loading saved filtration...'
+	caller_dir = os.getcwd()
+	os.chdir(SCRIPT_DIR)
+	filtration = cPickle.load(open('filtrations/' + in_file))
+	os.chdir(caller_dir)
+	return filtration

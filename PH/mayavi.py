@@ -1,3 +1,8 @@
+""" old code for 3D filt movies used to work (if mayavi was installed, tricky
+on OSX with matplotlib 2), then was deleted in leu of gnuplot. salvaged from
+commit history. would be cool to reimplement and add a switch in config.py for
+3D filt movie backend: gnuplot or mayavi"""
+
 def unpack_complex_data_3D(complex_list):
 
 	def group_by_birth_time(complex_ID_list):
