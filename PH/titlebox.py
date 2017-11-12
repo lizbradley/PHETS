@@ -26,7 +26,7 @@ def filenames_table(ax, filenames):
 	# title_table.auto_set_font_size(8)
 
 
-def filt_params_table(subplot, filt_params):
+def filt_params_table(subplot, filt_params, fontsize=None):
 	subplot.axis('off')
 	subplot.set_xlim([0,1])
 	subplot.set_ylim([0,1])
@@ -57,8 +57,11 @@ def filt_params_table(subplot, filt_params):
 		colWidths=[1.5, .5],
 		bbox=[0, 0, 1, 1],  # x0, y0, width, height
 	)
-	param_table.auto_set_font_size(False)
-	param_table.set_fontsize(6)
+
+	if fontsize:
+		param_table.auto_set_font_size(False)
+		param_table.set_fontsize(fontsize)
+		# used to be 6
 
 
 

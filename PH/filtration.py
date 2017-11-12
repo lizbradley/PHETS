@@ -453,10 +453,10 @@ class Filtration:
 		plots.PRF(self, filename)
 
 
-def load_filtration(in_file):
+def load_filtration(fname):
 	print 'loading saved filtration...'
 	caller_dir = os.getcwd()
 	os.chdir(SCRIPT_DIR)
-	filtration = cPickle.load(open('filtrations/' + in_file))
+	filtration = cPickle.load(open('filtrations/' + fname))
 	os.chdir(caller_dir)
 	return filtration
