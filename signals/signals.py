@@ -164,6 +164,8 @@ class Trajectory(BaseTrajectory):
 		self.source_ts = None
 		self.embed_params = None
 
+		self.dim = self.data.shape[1]
+
 		self.filts = None
 
 

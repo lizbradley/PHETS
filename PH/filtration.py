@@ -447,7 +447,7 @@ class Filtration:
 			return self._PRF
 
 	def movie(self, filename, **kwargs):
-		filtration_movie.make_movie(self, filename, **kwargs)
+		filtration_movie.build_movie(self, filename, **kwargs)
 
 	def plot_PD(self, filename):
 		plots.PD(self, filename)

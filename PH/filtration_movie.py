@@ -2,45 +2,44 @@ import io, subprocess, sys, os
 
 import matplotlib.image as mpimg
 import matplotlib.markers
-import matplotlib.pyplot as pyplot
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import collections
-pyplot.ioff()
+plt.ioff()
 
 
 from titlebox import filename_table, filt_params_table, update_epsilon
 from titlebox import movie_params_table
-from utilities import remove_old_frames, frames_to_movie, clear_temp_files
+from utilities import remove_old_frames, frames_to_movie, clear_temp_files, \
+	print_still
 from config import gnuplot_str
 
 
-def get_simplex_color(scheme, past_birth_time, present_birth_time, max_birth_time):
-	"""helper for plot_complex()"""
+def simplex_color(scheme, past_birth_time, birth_time, max_birth_time):
 	if scheme == 'none':
-		facecolor = 'lightblue'
+		facecolor = 'C0'
 		edgecolor = 'black'
 
 	elif scheme == 'highlight new':
-		if past_birth_time == present_birth_time:
-			facecolor = 'red'
-			edgecolor = 'firebrick'
+		if past_birth_time == birth_time:
+			facecolor = 'C1'
+			edgecolor = 'C3'
 		else:
-			facecolor = 'lightblue'
+			facecolor = 'C0'
 			edgecolor = 'black'
 
 	elif hasattr(scheme, '__len__') and scheme[0] == 'birth time gradient':
 		cycles = scheme[1]
-		prog = divmod(((past_birth_time / float(max_birth_time)) * cycles), 1)[1] 	# modulo 1
-		facecolor = (1, prog, 1 - prog)
-		edgecolor = (.5, prog, 1 - prog)
+		prog = (past_birth_time / float(max_birth_time))
+		c = divmod((prog * cycles), 1)[1] 	# modulo 1
+		facecolor = (1, c, 1 - c)
+		edgecolor = (.5, c, 1 - c)
 
 	else:
 		print 'ERROR:', scheme, 'is not a valid color scheme'
 		sys.exit()
 
 	return facecolor, edgecolor
-
-
 
 
 def plot_witnesses_2D(subplot, attractor_data):
@@ -55,27 +54,27 @@ def plot_witnesses_2D(subplot, attractor_data):
 		s=.1)
 
 	subplot.set_aspect('equal')
-	# lims = max(subplot.get_xlims(),
+
 
 def plot_landmarks_2D(subplot, landmark_data):
 	landmark_data = np.array(landmark_data)
 	x = landmark_data[:, 0]
 	y = landmark_data[:, 1]
-	subplot.scatter(x, y, color='darkblue', s=35)
-
+	subplot.scatter(x, y, color='lime', s=35)
 
 
 def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
 
 	complex_data = filtration.get_complex_plot_data()
 
+	for j, simplices_coords in enumerate(complex_data[:i + 1]):
 
-	for j, simplexes_coords in enumerate(complex_data[:i + 1]):
-
-		f_color, e_color = get_simplex_color(color_scheme, j, i, len(complex_data))
+		f_color, e_color = simplex_color(
+			color_scheme, j, i, len(complex_data)
+		)
 
 		simplexes = collections.PolyCollection(
-			simplexes_coords,
+			simplices_coords,
 			edgecolors=e_color,
 			facecolors=f_color,
 			lw=1,
@@ -87,9 +86,19 @@ def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
 		subplot.add_collection(simplexes)
 
 
+def plot_witnesses_3D_mayavi():
+	pass
 
 
-def plot_all_3D(subplot, filtration, i, camera_angle):
+def plot_landmarks_3D_mayavi():
+	pass
+
+
+def plot_complex_3D_mayavi():
+	pass
+
+
+def plot_all_3D_gnuplot(subplot, filtration, i, camera_angle):
 	def add_arrow(simplex, cmds):
 		set_arrow = ' '.join([
 			'set arrow from',
@@ -111,7 +120,7 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		])
 
 		style_poly = ' '.join([
-			'set object {} fc rgb "#999999"'.format(poly_count),
+			'set object {} fc rgb "#1F77B4"'.format(poly_count),
 			'fillstyle solid',
 			'lw 1'
 		])
@@ -120,7 +129,7 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		cmds.append(style_poly)
 
 
-	def write_gnup_script():
+	def write_gnuplot_script():
 		witness_data = filtration.witness_coords
 		landmark_data = filtration.landmark_coords
 		complex_data = filtration.get_complex_plot_data()
@@ -129,14 +138,14 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		np.savetxt('PH/temp/landmarks.txt', landmark_data)
 
 
-		cmds = ['set terminal pngcairo size 800, 800',
-				'set view {}, {}'.format(*camera_angle),
-				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
-				# 'set size ratio - 1',
-				# 'unset border',
-				# 'unset tics',
-				]
-
+		cmds = [
+			'set terminal pngcairo size 800, 800',
+			'set view {}, {}'.format(*camera_angle),
+			# 'set output "PH/frames/frame{:02d}.png"'.format(i),
+			# 'set size ratio - 1',
+			# 'unset border',
+			# 'unset tics',
+		]
 
 		# plot complex
 		complex_data = complex_data[:i + 1]
@@ -156,27 +165,24 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		wits_arg = '"PH/temp/witnesses.txt" with points pt 7 ps .1 ' \
 				   'lc "black" notitle'
 		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 notitle'
+		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 ' \
+		            'lc rgb "#00FF00" notitle'
 		cmds.append('splot {}, {}'.format(wits_arg, lands_arg))
-
-
 
 		cmds.append('q')
 
 		with open('PH/temp/gnuplot_cmds.txt', 'w') as f:
 			f.write('\n'.join(cmds))
 
-
-
-
-	write_gnup_script()
+	write_gnuplot_script()
 
 	try:
 		p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'],
 						 stdout=subprocess.PIPE)
 	except OSError:
-		print "ERROR: Unable to open gnuplot. Ensure that 'gnuplot_str' in " \
-			  "config.py is set to the appropriate command to launch gnuplot" \
-			  " on your system."
+		print '''ERROR: Unable to open gnuplot. Ensure that 'gnuplot_str' in 
+			  config.py is set to the appropriate command to launch gnuplot
+			  on your system.'''
 		sys.exit()
 
 	out, err = p.communicate()
@@ -186,127 +192,33 @@ def plot_all_3D(subplot, filtration, i, camera_angle):
 		img = mpimg.imread(f, format='png')
 	except ValueError as e:
 		print e
-		print "ERROR: Invalid PNG header. Ensure that you are using a recent" \
-			  " version of gnuplot (5+) and 'gnuplot_str' in config.py is " \
-			  "the command to launch this version."
+		print '''ERROR: Invalid PNG header. Ensure that you are using a recent
+			  version of gnuplot (5+) and 'gnuplot_str' in config.py is the 
+			  appropriate command to launch this version.'''
 		sys.exit()
 
 	subplot.axis('off')
 	subplot.imshow(img)
 
 
-
-
-def plot_all_2D_gnuplot(subplot, filtration, i):
-
-	def add_arrow(simplex, cmds):
-		set_arrow = ' '.join([
-			'set arrow from',
-			'{}, {} to'.format(*simplex[0]),
-			'{}, {}'.format(*simplex[1]),
-			# 'nohead lc "red"'
-			'nohead lw 1'
-		])
-		cmds.append(set_arrow)
-
-	def add_poly(simplex, cmds, poly_count):
-		set_poly = '\n'.join([
-			'set object {} polygon from \\'.format(poly_count),
-			'{}, {} to \\'.format(*simplex[0]),
-			'{}, {} to \\'.format(*simplex[1]),
-			'{}, {} to \\'.format(*simplex[2]),
-			'{}, {}'.format(*simplex[0]),
-		])
-
-		style_poly = ' '.join([
-			'set object {} fc rgb "#999999"'.format(poly_count),
-			'fillstyle solid',
-			'lw 1'
-		])
-
-		cmds.append(set_poly)
-		cmds.append(style_poly)
-
-
-
-	def write_gnup_script():
-		witness_data = filtration.witness_coords
-		landmark_data = filtration.landmark_coords
-		complex_data = filtration.get_complex_plot_data()[:i + 1]
-
-		np.savetxt('PH/temp/witnesses.txt', witness_data)
-		np.savetxt('PH/temp/andmarks.txt', landmark_data)
-
-		cmds = ['set terminal pngcairo size 700, 700',
-				# 'set output "PH/frames/frame{:02d}.png"'.format(i),
-				# 'set size ratio - 1',
-				# 'unset border',
-				# 'unset tics'
-				]
-
-
-
-
-		poly_count = 1
-		for complex in complex_data:
-			for simplex in complex:
-				if len(simplex) == 1:
-					pass
-				elif len(simplex) == 2:
-					add_arrow(simplex, cmds)
-				else:
-					add_poly(simplex, cmds, poly_count)
-					poly_count += 1
-		cmds.append('q')
-
-		# plot witnesses and landmarks
-		wits_arg = '"PH/temp/witnesses.txt" with points pt 7 ps .1 ' \
-				   'lc "black" notitle'
-		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 notitle'
-		cmds.append('plot {}, {}'.format(wits_arg, lands_arg))
-
-
-
-
-		with open('PH/temp/gnuplot_cmds.txt', 'w') as f:
-			f.write('\n'.join(cmds))
-
-
-	write_gnup_script()
-	p = subprocess.Popen([gnuplot_str, 'PH/temp/gnuplot_cmds.txt'],
-						 stdout=subprocess.PIPE)
-
-	out, err = p.communicate()
-	f = io.BytesIO(out)
-	img = mpimg.imread(f, format='png')
-
-
-	subplot.axis('off')
-
-
-	subplot.imshow(img),
-
-
-
-
-def make_movie(
+def build_movie(
 		filt,
 		out_filename,
 		color_scheme='none',
 		camera_angle=(70, 45),
 		alpha=1,
-		dpi=100,
+		dpi=200,
 
 ):
 	print 'building movie...'
 	remove_old_frames('PH/frames/')
-	fig = pyplot.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
+	fig = plt.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
 
-	fname_ax = pyplot.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
-	epsilon_ax = pyplot.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
-	movie_params_ax = pyplot.subplot2grid((12, 8), (4, 0), rowspan=2, colspan=2)
-	filt_params_ax = pyplot.subplot2grid((12, 8), (6, 0), rowspan=6, colspan=2)
-	plot_ax = pyplot.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
+	fname_ax = plt.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
+	epsilon_ax = plt.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
+	movie_params_ax = plt.subplot2grid((12, 8), (4, 0), rowspan=2, colspan=2)
+	filt_params_ax = plt.subplot2grid((12, 8), (6, 0), rowspan=6, colspan=2)
+	plot_ax = plt.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
 
 	filename_table(fname_ax, filt.filename)
 	movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
@@ -317,37 +229,28 @@ def make_movie(
 
 	amb_dim = filt.ambient_dim
 	if amb_dim not in (2, 3):
-		print 'ERROR: invalid ambient dimension {}, must be 2 or 3'.format(amb_dim)
+		print 'ERROR: invalid ambient dimension {}, must be 2 or 3'\
+			.format(amb_dim)
 		sys.exit()
 
 	for i, eps in enumerate(filt.epsilons):
-		sys.stdout.write('\rplotting frame {} of {}'.format(i + 1, filt.num_div))
-		sys.stdout.flush()
+		print_still('\rplotting frame {} of {}'.format(i + 1, filt.num_div))
 
 		if amb_dim == 2:
 			plot_witnesses_2D(plot_ax, witness_data)
 			plot_landmarks_2D(plot_ax, landmark_data)
 			plot_complex_2D(plot_ax, filt, i, color_scheme, alpha)
-			# plot_all_2D_gnuplot(plot_ax, filt, i)		# to test consistency
 		else:
-			plot_all_3D(plot_ax, filt, i, camera_angle)	# uses gnuplot
+			plot_all_3D_gnuplot(plot_ax, filt, i, camera_angle)
 
 		update_epsilon(epsilon_ax, eps)
 
-		pyplot.savefig('PH/frames/frame%03d.png' % i)
+		plt.savefig('PH/frames/frame%03d.png' % i)
 		plot_ax.clear()
 
 
-	pyplot.close(fig)
+	plt.close(fig)
 	print ''
 	frames_to_movie(out_filename, 'PH/frames/frame%03d.png', loglevel='error')
 	clear_temp_files('PH/temp/')
 
-
-
-
-
-
-
-if __name__ == '__main__':
-	pass

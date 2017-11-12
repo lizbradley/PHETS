@@ -4,10 +4,9 @@ change_dir()
 import time
 
 from PH import Filtration, load_filtration
-from PH import make_movie, PD, PRF
 from config import default_filtration_params as parameter_set
 
-test, start_time = get_test(set_test=201)
+test, start_time = get_test(set_test=202)
 
 
 if test == 14:
@@ -299,7 +298,6 @@ if test == 103:
 # 		'output/PH/test_ne.mp4',
 # 	)
 
-# test = 107
 if test == 107:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
@@ -327,7 +325,6 @@ if test == 107:
 
 
 
-# test = 108
 if test == 108:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
@@ -351,7 +348,6 @@ if test == 108:
 		'output/PH/test_dcov+20.mp4',
 	)
 
-# test = 109
 if test == 109:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
@@ -375,7 +371,6 @@ if test == 109:
 		'output/PH/test_dcov-20.mp4',
 	)
 
-# test = 110
 if test == 110:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 	filt_params = parameter_set
@@ -395,7 +390,6 @@ if test == 110:
 	make_movie(filtration, 'output/PH/test_110.mp4')
 
 
-# test = 200
 if test == 200:
 	in_filename = "datasets/trajectories/Ellipse200.txt"
 	filt_params = parameter_set
@@ -485,6 +479,25 @@ if test == 201:
 		filtration,
 		'output/nodham.mp4',
 	)
+
+if test == 202:
+	in_filename = "datasets/trajectories/btc2milIC123.txt"
+	filt_params = parameter_set
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -10,
+			'num_divisions': 10,
+			'd_use_hamiltonion': 0,
+			# 'use_euclid'
+			'graph_induced': True
+		})
+
+	# f = Filtration(in_filename, filt_params, out_fname='filt.p')
+	f = load_filtration('filt.p')
+
+	f.movie('output/PH/test_110.mp4', dpi=200)
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 
