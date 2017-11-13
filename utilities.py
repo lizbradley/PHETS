@@ -153,7 +153,7 @@ def remove_files_by_type(dir, ftype):
 			print 'removed {}'.format(dir + f)
 
 
-def frames_to_movie(out_filename, frame_path, framerate=1, loglevel='panic'):
+def frames_to_movie(out_filename, frame_path, framerate=1, loglevel='error'):
 	if os.path.exists(out_filename):
 		overwrite = raw_input(out_filename + " already exists. Overwrite? (y/n)\n")
 		if overwrite == "y":
