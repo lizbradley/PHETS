@@ -19,6 +19,22 @@ from titlebox import filename_table, filt_params_table
 # @profile(stream=f)
 
 
+def colorbar_ax(cbar_ax, levels):
+	viridis = get_cmap('viridis')
+	colors = [viridis(i) for i in np.linspace(0, 1, len(levels))]
+	cmap, norm = from_levels_and_colors(levels, colors, extend='max')
+
+	cbar = ColorbarBase(
+		cbar_ax,
+		norm=norm,
+		cmap=cmap,
+		ticks=levels,
+		extend='max',
+		extendrect=True
+	)
+
+
+	return cmap, norm
 
 def PD_ax(ax, cbar_ax, filtration):
 
@@ -32,20 +48,23 @@ def PD_ax(ax, cbar_ax, filtration):
 	ax.grid(which=u'major', zorder=0)
 	ax.minorticks_on()
 
-	ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k')		# diagonal line
+	ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k')  # diagonal line
 
 	data = filtration.PD()
 	if data == 'empty':
 		return
 
 	sc = None
+	levels = [1, 2, 3, 4, 5]
+	cmap, norm = colorbar_ax(cbar_ax, levels)
 	if len(data.mortal) > 0:
 		x_mor, y_mor, count_mor = data.mortal
 		sc = ax.scatter(
 			x_mor, y_mor, s=70,
 			c=count_mor, alpha=.8,
 			clip_on=True, zorder=100,
-			vmin=1, vmax=5
+			# vmin=1, vmax=5
+			cmap=cmap, norm=norm
 		)
 	if len(data.immortal) > 0:
 		x_imm, count_imm = data.immortal
@@ -54,24 +73,10 @@ def PD_ax(ax, cbar_ax, filtration):
 			x_imm, y_imm, marker='^', s=120,
 			c=count_imm, alpha=.8,
 			clip_on=False, zorder=100,
-			vmin=1, vmax=5
+			# vmin=1, vmax=5
+			cmap=cmap, norm=norm
 		)
 
-	levels = [1, 2, 3, 4, 5]
-	cb = plt.colorbar(
-		sc,
-		cax=cbar_ax,
-		extend='max',
-		extendrect=True,
-		extendfrac=.2,
-		values=levels
-	)
-
-	cb.ax.text(1.5, 0.10, '1')
-	cb.ax.text(1.5, 0.35, '2')
-	cb.ax.text(1.5, 0.60, '3')
-	cb.ax.text(1.5, 0.85, '4')
-	cb.ax.text(1.5, 1.10, '5+')
 
 
 # @profile(stream=f4)
@@ -85,17 +90,19 @@ def PD(filt, out_filename):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-	pos = cbar_ax.get_position()
-	cbar_ax.set_position(
-		[pos.x0 + .1, pos.y0 - .05, pos.x1 - pos.x0 + -.05, pos.y1 - pos.y0 + .1]
-	)
+	# pos = cbar_ax.get_position()
+	# cbar_ax.set_position(
+	# 	[pos.x0 + .1, pos.y0 - .05, pos.x1 - pos.x0 + -.05, pos.y1 - pos.y0 + .1]
+	# )
 
 	PD_ax(plot_ax, cbar_ax, filt)
-	filename_table(fname_ax, filt.filename)
+	filename_table(fname_ax, filt.name)
 	filt_params_table(params_ax, filt.params)
 
 	plt.savefig(out_filename)
 	plt.close(fig)
+
+
 
 
 def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
@@ -124,10 +131,8 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 		return x, y
 
 	plot_ax.set_aspect('equal')
-	viridis = get_cmap('viridis')
-	colors = [viridis(i) for i in np.linspace(0, 1, 13)]
 	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
-	cmap, norm = from_levels_and_colors(levels, colors, extend='max')
+	cmap, norm = colorbar_ax(cbar_ax, levels)
 	zm = ma.masked_where(np.isnan(z), z)
 
 	if x is not None and y is not None:
@@ -140,7 +145,6 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 		print 'ERROR: plot_heatmap: x and y must both be None or array-like'
 		sys.exit()
 
-	ColorbarBase(cbar_ax, norm=norm, cmap=cmap, ticks=levels, extend='max')
 	return cmap
 
 
@@ -160,7 +164,7 @@ def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
 
 
 
-def PRF(filtration, out_filename, annot_hm=False):
+def PRF(filt, out_filename, annot_hm=False):
 	print "plotting PRF..."
 
 	fig = plt.figure(figsize=(10, 6), tight_layout=True, dpi=100)
@@ -171,24 +175,18 @@ def PRF(filtration, out_filename, annot_hm=False):
 
 	######## from here ##########
 
-	func = filtration.PRF()
-	in_filename = filtration.filename
-	params = filtration.params
-
-	x, y, z, max_lim = func
+	x, y, z, max_lim = filt.PRF()
 
 	if len(x.shape) == 2: 			# meshgrid format
 		x, y = x[0], y[:, 0]		# reduce to arange format
-
 
 	plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=annot_hm)
 
 	####### to here ###########
 	# should eventually be replaced by PRF_ax
 
-	filename_table(fname_ax, in_filename)
-	filt_params_table(params_ax, params)
-
+	filename_table(fname_ax, filt.name)
+	filt_params_table(params_ax, filt.params)
 
 	fig.savefig(out_filename)
 	plt.close(fig)
