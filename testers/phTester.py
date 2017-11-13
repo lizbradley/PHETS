@@ -1,17 +1,22 @@
 from boilerplate import change_dir, get_test
-change_dir()
+
+change_dir()    # PHETS imports must come after this line
 
 import time
 
+from signals import Trajectory
 from PH import Filtration, load_filtration
-from config import default_filtration_params as parameter_set
+from config import default_filtration_params as filt_params
 
-test, start_time = get_test(set_test=202)
+test, start_time = get_test(set_test=203)
 
+
+def out_fname(str):
+	return 'output/PH/test_{}{}'.format(test, str)
 
 if test == 14:
 	in_filename = 'datasets/trajectories/49/C134C.txt'
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -36,7 +41,7 @@ if test == 14:
 	)
 if test == 15:
 	in_filename = 'datasets/trajectories/49/C134C.txt'
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -63,7 +68,7 @@ if test == 15:
 
 if test == 16:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -73,7 +78,7 @@ if test == 16:
 		})
 
 
-	filtration = Filtration(in_filename, filt_params, out_fname='test16.p')
+	filtration = Filtration(in_filename, filt_params, save='test16.p')
 	filtration = load_filtration('test16.p')
 
 	make_movie(
@@ -95,7 +100,7 @@ if test == 16:
 if test == 17:
 	in_filename = 'datasets/trajectories/L96N22F5_x1_m2tau10.txt'
 
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 50,
@@ -127,7 +132,7 @@ if test == 17:
 # test = 100
 if test == 100:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -150,7 +155,7 @@ if test == 100:
 # test = 101
 if test == 101:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -174,7 +179,7 @@ if test == 101:
 # NOT IMPLEMENTED #
 # if test == 102:
 # 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-# 	filt_params = parameter_set
+#
 # 	filt_params.update(
 # 		{
 # 			'ds_rate': 40,
@@ -199,7 +204,7 @@ if test == 101:
 # test = 103
 if test == 103:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -225,7 +230,7 @@ if test == 103:
 # NOT IMPLEMENTED #
 # if test == 104:
 # 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-# 	filt_params = parameter_set
+#
 # 	filt_params.update(
 # 		{
 # 			'ds_rate': 40,
@@ -251,7 +256,7 @@ if test == 103:
 # NOT IMPLEMENTED #
 # if test == 105:
 # 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-# 	filt_params = parameter_set
+#
 # 	filt_params.update(
 # 		{
 # 			'ds_rate': 40,
@@ -277,7 +282,7 @@ if test == 103:
 # NOT IMPLEMENTED #
 # if test == 106:
 # 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-# 	filt_params = parameter_set
+#
 # 	filt_params.update(
 # 		{
 # 			'ds_rate': 40,
@@ -300,7 +305,7 @@ if test == 103:
 
 if test == 107:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -327,7 +332,7 @@ if test == 107:
 
 if test == 108:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -350,7 +355,7 @@ if test == 108:
 
 if test == 109:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -373,7 +378,7 @@ if test == 109:
 
 if test == 110:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -392,7 +397,7 @@ if test == 110:
 
 if test == 200:
 	in_filename = "datasets/trajectories/Ellipse200.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 10,
@@ -415,7 +420,7 @@ if test == 200:
 if test == 201:
 	print 'dham -1'
 	in_filename = "datasets/trajectories/Ellipse200.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 10,
@@ -437,7 +442,7 @@ if test == 201:
 
 	print 'dham 1'
 	in_filename = "datasets/trajectories/Ellipse200.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 10,
@@ -461,7 +466,7 @@ if test == 201:
 
 	print 'no dham'
 	in_filename = "datasets/trajectories/Ellipse200.txt"
-	filt_params = parameter_set
+
 	filt_params.update(
 		{
 			'ds_rate': 10,
@@ -481,8 +486,8 @@ if test == 201:
 	)
 
 if test == 202:
-	in_filename = "datasets/trajectories/btc2milIC123.txt"
-	filt_params = parameter_set
+	# traj = Trajectory("datasets/trajectories/btc2milIC123.txt")
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -490,16 +495,37 @@ if test == 202:
 			'max_filtration_param': -10,
 			'num_divisions': 10,
 			'd_use_hamiltonion': 0,
-			# 'use_euclid'
 			'graph_induced': True
 		})
 
-	# f = Filtration(in_filename, filt_params, out_fname='filt.p')
-	f = load_filtration('filt.p')
+	# filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
 
-	# f.movie('output/PH/test_110.mp4')
-	f.plot_PD('output/PH/test110PD.png')
-	f.plot_PRF('output/PH/test110PRF.png')
+	filt.movie(out_fname('mp4'))
+	filt.plot_PD(out_fname('_PD.png'))
+	filt.plot_PRF('_PRF.png')
+
+
+if test == 203:
+	traj = Trajectory("datasets/trajectories/L63_x_m2/L63_x_m2_tau36.txt")
+
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 2000,
+			'max_filtration_param': -10,
+			'num_divisions': 10,
+			'd_use_hamiltonion': 0,
+			'graph_induced': True
+		})
+
+	# filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	# filt.movie(out_fname('.mp4'))
+	filt.plot_PD(out_fname('_PD.png'))
+	filt.plot_PRF(out_fname('_PRF_cbartest.png'))
+
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 
