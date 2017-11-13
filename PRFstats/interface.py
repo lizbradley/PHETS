@@ -8,6 +8,7 @@ from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig, \
 	plot_weight_functions, plot_heatmaps, plot_variane_fig
 from data import L2Classifier, mean_dists_compare
 from plots import dual_roc_fig, samples
+from signals import Trajectory
 from utilities import clear_old_files
 
 
@@ -53,8 +54,10 @@ def plot_dists_to_ref(
 		for i in i_arr:
 			fname = win_fname(i)
 			print_title(fname)
-			filts.append(Filtration(win_fname(i), filt_params, silent=quiet))
-		ref_filt = Filtration(win_fname(i_ref), filt_params, silent=quiet)
+			traj = Trajectory(win_fname(i))
+			filts.append(Filtration(traj, filt_params, silent=quiet))
+		ref_traj = Trajectory(win_fname(i_ref))
+		ref_filt = Filtration(ref_traj, filt_params, silent=quiet)
 		cPickle.dump(filts, open('PRFstats/data/filts.p', 'wb'))
 		cPickle.dump(ref_filt, open('PRFstats/data/ref_filt.p', 'wb'))
 
