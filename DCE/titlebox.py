@@ -7,7 +7,7 @@ def title_table(ax, name, window):
 
 	name_table = ax.table(
 		cellText=[[name]],
-		bbox=[0, .3, 1, .5],
+		bbox=[0, .5, 1, .5],
 		cellLoc='center'
 	)
 	window_table = ax.table(

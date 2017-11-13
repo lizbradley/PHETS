@@ -95,24 +95,28 @@ class PDData:
 
 class Filtration:
 
-	def __init__(self, traj, params, name='', silent=False, out_fname=None):
+	def __init__(self, traj, params, name='', silent=False, save=None):
 		caller_dir = os.getcwd()
 
-		if isinstance(traj, basestring):			# is filename
-			print 'reading input file...'
-			self.sig = np.loadtxt(traj)
-			self.filename = caller_dir + '/' + traj
-		else:										# is array
-			self.sig = traj
-			self.filename = name
+		# if isinstance(traj, basestring):			# is filename
+		# 	print 'reading input file...'
+		# 	self.sig = np.loadtxt(traj)
+		# 	self.filename = caller_dir + '/' + traj
+		# else:										# is array
+		# 	self.sig = traj
+		# 	self.filename = name
+		#
+		# self.name = self.filename.split('/')[-1].split('.')[0]
 
-		self.name = self.filename.split('/')[-1].split('.')[0]
+		self.name = traj.name
+		self.fname = traj.fname
+		self.ambient_dim = traj.dim
+		self.params = params.copy()
 
 		os.chdir(SCRIPT_DIR)
 
-		self.params = params.copy()
 
-		arr = self._build(params, silent)
+		arr = self._build(traj, params, silent)
 
 		self.epsilons = arr[3]
 		self.witness_coords = arr[0]
@@ -127,27 +131,26 @@ class Filtration:
 		self._PD = None
 		self._PRF = None
 
-		if out_fname:
-			if not silent: print 'pickling...'
-			# pickle.dump(self, open('filtrations/' + out_fname, 'wb'))
-			cPickle.dump(self, open('filtrations/' + out_fname, 'wb'))
-
 		os.chdir(caller_dir)
+
+		if save:
+			if not silent: print 'pickling...'
+			if isinstance(save, basestring):
+				fname = save
+			else:
+				fname = 'PH/filtrations/filt.p'
+			cPickle.dump(self, open(fname, 'wb'))
+
 
 
 	# private #
-	def _build(self, params, silent):
+	def _build(self, traj, params, silent):
 
 		if not silent: print "building filtration..."
 
-		sig_length = len(self.sig)
 		if params['worm_length'] is None:
-			params['worm_length'] = sig_length
-
-		if len(self.sig.shape) == 1:
-			print "ERROR: Filtration input 'sig' is one dimensional"
-			sys.exit()
-		np.savetxt('temp/worm_data.txt', self.sig)
+			params['worm_length'] = traj.data.shape[0]
+		np.savetxt('temp/worm_data.txt', traj.data)
 		start_time = time.time()
 
 		try:
@@ -443,8 +446,12 @@ class Filtration:
 		else:
 			return self._PRF
 
+
 	def movie(self, filename, **kwargs):
 		filtration_movie.build_movie(self, filename, **kwargs)
+
+	def plot_complex(self):
+		print 'implement me!'
 
 	def plot_PD(self, filename):
 		plots.PD(self, filename)
@@ -453,10 +460,9 @@ class Filtration:
 		plots.PRF(self, filename)
 
 
-def load_filtration(fname):
+def load_filtration(fname=None):
 	print 'loading saved filtration...'
-	caller_dir = os.getcwd()
-	os.chdir(SCRIPT_DIR)
-	filtration = cPickle.load(open('filtrations/' + fname))
-	os.chdir(caller_dir)
+	if fname is None:
+		fname='PH/filtrations/filt.p'
+	filtration = cPickle.load(open(fname))
 	return filtration

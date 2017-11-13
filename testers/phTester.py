@@ -524,7 +524,7 @@ if test == 203:
 
 	# filt.movie(out_fname('.mp4'))
 	filt.plot_PD(out_fname('_PD.png'))
-	filt.plot_PRF(out_fname('_PRF_cbartest.png'))
+	filt.plot_PRF(out_fname('_PRF.png'))
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

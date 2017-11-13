@@ -10,7 +10,7 @@ def highlight_window(ax, ts, window):
 	start = ts.win_start_pts[window]
 	window_lim = (start, start + ts.window_length)
 
-	if np.abs(window_lim[0] - window_lim[1]) < .01 * len(ts.data_full):
+	if np.abs(window_lim[0] - window_lim[1]) < .01 * len(ts.data):
 		ax.axvline(window_lim[0], color='r', alpha=0.7, zorder=1)
 	else:
 		ax.axvspan(window_lim[0], window_lim[1], fc='r', alpha=0.5, zorder=1)

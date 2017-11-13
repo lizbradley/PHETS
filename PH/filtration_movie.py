@@ -214,43 +214,34 @@ def build_movie(
 	remove_old_frames('PH/frames/')
 	fig = plt.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
 
-	fname_ax = plt.subplot2grid((12, 8), (0, 0), rowspan=2, colspan=2)
-	epsilon_ax = plt.subplot2grid((12, 8), (2, 0), rowspan=2, colspan=2)
-	movie_params_ax = plt.subplot2grid((12, 8), (4, 0), rowspan=2, colspan=2)
-	filt_params_ax = plt.subplot2grid((12, 8), (6, 0), rowspan=6, colspan=2)
-	plot_ax = plt.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
+	fname_ax =         plt.subplot2grid((12, 8), (0, 0), rowspan=2,  colspan=2)
+	epsilon_ax =       plt.subplot2grid((12, 8), (2, 0), rowspan=2,  colspan=2)
+	movie_params_ax =  plt.subplot2grid((12, 8), (4, 0), rowspan=2,  colspan=2)
+	filt_params_ax =   plt.subplot2grid((12, 8), (6, 0), rowspan=6,  colspan=2)
+	plot_ax =          plt.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
 
-	filename_table(fname_ax, filt.filename)
+	filename_table(fname_ax, filt.name)
 	movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
 	filt_params_table(filt_params_ax, filt.params)
 
 	witness_data = filt.witness_coords
 	landmark_data = filt.landmark_coords
-
 	amb_dim = filt.ambient_dim
-	if amb_dim not in (2, 3):
-		print 'ERROR: invalid ambient dimension {}, must be 2 or 3'\
-			.format(amb_dim)
-		sys.exit()
 
 	for i, eps in enumerate(filt.epsilons):
 		print_still('\rplotting frame {} of {}'.format(i + 1, filt.num_div))
-
 		if amb_dim == 2:
 			plot_witnesses_2D(plot_ax, witness_data)
 			plot_landmarks_2D(plot_ax, landmark_data)
 			plot_complex_2D(plot_ax, filt, i, color_scheme, alpha)
 		else:
 			plot_all_3D_gnuplot(plot_ax, filt, i, camera_angle)
-
 		update_epsilon(epsilon_ax, eps)
-
 		plt.savefig('PH/frames/frame%03d.png' % i)
 		plot_ax.clear()
 
-
 	plt.close(fig)
 	print ''
-	frames_to_movie(out_filename, 'PH/frames/frame%03d.png', loglevel='error')
+	frames_to_movie(out_filename, 'PH/frames/frame%03d.png')
 	clear_temp_files('PH/temp/')
 

@@ -11,6 +11,7 @@ def slide_window(timeseries, m, tau, out_fname, framerate=1):
 		print_still('frame {} of {}'.format(i, traj.num_windows))
 		slide_window_frame(traj, i, frame_fname % i)
 
+	print ''
 	frames_to_movie(out_fname, frame_fname,
 	                framerate=framerate, loglevel='error')
 

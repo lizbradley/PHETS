@@ -5,14 +5,16 @@ import plots
 from DCE import embed
 from PH import Filtration
 from config import SAMPLE_RATE
-from utilities import print_title
+from utilities import print_title, print_still
 
 
 class BaseTrajectory(object):
 
 	def __init__(self,
 	        data,
+	        name=None,
 	        fname=None,
+	        skiprows=0,
 			crop=None,
 			num_windows=None,
 			window_length=None,
@@ -21,13 +23,16 @@ class BaseTrajectory(object):
 
 	):
 		if isinstance(data, basestring):        # is filename
-			self.data_full = np.loadtxt(data)
+			print 'loading input file...'
+			self.data_full = np.loadtxt(data, skiprows=skiprows)
 			self.fname = data
 		else:                                   # is array
 			self.data_full = data
 			self.fname = fname
 
-		if self.fname is not None:
+		if name is not None:
+			self.name = name
+		elif self.fname is not None:
 			self.name = self.fname.split('/')[-1].split('.')[0]
 		else:
 			self.name = None
@@ -56,6 +61,7 @@ class BaseTrajectory(object):
 	def crop(self, lim):
 		if lim is None:
 			self.data = self.data_full
+			self.crop_lim = (0, len(self.data))
 
 		else:
 			crop_lim = np.array(self.crop_lim)
@@ -87,7 +93,8 @@ class BaseTrajectory(object):
 			'time_units': self.time_units
 		}
 		parent_type = type(self)
-		for w in windows_raw:
+		for i, w in enumerate(windows_raw):
+			kwargs.update({'name': '{} window #{}.'.format(self.name, i)})
 			if parent_type is Trajectory:
 				windows.append(Trajectory(w, **kwargs))
 			elif parent_type is TimeSeries:
@@ -98,26 +105,36 @@ class BaseTrajectory(object):
 		if num_windows is None:
 			return
 		else:
-			start_idxs = np.floor(
-				np.linspace(0, len(self.data), num_windows, endpoint=False)
-				# toggle these to reproduce IDA fig 5
-				# np.linspace(0, len(self.data) - 1, num_windows, endpoint=False)
-			).astype(int)
+			# start_points = np.floor(
+			# 	np.linspace(0, len(self.data) - 1, num_windows, endpoint=False)
+			# ).astype(int)
+
+			# toggle start_points to reproduce IDA fig 5
+			crop_0, crop_1 = self.crop_lim
+			start_points = np.linspace(
+				crop_0, crop_1, num_windows, endpoint=False
+			)
+
+			if self.time_units == 'samples':
+				start_points = start_points.astype(int)
 
 			if window_length is None:
 				window_length = len(self.data) / num_windows
 
-			if self.time_units == 'seconds':
+			if self.time_units == 'samples':
+				start_points_idxs = start_points
+			elif self.time_units == 'seconds':
 				window_length = int(window_length * SAMPLE_RATE)
-			windows = [self.data[sp:sp + window_length] for sp in start_idxs]
+				start_points_idxs = (start_points * SAMPLE_RATE).astype(int)
 
-			if self.time_units == 'seconds':
-				start_idxs = start_idxs / SAMPLE_RATE
+			windows = [self.data[sp:sp + window_length]
+			           for sp in start_points_idxs]
+
 
 		if self.norm_vol[2]:
 			windows = [self.normalize(w) for w in windows]
 
-		self.win_start_pts =  start_idxs
+		self.win_start_pts =  start_points
 		self.windows = self._spawn(windows)
 
 
@@ -176,16 +193,16 @@ class Trajectory(BaseTrajectory):
 
 		print_title('building filtrations for {}...'.format(self.name))
 		filts = []
-		windows_raw = [w.data for w in self.windows]
-		for i, t in enumerate(windows_raw):
+		for i, t in enumerate(self.windows):
 			if quiet:
-				sys.stdout.write('\rwindow {} of {}...'.format(
-					i + 1, len(windows_raw))
+				print_still(
+					'window {} of {}...'.format(i + 1, len(self.windows))
 				)
-				sys.stdout.flush()
 			else:
-				print_title('{} window {} of {}...'.format(
-						self.name, i + 1, len(windows_raw))
+				print_title(
+					'{} window {} of {}...'.format(
+						self.name, i + 1, len(self.windows)
+					)
 				)
 			f = Filtration(t, filt_params, silent=quiet,
 			               name='{}__window_{}'.format(self.name, i))
