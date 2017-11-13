@@ -2,7 +2,8 @@ from plots import slide_window_frame
 from utilities import remove_old_frames, print_still, frames_to_movie
 
 
-def slide_window(traj, out_fname, framerate=1):
+def slide_window(timeseries, m, tau, out_fname, framerate=1):
+	traj = timeseries.embed(m=m, tau=tau)
 	remove_old_frames('DCE/frames/')
 	frame_fname = 'DCE/frames/frame%03d.png'
 
@@ -13,3 +14,4 @@ def slide_window(traj, out_fname, framerate=1):
 	frames_to_movie(out_fname, frame_fname,
 	                framerate=framerate, loglevel='error')
 
+	return traj
