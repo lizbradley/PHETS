@@ -51,7 +51,7 @@ def plot_dce(fig, ax, dce_data):
 
 
 def slide_window_frame(traj, window, out_fname):
-	fig = plt.figure(figsize=(10, 8), tight_layout=False, dpi=100)
+	fig = plt.figure(figsize=(8, 6), tight_layout=False, dpi=100)
 	# fig.subplots_adjust(hspace=.5)
 
 	gs = gridspec.GridSpec(8, 10)
