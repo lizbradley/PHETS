@@ -54,52 +54,60 @@ pip install -r requirements.txt
 
 ## Demo
 ```python
+
 import numpy as np
-import DCE, Tools
-from PH import Filtration, make_movie, make_PD, make_PRF_plot
+from signals import TimeSeries
+from utilities import idx_to_freq
+from DCE.movies import slide_window
+from PH import Filtration
 from config import default_filtration_params as filt_params
-time_units = 'seconds'                  # 'seconds' or 'samples'
-crop = (1, 5)                           # range of signal
-tau = (1 / Tools.idx_to_freq(49)) / np.pi	# embedding delay
-m = 2 				        # embedding dimension
 
-sig = np.loadtxt('datasets/time_series/C135B/49-C135B.txt') # this is a middle C from a piano
-
-trajs = DCE.Movies.slide_window(    # other options here include vary_tau() and compare_multi()
-	sig,
-	'output/demo/embed_movie.mp4',
-	tau=tau,
-	m=m,
-	window_size=.05, 
-	window_step=.02,        
-	crop=crop,
-	time_units=time_units,
-	title='piano demo'
+ts = TimeSeries(
+    'datasets/time_series/C135B/49-C135B.txt',
+    crop=(0, 5),
+    num_windows=250,
+    window_length=.05,
+    time_units='seconds'    # defaults to 'samples'
 )
+
+# the slide_window function will create a movie showing an embedding for each
+# window of the time series
+tau = (1 / idx_to_freq(49)) / np.e      # choose tau = period / e
+
+traj = slide_window(
+    ts,
+    m=2, tau=tau,
+    out_fname='output/demo/embed_movie.mp4'
+)
+
 ```
 ![embed movie](docs/readme/embed_movie.gif "embed_movie.mp4")
 
 ```python
-traj = trajs[100]		# take embedding from 100th frame of movie
+# alternatively, we could skip the movie and embed explicitly:
+traj = ts.embed(m=2, tau=tau)
 
-# alternatively, we could embed explicitly:
-# traj = embed(sig, tau, m, crop=crop, time_units=time_units)		
+
+# now, lets build a filtration from the trajectory that is shown in the 100th 
+# frame of the slide_window movie
+traj_window = traj.windows[100]
 
 # parameters used to build the filtration:
 filt_params.update(
-	{
-		'ds_rate': 25,      # num landmarks = len(sig) / ds_rate
-		'num_divisions': 25,  # number of epsilon vals in filtration
-		# 'max_filtration_param': .05,  # if positive, explicit;
-		'max_filtration_param': -10,  # if negative, cuts off filtration at first 10 dim simplex
-		'use_cliques': True,
-	}
+    {
+        'ds_rate': 25,
+        'num_divisions': 10,                # number of epsilon vals in filtration
+        # 'max_filtration_param': .05,      # if > 0, explicit
+        'max_filtration_param': -10,        # if < 0, stops st first 10 dim simplex
+        # 'use_cliques': True,
+    }
 )
 
 # build the filtration:
-filt = Filtration(traj, filt_params, title='piano demo')
+filt = Filtration(traj_window, filt_params)
 
-make_movie(filt, 'output/demo/filt_movie.mp4')
+filt.movie('output/demo/filt_movie.mp4')
+
 ```
 
 ![filtration movie](docs/readme/filt_movie.gif "filt_movie.mp4")
@@ -108,20 +116,20 @@ make_movie(filt, 'output/demo/filt_movie.mp4')
 This filtration can be summarized by its homology, which may be expressed as a persistence diagram:
 
 ```python
-make_PD(filt, 'output/demo/PD.png')  # make the persistence diagram
+filt.plot_PD('output/demo/PD.png')          # plot the persistence diagram
 ```
 
 ![perseistence diagram](docs/readme/PD.png "PD.png")
 
 Or as a persistence rank function:
 ```python
-make_PRF_plot(filt, 'output/demo/PRF.png')  # make persistence rank function
+filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
 ```
 
 ![perseistence rank function](docs/readme/PRF.png "PRF.png")
 
 Persistence rank functions are amenable to statistical analysis. Several functions are provided for exploring these properties.
-`PRFCompare.plot_clusters()`, for example, takes two disjoint sets of samples ('training' and 'test') from each of two input signals,
+`PRFstats.plot_clusters()`, for example, takes two disjoint sets of samples ('training' and 'test') from each of two input signals,
 computes the mean PRF for each training set, and plots the L2 distances from these means to the PRFs of the test sets. 
 In the image below, two pianos are compared (left) and not easily distinguished; a viol and a clarinet are compared (right) and clustering is observed.
 
