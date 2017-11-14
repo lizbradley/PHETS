@@ -71,8 +71,9 @@ ts = TimeSeries(
 )
 
 # the slide_window function will create a movie showing an embedding for each
-# window of the time series
-tau = (1 / idx_to_freq(49)) / np.e      # choose tau = period / e
+# window of the time series and return the trajectory
+
+tau = (1 / idx_to_freq(49)) / np.pi      # first, choose tau = period / pi 
 
 traj = slide_window(
     ts,
@@ -86,7 +87,6 @@ traj = slide_window(
 ```python
 # alternatively, we could skip the movie and embed explicitly:
 traj = ts.embed(m=2, tau=tau)
-
 
 # now, lets build a filtration from the trajectory that is shown in the 100th 
 # frame of the slide_window movie
