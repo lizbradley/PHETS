@@ -12,6 +12,17 @@ from signals import Trajectory
 from utilities import clear_old_files
 
 
+def win_fname(fname_format, dir, base_filename, i):
+	if fname_format == 'i base':
+		filename = '{}/{}{}'.format(dir, i, base_filename)
+	elif fname_format == 'base i':
+		filename = '{}/{}{}.txt'.format(dir, base_filename, i)
+	else:
+		print "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
+		sys.exit()
+	return filename
+
+
 def plot_dists_to_ref(
 		dir, base_filename,
 		fname_format,   # 'i base' or 'base i'
@@ -36,34 +47,25 @@ def plot_dists_to_ref(
 	import cPickle
 	from utilities import print_title
 
-	def win_fname(i):
-		if fname_format == 'i base':
-			filename = '{}/{}{}'.format(dir, i, base_filename)
-		elif fname_format == 'base i':
-			filename = '{}/{}{}.txt'.format(dir, base_filename, i)
-		else:
-			print "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
-			sys.exit()
-		return filename
-
 	if load_saved_filts:
 		filts = np.load(open('PRFstats/data/filts.p'))
 		ref_filt = np.load(open('PRFstats/data/ref_filt.p'))
 	else:
 		filts = []
 		for i in i_arr:
-			fname = win_fname(i)
+			fname = win_fname(fname_format, dir, base_filename, i)
 			print_title(fname)
-			traj = Trajectory(win_fname(i))
+			traj = Trajectory(win_fname(fname_format, dir, base_filename, i))
 			filts.append(Filtration(traj, filt_params, silent=quiet))
-		ref_traj = Trajectory(win_fname(i_ref))
+		ref_traj = Trajectory(win_fname(fname_format, dir, base_filename,
+		                                i_ref))
 		ref_filt = Filtration(ref_traj, filt_params, silent=quiet)
 		cPickle.dump(filts, open('PRFstats/data/filts.p', 'wb'))
 		cPickle.dump(ref_filt, open('PRFstats/data/ref_filt.p', 'wb'))
 
 
 	prfs = [f.PRF(new_format=True) for f in filts]
-	ref_prf = ref_filt._PRF(new_format=True)
+	ref_prf = ref_filt.PRF(new_format=True)
 
 	dists = dists_to_ref(prfs, ref_prf, metric, dist_scale)
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
@@ -72,7 +74,6 @@ def plot_dists_to_ref(
 		dir = 'output/PRFstats/samples'
 		clear_old_files(dir, see_samples)
 		samples(filts, see_samples, dir)
-
 
 
 

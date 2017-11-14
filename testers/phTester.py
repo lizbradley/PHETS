@@ -519,10 +519,10 @@ if test == 203:
 			'graph_induced': True
 		})
 
-	# filt = Filtration(traj, filt_params, save=True)
+	filt = Filtration(traj, filt_params, save=True)
 	filt = load_filtration()
 
-	# filt.movie(out_fname('.mp4'))
+	filt.movie(out_fname('.mp4'))
 	filt.plot_PD(out_fname('_PD.png'))
 	filt.plot_PRF(out_fname('_PRF.png'))
 
