@@ -4,11 +4,11 @@ change_dir()
 import numpy as np
 from signals import TimeSeries, Trajectory
 from PRFstats import L2ROCs, plot_dists_to_means, plot_clusters, \
-	plot_dists_to_ref, plot_variance
+	plot_dists_to_ref, plot_variance, plot_pairwise_mean_dists
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=7)
+test, start_time = get_test(set_test=12)
 
 
 def out_fname():
@@ -309,6 +309,7 @@ if test == 9:
 	)
 
 if test == 10:
+
 	ts = TimeSeries(
 		'datasets/time_series/viol/40-viol.txt',
 		crop=(35000, 140000),
@@ -323,6 +324,7 @@ if test == 10:
 		'num_divisions': 10,
 		'max_filtration_param': -8
 	})
+
 
 	plot_variance(
 		traj,
@@ -360,4 +362,29 @@ if test == 11:
 		quiet=False,
 		annot_hm=False,
 		load_saved_filts=True
+	)
+
+if test == 12:
+
+	traj = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(10000, 150000),
+		num_windows=10,
+		window_length=10500
+	)
+
+	filt_params.update({
+		'ds_rate': 10,
+		'num_divisions': 10,
+	})
+
+	plot_pairwise_mean_dists(
+		traj,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (200, 500, 700)),
+		vary_param_2=('max_filtration_param', (-5, -8, -12)),
+		quiet=True,
+		annot_hm=False,
+		load_saved_filts=False
 	)

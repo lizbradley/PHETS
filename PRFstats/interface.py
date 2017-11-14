@@ -3,7 +3,7 @@ import sys
 import numpy as np
 
 from PRFstats.data import roc_data, dists_to_ref, \
-	fetch_filts, process_variance_data
+	fetch_filts, process_variance_data, get_dist
 from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig, \
 	plot_weight_functions, plot_heatmaps, plot_variane_fig
 from data import L2Classifier, mean_dists_compare
@@ -21,6 +21,10 @@ def win_fname(fname_format, dir, base_filename, i):
 		print "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
 		sys.exit()
 	return filename
+
+
+
+
 
 
 def plot_dists_to_ref(
@@ -288,3 +292,51 @@ def plot_variance(
 		)
 
 	return stats_data, hmap_data, hmap_data_pw
+
+
+def plot_pairwise_mean_dists(
+		traj,
+		out_filename,
+		filt_params,
+		vary_param_1,
+		vary_param_2=None,
+		legend_labels=None,
+
+		metric='L2', 		 		# 'L1' (abs) or 'L2' (euclidean)
+		dist_scale='b',
+		weight_func=lambda i, j: 1,
+
+		see_samples=5,
+		quiet=True,
+		annot_hm=False,
+		load_saved_filts=False,
+		filts_fname=None,
+		unit_test=False
+):
+	def fetch_prfs(filt_evo_array, quiet):
+		prf_evo_array = np.zeros_like(filt_evo_array)
+		for idx, filt in np.ndenumerate(filt_evo_array):
+			prf_evo_array[idx] = filt.PRF(silent=quiet, new_format=True)
+		return prf_evo_array
+
+
+	filt_evo_array = fetch_filts(
+		traj, filt_params,
+		load_saved_filts, quiet,
+		vary_param_1, vary_param_2,
+		filts_fname=filts_fname
+	)
+
+	prf_evo_array = fetch_prfs(filt_evo_array, quiet)
+
+	prf_mean_array = np.mean(prf_evo_array, axis=2)
+
+	dists_array = np.zeros((prf_mean_array.shape[0] - 1, prf_mean_array.shape[1]))
+	for i in range(prf_mean_array.shape[0] - 1):
+		for j in range(prf_mean_array.shape[1]):
+			d = get_dist(prf_mean_array[i,j], prf_mean_array[i + 1, j])
+			dists_array[i, j] = d
+
+	np.savetxt('output/PRFstats/pairwise_dists.txt', dists_array)
+
+

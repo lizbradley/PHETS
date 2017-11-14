@@ -8,6 +8,7 @@ def fetch_filts(
 		id=None, filts_fname=None, out_fname=None,
 		no_save=False
 ):
+	# todo: add handling of weight function as vary_param
 	suffix = id if id is not None else ''
 	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
 
@@ -107,6 +108,8 @@ def mean_dists_compare(prfs1, prfs2, metric, dist_scale):
 
 
 
+
+
 class VarianceData:
 	"""all data for a fixed value of vary_param_2 -- one curve per plot"""
 	def __init__(self):
@@ -199,7 +202,7 @@ def process_variance_data(
 			var_data.pointwise_mean_norm.append(pmn)
 
 			dists = [norm(np.subtract(PRF, pointwise_mean), metric)
-			         for PRF in prf_evo]
+			            for PRF in prf_evo]
 			variance = np.mean(np.power(dists, 2))  				# plot as data point
 			# variance = np.sum(np.power(dists, 2)) / (len(dists) - 1)
 			var_data.variance.append(variance)
