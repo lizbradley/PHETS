@@ -1,8 +1,8 @@
 from boilerplate import change_dir
 change_dir()
 
-from signals import TimeSeries
 import numpy as np
+from signals import TimeSeries
 from utilities import idx_to_freq
 from DCE.movies import slide_window
 from PH import Filtration
@@ -14,13 +14,11 @@ from config import default_filtration_params as filt_params
 
 ts = TimeSeries(
     'datasets/time_series/C135B/49-C135B.txt',
-    crop=(.5, 5),
-    num_windows=10,
+    crop=(0, 5),
+    num_windows=250,
     window_length=.05,
     time_units='seconds'    # defaults to 'samples'
 )
-
-ts.plot('output/demo/timeseries.png')
 
 # the slide_window function will create a movie showing an embedding for each
 # window of the time series
@@ -37,13 +35,13 @@ traj = ts.embed(m=2, tau=tau)
 
 # now, lets build a filtration from the trajectory that is shown in the fifth
 # frame of the slide_window movie
-traj_window = traj.windows[5]
+traj_window = traj.windows[100]
 
 # parameters used to build the filtration:
 filt_params.update(
     {
         'ds_rate': 25,
-        'num_divisions': 10,                # number of epsilon vals in filtration
+        'num_divisions': 20,                # number of epsilon vals in filtration
         # 'max_filtration_param': .05,      # if > 0, explicit
         'max_filtration_param': -20,        # if < 0, stops st first 10 dim simplex
         'use_cliques': True,
