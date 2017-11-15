@@ -5,6 +5,7 @@ import matplotlib.markers
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import collections
+
 plt.ioff()
 
 
@@ -22,8 +23,9 @@ def simplex_color(scheme, past_birth_time, birth_time, max_birth_time):
 
 	elif scheme == 'highlight new':
 		if past_birth_time == birth_time:
-			facecolor = 'C1'
-			edgecolor = 'C3'
+			facecolor = 'C3'
+			# edgecolor = 'C6'
+			edgecolor = 'maroon'
 		else:
 			facecolor = 'C0'
 			edgecolor = 'black'
@@ -60,7 +62,8 @@ def plot_landmarks_2D(subplot, landmark_data):
 	landmark_data = np.array(landmark_data)
 	x = landmark_data[:, 0]
 	y = landmark_data[:, 1]
-	subplot.scatter(x, y, color='lime', s=35)
+	# subplot.scatter(x, y, color='lime', s=35)
+	subplot.scatter(x, y, color='springgreen', s=35)
 
 
 def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
@@ -77,7 +80,7 @@ def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
 			simplices_coords,
 			edgecolors=e_color,
 			facecolors=f_color,
-			lw=1,
+			lw=1.5,
 			alpha=alpha,
 			zorder=0,
 			animated=True,
@@ -166,7 +169,7 @@ def plot_all_3D_gnuplot(subplot, filtration, i, camera_angle):
 				   'lc "black" notitle'
 		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 notitle'
 		lands_arg = '"PH/temp/landmarks.txt" with points pt 7 ps 1 ' \
-		            'lc rgb "#00FF00" notitle'
+		            'lc rgb "#00FF7F" notitle'
 		cmds.append('splot {}, {}'.format(wits_arg, lands_arg))
 
 		cmds.append('q')
@@ -210,16 +213,19 @@ def build_movie(
 		dpi=200,
 
 ):
+
+
 	print 'building movie...'
 	remove_old_frames('PH/frames/')
-	fig = plt.figure(figsize=(9, 6), tight_layout=True, dpi=dpi)
+	fig = plt.figure(figsize=(9, 6), tight_layout=False, dpi=dpi)
 
-	fname_ax =         plt.subplot2grid((12, 8), (0, 0), rowspan=2,  colspan=2)
-	epsilon_ax =       plt.subplot2grid((12, 8), (2, 0), rowspan=2,  colspan=2)
-	movie_params_ax =  plt.subplot2grid((12, 8), (4, 0), rowspan=2,  colspan=2)
-	filt_params_ax =   plt.subplot2grid((12, 8), (6, 0), rowspan=6,  colspan=2)
-	plot_ax =          plt.subplot2grid((12, 8), (0, 2), rowspan=12, colspan=6)
+	fname_ax =         plt.subplot2grid((12, 8), (0, 0), rowspan=1,  colspan=2)
+	epsilon_ax =       plt.subplot2grid((12, 8), (2, 0), rowspan=1,  colspan=2)
+	movie_params_ax =  plt.subplot2grid((12, 8), (4, 0), rowspan=1,  colspan=2)
+	filt_params_ax =   plt.subplot2grid((12, 8), (5, 0), rowspan=7,  colspan=2)
+	plot_ax =          plt.subplot2grid((12, 8), (0, 3), rowspan=12, colspan=6)
 
+	fig.subplots_adjust(left=.05, right=.95, bottom=.1, top=.9)
 	filename_table(fname_ax, filt.name)
 	movie_params_table(movie_params_ax, (color_scheme, alpha, '2D'))
 	filt_params_table(filt_params_ax, filt.params)
@@ -228,8 +234,10 @@ def build_movie(
 	landmark_data = filt.landmark_coords
 	amb_dim = filt.ambient_dim
 
+
 	for i, eps in enumerate(filt.epsilons):
 		print_still('\rplotting frame {} of {}'.format(i + 1, filt.num_div))
+
 		if amb_dim == 2:
 			plot_witnesses_2D(plot_ax, witness_data)
 			plot_landmarks_2D(plot_ax, landmark_data)
@@ -239,6 +247,7 @@ def build_movie(
 		update_epsilon(epsilon_ax, eps)
 		plt.savefig('PH/frames/frame%03d.png' % i)
 		plot_ax.clear()
+
 
 	plt.close(fig)
 	print ''

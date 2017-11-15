@@ -30,7 +30,7 @@ def colorbar_ax(cbar_ax, levels):
 		cmap=cmap,
 		ticks=levels,
 		extend='max',
-		extendrect=True
+		extendrect=True,
 	)
 
 
@@ -47,6 +47,7 @@ def PD_ax(ax, cbar_ax, filtration):
 	ax.set_ylabel('death ($\epsilon$)')
 	ax.grid(which=u'major', zorder=0)
 	ax.minorticks_on()
+	ax.ticklabel_format(axis='both', style='sci',  scilimits=(0,0))
 
 	ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k')  # diagonal line
 
@@ -54,26 +55,24 @@ def PD_ax(ax, cbar_ax, filtration):
 	if data == 'empty':
 		return
 
-	sc = None
 	levels = [1, 2, 3, 4, 5]
 	cmap, norm = colorbar_ax(cbar_ax, levels)
+
 	if len(data.mortal) > 0:
 		x_mor, y_mor, count_mor = data.mortal
-		sc = ax.scatter(
+		ax.scatter(
 			x_mor, y_mor, s=70,
 			c=count_mor, alpha=.8,
 			clip_on=True, zorder=100,
-			# vmin=1, vmax=5
 			cmap=cmap, norm=norm
 		)
 	if len(data.immortal) > 0:
 		x_imm, count_imm = data.immortal
 		y_imm = [max_lim for i in x_imm]
-		sc = ax.scatter(
+		ax.scatter(
 			x_imm, y_imm, marker='^', s=120,
 			c=count_imm, alpha=.8,
 			clip_on=False, zorder=100,
-			# vmin=1, vmax=5
 			cmap=cmap, norm=norm
 		)
 
@@ -90,10 +89,7 @@ def PD(filt, out_filename):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-	# pos = cbar_ax.get_position()
-	# cbar_ax.set_position(
-	# 	[pos.x0 + .1, pos.y0 - .05, pos.x1 - pos.x0 + -.05, pos.y1 - pos.y0 + .1]
-	# )
+
 
 	PD_ax(plot_ax, cbar_ax, filt)
 	filename_table(fname_ax, filt.name)
@@ -130,6 +126,7 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 		y = np.append(y, y[-1] + d)
 		return x, y
 
+	plot_ax.ticklabel_format(axis='both', style='sci',  scilimits=(0,0))
 	plot_ax.set_aspect('equal')
 	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
 	cmap, norm = colorbar_ax(cbar_ax, levels)
@@ -149,6 +146,8 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 
 
 def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
+
+	ax.ticklabel_format(axis='both', style='sci',  scilimits=(0,0))
 
 	if cbar_ax is None:
 		divider = make_axes_locatable(ax)
@@ -181,6 +180,8 @@ def PRF(filt, out_filename, annot_hm=False):
 		x, y = x[0], y[:, 0]		# reduce to arange format
 
 	plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=annot_hm)
+	plot_ax.set_xlabel('birth ($\epsilon$)')
+	plot_ax.set_ylabel('death ($\epsilon$)')
 
 	####### to here ###########
 	# should eventually be replaced by PRF_ax

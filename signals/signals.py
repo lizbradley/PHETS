@@ -94,7 +94,7 @@ class BaseTrajectory(object):
 		}
 		parent_type = type(self)
 		for i, w in enumerate(windows_raw):
-			kwargs.update({'name': '{} window #{}.'.format(self.name, i)})
+			kwargs.update({'name': '{} window {}'.format(self.name, i)})
 			if parent_type is Trajectory:
 				windows.append(Trajectory(w, **kwargs))
 			elif parent_type is TimeSeries:

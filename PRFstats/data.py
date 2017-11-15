@@ -9,6 +9,7 @@ def fetch_filts(
 		no_save=False
 ):
 	# todo: add handling of weight function as vary_param
+
 	suffix = id if id is not None else ''
 	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
 

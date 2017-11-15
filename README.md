@@ -113,13 +113,7 @@ filt.movie('output/demo/filt_movie.mp4')
 ![filtration movie](docs/readme/filt_movie.gif "filt_movie.mp4")
 
 
-This filtration can be summarized by its homology, which may be expressed as a persistence diagram:
-
-```python
-filt.plot_PD('output/demo/PD.png')          # plot the persistence diagram
-```
-
-![perseistence diagram](docs/readme/PD.png "PD.png")
+A filtration can be summarized by its homology, which may be expressed as a persistence rank function:
 
 Or as a persistence rank function:
 ```python
@@ -131,9 +125,9 @@ filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
 Persistence rank functions are amenable to statistical analysis. Several functions are provided for exploring these properties.
 `PRFstats.plot_clusters()`, for example, takes two disjoint sets of samples ('training' and 'test') from each of two input signals,
 computes the mean PRF for each training set, and plots the L2 distances from these means to the PRFs of the test sets. 
-In the image below, two pianos are compared (left) and not easily distinguished; a viol and a clarinet are compared (right) and clustering is observed.
+In the image below, two pianos are compared (left) and not easily distinguished; a viol and a piano are compared (right) and clustering is observed.
 
-![not so different](docs/readme/clusters.png "left: piano vs piano | right: viol vs clarinet")
+![not so different](docs/readme/clusters.png "left: piano vs piano | right: viol vs piano")
 
 See `reference.pdf` for more information.
 

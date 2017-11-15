@@ -15,8 +15,8 @@ def title_table(ax, name, window):
 		bbox=[0, 0, 1, .5],
 		cellLoc='center'
 	)
-	# title_table.auto_set_font_size(False)
-	# title_table.auto_set_font_size(8)
+	# window_table.auto_set_font_size(False)
+	# window_table.auto_set_font_size(6)
 
 def param_table(ax, params):
 
@@ -37,7 +37,7 @@ def param_table(ax, params):
 		colWidths=[1, 1],
 		bbox=[0, 0, 1, 1],  # x0, y0, width, height
 	)
-	# param_table.auto_set_font_size(False)
-	# param_table.set_fontsize(6)
+	# table.auto_set_font_size(False)
+	# table.set_fontsize(6)
 
 

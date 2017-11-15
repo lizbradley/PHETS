@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from matplotlib.ticker import FormatStrFormatter
 
 import titlebox
 import signals
@@ -46,18 +47,18 @@ def plot_dce(fig, ax, dce_data):
 	ax.set_yticks([ymin, ymax])
 	ax.set_xticks([xmin, xmax])
 
-
-	fig.subplots_adjust(left=.07, bottom=.07, right=.93, top=.93, wspace=.5, hspace=.5)
+	ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+	fig.subplots_adjust(left=.07, bottom=.07, right=.90, top=.93, wspace=.5, hspace=.5)
 
 
 def slide_window_frame(traj, window, out_fname):
-	fig = plt.figure(figsize=(8, 6), tight_layout=False, dpi=100)
-	# fig.subplots_adjust(hspace=.5)
+	fig = plt.figure(figsize=(8.5, 6), tight_layout=True, dpi=100)
+	# fig.subplots_adjust(hspace=.2)
 
 	gs = gridspec.GridSpec(8, 10)
 
-	fname_ax =        fig.add_subplot(gs[0,     :3 ])
-	param_ax =        fig.add_subplot(gs[1:4,   :3 ])
+	fname_ax =        fig.add_subplot(gs[0:2,    :4])
+	param_ax =        fig.add_subplot(gs[2:5,    :4])
 	ts_ax =           fig.add_subplot(gs[6:8,   :10])
 	if traj.dim == 2:
 		dce_ax =      fig.add_subplot(gs[0:6,  4:10])

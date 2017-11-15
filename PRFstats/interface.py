@@ -314,6 +314,8 @@ def plot_pairwise_mean_dists(
 		unit_test=False
 ):
 	def fetch_prfs(filt_evo_array, quiet):
+		# todo: add handling of weight function as vary param and call in other
+		# PRFstats functions
 		prf_evo_array = np.zeros_like(filt_evo_array)
 		for idx, filt in np.ndenumerate(filt_evo_array):
 			prf_evo_array[idx] = filt.PRF(silent=quiet, new_format=True)

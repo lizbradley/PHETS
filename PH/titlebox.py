@@ -1,6 +1,8 @@
 import numpy as np
 
 def filename_table(ax, filename):
+	ax.set_xlim([0,1])
+	ax.set_ylim([0,1])
 	ax.axis('off')
 	title_table = ax.table(
 		cellText=[
@@ -13,6 +15,8 @@ def filename_table(ax, filename):
 	# title_table.auto_set_font_size(8)
 
 def filenames_table(ax, filenames):
+	ax.set_xlim([0,1])
+	ax.set_ylim([0,1])
 	ax.axis('off')
 	title_table = ax.table(
 		cellText=[
@@ -58,14 +62,14 @@ def filt_params_table(subplot, filt_params, fontsize=None):
 		bbox=[0, 0, 1, 1],  # x0, y0, width, height
 	)
 
-	if fontsize:
-		param_table.auto_set_font_size(False)
-		param_table.set_fontsize(fontsize)
-		# used to be 6
+	param_table.auto_set_font_size(False)
+	param_table.set_fontsize(6)
 
 
 
 def update_epsilon(ax,e):
+	ax.set_xlim([0,1])
+	ax.set_ylim([0,1])
 	ax.axis('off')
 	time_table = ax.table(
 		cellText= [['$\epsilon$', '{:.6f}'.format(e)]],
@@ -81,6 +85,8 @@ def update_epsilon(ax,e):
 
 
 def movie_params_table(ax, params):
+	ax.set_xlim([0,1])
+	ax.set_ylim([0,1])
 	ax.axis('off')
 
 	table = ax.table(
@@ -88,5 +94,8 @@ def movie_params_table(ax, params):
 			['color scheme',params[0]],
 			['alpha', params[1]],
 			# ['camera angle',params[2]],
-		]
+		],
+		bbox=[0, 0, 1, 1],    # x0, y0, width, height
 	)
+	table.auto_set_font_size(False)
+	table.set_fontsize(6)
