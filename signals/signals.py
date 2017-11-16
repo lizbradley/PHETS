@@ -14,7 +14,6 @@ class BaseTrajectory(object):
 	        data,
 	        name=None,
 	        fname=None,
-	        skiprows=0,
 			crop=(None, None),
 			num_windows=None,
 			window_length=None,
@@ -24,7 +23,7 @@ class BaseTrajectory(object):
 	):
 		if isinstance(data, basestring):        # is filename
 			print 'loading input file...'
-			self.data_full = np.loadtxt(data, skiprows=skiprows)
+			self.data_full = np.loadtxt(data)
 			self.fname = data
 		else:                                   # is array
 			self.data_full = data

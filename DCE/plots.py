@@ -48,6 +48,7 @@ def plot_dce(fig, ax, dce_data):
 	ax.set_xticks([xmin, xmax])
 
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+	ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 	fig.subplots_adjust(left=.07, bottom=.07, right=.90, top=.93, wspace=.5, hspace=.5)
 
 

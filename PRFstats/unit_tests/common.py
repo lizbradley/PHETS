@@ -7,25 +7,11 @@ filt_params.update({
 	'max_filtration_param': -8
 })
 
-ellipse_traj = Trajectory(
-	'data/ellipse.txt',
-	crop=(100, 900),
-	num_windows=5,
-	vol_norm=(1, 1, 1)
-)
+ellipse_traj = Trajectory('data/ellipse.txt', crop=(100, 900), num_windows=5,
+                          vol_norm=(1, 1, 1))
 
-clar_traj = TimeSeries(
-	'data/40-clarinet.txt',
-	crop=(75000, 180000),
-	num_windows=10,
-	window_length=2000,
-	vol_norm=(0, 0, 1)
-).embed(tau=32, m=2)
+clar_traj = TimeSeries('data/40-clarinet.txt', crop=(75000, 180000),
+                       num_windows=10, window_length=2000, vol_norm=(0, 0, 1)).embed(tau=32, m=2)
 
-viol_traj = TimeSeries(
-	'data/40-viol.txt',
-	crop=(35000, 140000),
-	num_windows=10,
-	window_length=2000,
-	vol_norm=(0, 0, 1)
-).embed(tau=32, m=2)
+viol_traj = TimeSeries('data/40-viol.txt', crop=(35000, 140000),
+                       num_windows=10, window_length=2000, vol_norm=(0, 0, 1)).embed(tau=32, m=2)

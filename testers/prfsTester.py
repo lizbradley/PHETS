@@ -51,7 +51,6 @@ if test == 1:
 
 	L2ROCs(
 		traj1, traj2,
-		'clarinet', 'viol',
 		out_fname(),
 		filt_params,
 		k=(0, 10.01, .01),
@@ -90,7 +89,6 @@ if test == 2:
 
 	L2ROCs(
 		traj1, traj2,
-		'clarinet', 'viol',
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
@@ -129,7 +127,6 @@ if test == 3:
 
 	L2ROCs(
 		traj1, traj2,
-		'clarinet', 'viol',
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
@@ -299,7 +296,6 @@ if test == 9:
 
 	L2ROCs(
 		traj1, traj2,
-		'clarinet', 'viol',
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
