@@ -151,7 +151,6 @@ def plot_clusters(
 
 def L2ROCs(
 		traj1, traj2,
-		label1, label2,
 		out_fname,
 		filt_params,
 		k,
@@ -195,7 +194,7 @@ def L2ROCs(
 
 		data.append([roc1, roc2])
 
-	dual_roc_fig(data, k, label1, label2, out_fname, vary_param)
+	dual_roc_fig(data, k, traj1, traj2, out_fname, vary_param)
 
 	if see_samples:
 		dir = 'output/PRFstats/samples'

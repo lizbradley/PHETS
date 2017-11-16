@@ -122,12 +122,60 @@ filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
 
 ![perseistence rank function](docs/readme/PRF.png "PRF.png")
 
-Persistence rank functions are amenable to statistical analysis. Several functions are provided for exploring these properties.
-`PRFstats.plot_clusters()`, for example, takes two disjoint sets of samples ('training' and 'test') from each of two input signals,
-computes the mean PRF for each training set, and plots the L2 distances from these means to the PRFs of the test sets. 
-In the image below, two pianos are compared (left) and not easily distinguished; a viol and a piano are compared (right) and clustering is observed.
+Persistence rank functions are amenable to statistical analysis. `PRFstats.L2Classifier`, upon initialization, computes 
+a mean PRF and variance from a set of training PRFs; subsequently, `L2Classifier.predict(PRF, k)` returns `True` if the L2
+distance from `PRF` to the mean PRF is smaller than `k` times the variance. `PRFstats.L2ROCs` takes two pre-windowed `Trajectory`s, `traj1` and `traj2`,
+and partitions the windows roughly as follows:
+```
+        windows1, windows2 = traj1.windows, = traj2.windows
+		train1, test1 = windows1[1::2], windows1[::2]
+		train2, test2 = windows2[1::2], windows2[::2]
+```
 
-![not so different](docs/readme/clusters.png "left: piano vs piano | right: viol vs piano")
+Two L2Classifier are initialized:
 
-See `reference.pdf` for more information.
+```
+clf1 = L2Classifier(train1)
+clf2 = L2Classifier(train2)
+```
 
+`clf1.predict` and `clf2.predict` each called on both `test1` and `test2` for a range of `k`, and the results are plotted as ROC curves.
+
+```
+traj1 = TimeSeries(
+    'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
+    crop=(75000, 180000),
+    num_windows=50,
+    window_length=1500,
+    vol_norm=(0, 0, 1)  # (full, crop, windows)
+).embed(tau=32, m=2)
+
+
+traj2 = TimeSeries(
+    'datasets/time_series/viol/40-viol.txt',
+    crop=(35000, 140000),
+    num_windows=50,
+    window_length=1500,
+    vol_norm=(0, 0, 1)
+).embed(tau=32, m=2)
+
+
+filt_params.update({
+    'max_filtration_param': -21,
+    'num_divisions': 20,
+    'ds_rate': 20
+})
+
+L2ROCs(
+    traj1, traj2,
+    'clarinet', 'viol',
+    'output/demo/ROCs.png',
+    filt_params,
+    k=(0, 10.01, .01),
+)
+
+```
+
+For this case, at least, the classifiers preform very well:
+
+![L2Classifier ROCs](docs/readme/ROCs.png "ROCs.png")

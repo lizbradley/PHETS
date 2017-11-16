@@ -40,7 +40,8 @@ def ts_ax(ax, ts):
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
 def ts(ts, out_fname):
-	fig = plt.figure(figsize=(8, 2.5), tight_layout=True)
+	print 'plotting timeseries...'
+	fig = plt.figure(figsize=(8, 2.5), tight_layout=True, dpi=200)
 	ax = fig.add_subplot(111)
 	ts_ax(ax, ts)
 	plt.savefig(out_fname)

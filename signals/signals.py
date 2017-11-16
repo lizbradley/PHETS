@@ -15,7 +15,7 @@ class BaseTrajectory(object):
 	        name=None,
 	        fname=None,
 	        skiprows=0,
-			crop=None,
+			crop=(None, None),
 			num_windows=None,
 			window_length=None,
 			vol_norm=(False, False, False),     # (full, crop, windows)
@@ -33,7 +33,7 @@ class BaseTrajectory(object):
 		if name is not None:
 			self.name = name
 		elif self.fname is not None:
-			self.name = self.fname.split('/')[-1].split('.')[0]
+			self.name = self.fname.split('/')[-1]
 		else:
 			self.name = None
 
@@ -59,31 +59,31 @@ class BaseTrajectory(object):
 
 
 	def crop(self, lim):
-		if lim is None:
-			self.data = self.data_full
-			self.crop_lim = (0, len(self.data))
+		crop_lim = np.array(self.crop_lim)
 
-		else:
-			crop_lim = np.array(self.crop_lim)
-			self.crop_lim = crop_lim
+		if crop_lim[0] is None:
+			crop_lim[0] = 0
+		if crop_lim[1] is None:
+			crop_lim[1] = len(self.data_full)
 
-			if self.time_units == 'seconds':
-				crop_lim = (crop_lim * SAMPLE_RATE).astype(int)
+		if crop_lim[0] > crop_lim[1]:
+			print 'ERROR: crop[0] > crop[1]'
+			sys.exit()
 
-			if crop_lim[0] > crop_lim[1]:
-				print 'ERROR: crop[0] > crop[1]'
-				sys.exit()
+		self.crop_lim = crop_lim
 
-			if np.sum(crop_lim) > len(self.data_full):
-				print 'WARNING: crop out of bounds. len(self.data_full) = {}'\
-					.format(len(self.data_full))
 
-			data = self.data_full[crop_lim[0]:crop_lim[1]]
+		if self.time_units == 'seconds':
+			crop_lim = (crop_lim * SAMPLE_RATE).astype(int)
 
-			if self.norm_vol[1]:
-				data = self.normalize(data)
 
-			self.data = data
+
+		data = self.data_full[crop_lim[0]:crop_lim[1]]
+
+		if self.norm_vol[1]:
+			data = self.normalize(data)
+
+		self.data = data
 
 
 	def _spawn(self, windows_raw):
@@ -127,7 +127,7 @@ class BaseTrajectory(object):
 				window_length = int(window_length * SAMPLE_RATE)
 				start_points_idxs = (start_points * SAMPLE_RATE).astype(int)
 
-			windows = [self.data[sp:sp + window_length]
+			windows = [self.data_full[sp:sp + window_length]
 			           for sp in start_points_idxs]
 
 

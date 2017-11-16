@@ -294,28 +294,28 @@ class L2Classifier(object):
 		self.var = np.var(prfs, axis=0)                # local
 
 		self.dists = [get_dist(self.mean, prf) for prf in prfs]
-		# self.gvar = np.mean(self.dists)                     # global
+		# self.gvar = np.mean(self.dists)              # global
 		self.gstddev = np.mean(np.power(self.dists, 2)) ** .5
 
 		self.test_dists = []
 
 
-	def predict(self, tests, k):
+	def predict(self, test, k):
 
 		var_norm = norm(self.var)
-		dists = [get_dist(prf, self.mean) for prf in tests]
+		dist = get_dist(test, self.mean)
 
-		# return [dist <= var_norm * k for dist in dists]
-		# return [dist <= self.gvar * k for dist in dists]
-		return [dist <= self.gstddev * k for dist in dists]
+		# return dist <= var_norm * k
+		# return dist <= self.gvar * k
+		return dist <= self.gstddev * k
 
 
 def roc_data(clf, tests_true, tests_false, k_arr):
 	tpr = []
 	fpr = []
 	for k in k_arr:
-		true_pos = clf.predict(tests_true, k)
-		false_pos = clf.predict(tests_false, k)
+		true_pos = [clf.predict(t, k) for t in tests_true]
+		false_pos = [clf.predict(t, k) for t in tests_false]
 		true_pos_rate = sum(true_pos) / float(len(true_pos))
 		false_pos_rate = sum(false_pos) / float(len(false_pos))
 		tpr.append(true_pos_rate)

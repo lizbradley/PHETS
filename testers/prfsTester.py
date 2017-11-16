@@ -36,6 +36,9 @@ if test == 1:
 		vol_norm=(0, 0, 1)
 	)
 
+	# ts1.plot('output/PRFstats/ts1.png')
+	# ts2.plot('output/PRFstats/ts2.png')
+
 	traj1 = ts1.embed(tau=32, m=2)
 	traj2 = ts2.embed(tau=32, m=2)
 
@@ -51,8 +54,8 @@ if test == 1:
 		'clarinet', 'viol',
 		out_fname(),
 		filt_params,
-		k=(0, 5.01, .01),
-		load_saved_filts=False,
+		k=(0, 10.01, .01),
+		load_saved_filts=True,
 		quiet=False,
 		see_samples=2
 	)
@@ -388,3 +391,4 @@ if test == 12:
 		annot_hm=False,
 		load_saved_filts=False
 	)
+

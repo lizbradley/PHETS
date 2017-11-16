@@ -237,7 +237,7 @@ def roc_ax(ax, data, k, title):
 	return l, cm
 
 
-def dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
+def dual_roc_fig(data, k, traj1, traj2, fname, vary_param):
 	fig = plt.figure(figsize=(10, 4),dpi=100)
 	ax1 = fig.add_subplot(121)
 	ax2 = fig.add_subplot(122)
@@ -250,8 +250,8 @@ def dual_roc_fig(data, k, label_1, label_2, fname, vary_param):
 	for data_wl in data:
 		prf_data_1, prf_data_2 = data_wl
 
-		roc_ax(ax1, prf_data_1, k, 'is it a {}?'.format(label_1))
-		l, cm = roc_ax(ax2, prf_data_2, k, 'is it a {}?'.format(label_2))
+		roc_ax(ax1, prf_data_1, k, 'is it {}?'.format(traj1.name))
+		l, cm = roc_ax(ax2, prf_data_2, k, 'is it {}?'.format(traj2.name))
 		lines.append(l)
 
 	bounds = np.arange(k[0], k[1] + .5, .5)

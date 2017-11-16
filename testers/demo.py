@@ -6,6 +6,7 @@ from signals import TimeSeries
 from utilities import idx_to_freq
 from DCE.movies import slide_window
 from PH import Filtration, load_filtration
+from PRFstats import L2ROCs
 from config import default_filtration_params as filt_params
 
 # first load data into a TimeSeries instance. we have the choice of specifying
@@ -24,14 +25,14 @@ ts = TimeSeries(
 # window of the time series
 tau = (1 / idx_to_freq(49)) / np.pi      # choose tau = period / e
 
-traj = slide_window(
-    ts,
-    m=2, tau=tau,
-    out_fname='output/demo/embed_movie.mp4'
-)
+# traj = slide_window(
+#     ts,
+#     m=2, tau=tau,
+#     out_fname='output/demo/embed_movie.mp4'
+# )
 
 # alternatively, we could skip the movie and embed explicitly:
-# traj = ts.embed(m=2, tau=tau)
+traj = ts.embed(m=2, tau=tau)
 
 # now, lets build a filtration from the trajectory that is shown in the fifth
 # frame of the slide_window movie
@@ -48,15 +49,51 @@ filt_params.update(
 )
 
 # build the filtration:
-filt = Filtration(traj_window, filt_params, save=True)
-# filt = load_filtration()
+# filt = Filtration(traj_window, filt_params, save=True)
 # filt.movie(
 #     'output/demo/filt_movie.mp4',
 #     alpha=.5,
 #     color_scheme='highlight new'
 # )
-filt.plot_PD('output/demo/PD.png')          # plot the persistence diagram
-filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
+# filt.plot_PD('output/demo/PD.png')          # plot the persistence diagram
+# filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
 
 
 
+
+ts1 = TimeSeries(
+    'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
+    crop=(75000, 180000),
+    num_windows=50,
+    window_length=1500,
+    vol_norm=(0, 0, 1)  # (full, crop, windows)
+)
+
+
+ts2 = TimeSeries(
+    'datasets/time_series/viol/40-viol.txt',
+    crop=(35000, 140000),
+    num_windows=50,
+    window_length=1500,
+    vol_norm=(0, 0, 1)
+)
+
+ts1.plot('output/PRFstats/ts1.png')
+ts2.plot('output/PRFstats/ts2.png')
+
+traj1 = ts1.embed(tau=32, m=2)
+traj2 = ts2.embed(tau=32, m=2)
+
+
+filt_params.update({
+    'max_filtration_param': -21,
+    'num_divisions': 20,
+    'ds_rate': 20
+})
+
+L2ROCs(
+    traj1, traj2,
+    'output/demo/ROCs.png',
+    filt_params,
+    k=(0, 10.01, .01)
+)
