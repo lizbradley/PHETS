@@ -29,7 +29,6 @@ def ref__L2ROCs():
 
 	out = L2ROCs(
 		clar_traj, viol_traj,
-		'clarinet', 'viol',
 		'output/L2ROCs.png',
 		filt_params,
 		vary_param=('ds_rate', np.arange(80, 150, 10)),
@@ -62,4 +61,5 @@ def ref__plot_variance():
 
 
 if __name__ == '__main__':
+	# ref__L2ROCs()
 	pass

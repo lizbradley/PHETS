@@ -36,7 +36,7 @@ def check_overwrite(out_file_name):
 		if overwrite == "y":
 			pass
 		else:
-			print 'Goodbye'
+			print 'goodbye'
 			sys.exit()
 	os.chdir('..')
 
@@ -52,7 +52,7 @@ def clear_old_files(path, see_samples):
 						path = path + '/'
 					os.remove(path + f)
 		elif ans == 'q':
-			print 'Goodbye'
+			print 'goodbye'
 			sys.exit()
 		else:
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
@@ -75,7 +75,7 @@ def clear_dir(dir):
 		return False
 
 	else:
-		print 'Goodbye'
+		print 'goodbye'
 		sys.exit()
 
 def clear_dir_force(dir):

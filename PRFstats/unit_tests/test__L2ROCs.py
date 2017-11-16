@@ -14,7 +14,6 @@ def test__L2ROCs_v():
 	clear_dir_force('output')
 	out = L2ROCs(
 		clar_traj, viol_traj,
-		'clarinet', 'viol',
 		'output/L2ROCs.png',
 		filt_params,
 		vary_param=('ds_rate', np.arange(80, 150, 10)),

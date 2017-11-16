@@ -16,8 +16,6 @@ def out_fname():
 
 
 if test == 1:
-	# reproduce IDA figure 5 #
-	# toggle lines 86/87 in signals/signals.py to reproduce #
 
 	ts1 = TimeSeries(
 		'datasets/time_series/clarinet/sustained/high_quality/40-clarinet-HQ.txt',
@@ -36,8 +34,8 @@ if test == 1:
 		vol_norm=(0, 0, 1)
 	)
 
-	# ts1.plot('output/PRFstats/ts1.png')
-	# ts2.plot('output/PRFstats/ts2.png')
+	ts1.plot('output/PRFstats/ts1.png')
+	ts2.plot('output/PRFstats/ts2.png')
 
 	traj1 = ts1.embed(tau=32, m=2)
 	traj2 = ts2.embed(tau=32, m=2)
@@ -53,8 +51,8 @@ if test == 1:
 		traj1, traj2,
 		out_fname(),
 		filt_params,
-		k=(0, 10.01, .01),
-		load_saved_filts=True,
+		k=(0, 5.01, .01),
+		load_saved_filts=False,
 		quiet=False,
 		see_samples=2
 	)

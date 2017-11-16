@@ -52,7 +52,6 @@ def data__viol_filts_vv():
 
 
 if __name__ == '__main__':
-	# ref__fetch_filts_v()
-	data__viol_filts_v()
-	data__clar_filts_v()
+	# data__viol_filts_v()
+	# data__clar_filts_v()
 	data__viol_filts_vv()

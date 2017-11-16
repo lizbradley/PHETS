@@ -1,12 +1,13 @@
+import subprocess
 
 def test__dce():
-	import dceTester
+	subprocess.call(['python', 'dceTester.py', '-1'])
 
 def test__ph():
-	import phTester
+	subprocess.call(['python', 'phTester.py', '-1'])
 
 def test__prfsTester():
-	import prfsTester
+	subprocess.call(['python', 'prfsTester.py', '-1'])
 
 def test__demo():
-	import demo
+	subprocess.call(['python', 'demoTester.py', '-1'])

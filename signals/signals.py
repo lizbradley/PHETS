@@ -8,6 +8,9 @@ from config import SAMPLE_RATE
 from utilities import print_title, print_still
 
 
+class CropError(Exception):
+	pass
+
 class BaseTrajectory(object):
 
 	def __init__(self,
@@ -37,7 +40,8 @@ class BaseTrajectory(object):
 			self.name = None
 
 		self.norm_vol = vol_norm
-		self.crop_lim = crop
+		self.crop_lim = None
+		self.crop_cmd = crop
 		self.num_windows = num_windows
 		self.window_length = window_length
 		self.time_units = time_units
@@ -54,30 +58,41 @@ class BaseTrajectory(object):
 
 	@staticmethod
 	def normalize(data):
+		if np.max(np.abs(data)) == 0:
+			pass
 		return np.true_divide(data, np.max(np.abs(data)))
 
+	def _to_samples(self, time):
+		if self.time_units == 'samples':
+			return int(time)
+		elif self.time_units == 'seconds':
+			return int(time * SAMPLE_RATE)
 
-	def crop(self, lim):
-		crop_lim = np.array(self.crop_lim)
+	def _from_samples(self, time):
+		if self.time_units == 'samples':
+			return time
+		elif self.time_units == 'seconds':
+			return time / SAMPLE_RATE
 
-		if crop_lim[0] is None:
+	def crop(self, crop_cmd):
+		to_samples, from_samples = self._to_samples, self._from_samples
+
+		crop_lim = list(crop_cmd)
+		if crop_cmd[0] is None:
 			crop_lim[0] = 0
-		if crop_lim[1] is None:
-			crop_lim[1] = len(self.data_full)
-
-		if crop_lim[0] > crop_lim[1]:
-			print 'ERROR: crop[0] > crop[1]'
-			sys.exit()
+		if crop_cmd[1] is None:
+				crop_lim[1] = from_samples(len(self.data_full))
 
 		self.crop_lim = crop_lim
 
+		if crop_lim[0] > crop_lim[1]:
+			raise CropError('crop[0] > crop[1]')
 
-		if self.time_units == 'seconds':
-			crop_lim = (crop_lim * SAMPLE_RATE).astype(int)
+		if to_samples(crop_lim[1]) > len(self.data_full):
+			err = 'crop out of bounds. len(self.data_full) = {}'
+			raise CropError(err.format(len(self.data_full)))
 
-
-
-		data = self.data_full[crop_lim[0]:crop_lim[1]]
+		data = self.data_full[to_samples(crop_lim[0]):to_samples(crop_lim[1])]
 
 		if self.norm_vol[1]:
 			data = self.normalize(data)
@@ -100,35 +115,24 @@ class BaseTrajectory(object):
 				windows.append(TimeSeries(w, **kwargs))
 		return windows
 
-	def slice(self, num_windows, window_length):
+	def slice(self, num_windows, window_length=None):
 		if num_windows is None:
 			return
 		else:
-			# start_points = np.floor(
-			# 	np.linspace(0, len(self.data) - 1, num_windows, endpoint=False)
-			# ).astype(int)
-
-			# toggle start_points to reproduce IDA fig 5
 			crop_0, crop_1 = self.crop_lim
 			start_points = np.linspace(
 				crop_0, crop_1, num_windows, endpoint=False
 			)
 
-			if self.time_units == 'samples':
-				start_points = start_points.astype(int)
+			start_points_idxs = [self._to_samples(s) for s in start_points]
 
 			if window_length is None:
 				window_length = len(self.data) / num_windows
 
-			if self.time_units == 'samples':
-				start_points_idxs = start_points
-			elif self.time_units == 'seconds':
-				window_length = int(window_length * SAMPLE_RATE)
-				start_points_idxs = (start_points * SAMPLE_RATE).astype(int)
+			window_length = self._to_samples(window_length)
 
 			windows = [self.data_full[sp:sp + window_length]
 			           for sp in start_points_idxs]
-
 
 		if self.norm_vol[2]:
 			windows = [self.normalize(w) for w in windows]
@@ -153,7 +157,8 @@ class TimeSeries(BaseTrajectory):
 		traj = Trajectory(
 			data,
 			fname=self.fname,
-			crop=self.crop_lim,
+			crop=self.crop_cmd,
+			# crop=(self.crop_lim[0], self.crop_lim[1] - tau - 1),
 			num_windows=self.num_windows,
 			# window_length=self.window_length + tau  # + 1 ??
 			window_length=self.window_length,

@@ -18,3 +18,6 @@ def test__Traj_windows():
 	out = [w.data for w in ellipse_traj.windows]
 	ref = np.load('ref/ellipse_traj.npy')
 	assert np.array_equal(out, ref)
+
+if __name__ == '__main__':
+	test__TS_windows()
