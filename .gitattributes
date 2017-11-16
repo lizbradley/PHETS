@@ -1,1 +1,3 @@
 *.p linguist-generated=true
+PRFstats/unit_tests/ref/plot_variance_vv.p linguist-generated=true
+
