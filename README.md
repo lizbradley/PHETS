@@ -127,9 +127,9 @@ a mean PRF and variance from a set of training PRFs; subsequently, `L2Classifier
 distance from `PRF` to the mean PRF is smaller than `k` times the variance. `PRFstats.L2ROCs` takes two pre-windowed `Trajectory`s, `traj1` and `traj2`,
 and partitions the windows roughly as follows:
 ```
-        windows1, windows2 = traj1.windows, = traj2.windows
-		train1, test1 = windows1[1::2], windows1[::2]
-		train2, test2 = windows2[1::2], windows2[::2]
+windows1, windows2 = traj1.windows, = traj2.windows
+train1, test1 = windows1[1::2], windows1[::2]
+train2, test2 = windows2[1::2], windows2[::2]
 ```
 
 Two L2Classifier are initialized:
