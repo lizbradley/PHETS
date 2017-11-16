@@ -11,11 +11,11 @@ from config import default_filtration_params as filt_params
 # first, format data file
 fname = 'datasets/time_series/WAIS_age_dD_d18O_xs.txt'
 data = np.loadtxt(fname, skiprows=1, delimiter=',')
-data = data[:, 2]                       # select column
-fname = '{}.clean'.format(fname)        # new fname
-np.savetxt(fname, data)                 # save cleaned/formatted data
+data = data[:, 2]                           # select column
+fname = '{}.clean'.format(fname)            # new fname
+np.savetxt(fname, data)                     # save cleaned/formatted data
 
-# initialize a TimeSeries object
+# initialize a TimeSeries object from formatted data file
 ts = TimeSeries(
 	fname,
     crop=(20000, 40000),
@@ -23,16 +23,18 @@ ts = TimeSeries(
 	window_length=1000
 )
 
-traj = slide_window(                # make embed movie from the TimeSeries, returning a Trajectory
+traj = slide_window(                        # make embed movie from the TimeSeries, returning a Trajectory
 	ts,
 	m=2,
 	tau=200,
 	out_fname='output/liz/embed_movie.mp4'
 )
-# alternatively, we can embed explicitly (much faster than making the movie):
-traj = ts.embed(m=2, tau=200)       # returns a Trajectory object
 
-traj = traj.windows[3]	            # take embedding from 3rd window (ie 3rd frame of movie)
+traj = ts.embed(m=2, tau=200)               # alternatively, we can embed explicitly
+											# much faster than making the movie
+
+
+traj = traj.windows[3]	                    # take embedding from 3rd window (ie 3rd frame of movie)
 
 # parameters used to build the filtration:
 filt_params.update(

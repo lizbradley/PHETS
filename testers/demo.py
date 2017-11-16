@@ -25,11 +25,11 @@ ts = TimeSeries(
 # window of the time series
 tau = (1 / idx_to_freq(49)) / np.pi      # choose tau = period / e
 
-# traj = slide_window(
-#     ts,
-#     m=2, tau=tau,
-#     out_fname='output/demo/embed_movie.mp4'
-# )
+traj = slide_window(
+    ts,
+    m=2, tau=tau,
+    out_fname='output/demo/embed_movie.mp4'
+)
 
 # alternatively, we could skip the movie and embed explicitly:
 traj = ts.embed(m=2, tau=tau)
@@ -42,21 +42,21 @@ traj_window = traj.windows[100]
 filt_params.update(
     {
         'ds_rate': 25,
-        'num_divisions': 50,                # number of epsilon vals in filtration
-        'max_filtration_param': .02,      # if > 0, explicit
+        'num_divisions': 50,                 # number of epsilon vals in filtration
+        'max_filtration_param': .02,         # if > 0, explicit
         # 'max_filtration_param': -5,        # if < 0, stops st first 10 dim simplex
     }
 )
 
 # build the filtration:
-# filt = Filtration(traj_window, filt_params, save=True)
-# filt.movie(
-#     'output/demo/filt_movie.mp4',
-#     alpha=.5,
-#     color_scheme='highlight new'
-# )
-# filt.plot_PD('output/demo/PD.png')          # plot the persistence diagram
-# filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
+filt = Filtration(traj_window, filt_params)
+filt.movie(
+    'output/demo/filt_movie.mp4',
+    alpha=.5,
+    color_scheme='highlight new'
+)
+filt.plot_PD('output/demo/PD.png')          # plot the persistence diagram
+filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
 
 
 
