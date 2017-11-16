@@ -139,7 +139,7 @@ clf1 = L2Classifier(train1)
 clf2 = L2Classifier(train2)
 ```
 
-`clf1.predict` and `clf2.predict` each called on both `test1` and `test2` for a range of `k`, and the results are plotted as ROC curves.
+`clf1.predict` and `clf2.predict` are each called on both `test1` and `test2` for a range of `k`, and the results are plotted as ROC curves.
 
 ```
 traj1 = TimeSeries(
