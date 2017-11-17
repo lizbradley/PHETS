@@ -14,7 +14,7 @@ os.chdir(current_dir)
 from common import filt_params, viol_traj, clar_traj, ellipse_traj
 
 from utilities import clear_dir_force
-from PRFstats import plot_variance, L2ROCs
+from PRFstats import plot_variance, plot_ROCs
 from PRFstats.data import fetch_filts
 
 
@@ -27,7 +27,7 @@ def ref__fetch_filts_v():
 
 def ref__L2ROCs():
 
-	out = L2ROCs(
+	out = plot_ROCs(
 		clar_traj, viol_traj,
 		'output/L2ROCs.png',
 		filt_params,
@@ -37,7 +37,7 @@ def ref__L2ROCs():
 		load_saved_filts=True,
 		filts_fnames=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
 	)
-	np.save('ref/L2ROCs_v.npy', out)
+	np.save('ref/ROCs_v.npy', out)
 
 
 def ref__plot_variance():

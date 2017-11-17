@@ -6,7 +6,7 @@ from PRFstats.data import roc_data, dists_to_ref, \
 	fetch_filts, process_variance_data, get_dist
 from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig, \
 	plot_weight_functions, plot_heatmaps, plot_variane_fig
-from data import L2Classifier, mean_dists_compare
+from data import DistanceClassifier, mean_dists_compare
 from plots import dual_roc_fig, samples
 from signals import Trajectory
 from utilities import clear_old_files
@@ -149,11 +149,13 @@ def plot_clusters(
 	clusters_fig(dists, filt_params, traj1.name, traj2.name,out_filename)
 
 
-def L2ROCs(
+def plot_ROCs(
 		traj1, traj2,
 		out_fname,
 		filt_params,
 		k,
+		metric='L2',
+		dist_scale='none',
 		load_saved_filts=False,
 		filts_fnames=(None, None),
 		see_samples=0,
@@ -184,8 +186,8 @@ def L2ROCs(
 		train2, test2 = prfs2[1::2], prfs2[::2]
 
 		print 'training classifiers...'
-		clf1 = L2Classifier(train1)
-		clf2 = L2Classifier(train2)
+		clf1 = DistanceClassifier(train1, metric, dist_scale)
+		clf2 = DistanceClassifier(train2, metric, dist_scale)
 
 		print 'running tests...'
 		k_arr = np.arange(*k)

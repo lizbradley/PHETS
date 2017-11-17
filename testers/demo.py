@@ -6,7 +6,7 @@ from signals import TimeSeries
 from utilities import idx_to_freq
 from DCE.movies import slide_window
 from PH import Filtration, load_filtration
-from PRFstats import L2ROCs
+from PRFstats import plot_ROCs
 from config import default_filtration_params as filt_params
 
 # first load data into a TimeSeries instance. we have the choice of specifying
@@ -91,7 +91,7 @@ filt_params.update({
     'ds_rate': 20
 })
 
-L2ROCs(
+plot_ROCs(
     traj1, traj2,
     'output/demo/ROCs.png',
     filt_params,

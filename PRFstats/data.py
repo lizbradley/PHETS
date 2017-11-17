@@ -62,8 +62,8 @@ def norm(f, metric='L2'):
 		sys.exit()
 
 
-def get_dist(a, b):
-	return norm(np.subtract(a, b))
+def get_dist(a, b, metric='L2'):
+	return norm(np.subtract(a, b), metric)
 
 
 def scale_dists(dists, norms, norm_ref, scale):
@@ -280,35 +280,43 @@ def process_variance_data(
 	return curve_data, hmap_data, hmap_data_pre_weight
 
 
-
-class L2Classifier(object):
+class DistanceClassifier(object):
 	# TODO: add back in dist_scale, weight_func, and metri options
-	def __init__(self, train):		# training data as ndarray
+	def __init__(self, train, metric='L2', dist_scale='none'):
 		"""
-		classifier which compares the l2 distance from the mean of training
+		classifier which compares the distance from the mean of training
 		prfs to the test prf, vs the variance of training prfs
 		"""
 		prfs = train
+		self.metric = metric
 
 		self.mean = np.mean(prfs, axis=0)
-		self.var = np.var(prfs, axis=0)                # local
+		self.lvar = np.var(prfs, axis=0)                           # local
+		self.lstddev = np.power(self.lvar, .5)
 
 		self.dists = [get_dist(self.mean, prf) for prf in prfs]
-		# self.gvar = np.mean(self.dists)              # global
-		self.gstddev = np.mean(np.power(self.dists, 2)) ** .5
+
+		mean_norm = norm(self.mean, metric)
+		norms = [norm(prf, metric) for prf in prfs]
+		self.dists = scale_dists(self.dists, mean_norm, norms, dist_scale)
+
+		self.gvar = np.mean(np.power(self.dists, 2))               # global
+		self.gstddev = self.gvar ** .5
 
 		self.test_dists = []
 
 
-	def predict(self, test, k):
-
-		var_norm = norm(self.var)
+	def predict(self, test, k, stddev='global'):
 		dist = get_dist(test, self.mean)
 
-		# return dist <= var_norm * k
-		# return dist <= self.gvar * k
-		return dist <= self.gstddev * k
+		if stddev == 'global':
+			thresh =  self.gstddev * k
+		elif stddev == 'local':
+			thresh = norm(self.lstddev, self.metric) * k
+		else:
+			raise Exception("Invalid stddev option. Use 'local' or 'global'.")
 
+		return dist <= thresh
 
 def roc_data(clf, tests_true, tests_false, k_arr):
 	tpr = []

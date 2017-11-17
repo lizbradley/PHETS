@@ -3,7 +3,7 @@ change_dir()
 
 import numpy as np
 from signals import TimeSeries, Trajectory
-from PRFstats import L2ROCs, plot_dists_to_means, plot_clusters, \
+from PRFstats import plot_ROCs, plot_dists_to_means, plot_clusters, \
 	plot_dists_to_ref, plot_variance, plot_pairwise_mean_dists
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
@@ -47,7 +47,7 @@ if test == 1:
 		'ds_rate': 20
 	})
 
-	L2ROCs(
+	plot_ROCs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -85,7 +85,7 @@ if test == 2:
 		'num_divisions': 10,
 	})
 
-	L2ROCs(
+	plot_ROCs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -123,7 +123,7 @@ if test == 3:
 		'num_divisions': 10,
 	})
 
-	L2ROCs(
+	plot_ROCs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -292,7 +292,7 @@ if test == 9:
 		'max_filtration_param': -8
 	})
 
-	L2ROCs(
+	plot_ROCs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
