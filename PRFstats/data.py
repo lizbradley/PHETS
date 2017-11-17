@@ -1,6 +1,10 @@
+import numpy
 import numpy as np
 import sys
 
+class ParamError(Exception):
+	def __init__(self, msg):
+		Exception.__init__(self, msg)
 
 def fetch_filts(
 		traj, params, load_saved, quiet,
@@ -8,7 +12,6 @@ def fetch_filts(
 		id=None, filts_fname=None, out_fname=None,
 		no_save=False
 ):
-	# todo: add handling of weight function as vary_param
 
 	suffix = id if id is not None else ''
 	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
@@ -36,9 +39,8 @@ def fetch_filts(
 	filts_vv = np.array(filts_vv)
 
 	if vary_param_1 is None and vary_param_2 is not None:
-		print 'ERROR: vary_param_1 is None, vary_param_2 is not None'
-		sys.exit()
-	if vary_param_1 is None and vary_param_2 is None:
+		raise ParamError('vary_param_1 is None, vary_param_2 is not None')
+	elif vary_param_1 is None and vary_param_2 is None:
 		filts = filts_vv[0, 0]
 	elif vary_param_1 is not None and vary_param_2 is None:
 		filts = filts_vv[:, 0]
@@ -49,6 +51,11 @@ def fetch_filts(
 	if not no_save: np.save(fname, filts)
 	return filts
 
+def fetch_prfs(filt_evo_array, quiet):
+	prf_evo_array = np.zeros_like(filt_evo_array)
+	for idx, filt in np.ndenumerate(filt_evo_array):
+		prf_evo_array[idx] = filt.PRF(silent=quiet, new_format=True)
+	return prf_evo_array
 
 def norm(f, metric='L2'):
 	prf_res = len(f)
@@ -58,8 +65,7 @@ def norm(f, metric='L2'):
 	elif metric == 'L2':
 		return np.sqrt(np.nansum(np.power(f, 2)) * dA)
 	else:
-		print "ERROR: metric not recognized. Use 'L1' or 'L2'."
-		sys.exit()
+		raise ParamError("Invalid metric. Use 'L1' or 'L2'")
 
 
 def get_dist(a, b, metric='L2'):
@@ -77,9 +83,8 @@ def scale_dists(dists, norms, norm_ref, scale):
 	elif scale == 'a + b':
 		return np.true_divide(dists, np.add(norms, norm_ref))
 	else:
-		print "ERROR: dist_scale '" + scale + \
-		      "' is not recognized. Use 'none', 'a', 'b', or 'a + b'."
-		sys.exit()
+		msg = "Invalid dist_scale. Use 'none', 'a', 'b', or 'a + b'."
+		raise ParamError(msg)
 
 
 def dists_to_ref(funcs, ref_func, metric, scale):
@@ -106,9 +111,6 @@ def mean_dists_compare(prfs1, prfs2, metric, dist_scale):
 	]
 
 	return arr
-
-
-
 
 
 class VarianceData:
@@ -281,11 +283,10 @@ def process_variance_data(
 
 
 class DistanceClassifier(object):
-	# TODO: add back in dist_scale, weight_func, and metri options
 	def __init__(self, train, metric='L2', dist_scale='none'):
 		"""
 		classifier which compares the distance from the mean of training
-		prfs to the test prf, vs the variance of training prfs
+		prfs to the test prf, vs the standard deviation of training prfs
 		"""
 		prfs = train
 		self.metric = metric
@@ -310,13 +311,14 @@ class DistanceClassifier(object):
 		dist = get_dist(test, self.mean)
 
 		if stddev == 'global':
-			thresh =  self.gstddev * k
+			measure =  self.gstddev
 		elif stddev == 'local':
-			thresh = norm(self.lstddev, self.metric) * k
+			measure = norm(self.lstddev, self.metric)
 		else:
-			raise Exception("Invalid stddev option. Use 'local' or 'global'.")
+			raise ParamError("Invalid stddev. Use 'local' or 'global'.")
 
-		return dist <= thresh
+		return dist <= measure * k
+
 
 def roc_data(clf, tests_true, tests_false, k_arr):
 	tpr = []

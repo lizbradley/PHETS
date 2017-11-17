@@ -1,9 +1,7 @@
-import sys
-
 import numpy as np
 
 from PRFstats.data import roc_data, dists_to_ref, \
-	fetch_filts, process_variance_data, get_dist
+	fetch_filts, process_variance_data, get_dist, fetch_prfs
 from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig, \
 	plot_weight_functions, plot_heatmaps, plot_variane_fig
 from data import DistanceClassifier, mean_dists_compare
@@ -18,8 +16,8 @@ def win_fname(fname_format, dir, base_filename, i):
 	elif fname_format == 'base i':
 		filename = '{}/{}{}.txt'.format(dir, base_filename, i)
 	else:
-		print "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
-		sys.exit()
+		msg = "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
+		raise Exception(msg)
 	return filename
 
 
@@ -43,7 +41,9 @@ def plot_dists_to_ref(
 		quiet=True
 
 ):
-	""" plots distance from reference prf over a range of trajectory input files"""
+	"""
+	plots distance from reference prf over a range of trajectory input files
+	"""
 
 	# TODO: weight_func
 
@@ -86,7 +86,6 @@ def plot_dists_to_means(
 		traj2,
 		out_filename,
 		filt_params,
-		time_units='samples',
 		metric='L2',
 		dist_scale='none',              # 'none', 'a', or 'a + b'
 		weight_func=lambda i, j: 1,
@@ -314,15 +313,6 @@ def plot_pairwise_mean_dists(
 		filts_fname=None,
 		unit_test=False
 ):
-	def fetch_prfs(filt_evo_array, quiet):
-		# todo: add handling of weight function as vary param and call in other
-		# PRFstats functions
-		prf_evo_array = np.zeros_like(filt_evo_array)
-		for idx, filt in np.ndenumerate(filt_evo_array):
-			prf_evo_array[idx] = filt.PRF(silent=quiet, new_format=True)
-		return prf_evo_array
-
-
 	filt_evo_array = fetch_filts(
 		traj, filt_params,
 		load_saved_filts, quiet,

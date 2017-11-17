@@ -1,6 +1,7 @@
 import numpy
 import numpy as np
 from matplotlib import pyplot as plt
+import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import signals, PH
@@ -78,11 +79,11 @@ def plot_dists_ax(ax, d, mean, traj):
 	ax.set_xticks(ticks)
 
 
-def dists_to_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
+def dists_to_means_fig(refs, dists, traj1, traj2, out_filename):
 	print 'plotting distances...'
 
-	sig_1 = traj1.project()
-	sig_2 = traj2.project()
+	ts1 = traj1.project()
+	ts2 = traj2.project()
 
 	d_1_vs_1, d_2_vs_1, d_1_vs_2, d_2_vs_2 = dists
 	mean_prf_1, mean_prf_2 = refs
@@ -93,7 +94,6 @@ def dists_to_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 	mean_12 = np.mean(d_1_vs_2)
 	mean_22 = np.mean(d_2_vs_2)
 
-	import matplotlib.gridspec as gridspec
 
 	gs = gridspec.GridSpec(5, 5)
 	# row 1
@@ -133,11 +133,11 @@ def dists_to_means_fig(refs, dists, traj1, traj2, time_units, out_filename):
 
 	PH.plots.PRF_ax(mean_prf_2, ax6, annot_hm=True)
 
-	signals.plots.ts_zoom(ax7, sig_1)
+	signals.plots.ts_crop_ax(ax7, ts1)
 	ax7.grid(axis='x', zorder=0)
 	ax7.set_xlim(left=0)
 
-	signals.plots.ts_zoom(ax8, sig_2)
+	signals.plots.ts_crop_ax(ax8, ts2)
 	ax8.grid(axis='x', zorder=0)
 	ax8.set_xlim(left=0)
 
@@ -266,7 +266,6 @@ def dual_roc_fig(data, k, traj1, traj2, fname, vary_param):
 	cb.set_ticklabels([int(l) for l in labels])
 	cb.ax.tick_params(labelsize=14)
 
-	# fig.suptitle('k = range({}, {}, {})'.format(*k), fontsize=16)
 	if vary_param is not None:
 		fig.legend(lines, vary_param[1], loc=3)
 		fig.suptitle('varying parameter '+vary_param[0])
@@ -379,7 +378,8 @@ def plot_heatmaps(
 		ax2.set_title('pointwise variance', fontsize=12, y=1.05)
 		ax3.set_title('functional COV', 	fontsize=12, y=1.05)
 
-		ax1.set_ylabel('weighted',		fontsize=12, labelpad=10)		# abuse y axis label
+		# abuse y axis label for row title
+		ax1.set_ylabel('weighted',		fontsize=12, labelpad=10)
 		ax4.set_ylabel('unweighted',	fontsize=12, labelpad=10)
 
 		ticks = np.linspace(0, 1.4, filt_params['num_divisions'], endpoint=True)
