@@ -51,11 +51,13 @@ def fetch_filts(
 	if not no_save: np.save(fname, filts)
 	return filts
 
+
 def fetch_prfs(filt_evo_array, quiet):
 	prf_evo_array = np.zeros_like(filt_evo_array)
 	for idx, filt in np.ndenumerate(filt_evo_array):
 		prf_evo_array[idx] = filt.PRF(silent=quiet, new_format=True)
 	return prf_evo_array
+
 
 def norm(f, metric='L2'):
 	prf_res = len(f)

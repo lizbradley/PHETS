@@ -1,10 +1,12 @@
+import sys
+
 import numpy as np
-from matplotlib.colorbar import ColorbarBase
 import numpy.ma as ma
+
+from matplotlib.colorbar import ColorbarBase
 from matplotlib.colors import from_levels_and_colors
 from matplotlib.cm import get_cmap
 import matplotlib.pyplot as plt; plt.ioff()
-import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from titlebox import filename_table, filt_params_table
@@ -145,7 +147,7 @@ def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
 	return cmap
 
 
-def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
+def PRF_ax(filt, ax, cbar_ax=None, annot_hm=False):
 
 	ax.ticklabel_format(axis='both', style='sci',  scilimits=(0,0))
 
@@ -153,12 +155,13 @@ def PRF_ax(filtration, ax, cbar_ax=None, annot_hm=False):
 		divider = make_axes_locatable(ax)
 		cbar_ax = divider.append_axes('right', size='5%', pad=0.05)
 
-	if isinstance(filtration, filtration.Filtration):
-		z = filtration._PRF()
-		x = y = filtration.epsilons
+	import filtration
+	if isinstance(filt, filtration.Filtration):
+		z = filt.PRF()
+		x = y = filt.epsilons
 		plot_heatmap(ax, cbar_ax, x, y, z, annot_hm)
 	else:   # 2d array
-		z = filtration
+		z = filt
 		plot_heatmap(ax, cbar_ax, None, None, z, annot_hm)
 
 

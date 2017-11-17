@@ -95,7 +95,7 @@ def plot_dists_to_means(
 		quiet=True
 	):
 
-	# TODO: weight_func, see_samples, time_units, unit test
+	# TODO: weight_func,  unit test
 
 	filts1 = fetch_filts(
 		traj1, filt_params, load_saved_filts, quiet,
@@ -111,8 +111,13 @@ def plot_dists_to_means(
 
 	refs, dists = mean_dists_compare(prfs1, prfs2, metric, dist_scale)
 
-	dists_to_means_fig(refs, dists, traj1, traj2, time_units, out_filename)
+	dists_to_means_fig(refs, dists, traj1, traj2, out_filename)
 
+	if see_samples:
+		dir = 'output/PRFstats/samples'
+		clear_old_files(dir, see_samples)
+		samples(filts1, see_samples, dir)
+		samples(filts2, see_samples, dir)
 
 def plot_clusters(
 		traj1,
@@ -128,7 +133,7 @@ def plot_clusters(
 		quiet=True
 ):
 
-	# TODO: weight_func, see_samples, unit test
+	# TODO: weight_func, unit test
 
 
 	filts1 = fetch_filts(
@@ -147,6 +152,12 @@ def plot_clusters(
 
 	clusters_fig(dists, filt_params, traj1.name, traj2.name,out_filename)
 
+	if see_samples:
+		dir = 'output/PRFstats/samples'
+		clear_old_files(dir, see_samples)
+		samples(filts1, see_samples, dir)
+		samples(filts2, see_samples, dir)
+
 
 def plot_ROCs(
 		traj1, traj2,
@@ -161,22 +172,22 @@ def plot_ROCs(
 		quiet=True,
 		vary_param=None     # ('param', (100, 150, 200))
 ):
-	# TODO: add weight function
+	# TODO: weight function, vary_param_2
 
-	filts1_v = fetch_filts(
+	filts1 = fetch_filts(
 		traj1, filt_params, load_saved_filts, quiet, vary_param,
 		id=1, filts_fname=filts_fnames[0]
 	)
-	filts2_v = fetch_filts(
+	filts2 = fetch_filts(
 		traj2, filt_params, load_saved_filts, quiet, vary_param,
 		id=2, filts_fname=filts_fnames[1]
 	)
 
 	if vary_param is None:
-		filts1_v, filts2_v = [filts1_v], [filts2_v]
+		filts1, filts2 = [filts1], [filts2]
 	data = []
 
-	for filts1, filts2 in zip(filts1_v, filts2_v):
+	for filts1, filts2 in zip(filts1, filts2):
 
 		prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
 		prfs2 = [f.PRF(silent=quiet, new_format=True) for f in filts2]
@@ -200,12 +211,10 @@ def plot_ROCs(
 	if see_samples:
 		dir = 'output/PRFstats/samples'
 		clear_old_files(dir, see_samples)
-
 		if vary_param is None:
-			filts1_v, filts2_v = filts1_v[0], filts2_v[0]
-
-		samples(filts1_v, see_samples, dir, vary_param)
-		samples(filts2_v, see_samples, dir, vary_param)
+			filts1, filts2 = filts1[0], filts2[0]
+		samples(filts1, see_samples, dir, vary_param)
+		samples(filts2, see_samples, dir, vary_param)
 
 	return data
 

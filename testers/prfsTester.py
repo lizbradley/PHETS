@@ -8,7 +8,7 @@ from PRFstats import plot_ROCs, plot_dists_to_means, plot_clusters, \
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=1)
+test, start_time = get_test(set_test=5)
 
 
 def out_fname():

@@ -96,6 +96,7 @@ def movie_params_table(ax, params):
 			# ['camera angle',params[2]],
 		],
 		bbox=[0, 0, 1, 1],    # x0, y0, width, height
+		colWidths=[1.5, .5]
 	)
 	table.auto_set_font_size(False)
 	table.set_fontsize(6)
