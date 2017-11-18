@@ -51,10 +51,7 @@ def ts_crop_ax(ax, ts, show_window='all'):
 	y = ts.data
 	x = np.linspace(ts.crop_lim[0], ts.crop_lim[1], len(ts.data))
 
-	if ts.time_units == 'samples':
-		ax.set_xlabel('time (samples)')
-	elif ts.time_units == 'seconds':
-		ax.set_xlabel('time (seconds)')
+	ax.set_xlabel('time ({})'.format(ts.time_units))
 
 	ax.plot(x, y, color='k')
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
@@ -63,11 +60,7 @@ def ts_crop_ax(ax, ts, show_window='all'):
 		for i in range(ts.num_windows):
 			highlight_window(ax, ts, i)
 	elif isinstance(show_window, int):
-		try:
-			highlight_window(ax, ts, show_window)
-		except IndexError:
-			print 'ERROR: signals.plots.ts_crop_ax: show_window out of range'
-			sys.exit()
+		highlight_window(ax, ts, show_window)
 
 
 

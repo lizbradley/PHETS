@@ -135,11 +135,11 @@ def dists_to_means_fig(refs, dists, traj1, traj2, out_filename):
 
 	signals.plots.ts_crop_ax(ax7, ts1)
 	ax7.grid(axis='x', zorder=0)
-	ax7.set_xlim(left=0)
+	# ax7.set_xlim(left=0)
 
 	signals.plots.ts_crop_ax(ax8, ts2)
 	ax8.grid(axis='x', zorder=0)
-	ax8.set_xlim(left=0)
+	# ax8.set_xlim(left=0)
 
 	ylim = np.max(np.abs(np.append(ax7.get_ylim(), ax8.get_ylim())))
 	ax7.set_ylim(-ylim, ylim)
@@ -272,6 +272,27 @@ def dual_roc_fig(data, k, traj1, traj2, fname, vary_param):
 		fig.subplots_adjust(top = 0.85)
 
 	plt.savefig(fname)
+
+def weight_function_fig(f, num_div, fname):
+
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	div = make_axes_locatable(ax)
+	cax = div.append_axes('right', size='10%', pad=.2)
+
+	x = y = np.linspace(0, 2 ** .5, num_div)
+	xx, yy = np.meshgrid(x, y)
+	z = f(xx, yy)
+	if isinstance(z, int):
+		z = xx * 0 + z
+
+	mask = lambda x, y: x > y
+	mask = mask(xx, yy)
+	mask = np.where(mask is True, np.nan, 1)
+	z = np.multiply(z, mask)
+
+	heatmap_ax(ax, cax, x, y, z)
+	plt.savefig('weight_functions/{}.png'.format(fname))
 
 
 def weight_functions_figs(
