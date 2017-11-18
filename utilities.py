@@ -78,7 +78,7 @@ def clear_dir(dir):
 		print 'goodbye'
 		sys.exit()
 
-def clear_dir_force(dir):
+def clear_dir_rf(dir):
 	for subdir, dirs, files in os.walk(dir):
 		for file in files:
 			if file not in ('.gitignore', '.gitkeep'):
