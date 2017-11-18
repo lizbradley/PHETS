@@ -25,11 +25,7 @@ ts = TimeSeries(
 # window of the time series
 tau = (1 / idx_to_freq(49)) / np.pi      # choose tau = period / e
 
-traj = slide_window(
-    ts,
-    m=2, tau=tau,
-    out_fname='output/demo/embed_movie.mp4'
-)
+traj = slide_window(ts, 'output/demo/embed_movie.mp4', m=2, tau=tau)
 
 # alternatively, we could skip the movie and embed explicitly:
 traj = ts.embed(m=2, tau=tau)

@@ -75,11 +75,7 @@ ts = TimeSeries(
 
 tau = (1 / idx_to_freq(49)) / np.pi      # first, choose tau = period / pi 
 
-traj = slide_window(
-    ts,
-    m=2, tau=tau,
-    out_fname='output/demo/embed_movie.mp4'
-)
+traj = slide_window(ts, 'output/demo/embed_movie.mp4', m=2, tau=tau)
 
 ```
 ![embed movie](docs/readme/embed_movie.gif "embed_movie.mp4")
