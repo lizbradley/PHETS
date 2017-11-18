@@ -5,9 +5,11 @@ import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import signals, PH
-from PH.plots import plot_heatmap
+from PH.plots import heatmap_ax
 from PH.titlebox import filt_params_table, filenames_table
+from PRFstats.data import is_filt_param
 from utilities import print_title, clear_dir, clear_temp_files
+from config import default_filtration_params as filt_params
 
 
 def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
@@ -30,11 +32,11 @@ def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
 
 def samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
 
-	if vary_param_1 is None and vary_param_2 is None:
+	if not (is_filt_param(vary_param_1) or is_filt_param(vary_param_2)):
 		filts_vv = [[filts]]
-	elif vary_param_1 is not None and vary_param_2 is None:
+	elif is_filt_param(vary_param_1) and not is_filt_param(vary_param_2):
 		filts_vv = [[fs] for fs in filts]
-	else:       # neither are None
+	else:
 		filts_vv = filts
 
 	del filts
@@ -67,7 +69,7 @@ def samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
 				filt.movie(movie_filename)
 
 
-def plot_dists_ax(ax, d, mean, traj):
+def dists_ax(ax, d, mean, traj):
 	crop = traj.crop_lim
 	num_windows = traj.num_windows
 	t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
@@ -100,33 +102,31 @@ def dists_to_means_fig(refs, dists, traj1, traj2, out_filename):
 	ax1 = plt.subplot(gs[0:2,   0:2])
 	ax2 = plt.subplot(gs[0:2,   2:4])
 	ax3 = plt.subplot(gs[0:2,   4  ])
-
 	# row 2
 	ax4 = plt.subplot(gs[2:4,   0:2])
 	ax5 = plt.subplot(gs[2:4,   2:4])
 	ax6 = plt.subplot(gs[2:4,   4  ])
-
 	# row 3
 	ax7 = plt.subplot(gs[4,     0:2])
 	ax8 = plt.subplot(gs[4,     2:4])
 
-	plot_dists_ax(ax1, d_1_vs_1, mean_11, traj1)
+	dists_ax(ax1, d_1_vs_1, mean_11, traj1)
 	plt.setp(ax1.get_xticklabels(), visible=False)
 	plt.setp(ax1.get_xticklines(), visible=False)
 	ax1.set_ylim(bottom=0)
 
-	plot_dists_ax(ax2, d_2_vs_1, mean_21, traj2)
+	dists_ax(ax2, d_2_vs_1, mean_21, traj2)
 	plt.setp(ax2.get_yticklabels(), visible=False)
 	plt.setp(ax2.get_xticklabels(), visible=False)
 	plt.setp(ax2.get_xticklines(), visible=False)
 
 	PH.plots.PRF_ax(mean_prf_1, ax3, annot_hm=True)
 
-	plot_dists_ax(ax4, d_1_vs_2, mean_12, traj1)
+	dists_ax(ax4, d_1_vs_2, mean_12, traj1)
 	plt.setp(ax4.get_xticklabels(), visible=False)
 	plt.setp(ax4.get_xticklines(), visible=False)
 
-	plot_dists_ax(ax5, d_2_vs_2, mean_22, traj2)
+	dists_ax(ax5, d_2_vs_2, mean_22, traj2)
 	plt.setp(ax5.get_yticklabels(), visible=False)
 	plt.setp(ax5.get_xticklabels(), visible=False)
 	plt.setp(ax5.get_xticklines(), visible=False)
@@ -274,7 +274,7 @@ def dual_roc_fig(data, k, traj1, traj2, fname, vary_param):
 	plt.savefig(fname)
 
 
-def plot_weight_functions(
+def weight_functions_figs(
 		vary_param_2,
 		legend_labels,
 		weight_func,
@@ -316,11 +316,11 @@ def plot_weight_functions(
 		mask = np.where(mask is True, np.nan, 1)
 		z = np.multiply(z, mask)
 
-		plot_heatmap(ax, cax, x, y, z)
+		heatmap_ax(ax, cax, x, y, z)
 		plt.savefig('{}{}.png'.format(out_dir, fname))
 
 
-def plot_heatmaps(
+def heatmaps_figs(
 		data_arr,
 		data_arr_pre_weight,
 		filt_params,
@@ -366,12 +366,12 @@ def plot_heatmaps(
 
 		x = y = np.linspace(0, np.power(2, .5), filt_params['num_divisions'])
 
-		plot_heatmap(ax1, cax, x, y, hmap_data.pointwise_mean, annot_hm)
-		plot_heatmap(ax2, cax, x, y, hmap_data.pointwise_var, annot_hm)
-		plot_heatmap(ax3, cax, x, y, hmap_data.functional_COV, annot_hm)
-		plot_heatmap(ax4, cax, x, y, hmap_data_pw.pointwise_mean, annot_hm)
-		plot_heatmap(ax5, cax, x, y, hmap_data_pw.pointwise_var, annot_hm)
-		plot_heatmap(ax6, cax, x, y, hmap_data_pw.functional_COV, annot_hm)
+		heatmap_ax(ax1, cax, x, y, hmap_data.pointwise_mean, annot_hm)
+		heatmap_ax(ax2, cax, x, y, hmap_data.pointwise_var, annot_hm)
+		heatmap_ax(ax3, cax, x, y, hmap_data.functional_COV, annot_hm)
+		heatmap_ax(ax4, cax, x, y, hmap_data_pw.pointwise_mean, annot_hm)
+		heatmap_ax(ax5, cax, x, y, hmap_data_pw.pointwise_var, annot_hm)
+		heatmap_ax(ax6, cax, x, y, hmap_data_pw.functional_COV, annot_hm)
 
 
 		ax1.set_title('pointwise mean',		fontsize=12, y=1.05)
@@ -423,7 +423,7 @@ def plot_heatmaps(
 			plt.close(fig)
 
 
-def plot_variane_fig(
+def variance_fig(
 		data,
 		filt_params,
 		vary_param_1,

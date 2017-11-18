@@ -3,7 +3,7 @@ import numpy as np
 from PRFstats.data import roc_data, dists_to_ref, \
 	fetch_filts, process_variance_data, get_dist, fetch_prfs
 from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig, \
-	plot_weight_functions, plot_heatmaps, plot_variane_fig
+	weight_functions_figs, heatmaps_figs, variance_fig
 from data import DistanceClassifier, mean_dists_compare
 from plots import dual_roc_fig, samples
 from signals import Trajectory
@@ -240,7 +240,7 @@ def plot_variance(
 		return weight_func(x, y) ** .5
 
 	# plot_trajectory(sig)
-	plot_weight_functions(
+	weight_functions_figs(
 		vary_param_2,
 		legend_labels,
 		weight_func,
@@ -264,7 +264,7 @@ def plot_variance(
 		vary_param_2
 	)
 
-	plot_variane_fig(
+	variance_fig(
 		stats_data,
 		filt_params,
 		vary_param_1,
@@ -274,7 +274,7 @@ def plot_variance(
 		traj.fname
 	)
 
-	plot_heatmaps(
+	heatmaps_figs(
 		hmap_data,
 		hmap_data_pw,
 		filt_params,
@@ -319,23 +319,24 @@ def plot_pairwise_mean_dists(
 		filts_fname=None,
 		unit_test=False
 ):
-	filt_evo_array = fetch_filts(
+	filts = fetch_filts(
 		traj, filt_params,
 		load_saved_filts, quiet,
 		vary_param_1, vary_param_2,
 		filts_fname=filts_fname
 	)
 
-	prf_evo_array = fetch_prfs(filt_evo_array, quiet)
+	prfs = fetch_prfs(filts, weight_func, vary_param_1, vary_param_2, quiet)
 
-	prf_mean_array = np.mean(prf_evo_array, axis=2)
+	prfs_means = np.mean(prfs, axis=2)
 
-	dists_array = np.zeros((prf_mean_array.shape[0] - 1, prf_mean_array.shape[1]))
-	for i in range(prf_mean_array.shape[0] - 1):
-		for j in range(prf_mean_array.shape[1]):
-			d = get_dist(prf_mean_array[i,j], prf_mean_array[i + 1, j])
+	dists_array = np.zeros((prfs_means.shape[0] - 1, prfs_means.shape[1]))
+	for i in range(prfs_means.shape[0] - 1):
+		for j in range(prfs_means.shape[1]):
+			d = get_dist(prfs_means[i, j], prfs_means[i + 1, j])
 			dists_array[i, j] = d
 
 	np.savetxt('output/PRFstats/pairwise_dists.txt', dists_array)
+
 
 

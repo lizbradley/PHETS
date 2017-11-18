@@ -6,11 +6,20 @@ class ParamError(Exception):
 	def __init__(self, msg):
 		Exception.__init__(self, msg)
 
+
 def validate_vps(vp1, vp2):
 	if vp1 is None and vp2 is not None:
 		raise ParamError('vary_param_1 is None, vary_param_2 is not None')
 	if vp1[0] == vp2[0]:
 		raise ParamError('vary_param_1[0] == vary_param_2[0]')
+
+
+def is_filt_param(vp):
+	if vp is None:
+		return False
+	else:
+		return vp[0] in filt_params
+
 
 def fetch_filts(
 		traj, params, load_saved, quiet,
@@ -18,9 +27,6 @@ def fetch_filts(
 		id=None, filts_fname=None, out_fname=None,
 		save=True
 ):
-	def is_filt_param(vp):
-		return int(vp in filt_params)
-
 	suffix = id if id is not None else ''
 	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
 
@@ -28,8 +34,8 @@ def fetch_filts(
 		fname = default_fname if filts_fname is None else filts_fname
 		return np.load(fname)
 
-	iter_1 = len(vary_param_1) if is_filt_param(vary_param_1) else 1
-	iter_2 = len(vary_param_2) if is_filt_param(vary_param_2) else 1
+	iter_1 = len(vary_param_1[1]) if is_filt_param(vary_param_1) else 1
+	iter_2 = len(vary_param_2[1]) if is_filt_param(vary_param_2) else 1
 
 	filts_vv = []
 	for i in range(iter_1):
@@ -46,10 +52,10 @@ def fetch_filts(
 	filts_vv = np.array(filts_vv)
 
 	filts = {
-		(0, 0): filts_vv[0, 0],
-		(0, 1): filts_vv[0, :],
-		(1, 0): filts_vv[:, 0],
-		(1, 1): filts_vv
+		(False,  False ): filts_vv[0, 0],
+		(False,  True  ): filts_vv[0, :],
+		(True,   False ): filts_vv[:, 0],
+		(True,   True  ): filts_vv
 	}[is_filt_param(vary_param_1), is_filt_param(vary_param_2)]
 
 	fname = default_fname if out_fname is None else out_fname
@@ -71,11 +77,12 @@ def apply_weight(prf, weight_func):
 
 	return z
 
-def fetch_prfs(prfs, weight_func, vary_param_1, vary_param_2, quiet):
+
+def fetch_prfs(filts, weight_func, vary_param_1, vary_param_2, quiet):
 	# add handling for weight function / vary_params
 
-	prfs = np.zeros_like(prfs)
-	for idx, filt in np.ndenumerate(prfs):
+	prfs = np.zeros_like(filts)
+	for idx, filt in np.ndenumerate(filts):
 		prf = filt.PRF(silent=quiet, new_format=True)
 		prfs[idx] = apply_weight(prf, weight_func)
 
@@ -176,7 +183,6 @@ class HeatmapData:
 		self.pointwise_mean = [[]]
 		self.pointwise_var = [[]]
 		self.functional_COV = [[]]
-
 
 
 

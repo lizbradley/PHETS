@@ -1,12 +1,10 @@
-
 import numpy as np
-
-from PRFstats import fetch_filts
-from utilities import clear_dir_force
 
 from paths import chdir
 chdir()
 
+from utilities import clear_dir_force
+from PRFstats import fetch_filts
 from common import filt_params, ellipse_traj
 
 
@@ -29,3 +27,5 @@ def test__fetch_filts_v():
 
 	assert same
 
+if __name__ == '__main__':
+	test__fetch_filts_v()

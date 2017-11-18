@@ -103,7 +103,7 @@ def PD(filt, out_filename):
 
 
 
-def plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=False):
+def heatmap_ax(plot_ax, cbar_ax, x, y, z, annot=False):
 
 	def annotate():
 		offset = (1.41 / (len(x) - 1)) / 2
@@ -159,10 +159,10 @@ def PRF_ax(filt, ax, cbar_ax=None, annot_hm=False):
 	if isinstance(filt, filtration.Filtration):
 		z = filt.PRF()
 		x = y = filt.epsilons
-		plot_heatmap(ax, cbar_ax, x, y, z, annot_hm)
+		heatmap_ax(ax, cbar_ax, x, y, z, annot_hm)
 	else:   # 2d array
 		z = filt
-		plot_heatmap(ax, cbar_ax, None, None, z, annot_hm)
+		heatmap_ax(ax, cbar_ax, None, None, z, annot_hm)
 
 
 
@@ -182,7 +182,7 @@ def PRF(filt, out_filename, annot_hm=False):
 	if len(x.shape) == 2: 			# meshgrid format
 		x, y = x[0], y[:, 0]		# reduce to arange format
 
-	plot_heatmap(plot_ax, cbar_ax, x, y, z, annot=annot_hm)
+	heatmap_ax(plot_ax, cbar_ax, x, y, z, annot=annot_hm)
 	plot_ax.set_xlabel('birth ($\epsilon$)')
 	plot_ax.set_ylabel('death ($\epsilon$)')
 
