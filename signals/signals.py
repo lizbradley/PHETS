@@ -89,7 +89,7 @@ class BaseTrajectory(object):
 			raise CropError('crop[0] > crop[1]')
 
 		if to_samples(crop_lim[1]) > len(self.data_full):
-			err = 'crop out of bounds. len(self.data_full) = {}'
+			err = 'crop out of bounds. len(self.data_full) == {}'
 			raise CropError(err.format(len(self.data_full)))
 
 		data = self.data_full[to_samples(crop_lim[0]):to_samples(crop_lim[1])]
