@@ -27,6 +27,17 @@ def filts2comps(fname):
 	np.save(out_fname, comps)
 
 
+def data__viol_filts():
+	fetch_filts(
+		viol_traj, filt_params, load_saved=False, quiet=False,
+		out_fname='data/viol_filts_.npy',
+	)
+
+def data__clar_filts():
+	fetch_filts(
+		clar_traj, filt_params, load_saved=False, quiet=False,
+		out_fname='data/clar_filts_.npy',
+	)
 
 def data__viol_filts_v():
 	fetch_filts(
@@ -52,6 +63,6 @@ def data__viol_filts_vv():
 
 
 if __name__ == '__main__':
-	# data__viol_filts_v()
-	# data__clar_filts_v()
-	data__viol_filts_vv()
+	data__viol_filts()
+	data__clar_filts()
+	# data__viol_filts_vv()

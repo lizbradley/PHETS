@@ -46,8 +46,8 @@ def fetch_filts(
 		for j in range(iter_2):
 			if vary_param_2 is not None:
 				params.update({vary_param_2[0]: vary_param_2[1][j]})
-			filts = traj.filtrations(params, quiet)
-			filts_v.append(filts)
+			filts_ = traj.filtrations(params, quiet)
+			filts_v.append(filts_)
 		filts_vv.append(filts_v)
 	filts_vv = np.array(filts_vv)
 
@@ -78,35 +78,40 @@ def apply_weight(prf, weight_func):
 	return z
 
 
-def fetch_prfs(filts, weight_func, vary_param_1, vary_param_2, quiet):
-	# add handling for weight function / vary_params
-
+def fetch_prfs(
+		filts,
+		weight_func,
+		vary_param_1=None,
+		vary_param_2=None,
+		quiet=True
+	):
 	prfs = np.zeros_like(filts)
 	for idx, filt in np.ndenumerate(filts):
 		prf = filt.PRF(silent=quiet, new_format=True)
 		prfs[idx] = apply_weight(prf, weight_func)
 
-	if vary_param_1[0] == 'weight_func':
+	if vary_param_1 and vary_param_1[0] == 'weight_func':
 		if not vary_param_2:
+			prfs_ = prfs
 			prfs_v = np.empty(len(vary_param_1[1]))
 			for i, wf in enumerate(vary_param_1[1]):
-				prfs_v[i] = [apply_weight(prf, wf) for prf in prfs]
+				prfs_v[i] = [apply_weight(prf, wf) for prf in prfs_]
 			prfs = prfs_v
 
 		else:
 			prfs_v = prfs
 			prfs_vv = np.empty((len(vary_param_1[1]), len(vary_param_2[1])))
 			for i, wf in enumerate(vary_param_1[1]):
-				for j, prfs in prfs_v:
-					prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs]
+				for j, prfs_ in prfs_v:
+					prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs_]
 			prfs = prfs_vv
 
-	if vary_param_2[0] == 'weight_func':
+	if vary_param_2 and vary_param_2[0] == 'weight_func':
 		prfs_v = prfs
 		prfs_vv = np.empty(len(vary_param_1[1]), len(vary_param_2[1]))
-		for i, prfs in prfs_v:
+		for i, prfs_ in prfs_v:
 			for j, wf in enumerate(vary_param_2[1]):
-				prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs]
+				prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs_]
 		prfs = prfs_vv
 
 	return np.asarray(prfs)

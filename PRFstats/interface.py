@@ -89,13 +89,11 @@ def plot_dists_to_means(
 		metric='L2',
 		dist_scale='none',              # 'none', 'a', or 'a + b'
 		weight_func=lambda i, j: 1,
-		see_samples=5,
+		see_samples=0,
 		load_saved_filts=False,
 		filts_fnames=(None, None),
 		quiet=True
 	):
-
-	# TODO: weight_func,  unit test
 
 	filts1 = fetch_filts(
 		traj1, filt_params, load_saved_filts, quiet,
@@ -106,8 +104,8 @@ def plot_dists_to_means(
 		id=2, filts_fname=filts_fnames[1]
 	)
 
-	prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
-	prfs2 = [f.PRF(silent=quiet, new_format=True) for f in filts2]
+	prfs1 = fetch_prfs(filts1, weight_func, quiet=quiet)
+	prfs2 = fetch_prfs(filts2, weight_func, quiet=quiet)
 
 	refs, dists = mean_dists_compare(prfs1, prfs2, metric, dist_scale)
 
@@ -118,6 +116,8 @@ def plot_dists_to_means(
 		clear_old_files(dir, see_samples)
 		samples(filts1, see_samples, dir)
 		samples(filts2, see_samples, dir)
+
+	return dists
 
 def plot_clusters(
 		traj1,
