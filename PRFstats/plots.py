@@ -246,7 +246,7 @@ def dual_roc_fig(data, k, traj1, traj2, fname, vary_param):
 	cax = fig.add_axes([0.92, 0.05, 0.03, 0.9])
 
 	lines = []
-
+	if vary_param is None: data = [data]
 	for data_wl in data:
 		prf_data_1, prf_data_2 = data_wl
 

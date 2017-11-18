@@ -17,7 +17,7 @@ def test__fetch_filts_v():
 	out = fetch_filts(
 		ellipse_traj, filt_params, load_saved=False, quiet=True,
 		vary_param_1=('ds_rate', (5, 7, 9)),
-		no_save=True
+		save=False
 	)
 	ref = np.load('ref/ellipse_filts_v.npy')
 

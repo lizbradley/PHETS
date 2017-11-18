@@ -1,17 +1,25 @@
-import numpy
 import numpy as np
-import sys
+
+from config import default_filtration_params as filt_params
 
 class ParamError(Exception):
 	def __init__(self, msg):
 		Exception.__init__(self, msg)
 
+def validate_vps(vp1, vp2):
+	if vp1 is None and vp2 is not None:
+		raise ParamError('vary_param_1 is None, vary_param_2 is not None')
+	if vp1[0] == vp2[0]:
+		raise ParamError('vary_param_1[0] == vary_param_2[0]')
+
 def fetch_filts(
 		traj, params, load_saved, quiet,
 		vary_param_1=None, vary_param_2=None,
 		id=None, filts_fname=None, out_fname=None,
-		no_save=False
+		save=True
 ):
+	def is_filt_param(vp):
+		return int(vp in filt_params)
 
 	suffix = id if id is not None else ''
 	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
@@ -20,8 +28,8 @@ def fetch_filts(
 		fname = default_fname if filts_fname is None else filts_fname
 		return np.load(fname)
 
-	iter_1 = 1 if vary_param_1 is None else len(vary_param_1[1])
-	iter_2 = 1 if vary_param_2 is None else len(vary_param_2[1])
+	iter_1 = len(vary_param_1) if is_filt_param(vary_param_1) else 1
+	iter_2 = len(vary_param_2) if is_filt_param(vary_param_2) else 1
 
 	filts_vv = []
 	for i in range(iter_1):
@@ -35,28 +43,66 @@ def fetch_filts(
 			filts = traj.filtrations(params, quiet)
 			filts_v.append(filts)
 		filts_vv.append(filts_v)
-
 	filts_vv = np.array(filts_vv)
 
-	if vary_param_1 is None and vary_param_2 is not None:
-		raise ParamError('vary_param_1 is None, vary_param_2 is not None')
-	elif vary_param_1 is None and vary_param_2 is None:
-		filts = filts_vv[0, 0]
-	elif vary_param_1 is not None and vary_param_2 is None:
-		filts = filts_vv[:, 0]
-	else:
-		filts = filts_vv
+	filts = {
+		(0, 0): filts_vv[0, 0],
+		(0, 1): filts_vv[0, :],
+		(1, 0): filts_vv[:, 0],
+		(1, 1): filts_vv
+	}[is_filt_param(vary_param_1), is_filt_param(vary_param_2)]
 
 	fname = default_fname if out_fname is None else out_fname
-	if not no_save: np.save(fname, filts)
+	if save: np.save(fname, filts)
 	return filts
 
 
-def fetch_prfs(filt_evo_array, quiet):
-	prf_evo_array = np.zeros_like(filt_evo_array)
-	for idx, filt in np.ndenumerate(filt_evo_array):
-		prf_evo_array[idx] = filt.PRF(silent=quiet, new_format=True)
-	return prf_evo_array
+def apply_weight(prf, weight_func):
+	""" applies weight to _normalized_ prf"""
+	z = prf
+	x = y = np.linspace(0, 2 ** .5, len(z))
+	xx, yy = np.meshgrid(x, y)
+
+	weight_func = weight_func(xx, yy)
+	if isinstance(weight_func, int):
+		weight_func = np.full_like(xx, weight_func)
+
+	z = np.multiply(z, weight_func)
+
+	return z
+
+def fetch_prfs(prfs, weight_func, vary_param_1, vary_param_2, quiet):
+	# add handling for weight function / vary_params
+
+	prfs = np.zeros_like(prfs)
+	for idx, filt in np.ndenumerate(prfs):
+		prf = filt.PRF(silent=quiet, new_format=True)
+		prfs[idx] = apply_weight(prf, weight_func)
+
+	if vary_param_1[0] == 'weight_func':
+		if not vary_param_2:
+			prfs_v = np.empty(len(vary_param_1[1]))
+			for i, wf in enumerate(vary_param_1[1]):
+				prfs_v[i] = [apply_weight(prf, wf) for prf in prfs]
+			prfs = prfs_v
+
+		else:
+			prfs_v = prfs
+			prfs_vv = np.empty((len(vary_param_1[1]), len(vary_param_2[1])))
+			for i, wf in enumerate(vary_param_1[1]):
+				for j, prfs in prfs_v:
+					prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs]
+			prfs = prfs_vv
+
+	if vary_param_2[0] == 'weight_func':
+		prfs_v = prfs
+		prfs_vv = np.empty(len(vary_param_1[1]), len(vary_param_2[1]))
+		for i, prfs in prfs_v:
+			for j, wf in enumerate(vary_param_2[1]):
+				prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs]
+		prfs = prfs_vv
+
+	return np.asarray(prfs)
 
 
 def norm(f, metric='L2'):
@@ -132,27 +178,6 @@ class HeatmapData:
 		self.functional_COV = [[]]
 
 
-def apply_weight_func(f, weight_func):
-
-	# x, y, max_lim included vs z only
-	f_format_full = len(f.shape) == 1 and f.size == 4
-
-	z = f[2] if f_format_full else f
-
-	x = y = np.linspace(0, 2 ** .5, len(z))
-	xx, yy = np.meshgrid(x, y)
-
-	weight_func = weight_func(xx, yy)
-	if isinstance(weight_func, int):
-		weight_func = xx * 0 + weight_func
-
-	z = np.multiply(z, weight_func)
-
-	if f_format_full:
-		f[2] = z
-		return f
-	else:
-		return z
 
 
 def process_variance_data(
@@ -166,7 +191,7 @@ def process_variance_data(
 	def apply_weight_to_evo(prf_evo, weight_f):
 		weighted_prf_evo = []
 		for prf in prf_evo:
-			weighted_prf_evo.append(apply_weight_func(prf, weight_f))
+			weighted_prf_evo.append(apply_weight(prf, weight_f))
 		return np.asarray(weighted_prf_evo)
 
 
@@ -232,7 +257,7 @@ def process_variance_data(
 				FCOV = pointwise_variance / pointwise_mean  		 # plot as heatmap
 
 			if apply_weight_to_fcov:
-				hmap_data.functional_COV = apply_weight_func(FCOV, weight_func)
+				hmap_data.functional_COV = apply_weight(FCOV, weight_func)
 			else:
 				hmap_data.functional_COV = FCOV
 

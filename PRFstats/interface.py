@@ -183,10 +183,8 @@ def plot_ROCs(
 		id=2, filts_fname=filts_fnames[1]
 	)
 
-	if vary_param is None:
-		filts1, filts2 = [filts1], [filts2]
 	data = []
-
+	if vary_param is None: filts1, filts2 = [filts1], [filts2]
 	for filts1, filts2 in zip(filts1, filts2):
 
 		prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
@@ -205,14 +203,13 @@ def plot_ROCs(
 		roc2 = roc_data(clf2, test2, test1, k_arr)
 
 		data.append([roc1, roc2])
+	if vary_param is None: filts1, filts2 = filts1[0], filts2[0]
 
 	dual_roc_fig(data, k, traj1, traj2, out_fname, vary_param)
 
 	if see_samples:
 		dir = 'output/PRFstats/samples'
 		clear_old_files(dir, see_samples)
-		if vary_param is None:
-			filts1, filts2 = filts1[0], filts2[0]
 		samples(filts1, see_samples, dir, vary_param)
 		samples(filts2, see_samples, dir, vary_param)
 
