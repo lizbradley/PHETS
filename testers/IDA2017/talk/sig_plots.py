@@ -1,7 +1,7 @@
 import numpy as np
 
 from signals.signals import Signal, BaseTrajectory
-from signals.plots import ts
+from signals.plots import ts_fig
 
 from Tools import sec_to_samp
 
@@ -34,10 +34,10 @@ upright_sig = BaseTrajectory(
 	'../../datasets/time_series/piano_revisit/C144F/a440/07-consolidated.txt')
 
 
-ts('../../paper/sigs/fig_6/upright_sig.png', upright_sig, title='upright piano')
+ts_fig('../../paper/sigs/fig_6/upright_sig.png', upright_sig, title='upright piano')
 
 grand_sig = BaseTrajectory(
 	'../../datasets/time_series/piano_revisit/C134C/a440/07- C134C-consolidated.txt')
 
 
-ts('../../paper/sigs/fig_6/grand_sig.png', grand_sig, title='grand piano')
+ts_fig('../../paper/sigs/fig_6/grand_sig.png', grand_sig, title='grand piano')

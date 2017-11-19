@@ -6,7 +6,7 @@ from matplotlib.ticker import FormatStrFormatter
 from config import SAMPLE_RATE
 
 
-def highlight_window(ax, ts, window):
+def _highlight_window(ax, ts, window):
 	start = ts.win_start_pts[window]
 	window_lim = (start, start + ts.window_length)
 
@@ -35,11 +35,11 @@ def ts_ax(ax, ts):
 		ax.axvspan(ts.crop_lim[1], x[-1], color='k', alpha=.3, zorder=1)
 
 	for i in range(ts.num_windows):
-		highlight_window(ax, ts, i)
+		_highlight_window(ax, ts, i)
 
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
-def ts(ts, out_fname):
+def ts_fig(ts, out_fname):
 	print 'plotting timeseries...'
 	fig = plt.figure(figsize=(8, 2.5), tight_layout=True, dpi=200)
 	ax = fig.add_subplot(111)
@@ -58,9 +58,9 @@ def ts_crop_ax(ax, ts, show_window='all'):
 
 	if isinstance(show_window, basestring) and show_window == 'all':
 		for i in range(ts.num_windows):
-			highlight_window(ax, ts, i)
+			_highlight_window(ax, ts, i)
 	elif isinstance(show_window, int):
-		highlight_window(ax, ts, show_window)
+		_highlight_window(ax, ts, show_window)
 
 
 

@@ -14,16 +14,56 @@ class CropError(Exception):
 class BaseTrajectory(object):
 
 	def __init__(self,
-	        data,
-	        name=None,
-	        fname=None,
+			data,
+			name=None,
+			fname=None,
 			crop=(None, None),
 			num_windows=None,
 			window_length=None,
-			vol_norm=(False, False, False),     # (full, crop, windows)
+			vol_norm=(False, False, False),
 	        time_units='samples'
-
 	):
+		"""
+		Parameters
+		----------
+		data : str or array
+			The filename to load, or array. If a filename, sets `self.fname`.
+
+		name : string, optional
+			Sets `self.name`, a label used for titles for plots. If None and
+			`self.fname` is not None, `self.name` is derived from `self.fname`.
+			default: None
+
+		fname : string, optional
+			If `data` is not a filename (i.e. is an array), sets `self.fname`.
+			default: None
+
+		crop : array, optional
+			Range of signal to work with. Observes `time_units`. Either or both
+			bounds may be None.
+			format: (start, stop).
+			default: (None, None)
+
+		num_windows : int, optional
+			Slice signal into `windows` evenly spaced windows.
+			len(self.windows) == `windows`
+			default: None
+
+		window_length : int, optional
+			Observes 'time_units`
+			if None, self.window_length == len(self.data) / num_windows
+			default: None
+
+		vol_norm : arr, optional
+			Normalize amplitude by (full, crop, window).
+			default: (False, False, False)
+
+		time_units : str, optional
+			`'samples'` or `'seconds'`
+			Observes `config.SAMPLE_RATE`
+			default: `'samples'`
+
+		"""
 		if isinstance(data, basestring):        # is filename
 			print 'loading input file...'
 			self.data_full = np.loadtxt(data)
@@ -137,6 +177,7 @@ class BaseTrajectory(object):
 		if self.norm_vol[2]:
 			windows = [self.normalize(w) for w in windows]
 
+		self.window_length = window_length
 		self.win_start_pts =  start_points
 		self.windows = self._spawn(windows)
 
@@ -172,7 +213,7 @@ class TimeSeries(BaseTrajectory):
 		return traj
 
 	def plot(self, filename):
-		plots.ts(self, filename)
+		plots.ts_fig(self, filename)
 
 
 

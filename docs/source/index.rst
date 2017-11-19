@@ -1,12 +1,20 @@
 .. PHETS documentation master file, created by
-   sphinx-quickstart on Fri Jul  7 18:25:13 2017.
+   sphinx-quickstart on Sun Nov 19 00:57:42 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Documentation
-=============
+Welcome to PHETS's documentation!
+=================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
+   :caption: Contents:
 
-   reference
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
