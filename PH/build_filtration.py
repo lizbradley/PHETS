@@ -311,6 +311,50 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-s {}".format(stretch)
 				]
 
+	arg_idxs = {
+		'i': 1,
+		'o': 2,
+		'l': 3,
+		'w': 4,
+		'e': 5,
+		't': 6,
+		'q': 7,
+		'a': 8,
+		'y': 9,
+		'h': 10,
+		'm': 11,
+		'r': 12,
+		'n': 13,
+		'v': 14,
+		's': 15,
+		'c': 16,
+		'x': 17,
+		'f': 18,
+		'd': 19,
+	}
+
+	arg_idxs = {key: value - 1 for key, value in arg_idxs.iteritems()}
+
+	### attempt to remove popt dependency, by elliott ###
+
+	cmd = list(find_landmarks_cmd)
+	cmd.remove('./find_landmarks')
+
+	switches = np.zeros(len(arg_idxs))
+	values = np.empty(len(arg_idxs), dtype=object)
+
+	for c in cmd:
+		arg, param = c[1], c[2:].strip()
+		arg_idx = arg_idxs[arg]
+		switches[arg_idx] = 1 
+		values[arg_idx] = param
+	
+	cmd = np.transpose([switches, values])
+
+	np.savetxt('find_landmark_cmds.txt', cmd, fmt='%s')
+	
+
+	###    ##	###    ##	###    ##	###    ######	#
 
 	if silent:
 		p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)

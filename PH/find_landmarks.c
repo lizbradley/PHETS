@@ -132,7 +132,7 @@ poptContext POPT_Context;  /* context for parsing command-line options */
     { "use euclidean ",            'c', POPT_ARG_NONE,       0,                            16, "Calculate distance using euclidean distance.",                         0 },
     { "cov",                       'x', POPT_ARG_INT,        &d_cov,                       17, "Calculate distance using covariance.",                                 0 },
     { "compute GI complex",        'f', POPT_ARG_FLOAT,      &max_filtration_param,        18, "Output edgelist for graph induced complex.",                           0 },
-    { "number of divisions",       'd', POPT_ARG_FLOAT,        &num_divs,                    19, "Set number of divisions for GI complex.",                              0 },
+    { "number of divisions",       'd', POPT_ARG_FLOAT,        &num_divs,                    19, "Set number of divisions for GI complex.",                            0 },
     POPT_AUTOHELP
     { NULL, '\0', 0, NULL, 0}
   };
