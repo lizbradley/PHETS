@@ -8,7 +8,7 @@ from signals import Trajectory
 from PH import Filtration, load_filtration
 from config import default_filtration_params as filt_params
 
-test, start_time = get_test(set_test=203)
+test, start_time = get_test(set_test=100)
 
 
 def out_fname(str):
@@ -133,6 +133,8 @@ if test == 17:
 if test == 100:
 	in_filename = "datasets/trajectories/btc2milIC123.txt"
 
+	traj = Trajectory(in_filename)
+
 	filt_params.update(
 		{
 			'ds_rate': 40,
@@ -143,14 +145,11 @@ if test == 100:
 		})
 
 
-	filtration = Filtration(in_filename, filt_params)
+	filtration = Filtration(traj, filt_params)
 	# filtration = load_saved_filtration()		# reuses previous filtration
 
 
-	make_movie(
-		filtration,
-		'output/PH/test_euc.mp4',
-	)
+	filtration.movie('output/PH/test_euc.mp4')
 
 # test = 101
 if test == 101:

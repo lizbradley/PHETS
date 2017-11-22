@@ -105,12 +105,12 @@ void print_matrix(float *A);
 int comp (const void * elem1, const void * elem2) ;
 bool in_matrix(int* matrix,int size,int value);
 int main(int argc, char* argv[]){
-        char *parse;
-	struct timeval begin;
-	struct timeval end;
-  /***************** Command line argument parsing  *************************/
-poptContext POPT_Context;  /* context for parsing command-line options */
-  char        POPT_Ret;      /* used for iterating over the arguments */
+    char *parse;
+//	struct timeval begin;
+//	struct timeval end;
+//    /***************** Command line argument parsing  *************************/
+//    poptContext POPT_Context;  /* context for parsing command-line options */
+//    char        POPT_Ret;      /* used for iterating over the arguments */
 
   struct poptOption optionsTable[] =
   { 
@@ -132,99 +132,188 @@ poptContext POPT_Context;  /* context for parsing command-line options */
     { "use euclidean ",            'c', POPT_ARG_NONE,       0,                            16, "Calculate distance using euclidean distance.",                         0 },
     { "cov",                       'x', POPT_ARG_INT,        &d_cov,                       17, "Calculate distance using covariance.",                                 0 },
     { "compute GI complex",        'f', POPT_ARG_FLOAT,      &max_filtration_param,        18, "Output edgelist for graph induced complex.",                           0 },
-    { "number of divisions",       'd', POPT_ARG_FLOAT,        &num_divs,                    19, "Set number of divisions for GI complex.",                            0 },
+    { "number of divisions",       'd', POPT_ARG_FLOAT,      &num_divs,                    19, "Set number of divisions for GI complex.",                            0 },
     POPT_AUTOHELP
     { NULL, '\0', 0, NULL, 0}
   };
-  POPT_Context = poptGetContext(NULL, argc, (const char**) argv, optionsTable, 0);
-  poptSetOtherOptionHelp(POPT_Context, "[ Try --help for a more detailed description of the options]");
-   /* values are filled into the data structures by this function */
-   while ((POPT_Ret = poptGetNextOpt(POPT_Context)) >= 0)
-   {
-     switch (POPT_Ret) 
-     {
-      case 1:
-        if(!quiet)
-        	printf("Input file:%s\n",file);
-        break;
+   // POPT_Context = poptGetContext(NULL, argc, (const char**) argv, optionsTable, 0);
+   // poptSetOtherOptionHelp(POPT_Context, "[ Try --help for a more detailed description of the options]");
+   // /* values are filled into the data structures by this function */
+   //while ((POPT_Ret = poptGetNextOpt(POPT_Context)) >= 0
+   //{
+   //   switch (POPT_Ret)
 
-      case 2:
-      	if(!quiet)
-        	printf("Output file:%s\n",wfile);
-        break;
 
-      case 3:
-      	if(!quiet)
-        	printf("Number of landmarks set to %d.\n",num_landmarks);
-        	fflush(stdout);
-        break;
+    void eat_arg(int i, char* val)
+    {
+        switch (i)
+        {
+            case 1:
+                file = val;
+                if(!quiet)
+                    printf("Input file:%s\n",file);
+                break;
 
-      case 4:
-        if(strchr(parse,'-')!=NULL){
-        	parse=strtok(parse,"-");
-        	i=0;
-        	while(parse!=NULL){
-            
-            if(i==0)
-            	start = atoi(parse);
-            else
-            	stop = atoi(parse);
-            i++;
-            parse=strtok(NULL,",-");
-          }
+            case 2:
+                wfile = val;
+                if(!quiet)
+                    printf("Output file:%s\n",wfile);
+                break;
+
+            case 3:
+                num_landmarks = atoi(val);
+                if(!quiet){
+                    printf("Number of landmarks set to %d.\n",num_landmarks);
+                    fflush(stdout);
+                }
+                break;
+
+            case 4:
+                parse = val;
+                if(strchr(parse,'-')!=NULL){
+                    parse=strtok(parse,"-");
+                    i=0;
+                    while(parse!=NULL){
+
+                        if(i==0)
+                            start = atoi(parse);
+                        else
+                            stop = atoi(parse);
+                        i++;
+                        parse=strtok(NULL,",-");
+                    }
+                }
+                else{
+                    start = 0;
+                    stop = atoi(parse);
+                }
+
+                num_wits = stop-start;
+                if(!quiet){
+                    printf("Number of witnesses: %d\n",num_wits);
+                    fflush(stdout);
+                }
+                break;
+
+            case 5:
+                est = atoi(val);
+                use_est=true;
+                if(!quiet)
+                printf("Using evenly spaced in time to find landmarks.\n");
+                break;
+
+            case 6:
+                if(!quiet)
+                    printf("Timing selection processes.\n");
+                timing = true;
+                break;
+
+            case 7:
+                quiet = false;
+                break;
+
+            case 8:
+                speed_amplify = atof(val);
+                break;
+
+            case 9:
+                orientation_amplify = atof(val);
+                break;
+
+            case 10:
+                use_hamiltonian = atof(val);
+                break;
+
+            case 11:
+                m2_d = atoi(val);
+                break;
+
+            case 12:
+                speed_amplify = atof(val);
+                break;
+
+            case 13:
+                num_threads = atoi(val);
+                printf("Number of threads: %d\n",num_threads);
+                break;
+
+            case 14:
+                straight_VB = atof(val);
+                break;
+
+            case 15:
+                stretch = atof(val);
+
+            case 16:
+                if(!quiet)
+                    printf("Using euclidean distance.\n");
+                use_euclidean = true;
+                break;
+
+            case 17:
+                d_cov = atoi(val);
+
+            case 18:
+                max_filtration_param = atof(val);
+                if(!quiet)
+                    printf("Outputting edgelist for graph induced complex.\n");
+                break;
+
+            case 19:
+                num_divs = atof(val);
         }
-		else{
-            start = 0;
-            stop = atoi(parse);
-        }
-				
-		num_wits = stop-start;
-		if(!quiet){
-			printf("Number of witnesses: %d\n",num_wits);
-			fflush(stdout);
-		}
-		break;
-
-      case 5:
-      	use_est=true;
-      	if(!quiet)
-      	printf("Using evenly spaced in time to find landmarks.\n");
-		break;
-
-      case 6:
-      	if(!quiet)
-      		printf("Timing selection processes.\n");
-		timing = true;
-		break;
-
-	  case 7:
-	  	quiet = false;
-	  	break;
-
-	  case 13:
-	  	printf("Number of threads: %d\n",num_threads);
-	  	break;
-
-	  case 16:
-	  	if(!quiet)
-	  		printf("Using euclidean distance.\n");
-	  	use_euclidean = true;
-	  	break;
-	  case 18:
-	   	if(!quiet)
-	  		printf("Outputting edgelist for graph induced complex.\n");
-	  	break;
     }
-  }
-  if (POPT_Ret < -1) 
-  {
-    /* an error occurred during option processing */
-    fprintf(stderr, "%s: %s\n",
-    poptBadOption(POPT_Context, POPT_BADOPTION_NOALIAS),
-    poptStrerror(POPT_Ret));
-    return 1;
-  }
-  poptFreeContext(POPT_Context);
+
+    int NUMBER_ARGS = 19;    // number of all possible args
+    int STRING_MAX_SIZE = 100;
+
+    int switches [NUMBER_ARGS];
+    char vals [NUMBER_ARGS][STRING_MAX_SIZE];
+
+    FILE *sfile = fopen("find_landmark_arg_switches.txt", "r");
+    FILE *vfile = fopen("find_landmark_arg_vals.txt", "r");
+
+    int switch_;
+    char value [STRING_MAX_SIZE];
+
+    int i = 0;
+    while (fscanf(sfile, "%d", &switch_) > 0)
+    {
+        switches[i] = switch_;
+        i++;
+    }
+
+
+    i = 0;
+    while (fscanf(vfile, "%s", &value) > 0)
+    {
+        strcpy(vals[i], value);
+        i++;
+    }
+
+
+    fclose(sfile);
+    fclose(vfile);
+
+
+    for (i=0; i < NUMBER_ARGS; i++)
+    {
+        if (switches[i])
+        {
+            eat_arg(i + 1, vals[i]);
+        }
+    }
+
+//  if (POPT_Ret < -1)
+//  {
+//    /* an error occurred during option processing */
+//    fprintf(stderr, "%s: %s\n",
+//    poptBadOption(POPT_Context, POPT_BADOPTION_NOALIAS),
+//    poptStrerror(POPT_Ret));
+//    return 1;
+//  }
+//  poptFreeContext(POPT_Context);
+
   /***************** End command line parsing *************************/
 
 

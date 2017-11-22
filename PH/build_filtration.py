@@ -311,6 +311,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-s {}".format(stretch)
 				]
 
+	################# attempt to remove popt dependency #######################
+
 	arg_idxs = {
 		'i': 1,
 		'o': 2,
@@ -335,12 +337,10 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 	arg_idxs = {key: value - 1 for key, value in arg_idxs.iteritems()}
 
-	### attempt to remove popt dependency, by elliott ###
-
 	cmd = list(find_landmarks_cmd)
 	cmd.remove('./find_landmarks')
 
-	switches = np.zeros(len(arg_idxs))
+	switches = np.zeros(len(arg_idxs), dtype=int)
 	values = np.empty(len(arg_idxs), dtype=object)
 
 	for c in cmd:
@@ -348,20 +348,31 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		arg_idx = arg_idxs[arg]
 		switches[arg_idx] = 1 
 		values[arg_idx] = param
-	
-	cmd = np.transpose([switches, values])
 
-	np.savetxt('find_landmark_cmds.txt', cmd, fmt='%s')
-	
-
-	###    ##	###    ##	###    ##	###    ######	#
+	np.savetxt('find_landmark_arg_switches.txt', switches, fmt='%i')
+	np.savetxt('find_landmark_arg_vals.txt', values, fmt='%s')
 
 	if silent:
-		p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)
+		p = subprocess.Popen('./find_landmarks', stdout=subprocess.PIPE)
 		out, err = p.communicate()
 	else:
-		p = subprocess.Popen(find_landmarks_cmd)
+		p = subprocess.Popen('./find_landmarks')
 		p.communicate()
+
+	###########################################################################
+
+	# if silent:
+	# 	p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)
+	# 	out, err = p.communicate()
+	# else:
+	# 	p = subprocess.Popen(find_landmarks_cmd)
+	# 	p.communicate()
+
+
+
+
+
+
 
 	if m2_d!=0:
 		number_of_datapoints = int(number_of_datapoints-m2_d)
