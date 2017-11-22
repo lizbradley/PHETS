@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <popt.h>
+//#include <popt.h>
 #include <assert.h>
 #include <omp.h>
 #include <sys/time.h>
@@ -106,43 +106,34 @@ int comp (const void * elem1, const void * elem2) ;
 bool in_matrix(int* matrix,int size,int value);
 int main(int argc, char* argv[]){
     char *parse;
-//	struct timeval begin;
-//	struct timeval end;
-//    /***************** Command line argument parsing  *************************/
-//    poptContext POPT_Context;  /* context for parsing command-line options */
-//    char        POPT_Ret;      /* used for iterating over the arguments */
 
-  struct poptOption optionsTable[] =
-  { 
-    { "input file",                'i', POPT_ARG_STRING,     &file,                         1, "Input file of witnesses",                                              0 },
-    { "output file",               'o', POPT_ARG_STRING,     &wfile,                        2, "Where to output landmarks and their distances to each witness.",       0 },
-    { "landmarks",                 'l', POPT_ARG_INT,        &num_landmarks,                3, "Number of landmarks to use.",                                          0 },
-    { "witnesses",                 'w', POPT_ARG_STRING,     &parse,                        4, "Number of witnesses to use.  Can be an integer or a range of integers like x-y",      0 },
-    { "evenly spaced in time",     'e', POPT_ARG_INT,        &est,                          5, "Use evenly spaced in time to select every x landmark.",                0 },
-    { "time program",              't', POPT_ARG_NONE,       0,                             6, "Time each step of the code and output results.",                       0 },
-    { "print everything",          'q', POPT_ARG_NONE,       0,                             7, "Print all output.  Use for debugging.",                                0 },
-    { "set speed amplify",         'a', POPT_ARG_FLOAT,      &speed_amplify,                8, "Set the speed amplify variable.",                                      0 },
-    { "set orientation amplify",   'y', POPT_ARG_FLOAT,      &orientation_amplify,          9, "Set the orientation amplify variable.",                                0 },
-    { "set use hamiltonian",       'h', POPT_ARG_FLOAT,      &use_hamiltonian,             10, "Set the use hamiltonian variable.",                                    0 },
-    { "set m2_d",                  'm', POPT_ARG_INT,        &m2_d,                        11, "Set the m2_d variable.",                                               0 },
-    { "set ray dist amplify",      'r', POPT_ARG_FLOAT,      &speed_amplify,               12, "Set the ray distance amplify variable.",                               0 },
-    { "number of threads",         'n', POPT_ARG_INT,        &num_threads,                 13, "Set the number of threads to use.",                                    0 },
-    { "set straight_VB",           'v', POPT_ARG_FLOAT,      &straight_VB,                 14, "Set the straight_VB variable.",                                        0 },
-    { "set stretch ",              's', POPT_ARG_FLOAT,      &stretch,                     15, "Set the stretch variable.",                                            0 },
-    { "use euclidean ",            'c', POPT_ARG_NONE,       0,                            16, "Calculate distance using euclidean distance.",                         0 },
-    { "cov",                       'x', POPT_ARG_INT,        &d_cov,                       17, "Calculate distance using covariance.",                                 0 },
-    { "compute GI complex",        'f', POPT_ARG_FLOAT,      &max_filtration_param,        18, "Output edgelist for graph induced complex.",                           0 },
-    { "number of divisions",       'd', POPT_ARG_FLOAT,      &num_divs,                    19, "Set number of divisions for GI complex.",                            0 },
-    POPT_AUTOHELP
-    { NULL, '\0', 0, NULL, 0}
-  };
-   // POPT_Context = poptGetContext(NULL, argc, (const char**) argv, optionsTable, 0);
-   // poptSetOtherOptionHelp(POPT_Context, "[ Try --help for a more detailed description of the options]");
-   // /* values are filled into the data structures by this function */
-   //while ((POPT_Ret = poptGetNextOpt(POPT_Context)) >= 0
-   //{
-   //   switch (POPT_Ret)
-
+    // popt has been removed as a dependency, the following code is for reference
+    /*
+    struct poptOption optionsTable[] =
+    {
+        { "input file",                'i', POPT_ARG_STRING,     &file,                         1, "Input file of witnesses",                                              0 },
+        { "output file",               'o', POPT_ARG_STRING,     &wfile,                        2, "Where to output landmarks and their distances to each witness.",       0 },
+        { "landmarks",                 'l', POPT_ARG_INT,        &num_landmarks,                3, "Number of landmarks to use.",                                          0 },
+        { "witnesses",                 'w', POPT_ARG_STRING,     &parse,                        4, "Number of witnesses to use.  Can be an integer or a range of integers like x-y",      0 },
+        { "evenly spaced in time",     'e', POPT_ARG_INT,        &est,                          5, "Use evenly spaced in time to select every x landmark.",                0 },
+        { "time program",              't', POPT_ARG_NONE,       0,                             6, "Time each step of the code and output results.",                       0 },
+        { "print everything",          'q', POPT_ARG_NONE,       0,                             7, "Print all output.  Use for debugging.",                                0 },
+        { "set speed amplify",         'a', POPT_ARG_FLOAT,      &speed_amplify,                8, "Set the speed amplify variable.",                                      0 },
+        { "set orientation amplify",   'y', POPT_ARG_FLOAT,      &orientation_amplify,          9, "Set the orientation amplify variable.",                                0 },
+        { "set use hamiltonian",       'h', POPT_ARG_FLOAT,      &use_hamiltonian,             10, "Set the use hamiltonian variable.",                                    0 },
+        { "set m2_d",                  'm', POPT_ARG_INT,        &m2_d,                        11, "Set the m2_d variable.",                                               0 },
+        { "set ray dist amplify",      'r', POPT_ARG_FLOAT,      &speed_amplify,               12, "Set the ray distance amplify variable.",                               0 },
+        { "number of threads",         'n', POPT_ARG_INT,        &num_threads,                 13, "Set the number of threads to use.",                                    0 },
+        { "set straight_VB",           'v', POPT_ARG_FLOAT,      &straight_VB,                 14, "Set the straight_VB variable.",                                        0 },
+        { "set stretch ",              's', POPT_ARG_FLOAT,      &stretch,                     15, "Set the stretch variable.",                                            0 },
+        { "use euclidean ",            'c', POPT_ARG_NONE,       0,                            16, "Calculate distance using euclidean distance.",                         0 },
+        { "cov",                       'x', POPT_ARG_INT,        &d_cov,                       17, "Calculate distance using covariance.",                                 0 },
+        { "compute GI complex",        'f', POPT_ARG_FLOAT,      &max_filtration_param,        18, "Output edgelist for graph induced complex.",                           0 },
+        { "number of divisions",       'd', POPT_ARG_FLOAT,      &num_divs,                    19, "Set number of divisions for GI complex.",                              0 },
+        POPT_AUTOHELP
+        { NULL, '\0', 0, NULL, 0}
+    };
+    */
 
     void eat_arg(int i, char* val)
     {
