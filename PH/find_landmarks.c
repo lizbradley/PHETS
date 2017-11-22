@@ -298,15 +298,6 @@ int main(int argc, char* argv[]){
         }
     }
 
-//  if (POPT_Ret < -1)
-//  {
-//    /* an error occurred during option processing */
-//    fprintf(stderr, "%s: %s\n",
-//    poptBadOption(POPT_Context, POPT_BADOPTION_NOALIAS),
-//    poptStrerror(POPT_Ret));
-//    return 1;
-//  }
-//  poptFreeContext(POPT_Context);
 
   /***************** End command line parsing *************************/
 

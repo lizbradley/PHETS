@@ -349,10 +349,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		switches[arg_idx] = 1 
 		values[arg_idx] = param
 
-<<<<<<< HEAD
 	values = [None if v == '' else v for v in values]   # simplify c parsing
-=======
->>>>>>> 4cc8c1990ff1c079f18a2972da228d3be873a269
 	np.savetxt('find_landmark_arg_switches.txt', switches, fmt='%i')
 	np.savetxt('find_landmark_arg_vals.txt', values, fmt='%s')
 

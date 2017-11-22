@@ -8,7 +8,7 @@ from signals import Trajectory
 from PH import Filtration, load_filtration
 from config import default_filtration_params as filt_params
 
-test, start_time = get_test(set_test=100)
+test, start_time = get_test(set_test=110)
 
 
 def out_fname(str):
