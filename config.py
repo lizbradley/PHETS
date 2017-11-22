@@ -4,7 +4,7 @@ MEMORY_PROFILE_ON = False
 
 find_landmarks_c_compile_str = {
 	# 'linux': '/usr/bin/gcc-5 -fopenmp -lpopt find_landmarks.c -o find_landmarks -lm -lpopt',
-    'linux': 'gcc -fopenmp -lpopt -lm -o find_landmarks find_landmarks.c',
+    'linux': 'gcc -g -fopenmp -lpopt -lm -o find_landmarks find_landmarks.c',
 
 	'macOS': '/usr/local/bin/gcc-5 -fopenmp -lpopt -o find_landmarks find_landmarks.c'
 }
