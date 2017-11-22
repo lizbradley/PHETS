@@ -243,6 +243,7 @@ int main(int argc, char* argv[]){
 
             case 15:
                 stretch = atof(val);
+                break;
 
             case 16:
                 if(!quiet)
@@ -252,6 +253,7 @@ int main(int argc, char* argv[]){
 
             case 17:
                 d_cov = atoi(val);
+                break;
 
             case 18:
                 max_filtration_param = atof(val);
@@ -261,6 +263,7 @@ int main(int argc, char* argv[]){
 
             case 19:
                 num_divs = atof(val);
+                break;
         }
     }
 

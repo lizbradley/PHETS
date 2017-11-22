@@ -389,9 +389,12 @@ if test == 110:
 			'graph_induced': True
 		})
 
-	filtration = Filtration(in_filename, filt_params)
+	# filtration = Filtration(in_filename, filt_params)
+	traj = Trajectory(in_filename)
+	filtration = Filtration(traj, filt_params)
+	filtration.movie('output/PH/test_110.mp4')
 
-	make_movie(filtration, 'output/PH/test_110.mp4')
+	# make_movie(filtration, 'output/PH/test_110.mp4')
 
 
 if test == 200:
