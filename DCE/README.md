@@ -1,2 +1,0 @@
-NOTE: This module needs maintenance and will be refactored soon. Presently, movie functions are broken, except for ``slide_window`` and ``vary_tau``.
-Functionality will be migrated from Movies.py to movies.py (in accordance with the package-wide transition to lowercase filenames).

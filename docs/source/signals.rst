@@ -1,21 +1,6 @@
-signals package
-===============
+signals
+=======
 
-Submodules
-----------
-
-signals\.plots module
----------------------
-
-.. automodule:: signals.plots
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-
-Module contents
----------------
 
 .. automodule:: signals
     :members:

@@ -2,7 +2,7 @@
 
 **P**ersistent **H**omology on **E**mbedded **T**ime-**S**eries
 
-This module offers high-level tools for exploration and visualization of delay coordinate 
+This package offers high-level tools for exploration and visualization of delay coordinate 
 embedding and persistent homology. It is used to investigate the utilization of these tools together as a signal 
 processing technique.
 
