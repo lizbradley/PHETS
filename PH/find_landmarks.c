@@ -105,33 +105,34 @@ int comp (const void * elem1, const void * elem2) ;
 bool in_matrix(int* matrix,int size,int value);
 int main(int argc, char* argv[]){
     char *parse;
-/*
-================================================================================================================================================================
-CLI FLAGS
-================================================================================================================================================================
-ARG                         FLAG    TYPE       VAR                        ID    DESCRIPTION
-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-"input file"                'i'     STRING     &file                      1     "Input file of witnesses"
-"output file"               'o'     STRING     &wfile                     2     "Where to output landmarks and their distances to each witness."
-"landmarks"                 'l'     INT        &num_landmarks             3     "Number of landmarks to use."
-"witnesses"                 'w'     STRING     &parse                     4     "Number of witnesses to use.  Can be an integer or a range of integers like x-y"
-"evenly spaced in time"     'e'     INT        &est                       5     "Use evenly spaced in time to select every x landmark."
-"time program"              't'     NONE       0                          6     "Time each step of the code and output results."
-"print everything"          'q'     NONE       0                          7     "Print all output.  Use for debugging."
-"set speed amplify"         'a'     FLOAT      &speed_amplify             8     "Set the speed amplify variable."
-"set orientation amplify"   'y'     FLOAT      &orientation_amplify       9     "Set the orientation amplify variable."
-"set use hamiltonian"       'h'     FLOAT      &use_hamiltonian          10     "Set the use hamiltonian variable."
-"set m2_d"                  'm'     INT        &m2_d                     11     "Set the m2_d variable."
-"set ray dist amplify"      'r'     FLOAT      &speed_amplify            12     "Set the ray distance amplify variable."
-"number of threads"         'n'     INT        &num_threads              13     "Set the number of threads to use."
-"set straight_VB"           'v'     FLOAT      &straight_VB              14     "Set the straight_VB variable."
-"set stretch "              's'     FLOAT      &stretch                  15     "Set the stretch variable."
-"use euclidean "            'c'     NONE       0                         16     "Calculate distance using euclidean distance."
-"cov"                       'x'     INT        &d_cov                    17     "Calculate distance using covariance."
-"compute GI complex"        'f'     FLOAT      &max_filtration_param     18     "Output edgelist for graph induced complex."
-"number of divisions"       'd'     FLOAT      &num_divs                 19     "Set number of divisions for GI complex."
-================================================================================================================================================================
-*/
+
+    /*
+    ====================================================================================================================
+    CLI FLAGS
+    ====================================================================================================================
+    ARG                         FLAG    TYPE       VAR                        ID    DESCRIPTION
+    --------------------------------------------------------------------------------------------------------------------
+    "input file"                'i'     STRING     &file                      1     "Input file of witnesses"
+    "output file"               'o'     STRING     &wfile                     2     "Where to output landmarks and their distances to each witness."
+    "landmarks"                 'l'     INT        &num_landmarks             3     "Number of landmarks to use."
+    "witnesses"                 'w'     STRING     &parse                     4     "Number of witnesses to use.  Can be an integer or a range of integers like x-y"
+    "evenly spaced in time"     'e'     INT        &est                       5     "Use evenly spaced in time to select every x landmark."
+    "time program"              't'     NONE       0                          6     "Time each step of the code and output results."
+    "print everything"          'q'     NONE       0                          7     "Print all output.  Use for debugging."
+    "set speed amplify"         'a'     FLOAT      &speed_amplify             8     "Set the speed amplify variable."
+    "set orientation amplify"   'y'     FLOAT      &orientation_amplify       9     "Set the orientation amplify variable."
+    "set use hamiltonian"       'h'     FLOAT      &use_hamiltonian          10     "Set the use hamiltonian variable."
+    "set m2_d"                  'm'     INT        &m2_d                     11     "Set the m2_d variable."
+    "set ray dist amplify"      'r'     FLOAT      &speed_amplify            12     "Set the ray distance amplify variable."
+    "number of threads"         'n'     INT        &num_threads              13     "Set the number of threads to use."
+    "set straight_VB"           'v'     FLOAT      &straight_VB              14     "Set the straight_VB variable."
+    "set stretch "              's'     FLOAT      &stretch                  15     "Set the stretch variable."
+    "use euclidean "            'c'     NONE       0                         16     "Calculate distance using euclidean distance."
+    "cov"                       'x'     INT        &d_cov                    17     "Calculate distance using covariance."
+    "compute GI complex"        'f'     FLOAT      &max_filtration_param     18     "Output edgelist for graph induced complex."
+    "number of divisions"       'd'     FLOAT      &num_divs                 19     "Set number of divisions for GI complex."
+    ====================================================================================================================
+    */
 
     void eat_arg(int i, char* val)
     {
