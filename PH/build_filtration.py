@@ -311,9 +311,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-s {}".format(stretch)
 				]
 
-	################# attempt to remove popt dependency #######################
-
-	arg_idxs = {
+	arg_idxs = {        # see find_landmarks.c:110
 		'i': 1,
 		'o': 2,
 		'l': 3,
@@ -349,7 +347,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		switches[arg_idx] = 1 
 		values[arg_idx] = param
 
-	values = [None if v == '' else v for v in values]   # simplify c parsing
+	values = [None if v == '' else v for v in values]
 	np.savetxt('find_landmark_arg_switches.txt', switches, fmt='%i')
 	np.savetxt('find_landmark_arg_vals.txt', values, fmt='%s')
 
@@ -359,19 +357,6 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	else:
 		p = subprocess.Popen('./find_landmarks')
 		p.communicate()
-
-	###########################################################################
-
-	# if silent:
-	# 	p = subprocess.Popen(find_landmarks_cmd, stdout=subprocess.PIPE)
-	# 	out, err = p.communicate()
-	# else:
-	# 	p = subprocess.Popen(find_landmarks_cmd)
-	# 	p.communicate()
-
-
-
-
 
 
 
