@@ -57,7 +57,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PHETS'
-copyright = u'2017, Elliott Shugerman'
+# copyright = u'2017, Elliott Shugerman'
 author = u'Elliott Shugerman'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -181,24 +181,24 @@ texinfo_documents = [
 # -- Options for Epub output ----------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = project
-epub_author = author
-epub_publisher = author
-epub_copyright = copyright
-
-# The unique identifier of the text. This can be a ISBN number
-# or the project homepage.
+# epub_title = project
+# epub_author = author
+# epub_publisher = author
+# epub_copyright = copyright
 #
-# epub_identifier = ''
-
-# A unique identification for the text.
+# # The unique identifier of the text. This can be a ISBN number
+# # or the project homepage.
+# #
+# # epub_identifier = ''
 #
-# epub_uid = ''
-
-# A list of files that should not be packed into the epub file.
-epub_exclude_files = ['search.html']
-
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+# # A unique identification for the text.
+# #
+# # epub_uid = ''
+#
+# # A list of files that should not be packed into the epub file.
+# epub_exclude_files = ['search.html']
+#
+#
+#
+# # Example configuration for intersphinx: refer to the Python standard library.
+# intersphinx_mapping = {'https://docs.python.org/': None}

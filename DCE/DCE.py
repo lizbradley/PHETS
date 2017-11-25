@@ -5,6 +5,22 @@ class EmbedError(Exception):
 		Exception.__init__(self, msg)
 
 def embed(data, tau, m):
+	"""
+
+	Parameters
+	----------
+	data: array
+		one dimensional (time series)
+	tau: int
+		delay (samples)
+	m : int
+		target dimension
+
+	Returns
+	-------
+	array
+		m-dimensional embedding
+	"""
 
 	end = len(data) - (tau * (m - 1)) - 1
 

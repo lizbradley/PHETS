@@ -15,43 +15,33 @@ class BaseTrajectory(object):
 
 	def __init__(self,
 			data,
-			name=None,
-			fname=None,
 			crop=(None, None),
 			num_windows=None,
 			window_length=None,
 			vol_norm=(False, False, False),
-	        time_units='samples'
+	        time_units='samples',
+			name=None,
+		    fname=None,
 	):
 		"""
 		Parameters
 		----------
 		data : str or array
-			The filename to load, or array. If a filename, sets `self.fname`.
-
-		name : string, optional
-			Sets `self.name`, a label used for titles for plots. If None and
-			`self.fname` is not None, `self.name` is derived from `self.fname`.
-			default: None
-
-		fname : string, optional
-			If `data` is not a filename (i.e. is an array), sets `self.fname`.
-			default: None
+			The filename to load, or array. If a filename, sets ``fname``.
 
 		crop : array, optional
-			Range of signal to work with. Observes `time_units`. Either or both
+			Range of signal to work with. Observes ``time_units``. Either or both
 			bounds may be None.
 			format: (start, stop).
 			default: (None, None)
 
 		num_windows : int, optional
-			Slice signal into `windows` evenly spaced windows.
-			len(self.windows) == `windows`
+			Slice signal into ``windows`` evenly spaced windows.
 			default: None
 
-		window_length : int, optional
-			Observes 'time_units`
-			if None, self.window_length == len(self.data) / num_windows
+		window_length : int or float, optional
+			Observes ``time_units``
+			if None, ``window_length == len(data) / num_windows``
 			default: None
 
 		vol_norm : arr, optional
@@ -59,10 +49,18 @@ class BaseTrajectory(object):
 			default: (False, False, False)
 
 		time_units : str, optional
-			`'samples'` or `'seconds'`
-			Observes `config.SAMPLE_RATE`
-			default: `'samples'`
+			``'samples'`` or ``'seconds'``
+			Observes ``config.SAMPLE_RATE``
+			default: ``'samples'``
 
+		name : string, optional
+			Sets ``name``, a label used for titles for plots. If None and
+			``fname`` is not None, ``name`` is derived from ``fname``.
+			default: None
+
+		fname : string, optional
+			If ``data`` is not a filename (i.e. is an array), sets ``fname``.
+			default: None
 		"""
 		if isinstance(data, basestring):        # is filename
 			print 'loading input file...'
@@ -87,7 +85,7 @@ class BaseTrajectory(object):
 		self.time_units = time_units
 
 		if self.norm_vol[0]:
-			self.data_full = self.normalize(self.data_full)
+			self.data_full = self._normalize(self.data_full)
 
 		self.data = None
 		self.windows = None
@@ -97,7 +95,7 @@ class BaseTrajectory(object):
 
 
 	@staticmethod
-	def normalize(data):
+	def _normalize(data):
 		if np.max(np.abs(data)) == 0:
 			pass
 		return np.true_divide(data, np.max(np.abs(data)))
@@ -115,6 +113,19 @@ class BaseTrajectory(object):
 			return time / SAMPLE_RATE
 
 	def crop(self, crop_cmd):
+		""" Set ``data`` to the region of ``data_full`` specified by ``crop_cmd`` and
+		``time_units``.
+
+		Parameters
+		----------
+		crop_cmd : array
+			observes ``time_units``
+			format: (start, stop)
+
+		Returns
+		-------
+
+		"""
 		to_samples, from_samples = self._to_samples, self._from_samples
 
 		crop_lim = list(crop_cmd)
@@ -135,12 +146,29 @@ class BaseTrajectory(object):
 		data = self.data_full[to_samples(crop_lim[0]):to_samples(crop_lim[1])]
 
 		if self.norm_vol[1]:
-			data = self.normalize(data)
+			data = self._normalize(data)
 
 		self.data = data
 
 
 	def _spawn(self, windows_raw):
+		"""
+		helper for ``self.slice()``
+
+		Parameters
+		----------
+		windows_raw : array
+			raw window data as an array
+			if ``self`` is a ``TimeSeries``
+				``windows_raw.shape == (num_windows, window_length)``
+			if ``self`` is a ``Trajectory``
+				``windows_raw.shape == (num_windows, dim, window_length)``
+
+		Returns
+		-------
+		windows : array
+			an array of windows with the same type as ``self``
+		"""
 		windows = []
 		kwargs = {
 			'fname': self.fname,
@@ -156,26 +184,41 @@ class BaseTrajectory(object):
 		return windows
 
 	def slice(self, num_windows, window_length=None):
+		"""
+		Sets ``windows``, an array of evenly spaced windows from ``data``.
+
+		Parameters
+		----------
+		num_windows: int
+		window_length: int or float, optional
+			observes 'time_units``
+			if None, ``window_length == len(data) / num_windows``
+			default: None
+
+		Returns
+		-------
+
+		"""
 		if num_windows is None:
 			return
-		else:
-			crop_0, crop_1 = self.crop_lim
-			start_points = np.linspace(
-				crop_0, crop_1, num_windows, endpoint=False
-			)
 
-			start_points_idxs = [self._to_samples(s) for s in start_points]
+		crop_0, crop_1 = self.crop_lim
+		start_points = np.linspace(
+			crop_0, crop_1, num_windows, endpoint=False
+		)
 
-			if window_length is None:
-				window_length = len(self.data) / num_windows
+		start_points_idxs = [self._to_samples(s) for s in start_points]
 
-			window_length = self._to_samples(window_length)
+		if window_length is None:
+			window_length = len(self.data) / num_windows
 
-			windows = [self.data_full[sp:sp + window_length]
-			           for sp in start_points_idxs]
+		window_length = self._to_samples(window_length)
+
+		windows = [self.data_full[sp:sp + window_length]
+				   for sp in start_points_idxs]
 
 		if self.norm_vol[2]:
-			windows = [self.normalize(w) for w in windows]
+			windows = [self._normalize(w) for w in windows]
 
 		self.window_length = window_length
 		self.win_start_pts =  start_points
@@ -186,12 +229,27 @@ class BaseTrajectory(object):
 class TimeSeries(BaseTrajectory):
 
 	def __init__(self, data, **kwargs):
+		""" See :py:class:`BaseTrajectory` for parameter descriptions """
 		super(TimeSeries, self).__init__(data, **kwargs)
 
 		self.source_traj = None
 		self.project_axis = None
 
 	def embed(self, tau, m):
+		"""
+		Embed ``data_full``, re-apply crop and slicing.
+		Parameters
+		----------
+		tau : int or float
+			observes ``time_units``
+		m : int
+
+
+		Returns
+		-------
+		Trajectory
+
+		"""
 		if self.time_units == 'seconds':
 			tau = int(tau * SAMPLE_RATE)
 		data = embed(self.data_full, tau, m)
@@ -213,6 +271,18 @@ class TimeSeries(BaseTrajectory):
 		return traj
 
 	def plot(self, filename):
+		"""
+		Plot full time series with crop and windows demarcated, save to
+		``filename``.
+
+		Parameters
+		----------
+		filename : str
+
+		Returns
+		-------
+
+		"""
 		plots.ts_fig(self, filename)
 
 
@@ -221,6 +291,7 @@ class TimeSeries(BaseTrajectory):
 class Trajectory(BaseTrajectory):
 
 	def __init__(self, data, **kwargs):
+		""" See :py:class:`BaseTrajectory` for parameter descriptions """
 		super(Trajectory, self).__init__(data, **kwargs)
 
 		self.source_ts = None
@@ -232,6 +303,21 @@ class Trajectory(BaseTrajectory):
 
 
 	def filtrations(self, filt_params, quiet):
+		""" Compute filtration for each window of trajectory.
+
+		Parameters
+		----------
+		filt_params : dict
+			see Filtration
+		quiet : bool
+			terminal output noise
+
+		Returns
+		-------
+		array
+			array of Filtration objects
+
+		"""
 		if self.windows is None:
 			print 'ERROR: self.windows is None'
 			sys.exit()
@@ -258,6 +344,17 @@ class Trajectory(BaseTrajectory):
 
 
 	def project(self, axis=0):
+		""" Project ``self.data_full`` to time series, re-apply crop and slicing.
+
+		Parameters
+		----------
+		axis : int
+
+		Returns
+		-------
+		TimeSeries
+
+		"""
 		data = self.data_full[:, axis]
 
 		ts = TimeSeries(
