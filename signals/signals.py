@@ -29,7 +29,6 @@ class BaseTrajectory(object):
 		data : str or array
 			The filename to load, or array. If a filename, sets ``fname``.
 
-
 		crop : array, optional
 			Range of signal to work with. Observes ``time_units``. Either or both
 			bounds may be None.
@@ -38,12 +37,11 @@ class BaseTrajectory(object):
 
 		num_windows : int, optional
 			Slice signal into ``windows`` evenly spaced windows.
-			len(windows) == ``windows``
 			default: None
 
 		window_length : int or float, optional
-			Observes 'time_units``
-			if None, window_length == len(data) / num_windows
+			Observes ``time_units``
+			if None, ``window_length == len(data) / num_windows``
 			default: None
 
 		vol_norm : arr, optional
@@ -231,7 +229,7 @@ class BaseTrajectory(object):
 class TimeSeries(BaseTrajectory):
 
 	def __init__(self, data, **kwargs):
-		""" See :py:class: ``BaseTrajectory`` for parameter descriptions """
+		""" See :py:class:`BaseTrajectory` for parameter descriptions """
 		super(TimeSeries, self).__init__(data, **kwargs)
 
 		self.source_traj = None
@@ -250,6 +248,7 @@ class TimeSeries(BaseTrajectory):
 		Returns
 		-------
 		Trajectory
+
 		"""
 		if self.time_units == 'seconds':
 			tau = int(tau * SAMPLE_RATE)
@@ -292,7 +291,7 @@ class TimeSeries(BaseTrajectory):
 class Trajectory(BaseTrajectory):
 
 	def __init__(self, data, **kwargs):
-		""" See :py:class:``BaseTrajectory`` for parameter descriptions """
+		""" See :py:class:`BaseTrajectory` for parameter descriptions """
 		super(Trajectory, self).__init__(data, **kwargs)
 
 		self.source_ts = None
