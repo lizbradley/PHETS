@@ -93,7 +93,7 @@ class PDData:
 
 class Filtration:
 
-	def __init__(self, traj, params, silent=False, save=False):
+	def __init__(self, traj, params, silent=False, save=True):
 		"""
 
 		Parameters
@@ -101,13 +101,18 @@ class Filtration:
 		traj : Trajectory
 		params : dict
 			see :py:func:`build_filtration.build_filtration`
-		silent : bool
+		silent : bool, optional
 			Suppress stdout
-		save : bool or str
-			Save the filtration to file for later use. If ``save`` is a string,
-			specifies the output filename. Else, if ``save``, save to
-			``'PH/filtrations/filt.p'``.\n
-			default: False
+		save : bool or str, optional
+			Save the filtration to file for later use. \n
+			if ``save`` is a string:
+				save filtration to ``save``\n
+				should end with ``'.p'``
+			elif ``save`` is True:
+				save filtration to ``'PH/filtrations/filt.p'``\n
+				filtration may be loaded by calling :py:func:`load_filtration`
+				without specifying filename
+			default: True
 
 		"""
 		caller_dir = os.getcwd()
@@ -429,6 +434,17 @@ class Filtration:
 
 
 	def PD(self):
+		"""
+		if called for the first time:
+			calls perseus, generates persistence diagram, sets, :py:attr:`_PD`,
+			returns :py:attr:`_PD`
+		else:
+			returns :py:attr:`_PD`
+		Returns
+		-------
+		PDData
+
+		"""
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
 		self._get_intervals()		# calls perseus, sets self.intervals
@@ -438,6 +454,29 @@ class Filtration:
 
 
 	def PRF(self, silent=False, new_format=False):
+		"""
+		if called for the first time:
+			if :py:meth:`PD` has not been called:
+				calls perseus, generates persistence diagram, sets,
+				:py:attr:`_PD`, generates persistence rank function, sets,
+				:py:attr:`_PRF`, returns :py:attr:`_PRF`
+			else:
+				generates persistence rank function, sets, :py:attr:`_PRF`, returns
+				:py:attr:`_PRF`
+		else:
+			returns :py:attr:`_PRF`
+
+		Parameters
+		----------
+		silent : bool
+			suppress stdout
+
+		Returns
+		-------
+		array
+			TODO: PRF class
+
+		"""
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
 		self._get_intervals(silent=silent)
@@ -452,21 +491,101 @@ class Filtration:
 
 
 	def movie(self, filename, **kwargs):
+		"""
+
+		Parameters
+		----------
+		filename : str
+			Output path/filename. Should end in '.mp4' or other movie format.
+		color_scheme : str, optional
+			``None``, ``'highlight new'``, or
+			``('birth time gradient', cycles)`` where ``cycles`` is an ``int``
+			default: ``None``
+		camera_angle : array
+			For 3D mode. (azimuthal, elevation) in degrees.\n
+			default: (70, 45)
+		alpha : float
+			Opacity of simplexes\n
+			default: 1
+		dpi: int
+			plot resolution -- dots per inch
+
+		Returns
+		-------
+		None
+
+		"""
 		filtration_movie.build_movie(self, filename, **kwargs)
 
-	def plot_complex(self):
-		print 'implement me!'
+	def plot_complex(self, i, filename):
+		"""
+		plot complex at ith step of the filtration
+
+		Parameters
+		----------
+		i : int
+		filename : str
+			Output path/filename. Should end in '.png' or other supported image
+			format.\n
+
+		Returns
+		-------
+		None
+
+		"""
+		raise NotImplemented
 
 	def plot_PD(self, filename):
+		"""
+		plot the persistence diagram
+
+		Parameters
+		----------
+		filename : str
+			Output path/filename. Should end in '.png' or other supported image
+			format.\n
+
+		Returns
+		-------
+		None
+
+		"""
 		plots.PD(self, filename)
 
 	def plot_PRF(self, filename):
+		"""
+		plot the persistence rank function
+
+		Parameters
+		----------
+
+		filename : str
+			Output path/filename. Should end in '.png' or other supported image
+			format.\n
+
+		Returns
+		-------
+		None
+
+		"""
 		plots.PRF(self, filename)
 
 
-def load_filtration(fname=None):
+def load_filtration(filename=None):
+	"""
+	load a filtration from file
+
+	Parameters
+	----------
+	filename : str
+		Path/filename. Should end with ``'.p'``
+
+	Returns
+	-------
+
+	"""
 	print 'loading saved filtration...'
-	if fname is None:
-		fname='PH/filtrations/filt.p'
-	filtration = cPickle.load(open(fname))
+	if filename is None:
+		filename= 'PH/filtrations/filt.p'
+	filtration = cPickle.load(open(filename))
 	return filtration

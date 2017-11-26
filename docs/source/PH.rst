@@ -2,6 +2,7 @@ PH
 ==
 
 .. autoclass:: PH.Filtration
+    :members:
 
 .. autofunction:: PH.load_filtration
 

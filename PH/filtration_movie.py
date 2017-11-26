@@ -17,7 +17,7 @@ from config import gnuplot_str
 
 
 def simplex_color(scheme, past_birth_time, birth_time, max_birth_time):
-	if scheme == 'none':
+	if scheme is None:
 		facecolor = 'C0'
 		edgecolor = 'black'
 
@@ -207,7 +207,7 @@ def plot_all_3D_gnuplot(subplot, filtration, i, camera_angle):
 def build_movie(
 		filt,
 		out_filename,
-		color_scheme='none',
+		color_scheme=None,
 		camera_angle=(70, 45),
 		alpha=1,
 		dpi=200,
