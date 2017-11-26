@@ -29,7 +29,7 @@ if test == 1:
 
 		})
 
-	filt = Filtration(in_fname, params)		# BUG: filtration only has 7 steps !!
+	filt = Filtration(in_fname, params)  # BUG: filtration only has 7 steps !!
 	# make_movie(filt, movie_fname(test), color_scheme='highlight new')
 	PD(filt, pd_fname(test))
 	PRF(filt, 'output/debug/test_1_PRF.png')
@@ -49,7 +49,7 @@ if test == 2:
 
 		})
 
-	filt = Filtration(in_fname, params)		# BUG: filtration only has 5 steps !!
+	filt = Filtration(in_fname, params)  # BUG: filtration only has 5 steps !!
 	make_movie(filt, movie_fname(test))
 	PD(filt, pd_fname(test))
 
@@ -209,7 +209,7 @@ if test == 7:
 
 		})
 
-	filt = Filtration(in_fname, params)		# BUG: filtration only has 5 steps !!
+	filt = Filtration(in_fname, params)  # BUG: filtration only has 5 steps !!
 	make_movie(filt, movie_fname(test), alpha=.5)
 
 

@@ -103,7 +103,8 @@ bool 			 quiet = true;
 void print_matrix(float *A);
 int comp (const void * elem1, const void * elem2) ;
 bool in_matrix(int* matrix,int size,int value);
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[])
+{
     char *parse;
 
     /*
@@ -298,7 +299,7 @@ int main(int argc, char* argv[]){
     }
 
 
-  /***************** End command line parsing *************************/
+    /***************** End command line parsing *************************/
 
 
 

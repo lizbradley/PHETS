@@ -335,8 +335,7 @@ class Trajectory(BaseTrajectory):
 						self.name, i + 1, len(self.windows)
 					)
 				)
-			f = Filtration(t, filt_params, silent=quiet,
-			               name='{}__window_{}'.format(self.name, i))
+			f = Filtration(t, filt_params, silent=quiet)
 			filts.append(f)
 		print 'done.'
 		self.filts = filts

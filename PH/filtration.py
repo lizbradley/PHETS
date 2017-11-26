@@ -8,8 +8,6 @@ from config import find_landmarks_c_compile_str
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-
-
 def compile_find_landmarks_c():
 	if sys.platform == "linux" or sys.platform == "linux2":
 		compile_str = find_landmarks_c_compile_str['linux']
@@ -19,10 +17,10 @@ def compile_find_landmarks_c():
 		print 'Sorry, PHETS requires linux or macOS.'
 		sys.exit()
 	subprocess.call(compile_str, shell=True)
-	print '''find_landmarks recompilation attempt complete. If 
-	successful, please repeat your test. If problem persists, you will 
-	need to tweak find_landmarks_c_compile_str in config.py to compile find_landmarks.c
-	on your system'''
+	print '''find_landmarks recompilation attempt complete. If successful, 
+	please repeat your test. If problem persists, you will need to tweak 
+	find_landmarks_c_compile_str in config.py to compile find_landmarks.c on 
+	your system '''
 
 	sys.exit()
 
@@ -95,18 +93,25 @@ class PDData:
 
 class Filtration:
 
-	def __init__(self, traj, params, name='', silent=False, save=None):
-		caller_dir = os.getcwd()
+	def __init__(self, traj, params, silent=False, save=False):
+		"""
 
-		# if isinstance(traj, basestring):			# is filename
-		# 	print 'reading input file...'
-		# 	self.sig = np.loadtxt(traj)
-		# 	self.filename = caller_dir + '/' + traj
-		# else:										# is array
-		# 	self.sig = traj
-		# 	self.filename = name
-		#
-		# self.name = self.filename.split('/')[-1].split('.')[0]
+		Parameters
+		----------
+		traj : Trajectory
+		params : dict
+			see
+			options
+		silent : bool
+			Suppress stdout
+		save : bool or str
+			Save the filtration to file for later use. If ``save`` is a string,
+			specifies the output filename. Else, if ``save``, save to
+			``'PH/filtrations/filt.p'``.
+			default: False
+
+		"""
+		caller_dir = os.getcwd()
 
 		self.name = traj.name
 		self.fname = traj.fname
@@ -336,13 +341,15 @@ class Filtration:
 			mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
 
 			if len(mortal):
-				mortal = np.vstack({tuple(row) for row in mortal}).T 		# toss duplicates
+				# toss duplicates #
+				mortal = np.vstack({tuple(row) for row in mortal}).T
 
 			count_imm = get_multiplicity(birth_e_imm, None)
 			immortal = np.asarray([birth_e_imm, count_imm]).T
 
 			if len(immortal):
-				immortal = np.vstack({tuple(row) for row in immortal}).T 	# toss duplicates
+				# toss duplicates #
+				immortal = np.vstack({tuple(row) for row in immortal}).T
 
 
 		data = PDData(mortal, immortal, lim)
