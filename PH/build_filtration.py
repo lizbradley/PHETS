@@ -1,5 +1,5 @@
 """
-original author: Jamie
+original authors: Jamie and Nikki
 edits by Samantha Molnar and Elliott Shugerman
 """
 
@@ -18,128 +18,157 @@ import subprocess
 
 def build_filtration(input_file_name, parameter_set, silent=False):
 	"""
-
 	Parameters
 	----------
 	input_file_name : str
-
 	parameter_set : dict
-
 		Options for filtration and landmark selection. Defaults are set in
-		``config.py``
-
-		GENERAL
-		-------
-
-		num_divisions
-			How many steps the filtration should be comprised of. The filtration parameter will be divided up equally in the interval [min_filtration_param, max_filtration_param].
-			default: 50
-
-		max_filtration_param
-			The maximum value for the filtration parameter. If it is a negative integer, -x, the program will automatically choose the max filtration parameter such that the highest dimensional simplex constructed is of dimension x - 1.
-			default: -20
-
-		min_filtration_param
-			The minimum value for the filtration parameter. Zero is usually fine.
-			default: 0
-
-		start
-			How many lines to skip in the input file before reading data in.
-			default: 0
-
-		worm_length
-			How many witnesses the program will read from the data file. If set to None, the program will read the file to the end. In general, a reasonable cap we have found is 10,000 witnesses and 200 or less landmarks.
-			default: None
-
-		ds_rate
-			The ratio of number of witnesses / number of landmarks.
-			default: 50
-
-		landmark_selector
-			 "maxmin" How the landmarks are selected from among the witnesses. Only options are "EST" for equally spaced in time and "maxmin" for a max-min distance algorithm.
-			 default: "maxmin"
-
-
-
-		WITNESS RELATION
-		----------------
-
-		absolute
-			The standard fuzzy witness relation says that a witness witnesses a simplex if the distance from the witness to each of the landmarks is within epsilon *more* than the distance to the closest landmark. If using the absolute relation, the closest landmark is dropped from the calculation, and the distance from a witness to each of the landmarks must be within epsilon of zero.
-			default: False
-
-		use_cliques
-			If this is set to True, than witnesses are only used to connect edges, and higher simplices (faces, solids, etc.) are inferred from the 1-skeleton graph using the Bron-Kerbosch maximal clique finding algorithm. This can be useful in reducing noise if several of the false holes are triangles.
-			default: False
-
-		simplex_cutoff
-			If not equal to zero, this caps the number of landmarks a witness can witness. Note: this does not effect automatic max_filtration_param selection.
-			default: 0
-
-		weak
-			Uses a completely different relation. The filtration parameter k specifies that each witness will witness a simplex of its k-nearest neighbors. If this relation is used, max_filtration_param should be a positive integer, and num_divisions and min_filtration_param will be ignored.
-			default: False
-
-		use_twr
-			Uses a completely different algorithm. TODO: insert your description here. Note: this works best with EST landmark selection. If max-min is used, be sure to set time_order_landmarks to True.
-			default: False
-
-
-
+		``config.py``\n
+		GENERAL:
+			num_divisions
+				Number of (epsilon) steps in filtration. The filtration
+				parameter will be divided up equally in the interval
+				[min_filtration_param, max_filtration_param].\n
+				default: 50
+			max_filtration_param
+				The maximum value for the filtration parameter. If it is a
+				negative integer, -x, the program will automatically choose the
+				max filtration parameter such that the highest dimensional
+				simplex constructed is of dimension x - 1.\n
+				default: -20
+			min_filtration_param
+				The minimum value for the filtration parameter. Zero is usually
+				fine.\n
+				default: 0
+			start
+				How many lines to skip in the input file before reading data
+				in.\n
+				default: 0
+			worm_length
+				How many witnesses the program will read from the data file.
+				If set to None, the program will read the file to the end. In
+				general, a reasonable cap we have found is 10,000 witnesses
+				and 200 or less landmarks.\n
+				default: None
+			ds_rate
+				The ratio of number of witnesses / number of landmarks.\n
+				default: 50
+			landmark_selector
+				 "maxmin" How the landmarks are selected from among the
+				 witnesses. Only options are "EST" for equally spaced in time
+				 and "maxmin" for a max-min distance algorithm.\n
+				 default: "maxmin"
+		WITNESS RELATION:
+			absolute
+				The standard fuzzy witness relation says that a witness
+				witnesses a simplex if the distance from the witness to each of
+				the landmarks is within epsilon *more* than the distance to the
+				closest landmark. If using the absolute relation, the closest
+				landmark is dropped from the calculation, and the distance from
+				a witness to each of the landmarks must be within epsilon of
+				zero.\n
+				default: False
+			use_cliques
+				If this is set to True, than witnesses are only used to
+				connect edges, and higher simplices (faces, solids, etc.) are
+				inferred from the 1-skeleton graph using the Bron-Kerbosch
+				maximal clique finding algorithm. This can be useful in
+				reducing noise if several of the false holes are triangles.\n
+				default: False
+			simplex_cutoff
+				If not equal to zero, this caps the number of landmarks a
+				witness can witness. Note: this does not effect automatic
+				max_filtration_param selection.\n
+				default: 0
+			weak
+				Uses a completely different relation. The filtration
+				parameter k specifies that each witness will witness a
+				simplex of its k-nearest neighbors. If this relation is used,
+				max_filtration_param should be a positive integer,
+				and num_divisions and min_filtration_param will be ignored.\n
+				default: False
+			use_twr
+				Uses a completely different algorithm. TODO: insert your
+				description here. Note: this works best with EST landmark
+				selection. If max-min is used, be sure to set
+				time_order_landmarks to True.\n
+				default: False
 		DISTANCE DISTORTIONS:
-
-		d_speed_amplify
-			The factor by which distances are divided if the witness is at a relatively high speed.
-			default: 1
-
-		d_orientation_amplify
-			The factor by which distances are divided if the witness and the landmark are travelling in similar directions.
-			default: 1
-
-		d_stretch
-			The factor by which distances are divided if the vector from the witness to the landmark is in a similar direction (possibly backwards) as the direction in which time is flowing at the witness.
-			default: 1
-
-		d_ray_distance_amplify
-			TODO: change this parameter. Right now, as long as the number is not 1, this will multiply the distance between two points by the distance between the closest points on the parameterized rays.
-			default: 1
-
-		d_use_hamiltonian
-			If this is not zero, this will override all the above distortions. Distance will be computed using not only position coordinates, but also velocity coordinates. Velocity componnents are scaled by the value of this parameter (before squaring). If the value is negative, than the absolute value of the parameter is used, but the unit velocities are used instead of the actual velocities.
-			default: 0
-
-		use_ne_for_maxmin
-			Whether or not to apply the above distance distortions to the max-min landmark selection (not recommended). Has no effect if landmark selector is EST.
-			default: False
-
-
-
-		MISC
-		----
-		connect_time_1_skeleton
-			If this is set to True, then on the first step of the filtration, each landmark will be adjoined by an edge to the next landmark in time. Note: this works best with EST landmark selection. If max-min is used, be sure to set time_order_landmarks to True.
-			default: False
-
-		reentry_filter
-			Attempts to limit high dimensional simplices by requiring that landmarks get far away then come back. This only works if using cliques. Note: this works best with EST landmark selection. If max-min is used, be sure to set time_order_landmarks to True.
-			default: False
-
-
-		dimension_cutoff
-			Simplexes with dimension greater than the dimension cuttoff will be seperated into their lower dimensional subsets when writing to the output file. This is very handy, as both Perseus and PHAT seem to take exponential time as a function of the dimension of a simplex. The caveat is that all homology greater than or equal to the dimension cutoff will be inacurate. Thus, if one cares about Betti 2, dimension cutoff should be at least 3.
-			default: 2
-			still valid / in use ??? setting to 0 doesn't affect tests
-
-		store_top_simplices
-			If there is a dimension cutoff in use, this parameter determines at which point in the process the simplices are decomposed. By setting this to False, smaller simplices will be stored when they are discovered. This makes the output file a bit smaller, but takes a bit longer. The results will be left unchanged.
-			default: True
-
-
+			d_speed_amplify
+				The factor by which distances are divided if the witness is
+				at a relatively high speed.\n
+				default: 1
+			d_orientation_amplify
+				The factor by which distances are divided if the witness and
+				the landmark are travelling in similar directions.\n
+				default: 1
+			d_stretch
+				The factor by which distances are divided if the vector from
+				the witness to the landmark is in a similar direction (
+				possibly backwards) as the direction in which time is flowing
+				at the witness.\n
+				default: 1
+			d_ray_distance_amplify
+				TODO: change this parameter. Right now, as long as the number
+				is not 1, this will multiply the distance between two points
+				by the distance between the closest points on the
+				parameterized rays.\n
+				default: 1
+			d_use_hamiltonian
+				If this is not zero, this will override all the above
+				distortions. Distance will be computed using not only
+				position coordinates, but also velocity coordinates. Velocity
+				componnents are scaled by the value of this parameter (before
+				squaring). If the value is negative, than the absolute value
+				of the parameter is used, but the unit velocities are used
+				instead of the actual velocities.\n
+				default: 0
+			use_ne_for_maxmin
+				Whether or not to apply the above distance distortions to the
+				max-min landmark selection (not recommended). Has no effect
+				if landmark selector is EST.\n
+				default: False
+		MISC:
+			connect_time_1_skeleton
+				If this is set to True, then on the first step of the
+				filtration, each landmark will be adjoined by an edge to the
+				next landmark in time. Note: this works best with EST
+				landmark selection. If max-min is used, be sure to set
+				time_order_landmarks to True.\n
+				default: False
+			reentry_filter
+				Attempts to limit high dimensional simplices by requiring
+				that landmarks get far away then come back. This only works
+				if using cliques. Note: this works best with EST landmark
+				selection. If max-min is used, be sure to set
+				time_order_landmarks to True.\n
+				default: False
+			dimension_cutoff
+				Simplexes with dimension greater than the dimension cuttoff
+				will be seperated into their lower dimensional subsets when
+				writing to the output file. This is very handy, as both
+				Perseus and PHAT seem to take exponential time as a function
+				of the dimension of a simplex. The caveat is that all
+				homology greater than or equal to the dimension cutoff will
+				be inacurate. Thus, if one cares about Betti 2, dimension
+				cutoff should be at least 3.\n
+				still valid / in use ??? setting to 0 doesn't affect tests\n
+				default: 2
+			store_top_simplices
+				If there is a dimension cutoff in use, this parameter
+				determines at which point in the process the simplices are
+				decomposed. By setting this to False, smaller simplices will
+				be stored when they are discovered. This makes the output
+				file a bit smaller, but takes a bit longer. The results will
+				be left unchanged.\n
+				default: True
 	silent : bool
 		Suppress stdout
 
 	Returns
 	-------
+	array
+		(simplexes, (landmarks, witnesses), eps)
 
 	"""
 	num_threads = 2
@@ -182,16 +211,13 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	## Read data into witness and landmark lists.
 	witnesses = []
 	landmarks = []
-	landmark_indices = []
 	ls = get_param("landmark_selector")
 	downsample_rate = get_param("ds_rate")
-	maxmin = False
 	counter = 0
 	for i in xrange(start):         # Where to start reading data
 		input_file.readline()
 		counter+=1
 	landmark_indices=[]
-
 
 	for line in input_file.read().split("\n"):
 		if line != "" and counter>=start:
@@ -208,18 +234,14 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 	number_of_datapoints = len(witnesses)
 	number_of_vertices = int(number_of_datapoints/downsample_rate)
-	num_coordinates = len(witnesses[0])
 	stop = start + counter
 
 	if max_filtration_param < 0:
 		if float(number_of_vertices) < abs(max_filtration_param) + 1:
-			print '''ERROR: 'max_filtration_param' ({}) and number of landmarks ({})
-			are incompatible. Try decreasing 'ds_rate' or increasing 'worm_length'.'''.format(max_filtration_param,
-			number_of_vertices)
-			sys.exit()
-
-	# for more information about these parameters type ./find_landmarks --help in the terminal
-	# the distance calculations are calculated and outputted to a file called find_landmarks.txt
+			msg = '''ERROR: 'max_filtration_param' ({}) and number of landmarks
+			 ({}) are incompatible. Try decreasing 'ds_rate' or increasing 
+			 'worm_length'.'''.format(max_filtration_param, number_of_vertices)
+			raise Exception(msg)
 
 	if ls=="EST":
 		if always_euclidean:
@@ -513,10 +535,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	assert len(landmarks) == number_of_vertices
 
 
-
-
 	if graph_induced:
-
 		w2l_id_dict = {}
 		for land_id, wit_id in enumerate(landmark_indices):
 			w2l_id_dict[wit_id] = land_id
