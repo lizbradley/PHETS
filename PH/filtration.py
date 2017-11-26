@@ -100,14 +100,13 @@ class Filtration:
 		----------
 		traj : Trajectory
 		params : dict
-			see
-			options
+			see :py:func:`build_filtration.build_filtration`
 		silent : bool
 			Suppress stdout
 		save : bool or str
 			Save the filtration to file for later use. If ``save`` is a string,
 			specifies the output filename. Else, if ``save``, save to
-			``'PH/filtrations/filt.p'``.
+			``'PH/filtrations/filt.p'``.\n
 			default: False
 
 		"""
@@ -271,7 +270,6 @@ class Filtration:
 		return ID_array
 
 
-
 	def _get_intervals(self, silent=False):
 
 		if self.intervals is not None:
@@ -283,7 +281,6 @@ class Filtration:
 
 
 	def _build_PD_data(self):
-		""" formats perseus output """
 
 		def get_multiplicity(birth_e, death_e):
 			try:
