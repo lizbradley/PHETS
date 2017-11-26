@@ -31,15 +31,11 @@ default_filtration_params = {
 	"absolute": False,
 	"use_cliques": False,
 	"use_twr": False,
-	"m2_d": 0, 					 # Set to anything but 0 to run, set 'time_order_landmarks' = TRUE (don't think i need last part anymore - CHECK)
+	"m2_d": 0, 					 # Set to anything but 0 to run
 	"straight_VB": 0,
-	"out": None,
-	"program": "Perseus",
 	"dimension_cutoff": 2,
-	"time_order_landmarks": False,
 	"connect_time_1_skeleton": False,
 	"reentry_filter": False,
 	"store_top_simplices": True,
-	"sort_output": False,
 	"graph_induced": False    # Use graph induced complex to build filtration.
 }

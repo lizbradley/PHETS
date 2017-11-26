@@ -114,15 +114,6 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 
 
-		OUTPUT
-		------
-
-		dimension_cuttoff
-			Simplexes with dimension greater than the dimension cuttoff will be seperated into their lower dimensional subsets when writing to the output file. This is very handy, as both Perseus and PHAT seem to take exponential time as a function of the dimension of a simplex. The caveat is that all homology greater than or equal to the dimension cutoff will be inacurate. Thus, if one cares about Betti 2, dimension cutoff should be at least 3.
-			default: 2
-			still valid / in use ???
-
-
 		MISC
 		----
 		connect_time_1_skeleton
@@ -133,17 +124,16 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			Attempts to limit high dimensional simplices by requiring that landmarks get far away then come back. This only works if using cliques. Note: this works best with EST landmark selection. If max-min is used, be sure to set time_order_landmarks to True.
 			default: False
 
-		time_order_landmarks
-			If max-min landmark selection is used, this will order the landmarks temporally. If using max-min in conjunction with any feature that exploits the ordering of the data in any way, such as connect_time_1_skeleton, reentry_filter, or use_twr, this parameter should be set to True. Otherwise, the order of the landmarks is by default the order in which the max-min algorithm selected them.
-			default: False
+
+		dimension_cutoff
+			Simplexes with dimension greater than the dimension cuttoff will be seperated into their lower dimensional subsets when writing to the output file. This is very handy, as both Perseus and PHAT seem to take exponential time as a function of the dimension of a simplex. The caveat is that all homology greater than or equal to the dimension cutoff will be inacurate. Thus, if one cares about Betti 2, dimension cutoff should be at least 3.
+			default: 2
+			still valid / in use ??? setting to 0 doesn't affect tests
 
 		store_top_simplices
 			If there is a dimension cutoff in use, this parameter determines at which point in the process the simplices are decomposed. By setting this to False, smaller simplices will be stored when they are discovered. This makes the output file a bit smaller, but takes a bit longer. The results will be left unchanged.
 			default: True
 
-		sort_output
-			If program is Perseus, this will sort the output by birth time. TODO: This feature does not always work, and may need rewriting.
-			default: False
 
 	silent : bool
 		Suppress stdout
@@ -183,7 +173,6 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	start = get_param("start")
 	worm_length = get_param("worm_length")
 	store_top_simplices = get_param("store_top_simplices")
-	sort_output = get_param("sort_output")
 	absolute = get_param("absolute")
 	num_divisions = get_param("num_divisions")
 	simplex_cutoff = get_param("simplex_cutoff")
@@ -562,7 +551,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 		simplexes = []
 		for i, row in enumerate(filt_diffs):
-			complex = [SimplexBirth(ids, i, sort_output) for ids in row]
+			complex = [SimplexBirth(ids, i) for ids in row]
 			simplexes.extend(complex)
 
 		return simplexes, (landmarks, witnesses), eps
@@ -578,7 +567,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	reentry_filter = get_param("reentry_filter")
 	if get_param("connect_time_1_skeleton") or reentry_filter: # Connect time-1-skeleton
 		for i in xrange(number_of_vertices - 1):
-			filtration.add(SimplexBirth(ImmutableSet([i, i + 1]), 0, sort_output))
+			filtration.add(SimplexBirth(ImmutableSet([i, i + 1]), 0))
 	use_cliques = get_param("use_cliques")
 	use_twr = get_param("use_twr")
 
@@ -587,6 +576,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		g = nx.Graph()
 		for line in xrange(number_of_vertices):
 			g.add_node(line)
+
 	def filter_and_build():
 		g2 = None
 		if reentry_filter:
@@ -602,7 +592,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		else:
 			g2 = g
 		for clique in nx.find_cliques(g2):
-			filtration.add(SimplexBirth(clique, q, sort_output))
+			filtration.add(SimplexBirth(clique, q))
+
 	if weak: # Builds filtration based on k nearest neighbors.
 		if max_filtration_param % 1 != 0:
 			raise Exception("Argument 'max_filtration_param' must be an integer if using the weak witness relation.")
@@ -613,12 +604,14 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					for i in xrange(k):
 						g.add_edge(d[witness_index][i].id_num, d[witness_index][k].id_num)
 				elif store_top_simplices:
-					filtration.add(SimplexBirth([d[witness_index][landmark_index].id_num for landmark_index in xrange(k + 1)], k, sort_output))
+					filtration.add(SimplexBirth(
+						[d[witness_index][landmark_index].id_num for
+						 landmark_index in xrange(k + 1)], k))
 				else:
 					if progress > 0:
 						for base in itertools.combinations([d[witness_index][landmark_index].id_num for landmark_index in xrange(k)], min(k, dimension_cutoff)):
 							new_subset = ImmutableSet(base + (d[witness_index][k].id_num,))
-							filtration.add(SimplexBirth(new_subset, k, sort_output))
+							filtration.add(SimplexBirth(new_subset, k))
 			if use_cliques:
 				filter_and_build()
 	if use_twr:
@@ -697,10 +690,12 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					if not store_top_simplices and len(good_landmarks[witness_index]) > 0:
 						for base in itertools.combinations(good_landmarks[witness_index], min(len(good_landmarks[witness_index]), dimension_cutoff)):
 							new_subset = ImmutableSet(base + (good_landmarks[witness_index][i],))
-							filtration.add(SimplexBirth(new_subset, q, sort_output))
+							filtration.add(SimplexBirth(new_subset, q))
 					add_simplex = True
 				if (not use_cliques) and store_top_simplices and add_simplex and len(good_landmarks[witness_index])>= 2:
-					filtration.add(SimplexBirth([good_landmarks[witness_index][i] for i in xrange(len(good_landmarks[witness_index]))], q, sort_output))
+					filtration.add(SimplexBirth(
+						[good_landmarks[witness_index][i] for i in
+						 xrange(len(good_landmarks[witness_index]))], q))
 				if done:
 					break
 			if use_cliques:
@@ -746,7 +741,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 							if not store_top_simplices and progress > 0:
 								for base in itertools.combinations([d[witness_index][landmark_index].id_num for landmark_index in xrange(progress)], min(progress, dimension_cutoff)):
 									new_subset = ImmutableSet(base + (d[witness_index][progress].id_num,))
-									filtration.add(SimplexBirth(new_subset, q, sort_output))
+									filtration.add(SimplexBirth(new_subset, q))
 							add_simplex = True
 						progress_index[witness_index] += 1
 					else:
@@ -756,7 +751,9 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					for landmark_index in xrange(progress):
 						list_o_landmarks.append(d[witness_index][landmark_index].id_num)
 					#print 'At threshold %f, witness %d has landmark set %s' % (threshold, witness_index, str(list_o_landmarks))
-					filtration.add(SimplexBirth([d[witness_index][landmark_index].id_num for landmark_index in xrange(progress)], q, sort_output))
+					filtration.add(SimplexBirth(
+						[d[witness_index][landmark_index].id_num for
+						 landmark_index in xrange(progress)], q))
 				if done:
 					break
 			if use_cliques:
@@ -790,11 +787,7 @@ class SimplexBirth:
 
 	include_birth_time = False
 
-	def __init__(self, landmark_list, birth_time, keep_sorted_list):
-		if (keep_sorted_list):
-			self.sll = sorted(landmark_list)
-		else:
-			self.sll = None
+	def __init__(self, landmark_list, birth_time):
 		self.landmark_set = ImmutableSet(landmark_list)
 		self.birth_time = birth_time
 
@@ -815,13 +808,6 @@ class SimplexBirth:
 			elif len(self.landmark_set) > len(other.landmark_set):
 				return 1
 			else:
-				if self.sll is None:
-					return 0
-				for i in xrange(len(self.sll)):
-					if self.sll[i] < other.sll[i]:
-						return -1
-					elif self.sll[i] > other.sll[i]:
-						return 1
 				return 0
 
 	def __hash__(self):
