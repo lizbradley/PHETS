@@ -1,41 +1,159 @@
-'''
+"""
 original author: Jamie
-'''
-
-'''
-Samantha Molnar
-Began edits 10/24/16
-'''
-
-
+edits by Samantha Molnar and Elliott Shugerman
+"""
 
 from sets import Set, ImmutableSet
 import networkx as nx
 import sys
 import itertools
-from heapq import heappush, heappop
 import numpy as np
 import math
 import subprocess
-import multiprocessing
-from memory_profiler import profile
-import os
 
-# from Utilities import mem_profile
-from config import MEMORY_PROFILE_ON
-
-d = [] #this is where distance to all landmarks for each witness goes.  It is a list of'
-def sort(i):
-	d[i].sort()
 
 
 # f = open("output/run_info/build_filtration_memory.txt","wb")
 # @profile(stream=f)
-def build_filtration(input_file_name, parameter_set, silent=False):
-	num_threads = 2
-	global d
-	d = []
 
+def build_filtration(input_file_name, parameter_set, silent=False):
+	"""
+
+	Parameters
+	----------
+	input_file_name : str
+
+	parameter_set : dict
+
+		Options for filtration and landmark selection. Defaults are set in
+		``config.py``
+
+		GENERAL
+		-------
+
+		num_divisions
+			How many steps the filtration should be comprised of. The filtration parameter will be divided up equally in the interval [min_filtration_param, max_filtration_param].
+			default: 50
+
+		max_filtration_param
+			The maximum value for the filtration parameter. If it is a negative integer, -x, the program will automatically choose the max filtration parameter such that the highest dimensional simplex constructed is of dimension x - 1.
+			default: -20
+
+		min_filtration_param
+			The minimum value for the filtration parameter. Zero is usually fine.
+			default: 0
+
+		start
+			How many lines to skip in the input file before reading data in.
+			default: 0
+
+		worm_length
+			How many witnesses the program will read from the data file. If set to None, the program will read the file to the end. In general, a reasonable cap we have found is 10,000 witnesses and 200 or less landmarks.
+			default: None
+
+		ds_rate
+			The ratio of number of witnesses / number of landmarks.
+			default: 50
+
+		landmark_selector
+			 "maxmin" How the landmarks are selected from among the witnesses. Only options are "EST" for equally spaced in time and "maxmin" for a max-min distance algorithm.
+			 default: "maxmin"
+
+
+
+		WITNESS RELATION
+		----------------
+
+		absolute
+			The standard fuzzy witness relation says that a witness witnesses a simplex if the distance from the witness to each of the landmarks is within epsilon *more* than the distance to the closest landmark. If using the absolute relation, the closest landmark is dropped from the calculation, and the distance from a witness to each of the landmarks must be within epsilon of zero.
+			default: False
+
+		use_cliques
+			If this is set to True, than witnesses are only used to connect edges, and higher simplices (faces, solids, etc.) are inferred from the 1-skeleton graph using the Bron-Kerbosch maximal clique finding algorithm. This can be useful in reducing noise if several of the false holes are triangles.
+			default: False
+
+		simplex_cutoff
+			If not equal to zero, this caps the number of landmarks a witness can witness. Note: this does not effect automatic max_filtration_param selection.
+			default: 0
+
+		weak
+			Uses a completely different relation. The filtration parameter k specifies that each witness will witness a simplex of its k-nearest neighbors. If this relation is used, max_filtration_param should be a positive integer, and num_divisions and min_filtration_param will be ignored.
+			default: False
+
+		use_twr
+			Uses a completely different algorithm. TODO: insert your description here. Note: this works best with EST landmark selection. If max-min is used, be sure to set time_order_landmarks to True.
+			default: False
+
+
+
+		DISTANCE DISTORTIONS:
+
+		d_speed_amplify
+			The factor by which distances are divided if the witness is at a relatively high speed.
+			default: 1
+
+		d_orientation_amplify
+			The factor by which distances are divided if the witness and the landmark are travelling in similar directions.
+			default: 1
+
+		d_stretch
+			The factor by which distances are divided if the vector from the witness to the landmark is in a similar direction (possibly backwards) as the direction in which time is flowing at the witness.
+			default: 1
+
+		d_ray_distance_amplify
+			TODO: change this parameter. Right now, as long as the number is not 1, this will multiply the distance between two points by the distance between the closest points on the parameterized rays.
+			default: 1
+
+		d_use_hamiltonian
+			If this is not zero, this will override all the above distortions. Distance will be computed using not only position coordinates, but also velocity coordinates. Velocity componnents are scaled by the value of this parameter (before squaring). If the value is negative, than the absolute value of the parameter is used, but the unit velocities are used instead of the actual velocities.
+			default: 0
+
+		use_ne_for_maxmin
+			Whether or not to apply the above distance distortions to the max-min landmark selection (not recommended). Has no effect if landmark selector is EST.
+			default: False
+
+
+
+		OUTPUT
+		------
+
+		dimension_cuttoff
+			Simplexes with dimension greater than the dimension cuttoff will be seperated into their lower dimensional subsets when writing to the output file. This is very handy, as both Perseus and PHAT seem to take exponential time as a function of the dimension of a simplex. The caveat is that all homology greater than or equal to the dimension cutoff will be inacurate. Thus, if one cares about Betti 2, dimension cutoff should be at least 3.
+			default: 2
+			still valid / in use ???
+
+
+		MISC
+		----
+		connect_time_1_skeleton
+			If this is set to True, then on the first step of the filtration, each landmark will be adjoined by an edge to the next landmark in time. Note: this works best with EST landmark selection. If max-min is used, be sure to set time_order_landmarks to True.
+			default: False
+
+		reentry_filter
+			Attempts to limit high dimensional simplices by requiring that landmarks get far away then come back. This only works if using cliques. Note: this works best with EST landmark selection. If max-min is used, be sure to set time_order_landmarks to True.
+			default: False
+
+		time_order_landmarks
+			If max-min landmark selection is used, this will order the landmarks temporally. If using max-min in conjunction with any feature that exploits the ordering of the data in any way, such as connect_time_1_skeleton, reentry_filter, or use_twr, this parameter should be set to True. Otherwise, the order of the landmarks is by default the order in which the max-min algorithm selected them.
+			default: False
+
+		store_top_simplices
+			If there is a dimension cutoff in use, this parameter determines at which point in the process the simplices are decomposed. By setting this to False, smaller simplices will be stored when they are discovered. This makes the output file a bit smaller, but takes a bit longer. The results will be left unchanged.
+			default: True
+
+		sort_output
+			If program is Perseus, this will sort the output by birth time. TODO: This feature does not always work, and may need rewriting.
+			default: False
+
+	silent : bool
+		Suppress stdout
+
+	Returns
+	-------
+
+	"""
+	num_threads = 2
+	d = []
 
 	def get_param(key):
 		return parameter_set[key]
@@ -70,8 +188,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	num_divisions = get_param("num_divisions")
 	simplex_cutoff = get_param("simplex_cutoff")
 
-
-	'''=============== This code written by Sam ======================'''
+	##################### begin edits by Sam and Elliott ######################
 
 	## Read data into witness and landmark lists.
 	witnesses = []
@@ -81,7 +198,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	downsample_rate = get_param("ds_rate")
 	maxmin = False
 	counter = 0
-	for i in xrange(start):           #  Where to start reading data
+	for i in xrange(start):         # Where to start reading data
 		input_file.readline()
 		counter+=1
 	landmark_indices=[]
@@ -406,32 +523,35 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	sys.stdout.flush()
 	assert len(landmarks) == number_of_vertices
 
-	'''=============== End code written by Sam ======================'''
-	'''=============== Start code written by Elliott ======================'''
 
-	w2l_id_dict = {}
-	for land_id, wit_id in enumerate(landmark_indices):
-		w2l_id_dict[wit_id] = land_id
-
-	def wit_ids_2_land_ids(simplex):
-		return [w2l_id_dict[wit_id] for wit_id in simplex]
 
 
 	if graph_induced:
-		import re
+
+		w2l_id_dict = {}
+		for land_id, wit_id in enumerate(landmark_indices):
+			w2l_id_dict[wit_id] = land_id
+
+		def wit_ids_2_land_ids(simplex):
+			return [w2l_id_dict[wit_id] for wit_id in simplex]
+
 		with open('GI_edge_filtration.txt', 'r') as f:
 			lines = f.readlines()
 
-		eps = []
-		filt_diffs = []
-
+		eps, filt_diffs = [], []
 		for line in lines:
 			e, filt_diff_str = line.split(': ')
 			eps.append(float(e))
 
 			fd_str_arr = filt_diff_str.split(' ')
-			fd_str_arr = [re.sub('[\[\]]', '', simp_str) for simp_str in fd_str_arr]
-			filt_diff = [np.fromstring(simp_str, sep=',', dtype=int) for simp_str in fd_str_arr]
+			fd_str_arr = [
+				simp_str.replace('[', '').replace(']', '')
+				for simp_str in fd_str_arr
+			]
+			filt_diff = [
+				np.fromstring(simp_str, sep=',', dtype=int)
+				for simp_str in fd_str_arr
+			]
 			filt_diffs.append(filt_diff)
 
 		filt_diffs = np.asarray(filt_diffs)
@@ -445,12 +565,10 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			complex = [SimplexBirth(ids, i, sort_output) for ids in row]
 			simplexes.extend(complex)
 
+		return simplexes, (landmarks, witnesses), eps
 
-		return (simplexes, (landmarks, witnesses), eps)
 
-
-	'''=============== End code written by Elliott ======================'''
-
+	###################### end edits by Sam and Elliott #######################
 
 
 	print("Building filtration...")
@@ -663,94 +781,6 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 				max_sb_length = len(sb.landmark_set)
 		print("Done. Filtration contains %i top simplex birth events, with the largest one comprised of %i landmarks.\nMax filtration parameter: %s.\n" % (len(filtration), max_sb_length, max_filtration_param))
 
-	## Write to output file
-	output_file_name = get_param("out")
-
-	if not output_file_name is None:
-		output_file = open(output_file_name, "w")
-		output_file.truncate()
-		program = get_param("program")
-		if dimension_cutoff is None:
-			print("Writing filtration for input into %s..." % program)
-			dimension_cutoff = number_of_vertices
-		else:
-			print("Writing filtration to file %s for input into %s, ignoring simplices above dimension %i..." % (output_file_name,program, dimension_cutoff))
-		num_lines = 0
-		if program == "Perseus":
-			sets_printed_so_far = Set()
-			num_lines = len(filtration) + 1
-			output_file.write("1\n")
-			list_filtration = None
-			if (sort_output):
-				list_filtration = list(filtration)
-				list_filtration.sort()
-			for simplex_birth in (list_filtration if sort_output else filtration):
-				dimension = len(simplex_birth.landmark_set) - 1
-				if dimension > dimension_cutoff:
-					for subtuple in itertools.combinations(simplex_birth.landmark_set, dimension_cutoff + 1):
-						subset = ImmutableSet(subtuple)
-						if not ((subset, simplex_birth.birth_time) in sets_printed_so_far):
-							output_file.write(str(dimension_cutoff) + " ")
-							for landmark in subset:
-								output_file.write(str(landmark + 1) + " ")
-							output_file.write(str(simplex_birth.birth_time + 1) + "\n")
-							sets_printed_so_far.add((subset, simplex_birth.birth_time))
-				else:
-					if not ((simplex_birth.landmark_set, simplex_birth.birth_time) in sets_printed_so_far):
-						output_file.write(str(dimension) + " ")
-						for landmark in (simplex_birth.sll if sort_output else simplex_birth.landmark_set):
-							output_file.write(str(landmark + 1) + " ")
-						output_file.write(str(simplex_birth.birth_time + 1) + "\n")
-						sets_printed_so_far.add((simplex_birth.landmark_set, simplex_birth.birth_time))
-		elif program == "PHAT":
-			line_map = {}
-			for i in xrange(number_of_vertices - 1):
-				output_file.write("0\n")
-				line_map[ImmutableSet([i])] = i
-			output_file.write("0")
-			line_map[ImmutableSet([number_of_vertices - 1])] = number_of_vertices - 1
-			simultaneous_additions = []
-			class Context: # Note: if upgrading to Python 3, one could just use the nonlocal keyword (see below comment).
-				line_number = number_of_vertices
-			list_filtration = list(filtration)
-			list_filtration.sort()
-			last_birth_time = 0
-			def process_and_get_line_number(s):
-				#nonlocal line_number
-				if s in line_map:
-					return line_map[s]
-				else:
-					dimension = len(s) - 1
-					if dimension > dimension_cutoff:
-						for subset in itertools.combinations(s, dimension_cutoff + 1): # Take all subsets of size dimension_cutoff + 1
-							process_and_get_line_number(ImmutableSet(subset))
-					elif dimension > 0:
-						subsets_line_numbers = []
-						for e in s:
-							subsets_line_numbers.append(process_and_get_line_number(ImmutableSet(s - Set([e]))))
-						output_file.write("\n" + str(dimension))
-						for l in subsets_line_numbers:
-							output_file.write(" " + str(l))
-						line_map[s] = Context.line_number
-						Context.line_number += 1
-						return Context.line_number - 1
-					else:
-						raise Exception("Should have already added single point for base case: " + str(s))
-			for simplex_birth in list_filtration:
-				if simplex_birth.birth_time > last_birth_time:
-					simultaneous_additions.append((Context.line_number - 1, last_birth_time + 1)) # Every line up to and including that line number (indexing starts at 0) had that birth time or earlier (indexing starts at 1)
-					last_birth_time = simplex_birth.birth_time
-				process_and_get_line_number(simplex_birth.landmark_set)
-			simultaneous_additions.append((sys.maxsize, last_birth_time))
-			output_file.write("\n\n# Simultaneous additions: Every line up to and including __ (indexing starts at 0) has birth time __ (or earlier).")
-			for addition in simultaneous_additions:
-				output_file.write("\n# %20i %20i" % addition)
-			extra_data = (extra_data[0], extra_data[1], simultaneous_additions)
-			num_lines = Context.line_number
-		else:
-			raise Exception("Only supported programs are 'Perseus' and 'PHAT'")
-		output_file.close()
-		print("Done. File contains %i lines.\n" % num_lines)
 	print("Filtration has been successfully built!\n")
 	return (filtration, extra_data + (max_filtration_param,), epsilons)
 
