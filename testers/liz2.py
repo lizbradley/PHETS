@@ -9,7 +9,8 @@ from PH import Filtration
 from config import default_filtration_params as filt_params
 
 # first, format data file
-fname = 'datasets/time_series/WAIS_age_dD_d18O_xs.txt'
+# fname = 'datasets/time_series/WAIS_age_dD_d18O_xs.txt'
+fname = '../WAIS_age_dD_d18O_xs.txt'
 data = np.loadtxt(fname, skiprows=1, delimiter=',')
 data = data[:, 2]                           # select column
 fname = '{}.clean'.format(fname)            # new fname
