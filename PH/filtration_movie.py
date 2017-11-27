@@ -16,6 +16,20 @@ from utilities import remove_old_frames, frames_to_movie, clear_temp_files, \
 from config import gnuplot_str
 
 
+def complexes_coords(filtration):
+	"""Replaces each landmark_ID with corresponding coordinates"""
+	coords_array = []
+	for row in filtration.complexes:
+		new_row = []
+		for simplex in row:
+			simplex_coords = []
+			for landmark_ID in simplex:
+				landmark_coords = filtration.landmark_coords[landmark_ID]
+				simplex_coords.append(landmark_coords)
+			new_row.append(simplex_coords)
+		coords_array.append(new_row)
+	return np.asarray(coords_array)
+
 def simplex_color(scheme, past_birth_time, birth_time, max_birth_time):
 	if scheme is None:
 		facecolor = 'C0'
@@ -66,9 +80,10 @@ def plot_landmarks_2D(subplot, landmark_data):
 	subplot.scatter(x, y, color='springgreen', s=35)
 
 
+
 def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
 
-	complex_data = filtration.get_complex_plot_data()
+	complex_data = complexes_coords(filtration)
 
 	for j, simplices_coords in enumerate(complex_data[:i + 1]):
 
@@ -135,7 +150,7 @@ def plot_all_3D_gnuplot(subplot, filtration, i, camera_angle):
 	def write_gnuplot_script():
 		witness_data = filtration.witness_coords
 		landmark_data = filtration.landmark_coords
-		complex_data = filtration.get_complex_plot_data()
+		complex_data = complexes_coords(filtration)
 
 		np.savetxt('PH/temp/witnesses.txt', witness_data)
 		np.savetxt('PH/temp/landmarks.txt', landmark_data)

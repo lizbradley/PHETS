@@ -11,15 +11,6 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from titlebox import filename_table, filt_params_table
 
-# from Utilities import mem_profile
-# f=open("output/run_info/group_by_birth_time_memory.txt","wb")
-# f2=open("output/run_info/expand_to_2simplexes_memory.txt","wb")
-# f3=open("output/run_info/build_perseus_in_file_memory.txt","wb")
-# f4=open("output/run_info/make_figure_memory.txt","wb")
-
-# @mem_profile(f, MEMORY_PROFILE_ON)
-# @profile(stream=f)
-
 
 def colorbar_ax(cbar_ax, levels):
 	viridis = get_cmap('viridis')
@@ -34,15 +25,14 @@ def colorbar_ax(cbar_ax, levels):
 		extend='max',
 		extendrect=True,
 	)
-
-
 	return cmap, norm
 
-def PD_ax(ax, cbar_ax, filtration):
+
+def PD_ax(ax, cbar_ax, pd):
 
 	ax.set_aspect('equal')
 	min_lim = 0
-	max_lim = np.max(filtration.epsilons)
+	max_lim = pd.lim
 	ax.set_xlim(min_lim, max_lim)
 	ax.set_ylim(min_lim, max_lim)
 	ax.set_xlabel('birth ($\epsilon$)')
@@ -53,35 +43,29 @@ def PD_ax(ax, cbar_ax, filtration):
 
 	ax.plot([min_lim, max_lim], [min_lim, max_lim], color='k')  # diagonal line
 
-	data = filtration.PD()
-	if data == 'empty':
-		return
-
 	levels = [1, 2, 3, 4, 5]
 	cmap, norm = colorbar_ax(cbar_ax, levels)
 
-	if len(data.mortal) > 0:
-		x_mor, y_mor, count_mor = data.mortal
-		ax.scatter(
-			x_mor, y_mor, s=70,
-			c=count_mor, alpha=.8,
-			clip_on=True, zorder=100,
-			cmap=cmap, norm=norm
-		)
-	if len(data.immortal) > 0:
-		x_imm, count_imm = data.immortal
-		y_imm = [max_lim for i in x_imm]
-		ax.scatter(
-			x_imm, y_imm, marker='^', s=120,
-			c=count_imm, alpha=.8,
-			clip_on=False, zorder=100,
-			cmap=cmap, norm=norm
-		)
+	x_mor, y_mor, count_mor = pd.mortal
+	ax.scatter(
+		x_mor, y_mor, s=70,
+		c=count_mor, alpha=.8,
+		clip_on=True, zorder=100,
+		cmap=cmap, norm=norm
+	)
+
+	x_imm, count_imm = pd.immortal
+	y_imm = [max_lim for i in x_imm]
+	ax.scatter(
+		x_imm, y_imm, marker='^', s=120,
+		c=count_imm, alpha=.8,
+		clip_on=False, zorder=100,
+		cmap=cmap, norm=norm
+	)
 
 
 
-# @profile(stream=f4)
-def PD(filt, out_filename):
+def PD_fig(filt, out_filename):
 	print 'plotting persistence diagram...'
 
 	fig = plt.figure(figsize=(10, 6), tight_layout=True, dpi=100)
@@ -91,9 +75,7 @@ def PD(filt, out_filename):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-
-
-	PD_ax(plot_ax, cbar_ax, filt)
+	PD_ax(plot_ax, cbar_ax, filt.PD)
 	filename_table(fname_ax, filt.name)
 	filt_params_table(params_ax, filt.params)
 
@@ -101,9 +83,7 @@ def PD(filt, out_filename):
 	plt.close(fig)
 
 
-
-
-def heatmap_ax(plot_ax, cbar_ax, x, y, z, annot=False):
+def heatmap_ax(plot_ax, cbar_ax, z, dom=None, annot=False):
 
 	def annotate():
 		offset = (1.41 / (len(x) - 1)) / 2
@@ -111,8 +91,8 @@ def heatmap_ax(plot_ax, cbar_ax, x, y, z, annot=False):
 			for j, y_ in enumerate(y):
 				plot_ax.text(
 					x_ + offset, y_ + offset, '%.3f' % z[j, i],
-					horizontalalignment='center',
-					verticalalignment='center',
+					ha='center',
+					va='center',
 					color='salmon'
 				)
 
@@ -128,45 +108,42 @@ def heatmap_ax(plot_ax, cbar_ax, x, y, z, annot=False):
 		y = np.append(y, y[-1] + d)
 		return x, y
 
-	plot_ax.ticklabel_format(axis='both', style='sci',  scilimits=(0,0))
+	plot_ax.ticklabel_format(axis='both', style='sci',  scilimits=(0, 0))
 	plot_ax.set_aspect('equal')
 	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
 	cmap, norm = colorbar_ax(cbar_ax, levels)
 	zm = ma.masked_where(np.isnan(z), z)
 
-	if x is not None and y is not None:
-		x, y = extend_domain(x, y)
-		plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
-		if annot: annotate()
-	elif x is None and y is None:
+	if dom is None:
 		plot_ax.pcolormesh(zm, cmap=cmap, norm=norm, clip_on=False)
 	else:
-		print 'ERROR: plot_heatmap: x and y must both be None or array-like'
-		sys.exit()
+		x, y = extend_domain(dom, dom)
+		plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
+		if annot: annotate()
 
 	return cmap
 
 
-def PRF_ax(filt, ax, cbar_ax=None, annot_hm=False):
+def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
 
-	ax.ticklabel_format(axis='both', style='sci',  scilimits=(0,0))
+	ax.set_xlabel('birth ($\epsilon$)')
+	ax.set_ylabel('death ($\epsilon$)')
 
 	if cbar_ax is None:
 		divider = make_axes_locatable(ax)
 		cbar_ax = divider.append_axes('right', size='5%', pad=0.05)
 
-	import filtration
-	if isinstance(filt, filtration.Filtration):
-		z = filt.PRF()
-		x = y = filt.epsilons
-		heatmap_ax(ax, cbar_ax, x, y, z, annot_hm)
+	from filtration import PRankFunction
+	if isinstance(prf, PRankFunction):
+		z = prf.f
+		heatmap_ax(ax, cbar_ax, z, dom=prf.epsilons, annot=annot_hm)
 	else:   # 2d array
-		z = filt
-		heatmap_ax(ax, cbar_ax, None, None, z, annot_hm)
+		z = prf
+		heatmap_ax(ax, cbar_ax, z, annot=annot_hm)
 
 
 
-def PRF(filt, out_filename, annot_hm=False):
+def PRF_fig(filt, out_filename, annot_hm=False):
 	print "plotting PRF..."
 
 	fig = plt.figure(figsize=(10, 6), tight_layout=True, dpi=100)
@@ -175,19 +152,7 @@ def PRF(filt, out_filename, annot_hm=False):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-	######## from here ##########
-
-	x, y, z, max_lim = filt.PRF()
-
-	if len(x.shape) == 2: 			# meshgrid format
-		x, y = x[0], y[:, 0]		# reduce to arange format
-
-	heatmap_ax(plot_ax, cbar_ax, x, y, z, annot=annot_hm)
-	plot_ax.set_xlabel('birth ($\epsilon$)')
-	plot_ax.set_ylabel('death ($\epsilon$)')
-
-	####### to here ###########
-	# should eventually be replaced by PRF_ax
+	PRF_ax(filt.prf, plot_ax, cbar_ax, annot_hm)
 
 	filename_table(fname_ax, filt.name)
 	filt_params_table(params_ax, filt.params)
