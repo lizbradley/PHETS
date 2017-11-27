@@ -980,7 +980,7 @@ int main(int argc, char* argv[])
 /************* Writing landmarks distances to file ****************/
 	printf("Writing landmarks to file...");
 	fflush(stdout);
-	fp=fopen("landmark_outputs.txt","w");
+	fp=fopen("temp/landmark_outputs.txt","w");
 	if (fp == NULL) {
     	printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
     	fflush(stdout);
