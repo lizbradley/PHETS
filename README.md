@@ -19,14 +19,16 @@ higher dimensional trajectories as .txt files.
 * gnuplot (with pngcairo)
 
 
-### Setup
-
 #### Install Dependencies
 
+##### Debian-based 
 ```bash
 sudo apt-get install ffmpeg
 sudo apt-get install gnuplot-x11
 ```
+
+##### macOS
+[coming soon]
 
 #### Install PHETS
 
