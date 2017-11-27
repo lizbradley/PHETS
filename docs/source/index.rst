@@ -33,7 +33,7 @@ initialized from arrays or text files. Calling the ``embed`` method of a
 ``BaseTrajectory``, where all cropping, windowing, and normalization is handled.
 
 ``PH`` holds the ``Filtration`` class, which is initialized from a ``Trajectory`` and a
-dict of filtration parameters. Filtration moves, persistence diagrams, and
+dict of filtration parameters. Filtration movies, persistence diagrams, and
 persistence rank functions are created by calling the respective methods of
 the Filtration class.
 
