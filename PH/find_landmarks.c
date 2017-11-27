@@ -26,16 +26,11 @@ double calctime(struct timeval start, struct timeval end)
 End from CSCI5576 HW7
 ===============================================*/
 
-// Example of basic command line run after compilation:
-//	./find_landmarks -i {witness input file} -o {file to output landmarks & distances} -l {number of landmarks} -w 0-100 
-// for more information on parameters in the command line type ./find_landmarks --help
-
-
 
 /*=============================================================
-        Samantha Molnar
-		Calculate euclidean distance matrix of witnesses then landmark selection.
-		08/2017 Adding dimensionality option for witnesses
+Samantha Molnar
+Calculate euclidean distance matrix of witnesses then landmark selection.
+08/2017 Adding dimensionality option for witnesses
 =============================================================*/
 typedef enum { false, true } bool; // Provide C++ style 'bool' type in C
 float           *witnesses;
