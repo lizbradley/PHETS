@@ -210,18 +210,19 @@ class BaseTrajectory(object):
 		start_points_idxs = [self._to_samples(s) for s in start_points]
 
 		if window_length is None:
-			window_length = len(self.data) / num_windows
+			window_length_samp = int(len(self.data) / num_windows)
+			window_length = self._from_samples(window_length_samp)
+		else:
+			window_length_samp = self._to_samples(window_length)
 
-		window_length = self._to_samples(window_length)
-
-		windows = [self.data_full[sp:sp + window_length]
+		windows = [self.data_full[sp:sp + window_length_samp]
 				   for sp in start_points_idxs]
 
 		if self.norm_vol[2]:
 			windows = [self._normalize(w) for w in windows]
 
 		self.window_length = window_length
-		self.win_start_pts =  start_points
+		self.win_start_pts = start_points
 		self.windows = self._spawn(windows)
 
 
@@ -257,9 +258,7 @@ class TimeSeries(BaseTrajectory):
 			data,
 			fname=self.fname,
 			crop=self.crop_cmd,
-			# crop=(self.crop_lim[0], self.crop_lim[1] - tau - 1),
 			num_windows=self.num_windows,
-			# window_length=self.window_length + tau  # + 1 ??
 			window_length=self.window_length,
 			vol_norm=self.norm_vol,
 			time_units=self.time_units
