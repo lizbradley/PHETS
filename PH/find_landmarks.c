@@ -259,8 +259,8 @@ int main(int argc, char* argv[])
     int switches [NUMBER_ARGS];
     char vals [NUMBER_ARGS][STRING_MAX_SIZE];
 
-    FILE *sfile = fopen("find_landmark_arg_switches.txt", "r");
-    FILE *vfile = fopen("find_landmark_arg_vals.txt", "r");
+    FILE *sfile = fopen("temp/find_landmark_arg_switches.txt", "r");
+    FILE *vfile = fopen("temp/find_landmark_arg_vals.txt", "r");
 
     int switch_;
     char value [STRING_MAX_SIZE];
@@ -836,7 +836,7 @@ int main(int argc, char* argv[])
 
 
 
-		fp = fopen("GI_edge_filtration.txt","w");
+		fp = fopen("temp/gi_edge_filtration.txt","w");
 		if (fp == NULL) {
     		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
     		fflush(stdout);

@@ -1,6 +1,2 @@
-.idea/
 find_landmarks
-landmark_outputs.txt
-GI_edge_filtration.txt
-/find_landmark_arg_switches.txt
-/find_landmark_arg_vals.txt
+temp/*

@@ -476,8 +476,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		values[arg_idx] = param
 
 	values = [None if v == '' else v for v in values]
-	np.savetxt('find_landmark_arg_switches.txt', switches, fmt='%i')
-	np.savetxt('find_landmark_arg_vals.txt', values, fmt='%s')
+	np.savetxt('temp/find_landmark_arg_switches.txt', switches, fmt='%i')
+	np.savetxt('temp/find_landmark_arg_vals.txt', values, fmt='%s')
 
 	if silent:
 		p = subprocess.Popen('./find_landmarks', stdout=subprocess.PIPE)
@@ -543,7 +543,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		def wit_ids_2_land_ids(simplex):
 			return [w2l_id_dict[wit_id] for wit_id in simplex]
 
-		with open('GI_edge_filtration.txt', 'r') as f:
+		with open('temp/gi_edge_filtration.txt', 'r') as f:
 			lines = f.readlines()
 
 		eps, filt_diffs = [], []

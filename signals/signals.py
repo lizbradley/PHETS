@@ -239,6 +239,7 @@ class TimeSeries(BaseTrajectory):
 	def embed(self, tau, m):
 		"""
 		Embed ``data_full``, re-apply crop and slicing.
+
 		Parameters
 		----------
 		tau : int or float
