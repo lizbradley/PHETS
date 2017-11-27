@@ -5,8 +5,8 @@ MEMORY_PROFILE_ON = False
 find_landmarks_c_compile_str = {
     # 'linux': 'gcc -g -fopenmp -lpopt -lm -o find_landmarks find_landmarks.c',
 	'linux': 'gcc -g -fopenmp -lm -o find_landmarks find_landmarks.c',
-
-	'macOS': '/usr/local/bin/gcc-5 -fopenmp -lpopt -o find_landmarks find_landmarks.c'
+	# 'macOS': '/usr/local/bin/gcc-5 -fopenmp -lpopt -o find_landmarks find_landmarks.c'
+	'macOS': 'gcc -fopenmp -o find_landmarks find_landmarks.c'
 }
 
 gnuplot_str = 'gnuplot'
@@ -31,11 +31,11 @@ default_filtration_params = {
 	"absolute": False,
 	"use_cliques": False,
 	"use_twr": False,
-	"m2_d": 0, 					 # Set to anything but 0 to run
+	"m2_d": 0,
 	"straight_VB": 0,
 	"dimension_cutoff": 2,
 	"connect_time_1_skeleton": False,
 	"reentry_filter": False,
 	"store_top_simplices": True,
-	"graph_induced": False    # Use graph induced complex to build filtration.
+	"graph_induced": False
 }
