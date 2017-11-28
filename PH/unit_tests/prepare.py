@@ -49,16 +49,22 @@ def ref__ham1_filt():
 	np.save('ref/ham1_filt.npy', ham1_filt.complexes)
 
 
+
+def ref__euc_prf():
+	np.save('ref/euc_prf.npy', euc_filt.PRF(new_format=True))
+
+
+
 if __name__ == '__main__':
-	# ref__euc_filt()
+	ref__euc_filt()
 	# ref__ham5_filt()
 	# ref__doamp5_filt()
 	# ref__m2d10_filt()
 	# ref__dcov20_filt()
-	ref__dcovn20_filt()
+	# ref__dcovn20_filt()
 	# ref__gi_filt()
 	# ref__hamn10_filt()
 	# ref__hamn1_filt()
 	# ref__ham1_filt()
-
+	ref__euc_prf()
 	pass
