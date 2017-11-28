@@ -119,6 +119,7 @@ def plot_dists_to_means(
 
 	return dists
 
+
 def plot_clusters(
 		traj1,
 		traj2,
@@ -159,6 +160,7 @@ def plot_clusters(
 		samples(filts2, see_samples, dir)
 
 
+
 def plot_ROCs(
 		traj1, traj2,
 		out_fname,
@@ -184,15 +186,11 @@ def plot_ROCs(
 	)
 
 	data = []
-	debugprfs1, debugprfs2 = [], []
 	if vary_param is None: filts1, filts2 = [filts1], [filts2]
 	for filts1, filts2 in zip(filts1, filts2):
 
 		prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
 		prfs2 = [f.PRF(silent=quiet, new_format=True) for f in filts2]
-
-		debugprfs1.append(prfs1)
-		debugprfs2.append(prfs2)
 
 		train1, test1 = prfs1[1::2], prfs1[::2]
 		train2, test2 = prfs2[1::2], prfs2[::2]
@@ -209,8 +207,6 @@ def plot_ROCs(
 		data.append([roc1, roc2])
 	if vary_param is None: filts1, filts2 = filts1[0], filts2[0]
 
-	np.save('debugprfs1_ref.npy', debugprfs1)
-	np.save('debugprfs2_ref.npy', debugprfs2)
 	dual_roc_fig(data, k, traj1, traj2, out_fname, vary_param)
 
 	if see_samples:
