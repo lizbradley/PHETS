@@ -1,3 +1,5 @@
+from itertools import chain
+
 import numpy as np
 
 from PRFstats.data import roc_data, dists_to_ref, \
@@ -69,7 +71,7 @@ def plot_dists_to_ref(
 
 
 	prfs = [f.PRF(new_format=True) for f in filts]
-	ref_prf = ref_filt.PRF(new_format=True)
+	ref_prf = ref_filt.PRF
 
 	dists = dists_to_ref(prfs, ref_prf, metric, dist_scale)
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
@@ -89,7 +91,7 @@ def plot_dists_to_means(
 		metric='L2',
 		dist_scale='none',              # 'none', 'a', or 'a + b'
 		weight_func=lambda i, j: 1,
-		see_samples=0,
+		see_samples=False,
 		load_saved_filts=False,
 		filts_fnames=(None, None),
 		quiet=True
@@ -127,14 +129,11 @@ def plot_clusters(
 		metric='L2',
 		dist_scale='none',              # 'none', 'a', or 'a + b'
 		weight_func=lambda i, j: 1,
-		see_samples=5,
+		see_samples=False,
 		load_saved_filts=False,
 		filts_fnames=(None, None),
 		quiet=True
 ):
-
-	# TODO: weight_func, unit test
-
 
 	filts1 = fetch_filts(
 		traj1, filt_params, load_saved_filts, quiet,
@@ -145,8 +144,8 @@ def plot_clusters(
 		id=2, filts_fname=filts_fnames[1]
 	)
 
-	prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
-	prfs2 = [f.PRF(silent=quiet, new_format=True) for f in filts2]
+	prfs1 = fetch_prfs(filts1, weight_func, quiet=quiet)
+	prfs2 = fetch_prfs(filts2, weight_func, quiet=quiet)
 
 	refs, dists = mean_dists_compare(prfs1, prfs2, metric, dist_scale)
 
@@ -166,6 +165,7 @@ def plot_ROCs(
 		k,
 		metric='L2',
 		dist_scale='none',
+		weight_func=lambda i, j: 1,
 		load_saved_filts=False,
 		filts_fnames=(None, None),
 		see_samples=0,
@@ -183,12 +183,36 @@ def plot_ROCs(
 		id=2, filts_fname=filts_fnames[1]
 	)
 
+
+	# prfs1 = fetch_prfs(filts1, weight_func, quiet=quiet)
+	# prfs2 = fetch_prfs(filts2, weight_func, quiet=quiet)
+	#
+	# data = []
+	#
+	# if vary_param is None: prfs1, prfs2 = [prfs1], [prfs2]
+	# for prfs1_, prfs2_ in zip(prfs1, prfs2):
+	# 	train1, test1 = prfs1_[1::2], prfs1_[::2]
+	# 	train2, test2 = prfs2_[1::2], prfs2_[::2]
+	#
+	# 	print 'training classifiers...'
+	# 	clf1 = DistanceClassifier(train1, metric, dist_scale)
+	# 	clf2 = DistanceClassifier(train2, metric, dist_scale)
+	#
+	# 	print 'running tests...'
+	# 	k_arr = np.arange(*k)
+	# 	roc1 = roc_data(clf1, test1, test2, k_arr)
+	# 	roc2 = roc_data(clf2, test2, test1, k_arr)
+	#
+	# 	data.append([roc1, roc2])
+
 	data = []
 	if vary_param is None: filts1, filts2 = [filts1], [filts2]
 	for filts1, filts2 in zip(filts1, filts2):
 
-		prfs1 = [f.PRF(silent=quiet, new_format=True) for f in filts1]
-		prfs2 = [f.PRF(silent=quiet, new_format=True) for f in filts2]
+		for f in chain(filts1, filts2): f.silent = quiet
+
+		prfs1 = [f.PRF.data for f in filts1]
+		prfs2 = [f.PRF.data for f in filts2]
 
 		train1, test1 = prfs1[1::2], prfs1[::2]
 		train2, test2 = prfs2[1::2], prfs2[::2]

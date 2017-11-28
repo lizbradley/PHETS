@@ -62,7 +62,7 @@ def test__ROCs_v():
 	# clear_dir_rf('output')
 	out = plot_ROCs(
 		clar_traj, viol_traj,
-		'output/L2ROCs.png',
+		'output/ROCs.png',
 		filt_params,
 		vary_param=('ds_rate', np.arange(80, 150, 10)),
 		k=(0, 5.01, .1),
@@ -76,4 +76,5 @@ def test__ROCs_v():
 
 if __name__ == '__main__':
 	# test__fetch_filts_v()
-	test__plot_dists_to_means()
+	# test__plot_dists_to_means()
+	test__ROCs_v()

@@ -46,7 +46,7 @@ def PD_ax(ax, cbar_ax, pd):
 	levels = [1, 2, 3, 4, 5]
 	cmap, norm = colorbar_ax(cbar_ax, levels)
 
-	x_mor, y_mor, count_mor = pd.mortal
+	x_mor, y_mor, count_mor = pd.mortal.T
 	ax.scatter(
 		x_mor, y_mor, s=70,
 		c=count_mor, alpha=.8,
@@ -54,7 +54,7 @@ def PD_ax(ax, cbar_ax, pd):
 		cmap=cmap, norm=norm
 	)
 
-	x_imm, count_imm = pd.immortal
+	x_imm, count_imm = pd.immortal.T
 	y_imm = [max_lim for i in x_imm]
 	ax.scatter(
 		x_imm, y_imm, marker='^', s=120,
@@ -152,7 +152,7 @@ def PRF_fig(filt, out_filename, annot_hm=False):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-	PRF_ax(filt.prf, plot_ax, cbar_ax, annot_hm)
+	PRF_ax(filt.PRF, plot_ax, cbar_ax, annot_hm)
 
 	filename_table(fname_ax, filt.name)
 	filt_params_table(params_ax, filt.params)

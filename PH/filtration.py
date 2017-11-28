@@ -22,6 +22,7 @@ class Intervals:
 		intervals = self.read_perseus_out_file(silent)
 		self.birth_time, self.death_time = intervals[:, 0], intervals[:, 1]
 		os.chdir(caller_dir)
+
 	@staticmethod
 	def write_perseus_in_file(filt_array, silent):
 		if not silent: print 'building perseus_in.txt...'
@@ -66,9 +67,6 @@ class Intervals:
 		except IOError:
 			intervals = np.empty((2, 0))
 			if not silent: print "WARNING: no homology for this window"
-
-		# if len(intervals.shape) == 1:
-		# 	intervals = np.array([intervals])
 
 		intervals[intervals == -1] = np.nan
 
@@ -350,13 +348,13 @@ class Filtration:
 		count_triangles(ID_array)
 		return ID_array
 
-
+	@property
 	def intervals(self):
 		if self._intervals is None:
 			self._intervals = Intervals(self)
 		return self._intervals
 
-
+	@property
 	def PD(self):
 		"""
 		if called for the first time:
@@ -370,10 +368,10 @@ class Filtration:
 
 		"""
 		if self._PD is None:
-			ints = self.intervals()
-			self._PD = PDiagram(self.intervals())
+			self._PD = PDiagram(self.intervals)
 		return self._PD
 
+	@property
 	def PRF(self):
 		"""
 		if called for the first time:
@@ -397,7 +395,7 @@ class Filtration:
 
 		"""
 		if self._PRF is None:
-			self._PRF = PRankFunction(self.PD())
+			self._PRF = PRankFunction(self.PD)
 		return self._PRF
 
 

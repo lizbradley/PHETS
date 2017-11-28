@@ -210,18 +210,19 @@ class BaseTrajectory(object):
 		start_points_idxs = [self._to_samples(s) for s in start_points]
 
 		if window_length is None:
-			window_length = len(self.data) / num_windows
+			window_length_samp = int(len(self.data) / num_windows)
+			window_length = self._from_samples(window_length_samp)
+		else:
+			window_length_samp = self._to_samples(window_length)
 
-		window_length = self._to_samples(window_length)
-
-		windows = [self.data_full[sp:sp + window_length]
-				   for sp in start_points_idxs]
+		windows = [self.data_full[sp:sp + window_length_samp]
+		           for sp in start_points_idxs]
 
 		if self.norm_vol[2]:
 			windows = [self._normalize(w) for w in windows]
 
 		self.window_length = window_length
-		self.win_start_pts =  start_points
+		self.win_start_pts = start_points
 		self.windows = self._spawn(windows)
 
 
@@ -319,12 +320,11 @@ class Trajectory(BaseTrajectory):
 
 		"""
 		if self.windows is None:
-			print 'ERROR: self.windows is None'
-			sys.exit()
+			raise Exception('self.windows is None')
 
 		print_title('building filtrations for {}...'.format(self.name))
 		filts = []
-		for i, t in enumerate(self.windows):
+		for i, traj in enumerate(self.windows):
 			if quiet:
 				print_still(
 					'window {} of {}...'.format(i + 1, len(self.windows))
@@ -335,7 +335,7 @@ class Trajectory(BaseTrajectory):
 						self.name, i + 1, len(self.windows)
 					)
 				)
-			f = Filtration(t, filt_params, silent=quiet, save=False)
+			f = Filtration(traj, filt_params, silent=quiet, save=False)
 			filts.append(f)
 		print 'done.'
 		self.filts = filts
