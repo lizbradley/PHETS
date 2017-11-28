@@ -2,7 +2,8 @@
 *.pyc
 *.npy
 *.p
-/.cache/
 /*/unit_tests/**/*.png
 !/*/unit_tests/**/*.npy
 !/*/unit_tests/**/*.p
+/*/.cache/
+/.cache/

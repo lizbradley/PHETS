@@ -18,18 +18,7 @@ for subdir, dirs, files in os.walk('.'):
 
 remove_files_by_type('DCE/frames/', '.txt')
 remove_files_by_type('DCE/temp_data/', '.txt')
-
-
-try:
-    os.remove('PH/landmark_outputs.txt')
-except OSError:
-    pass
-
-try:
-    os.remove('PH/GI_edge_filtration.txt')
-except OSError:
-    pass
-
+remove_files_by_type('PH/temp/', '.txt')
 remove_files_by_type('PH/frames/', '.png')
 remove_files_by_type('PH/perseus/', '.txt')
 

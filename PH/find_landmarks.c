@@ -26,16 +26,11 @@ double calctime(struct timeval start, struct timeval end)
 End from CSCI5576 HW7
 ===============================================*/
 
-// Example of basic command line run after compilation:
-//	./find_landmarks -i {witness input file} -o {file to output landmarks & distances} -l {number of landmarks} -w 0-100 
-// for more information on parameters in the command line type ./find_landmarks --help
-
-
 
 /*=============================================================
-        Samantha Molnar
-		Calculate euclidean distance matrix of witnesses then landmark selection.
-		08/2017 Adding dimensionality option for witnesses
+Samantha Molnar
+Calculate euclidean distance matrix of witnesses then landmark selection.
+08/2017 Adding dimensionality option for witnesses
 =============================================================*/
 typedef enum { false, true } bool; // Provide C++ style 'bool' type in C
 float           *witnesses;
@@ -264,8 +259,8 @@ int main(int argc, char* argv[])
     int switches [NUMBER_ARGS];
     char vals [NUMBER_ARGS][STRING_MAX_SIZE];
 
-    FILE *sfile = fopen("find_landmark_arg_switches.txt", "r");
-    FILE *vfile = fopen("find_landmark_arg_vals.txt", "r");
+    FILE *sfile = fopen("temp/find_landmark_arg_switches.txt", "r");
+    FILE *vfile = fopen("temp/find_landmark_arg_vals.txt", "r");
 
     int switch_;
     char value [STRING_MAX_SIZE];
@@ -841,7 +836,7 @@ int main(int argc, char* argv[])
 
 
 
-		fp = fopen("GI_edge_filtration.txt","w");
+		fp = fopen("temp/gi_edge_filtration.txt","w");
 		if (fp == NULL) {
     		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
     		fflush(stdout);
@@ -985,7 +980,7 @@ int main(int argc, char* argv[])
 /************* Writing landmarks distances to file ****************/
 	printf("Writing landmarks to file...");
 	fflush(stdout);
-	fp=fopen("landmark_outputs.txt","w");
+	fp=fopen("temp/landmark_outputs.txt","w");
 	if (fp == NULL) {
     	printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
     	fflush(stdout);

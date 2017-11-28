@@ -2,6 +2,8 @@ networkx
 numpy
 matplotlib
 scipy
-psutil
-memory_profiler
-
+# psutil
+# memory_profiler
+sphinx
+sphinx_rtd_theme
+pytest

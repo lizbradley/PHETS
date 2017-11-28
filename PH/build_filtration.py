@@ -251,8 +251,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m }".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -272,8 +272,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -292,8 +292,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -312,8 +312,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -332,8 +332,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -351,8 +351,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -369,8 +369,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -389,8 +389,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -408,8 +408,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -427,8 +427,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-n {}".format(num_threads),
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
-					"-i{}".format(input_file_name),
-					"-olandmark_outputs.txt",
+					"-i {}".format(input_file_name),
+					"-o temp/landmark_outputs.txt",
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -476,8 +476,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		values[arg_idx] = param
 
 	values = [None if v == '' else v for v in values]
-	np.savetxt('find_landmark_arg_switches.txt', switches, fmt='%i')
-	np.savetxt('find_landmark_arg_vals.txt', values, fmt='%s')
+	np.savetxt('temp/find_landmark_arg_switches.txt', switches, fmt='%i')
+	np.savetxt('temp/find_landmark_arg_vals.txt', values, fmt='%s')
 
 	if silent:
 		p = subprocess.Popen('./find_landmarks', stdout=subprocess.PIPE)
@@ -492,7 +492,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		number_of_datapoints = int(number_of_datapoints-m2_d)
 
 	## Build and sort distance matrix.
-	landmarks_file = open("landmark_outputs.txt","rb")
+	landmarks_file = open("temp/landmark_outputs.txt","rb")
 
 	line = landmarks_file.readlines()
 	sys.stdout.write("Reading in distance calculations...")
@@ -543,7 +543,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		def wit_ids_2_land_ids(simplex):
 			return [w2l_id_dict[wit_id] for wit_id in simplex]
 
-		with open('GI_edge_filtration.txt', 'r') as f:
+		with open('temp/gi_edge_filtration.txt', 'r') as f:
 			lines = f.readlines()
 
 		eps, filt_diffs = [], []

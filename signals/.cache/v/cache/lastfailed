@@ -1,4 +1,0 @@
-{
-  "unit_tests/test__signals.py::test__TS_windows": true, 
-  "unit_tests/test__signals.py::test__Traj_windows": true
-}
