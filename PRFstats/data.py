@@ -88,7 +88,7 @@ def fetch_prfs(
 	prfs = np.zeros_like(filts)
 	for idx, filt in np.ndenumerate(filts):
 		filt.silent = quiet
-		prf = filt.PRF.data
+		prf = filt.PRF().data
 		prfs[idx] = apply_weight(prf, weight_func)
 
 	if vary_param_1 and vary_param_1[0] == 'weight_func':

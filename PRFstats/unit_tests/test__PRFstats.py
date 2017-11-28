@@ -71,7 +71,7 @@ def test__ROCs_v():
 		filts_fnames=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
 	)
 	ref = np.load('ref/plot_ROCs_v.npy')
-	assert np.array_equal(out, ref)
+	np.testing.assert_array_equal(out, ref)
 
 
 if __name__ == '__main__':

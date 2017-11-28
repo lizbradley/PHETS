@@ -85,12 +85,13 @@ def test__ham1_equiv():
 def test__ham_euc_equiv():
 	assert np.array_equal(ham1_filt.complexes, euc_filt.complexes)
 
+
 def test__euc_prf():
 	ref = np.load('ref/euc_prf.npy')
-	out = euc_filt.PRF(new_format=True)
+	out = euc_filt.PRF().data
 	np.testing.assert_array_equal(ref, out)
 
 
 if __name__ == '__main__':
-	# test__euc_prf()
+	test__euc_prf()
 	pass

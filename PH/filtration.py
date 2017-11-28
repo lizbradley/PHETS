@@ -86,7 +86,7 @@ class PDiagram:
 	@staticmethod
 	def _get_multiplicity(birth_e, death_e=None):
 		if death_e is None:
-			death_e = np.full_like(birth_e, np.nan)
+			death_e = np.full_like(birth_e, -1)
 		count = np.zeros_like(birth_e)
 		for i, pt in enumerate(zip(birth_e, death_e)):
 			for scanner_pt in zip(birth_e, death_e):
@@ -109,7 +109,7 @@ class PDiagram:
 		count_mor = self._get_multiplicity(birth_e_mor, death_e_mor)
 		mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
 
-		count_imm = self._get_multiplicity(birth_e_imm, None)
+		count_imm = self._get_multiplicity(birth_e_imm)
 		immortal = np.asarray([birth_e_imm, count_imm]).T
 
 		if len(mortal):
@@ -150,8 +150,8 @@ class PRankFunction:
 			else:
 				zz[i] = np.nan
 		zz = np.reshape(zz, xx.shape)
-
 		return zz
+
 
 
 class Filtration:
@@ -348,13 +348,11 @@ class Filtration:
 		count_triangles(ID_array)
 		return ID_array
 
-	@property
 	def intervals(self):
 		if self._intervals is None:
 			self._intervals = Intervals(self)
 		return self._intervals
 
-	@property
 	def PD(self):
 		"""
 		if called for the first time:
@@ -368,10 +366,9 @@ class Filtration:
 
 		"""
 		if self._PD is None:
-			self._PD = PDiagram(self.intervals)
+			self._PD = PDiagram(self.intervals())
 		return self._PD
 
-	@property
 	def PRF(self):
 		"""
 		if called for the first time:
@@ -395,7 +392,7 @@ class Filtration:
 
 		"""
 		if self._PRF is None:
-			self._PRF = PRankFunction(self.PD)
+			self._PRF = PRankFunction(self.PD())
 		return self._PRF
 
 
