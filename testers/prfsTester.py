@@ -253,9 +253,7 @@ if test == 7:
 	})
 
 	plot_dists_to_ref(
-		'datasets/trajectories/L63_x_m2',
-		'L63_x_m2_tau',
-		'base i',
+		'L63_x_m2_tau{}',
 		out_fname(),
 		filt_params,
 		i_ref=15,

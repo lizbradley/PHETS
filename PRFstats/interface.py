@@ -12,27 +12,11 @@ from signals import Trajectory
 from utilities import clear_old_files
 
 
-def win_fname(fname_format, dir, base_filename, i):
-	if fname_format == 'i base':
-		filename = '{}/{}{}'.format(dir, i, base_filename)
-	elif fname_format == 'base i':
-		filename = '{}/{}{}.txt'.format(dir, base_filename, i)
-	else:
-		msg = "ERROR: invalid fname_format. Valid options: 'i base', 'base i'"
-		raise Exception(msg)
-	return filename
-
-
-
-
-
 
 def plot_dists_to_ref(
-		dir, base_filename,
-		fname_format,   # 'i base' or 'base i'
+		path,
 		out_filename,
 		filt_params,
-
 		i_ref=15,
 		i_arr=np.arange(10, 20, 1),
 		weight_func=lambda i, j: 1,
@@ -47,7 +31,7 @@ def plot_dists_to_ref(
 	plots distance from reference prf over a range of trajectory input files
 	"""
 
-	# TODO: weight_func
+	# TODO: weight_func, unit test
 
 	from PH import Filtration
 	import cPickle
@@ -59,21 +43,21 @@ def plot_dists_to_ref(
 	else:
 		filts = []
 		for i in i_arr:
-			fname = win_fname(fname_format, dir, base_filename, i)
+			fname = path.format(i)
 			print_title(fname)
-			traj = Trajectory(win_fname(fname_format, dir, base_filename, i))
+			traj = Trajectory(fname)
 			filts.append(Filtration(traj, filt_params, silent=quiet))
-		ref_traj = Trajectory(win_fname(fname_format, dir, base_filename,
-		                                i_ref))
+		ref_traj = Trajectory(path.format(i_ref))
 		ref_filt = Filtration(ref_traj, filt_params, silent=quiet)
 		cPickle.dump(filts, open('PRFstats/data/filts.p', 'wb'))
 		cPickle.dump(ref_filt, open('PRFstats/data/ref_filt.p', 'wb'))
 
 
-	prfs = [f.PRF(new_format=True) for f in filts]
+	prfs = [f.PRF() for f in filts]
 	ref_prf = ref_filt.PRF
 
 	dists = dists_to_ref(prfs, ref_prf, metric, dist_scale)
+	base_filename = path.split('/')[-1]
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
 	if see_samples:
