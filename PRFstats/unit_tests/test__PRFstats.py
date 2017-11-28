@@ -75,5 +75,5 @@ def test__ROCs_v():
 
 
 if __name__ == '__main__':
-	test__fetch_filts_v()
-
+	# test__fetch_filts_v()
+	test__ROCs_v()
