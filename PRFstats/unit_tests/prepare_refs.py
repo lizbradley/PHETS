@@ -71,6 +71,6 @@ def ref__plot_variance():
 
 
 if __name__ == '__main__':
-	# ref__ROCs()
+	ref__plot_ROCs()
 	# ref__plot_dists_to_means()
 	pass
