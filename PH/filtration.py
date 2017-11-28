@@ -11,12 +11,17 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Intervals:
-	def __init__(self, complexes, epsilons, silent=False):
+	def __init__(self, filtration):
+		complexes = filtration.complexes
+		silent = filtration.silent
+		self.epsilons = filtration.epsilons
+		caller_dir = os.getcwd()
+		os.chdir(SCRIPT_DIR)
 		self.write_perseus_in_file(complexes, silent)
 		self.call_perseus(silent)
-		self.birth_time, self.death_time = self.read_perseus_out_file()
-		self.epsilons = epsilons
-
+		intervals = self.read_perseus_out_file(silent)
+		self.birth_time, self.death_time = intervals[:, 0], intervals[:, 1]
+		os.chdir(caller_dir)
 	@staticmethod
 	def write_perseus_in_file(filt_array, silent):
 		if not silent: print 'building perseus_in.txt...'
@@ -57,13 +62,13 @@ class Intervals:
 		try:
 			with warnings.catch_warnings():
 				warnings.simplefilter('ignore')
-				intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=1)
+				intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=2)
 		except IOError:
 			intervals = np.empty((2, 0))
 			if not silent: print "WARNING: no homology for this window"
 
-		if len(intervals.shape) == 1:
-			intervals = [intervals]
+		# if len(intervals.shape) == 1:
+		# 	intervals = np.array([intervals])
 
 		intervals[intervals == -1] = np.nan
 
@@ -97,7 +102,7 @@ class PDiagram:
 		birth_e_imm = []
 
 		for birth, death in zip(intervals.birth_time, intervals.death_time):
-			if death == np.nan:						        # immortal
+			if np.isnan(death):						        # immortal
 				birth_e_imm.append(self._t_to_eps(birth))
 			else:										    # mortal
 				birth_e_mor.append(self._t_to_eps(birth))
@@ -106,16 +111,16 @@ class PDiagram:
 		count_mor = self._get_multiplicity(birth_e_mor, death_e_mor)
 		mortal = np.asarray([birth_e_mor, death_e_mor, count_mor]).T
 
-		if len(mortal):
-			# toss duplicates #
-			mortal = np.vstack({tuple(row) for row in mortal}).T
-
 		count_imm = self._get_multiplicity(birth_e_imm, None)
 		immortal = np.asarray([birth_e_imm, count_imm]).T
 
+		if len(mortal):
+			# toss duplicates #
+			mortal = np.vstack({tuple(row) for row in mortal})
+
 		if len(immortal):
 			# toss duplicates #
-			immortal = np.vstack({tuple(row) for row in immortal}).T
+			immortal = np.vstack({tuple(row) for row in immortal})
 
 		return mortal, immortal
 
@@ -123,7 +128,7 @@ class PDiagram:
 class PRankFunction:
 	def __init__(self, pd):
 		self.epsilons = pd.epsilons
-		self.f = self._build(pd)
+		self.data = self._build(pd)
 
 	def _build(self, pd):
 
@@ -346,14 +351,12 @@ class Filtration:
 		return ID_array
 
 
-	@property
 	def intervals(self):
 		if self._intervals is None:
-			self._intervals = Intervals(self.complexes, self.silent)
+			self._intervals = Intervals(self)
 		return self._intervals
 
 
-	@property
 	def PD(self):
 		"""
 		if called for the first time:
@@ -367,10 +370,10 @@ class Filtration:
 
 		"""
 		if self._PD is None:
-			self._PD = PDiagram(self.intervals)
+			ints = self.intervals()
+			self._PD = PDiagram(self.intervals())
 		return self._PD
 
-	@property
 	def PRF(self):
 		"""
 		if called for the first time:
@@ -394,7 +397,7 @@ class Filtration:
 
 		"""
 		if self._PRF is None:
-			self._PRF = PRankFunction(self.PD)
+			self._PRF = PRankFunction(self.PD())
 		return self._PRF
 
 

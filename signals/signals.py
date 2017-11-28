@@ -335,7 +335,7 @@ class Trajectory(BaseTrajectory):
 						self.name, i + 1, len(self.windows)
 					)
 				)
-			f = Filtration(t, filt_params, silent=quiet)
+			f = Filtration(t, filt_params, silent=quiet, save=False)
 			filts.append(f)
 		print 'done.'
 		self.filts = filts

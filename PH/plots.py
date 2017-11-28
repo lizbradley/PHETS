@@ -135,7 +135,7 @@ def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
 
 	from filtration import PRankFunction
 	if isinstance(prf, PRankFunction):
-		z = prf.f
+		z = prf.data
 		heatmap_ax(ax, cbar_ax, z, dom=prf.epsilons, annot=annot_hm)
 	else:   # 2d array
 		z = prf
