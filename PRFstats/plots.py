@@ -497,13 +497,25 @@ def variance_fig(
 
 
 	if vary_param_2:
-		if legend_labels: label_list = legend_labels
-		else: label_list = [vary_param_2[0] + ' = ' + str(val) for val in vary_param_2[1]]
+
+		if legend_labels:
+			label_list = legend_labels
+		else:
+			label_list = [
+				'{} = {}'.format(vary_param_2[0], str(val))
+				for val in vary_param_2[1]
+			]
+
 		line_list = []
 		for i, var_data in enumerate(data):
 			l = plot_stats_curves(var_data)
 			line_list.append(l)
-		fig.legend(line_list, label_list, 'lower left', borderaxespad=3, borderpad=1)
+
+		fig.legend(
+			line_list, label_list,
+			'lower left',
+			borderaxespad=3, borderpad=1
+		)
 
 	else:
 		plot_stats_curves(data[0])
@@ -511,7 +523,6 @@ def variance_fig(
 	for ax in [ax1, ax2, ax3, ax4, ax5]:
 		ax.grid()
 		ax.set_ylim(bottom=0)
-
 		if ax is not ax5:
 			plt.setp(ax.get_xticklabels(), visible=False)
 			plt.setp(ax.get_xticklines(), visible=False)

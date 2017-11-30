@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 
 from config import default_filtration_params as filt_params
@@ -86,10 +87,12 @@ def fetch_prfs(
 		quiet=True
 	):
 	prfs = np.zeros_like(filts)
+	prfs_pre_weight = np.zeros_like(filts)
 	for idx, filt in np.ndenumerate(filts):
 		filt.silent = quiet
 		prf = filt.PRF().data
 		prfs[idx] = apply_weight(prf, weight_func)
+		prfs_pre_weight = prf
 
 	if vary_param_1 and vary_param_1[0] == 'weight_func':
 		if not vary_param_2:
@@ -115,22 +118,17 @@ def fetch_prfs(
 				prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs_]
 		prfs = prfs_vv
 
-	return np.asarray(prfs)
+	return np.asarray(prfs_pre_weight), np.asarray(prfs)
 
 
-def norm(f, metric='L2'):
+def norm(f):
 	prf_res = len(f)
 	dA = 2. / (prf_res ** 2)	  # normalize such that area of PRF domain is 1
-	if metric == 'L1':
-		return np.nansum(np.abs(f)) * dA
-	elif metric == 'L2':
-		return np.sqrt(np.nansum(np.power(f, 2)) * dA)
-	else:
-		raise ParamError("Invalid metric. Use 'L1' or 'L2'")
+	return np.sqrt(np.nansum(np.power(f, 2)) * dA)
 
 
-def get_dist(a, b, metric='L2'):
-	return norm(np.subtract(a, b), metric)
+def get_dist(a, b):
+	return norm(np.subtract(a, b))
 
 
 def scale_dists(dists, norms, norm_ref, scale):
@@ -148,23 +146,23 @@ def scale_dists(dists, norms, norm_ref, scale):
 		raise ParamError(msg)
 
 
-def dists_to_ref(funcs, ref_func, metric, scale):
-	dists = [norm(np.subtract(f, ref_func), metric) for f in funcs]
-	norms = [norm(f, metric) for f in funcs]
-	norm_ref = [norm(ref_func, metric)] * len(dists)
+def dists_to_ref(funcs, ref_func, scale):
+	dists = [norm(np.subtract(f, ref_func)) for f in funcs]
+	norms = [norm(f) for f in funcs]
+	norm_ref = [norm(ref_func)] * len(dists)
 	return scale_dists(dists, norms, norm_ref, scale)
 
 
-def mean_dists_compare(prfs1, prfs2, metric, dist_scale):
+def mean_dists_compare(prfs1, prfs2, dist_scale):
 	"""generates and processes data for plot_dists_vs_means, and plot_clusters"""
 
 	mean1 = np.mean(prfs1, axis=0)
 	mean2 = np.mean(prfs2, axis=0)
 
-	dists_1_vs_1 = dists_to_ref(prfs1, mean1, metric, dist_scale)
-	dists_2_vs_1 = dists_to_ref(prfs2, mean1, metric, dist_scale)
-	dists_1_vs_2 = dists_to_ref(prfs1, mean2, metric, dist_scale)
-	dists_2_vs_2 = dists_to_ref(prfs2, mean2, metric, dist_scale)
+	dists_1_vs_1 = dists_to_ref(prfs1, mean1, dist_scale)
+	dists_2_vs_1 = dists_to_ref(prfs2, mean1, dist_scale)
+	dists_1_vs_2 = dists_to_ref(prfs1, mean2, dist_scale)
+	dists_2_vs_2 = dists_to_ref(prfs2, mean2, dist_scale)
 
 	arr = [
 		[mean1, mean2],
@@ -183,152 +181,70 @@ class VarianceData:
 		self.pointwise_variance_norm = []
 		self.functional_COV_norm = []
 
-class HeatmapData:
-
-	def __init__(self):
-		self.pointwise_mean = [[]]
-		self.pointwise_var = [[]]
-		self.functional_COV = [[]]
 
 
+class PointwiseStats:
+	def __init__(self, prfs):
+		self.mean = np.mean(prfs, axis=0)
+		self.var = np.var(prfs, axis=0)
 
-def process_variance_data(
-		filt_evo_array,
-		metric,
-		dist_scale,
-		weight_func,
-		vary_param_2
-):
-
-	def apply_weight_to_evo(prf_evo, weight_f):
-		weighted_prf_evo = []
-		for prf in prf_evo:
-			weighted_prf_evo.append(apply_weight(prf, weight_f))
-		return np.asarray(weighted_prf_evo)
+		with warnings.catch_warnings():
+			warnings.simplefilter("ignore")
+			self.cov = self.var / self.mean
 
 
-	def apply_weight_func_to_array(prf_evo_array, weight_f):
-		for row in prf_evo_array:
-			for evo in row:
-				evo[...] = apply_weight_to_evo(evo, weight_f)
-		return prf_evo_array
+class NormStats:
+	def __init__self(self, prfs, pw_stats):
+		self.mean = norm(pw_stats.mean)
+		self.lvar = norm(pw_stats.var)
+		self.lfanofactor = norm(self.lvar / self.mean)
+		self.gvar = self.global_variance(prfs)
+		self.gfanofactor = self.gvar / self.mean
 
 
-	def vary_evos_over_weight_func(prf_evos):
-		prf_evos_1d = prf_evos[0]
-		prf_evos_2d = []
-		for prf_evo in prf_evos_1d:
-			prf_evo_vary_2 = []
-			for weight_f in vary_param_2[1]:
-				weighted_prf_evo = apply_weight_to_evo(prf_evo, weight_f)
-				prf_evo_vary_2.append(weighted_prf_evo)
-			prf_evos_2d.append(prf_evo_vary_2)
+	@staticmethod
+	def global_variance(prfs):
+		pw_mean = np.mean(prfs)
+		dists = np.array([norm(prf - pw_mean) for prf in prfs])
+		return np.mean(dists ** 2)
 
-		prf_evos_2d = np.transpose(np.asarray(prf_evos_2d), (1, 0, 2, 3))
-		return prf_evos_2d
+def indices(vp1, vp2):
+	if vp2 is None:
+		lim1 = len(vp1)
+		idxs = [i for i in range(lim1)]
+		shape = lim1
 
-
-	def calculate_stats(prf_evos_1d, apply_weight_to_fcov=True):
-		var_data = VarianceData()
-		hmap_data_arr = []
-
-		for prf_evo in prf_evos_1d:  # for each value of vary_param_1
-
-			hmap_data = HeatmapData()
-			# see definitions for norm() and get_dists_from_ref() around lines 45 - 90
-
-			pointwise_mean = np.mean(prf_evo, axis=0)  				# plot as heatmap
-			hmap_data.pointwise_mean = pointwise_mean
-
-			pmn = norm(pointwise_mean, metric)  					# plot as data point
-			var_data.pointwise_mean_norm.append(pmn)
-
-			dists = [norm(np.subtract(PRF, pointwise_mean), metric)
-			            for PRF in prf_evo]
-			variance = np.mean(np.power(dists, 2))  				# plot as data point
-			# variance = np.sum(np.power(dists, 2)) / (len(dists) - 1)
-			var_data.variance.append(variance)
-
-			scaled_dists = dists_to_ref(
-				prf_evo, pointwise_mean, metric, dist_scale
-			)
-			scaled_variance = np.mean(np.power(scaled_dists, 2))    # plot as data point
-			var_data.scaled_variance.append(scaled_variance)
-
-			diffs = [PRF - pointwise_mean for PRF in prf_evo]
-
-			pointwise_variance = np.var(diffs, axis=0) 				# plot as heatmap
-			hmap_data.pointwise_var = pointwise_variance
-
-			pvn = norm(pointwise_variance, metric) 					# plot as data point
-			var_data.pointwise_variance_norm.append(pvn)
-
-			import warnings
-			with warnings.catch_warnings():
-				warnings.simplefilter("ignore")
-				FCOV = pointwise_variance / pointwise_mean  		 # plot as heatmap
-
-			if apply_weight_to_fcov:
-				hmap_data.functional_COV = apply_weight(FCOV, weight_func)
-			else:
-				hmap_data.functional_COV = FCOV
-
-			fcovn = norm(FCOV, metric)  # plot as data point
-			var_data.functional_COV_norm.append(fcovn)
-
-			hmap_data_arr.append(hmap_data)
-
-		return var_data, hmap_data_arr
-
-
-
-	print 'processing data...'
-
-	if vary_param_2 is None:
-		filt_evo_array = np.asarray([filt_evo_array])
 	else:
-		filt_evo_array = filt_evo_array.transpose((1, 0, 2))
+		lim1, lim2 = len(vp1), len(vp2)
+		idxs = [[i, j] for i in range(lim1) for j in range(lim2)]
+		shape = (lim1, lim2)
 
-	prf_evo_array = np.asarray(
-		[[[f.PRF(new_format=True) for f in evo]
-			for evo in row]
-	            for row in filt_evo_array]
-	)
+	return shape, idxs
 
-	prf_evo_array_pre_weight = prf_evo_array
 
-	if vary_param_2 and vary_param_2[0] == 'weight_func':
-		prf_evo_array = vary_evos_over_weight_func(prf_evo_array)
-	elif vary_param_2:
-		prf_evo_array = apply_weight_func_to_array(prf_evo_array, weight_func)
+def pointwise_stats(prfs, vary_param_1, vary_param_2):
+	shape, idxs = indices(vary_param_1, vary_param_2)
+	data = np.empty(shape)
+	for idx in idxs:
+		data[idx] = PointwiseStats(prfs[idx])
+	return data
 
-	curve_data = []
-	hmap_data = []
-	for row in prf_evo_array:
-		cd, hmd = calculate_stats(row)
-		curve_data.append(cd)
-		hmap_data.append(hmd)
+def scaler_stats(prfs, pw_stats, vary_param_1, vary_param_2):
+	shape, idxs = indices(vary_param_1, vary_param_2)
+	data = np.empty(shape)
+	for idx in idxs:
+		data[idx] = NormStats(prfs[idx], pw_stats[idx])
+	return data
 
-	hmap_data_pre_weight = []
-	for row in prf_evo_array_pre_weight:
-		cd, hmd_pre_weight = calculate_stats(row, apply_weight_to_fcov=False)
-		hmap_data_pre_weight.append(hmd_pre_weight)
-
-	curve_data = np.asarray(curve_data)
-	hmap_data = np.asarray(hmap_data)
-	hmap_data_pre_weight = np.asarray(hmap_data_pre_weight)
-
-	return curve_data, hmap_data, hmap_data_pre_weight
 
 
 class DistanceClassifier(object):
-	def __init__(self, train, metric='L2', dist_scale='none'):
+	def __init__(self, train, dist_scale='none'):
 		"""
 		classifier which compares the distance from the mean of training
 		prfs to the test prf, vs the standard deviation of training prfs
 		"""
 		prfs = train
-		self.metric = metric
 
 		self.mean = np.mean(prfs, axis=0)
 		self.lvar = np.var(prfs, axis=0)                           # local
@@ -336,8 +252,8 @@ class DistanceClassifier(object):
 
 		self.dists = [get_dist(self.mean, prf) for prf in prfs]
 
-		mean_norm = norm(self.mean, metric)
-		norms = [norm(prf, metric) for prf in prfs]
+		mean_norm = norm(self.mean)
+		norms = [norm(prf) for prf in prfs]
 		self.dists = scale_dists(self.dists, mean_norm, norms, dist_scale)
 
 		self.gvar = np.mean(np.power(self.dists, 2))               # global
@@ -352,7 +268,7 @@ class DistanceClassifier(object):
 		if stddev == 'global':
 			measure =  self.gstddev
 		elif stddev == 'local':
-			measure = norm(self.lstddev, self.metric)
+			measure = norm(self.lstddev)
 		else:
 			raise ParamError("Invalid stddev. Use 'local' or 'global'.")
 
