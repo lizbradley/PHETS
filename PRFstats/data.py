@@ -3,6 +3,7 @@ import numpy as np
 
 from config import default_filtration_params as filt_params
 
+
 class ParamError(Exception):
 	def __init__(self, msg):
 		Exception.__init__(self, msg)
@@ -25,10 +26,10 @@ def is_filt_param(vp):
 def fetch_filts(
 		traj, params, load_saved, quiet,
 		vary_param_1=None, vary_param_2=None,
-		id=None, filts_fname=None, out_fname=None,
+		fid=None, filts_fname=None, out_fname=None,
 		save=True
 ):
-	suffix = id if id is not None else ''
+	suffix = fid if fid is not None else ''
 	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
 
 	if load_saved:
@@ -52,12 +53,15 @@ def fetch_filts(
 		filts_vv.append(filts_v)
 	filts_vv = np.array(filts_vv)
 
+	# filts = np.squeeze(filts_vv)
 	filts = {
 		(False,  False ): filts_vv[0, 0],
 		(False,  True  ): filts_vv[0, :],
 		(True,   False ): filts_vv[:, 0],
 		(True,   True  ): filts_vv
 	}[is_filt_param(vary_param_1), is_filt_param(vary_param_2)]
+
+
 
 	fname = default_fname if out_fname is None else out_fname
 	if save: np.save(fname, filts)
@@ -87,17 +91,16 @@ def fetch_prfs(
 		quiet=True
 	):
 	prfs = np.zeros_like(filts)
-	prfs_pre_weight = np.zeros_like(filts)
 	for idx, filt in np.ndenumerate(filts):
 		filt.silent = quiet
 		prf = filt.PRF().data
 		prfs[idx] = apply_weight(prf, weight_func)
-		prfs_pre_weight = prf
 
 	if vary_param_1 and vary_param_1[0] == 'weight_func':
 		if not vary_param_2:
 			prfs_ = prfs
 			prfs_v = np.empty(len(vary_param_1[1]))
+			prfs_pre_weight_v = np.empty(len(vary_param_1[1]))
 			for i, wf in enumerate(vary_param_1[1]):
 				prfs_v[i] = [apply_weight(prf, wf) for prf in prfs_]
 			prfs = prfs_v
@@ -118,7 +121,7 @@ def fetch_prfs(
 				prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs_]
 		prfs = prfs_vv
 
-	return np.asarray(prfs_pre_weight), np.asarray(prfs)
+	return np.asarray(prfs)
 
 
 def norm(f):
@@ -127,42 +130,25 @@ def norm(f):
 	return np.sqrt(np.nansum(np.power(f, 2)) * dA)
 
 
-def get_dist(a, b):
+def distance(a, b):
 	return norm(np.subtract(a, b))
 
 
-def scale_dists(dists, norms, norm_ref, scale):
-	""" helper for get_dists_from_ref """
-	if scale == 'none':
-		return dists
-	elif scale == 'a':
-		return np.true_divide(dists, norms)
-	elif scale == 'b':
-		return np.true_divide(dists, norm_ref)
-	elif scale == 'a + b':
-		return np.true_divide(dists, np.add(norms, norm_ref))
-	else:
-		msg = "Invalid dist_scale. Use 'none', 'a', 'b', or 'a + b'."
-		raise ParamError(msg)
-
-
-def dists_to_ref(funcs, ref_func, scale):
+def dists_to_ref(funcs, ref_func):
 	dists = [norm(np.subtract(f, ref_func)) for f in funcs]
-	norms = [norm(f) for f in funcs]
-	norm_ref = [norm(ref_func)] * len(dists)
-	return scale_dists(dists, norms, norm_ref, scale)
+	return dists
 
 
-def mean_dists_compare(prfs1, prfs2, dist_scale):
-	"""generates and processes data for plot_dists_vs_means, and plot_clusters"""
+def mean_dists_compare(prfs1, prfs2):
+	"""data for plot_dists_vs_means, and plot_clusters"""
 
 	mean1 = np.mean(prfs1, axis=0)
 	mean2 = np.mean(prfs2, axis=0)
 
-	dists_1_vs_1 = dists_to_ref(prfs1, mean1, dist_scale)
-	dists_2_vs_1 = dists_to_ref(prfs2, mean1, dist_scale)
-	dists_1_vs_2 = dists_to_ref(prfs1, mean2, dist_scale)
-	dists_2_vs_2 = dists_to_ref(prfs2, mean2, dist_scale)
+	dists_1_vs_1 = dists_to_ref(prfs1, mean1)
+	dists_2_vs_1 = dists_to_ref(prfs2, mean1)
+	dists_1_vs_2 = dists_to_ref(prfs1, mean2)
+	dists_2_vs_2 = dists_to_ref(prfs2, mean2)
 
 	arr = [
 		[mean1, mean2],
@@ -170,17 +156,6 @@ def mean_dists_compare(prfs1, prfs2, dist_scale):
 	]
 
 	return arr
-
-
-class VarianceData:
-	"""all data for a fixed value of vary_param_2 -- one curve per plot"""
-	def __init__(self):
-		self.pointwise_mean_norm = []
-		self.variance = []
-		self.scaled_variance = []
-		self.pointwise_variance_norm = []
-		self.functional_COV_norm = []
-
 
 
 class PointwiseStats:
@@ -192,15 +167,28 @@ class PointwiseStats:
 			warnings.simplefilter("ignore")
 			self.cov = self.var / self.mean
 
+class VarianceData:
+	pass
+
+class HeatmapData:
+	pass
+
 
 class NormStats:
-	def __init__self(self, prfs, pw_stats):
+	def __init__(self, prfs, pw_stats):
 		self.mean = norm(pw_stats.mean)
 		self.lvar = norm(pw_stats.var)
-		self.lfanofactor = norm(self.lvar / self.mean)
+		self.lfanofactor = norm(pw_stats.var / pw_stats.mean)
+		self.lfanofactor2 = self.lvar / self.mean
+
 		self.gvar = self.global_variance(prfs)
 		self.gfanofactor = self.gvar / self.mean
 
+		print '''
+		lfanofactor: {} 
+		lfanofactor2: {}
+		gfanofactor: {} 
+		'''.format(self.lfanofactor, self.lfanofactor2, self.gfanofactor)
 
 	@staticmethod
 	def global_variance(prfs):
@@ -208,15 +196,17 @@ class NormStats:
 		dists = np.array([norm(prf - pw_mean) for prf in prfs])
 		return np.mean(dists ** 2)
 
+
+
 def indices(vp1, vp2):
 	if vp2 is None:
-		lim1 = len(vp1)
+		lim1 = len(vp1[1])
 		idxs = [i for i in range(lim1)]
 		shape = lim1
 
 	else:
-		lim1, lim2 = len(vp1), len(vp2)
-		idxs = [[i, j] for i in range(lim1) for j in range(lim2)]
+		lim1, lim2 = len(vp1[1]), len(vp2[1])
+		idxs = [(i, j) for i in range(lim1) for j in range(lim2)]
 		shape = (lim1, lim2)
 
 	return shape, idxs
@@ -224,22 +214,22 @@ def indices(vp1, vp2):
 
 def pointwise_stats(prfs, vary_param_1, vary_param_2):
 	shape, idxs = indices(vary_param_1, vary_param_2)
-	data = np.empty(shape)
+	data = np.empty(shape, dtype=object)
 	for idx in idxs:
 		data[idx] = PointwiseStats(prfs[idx])
 	return data
 
+
 def scaler_stats(prfs, pw_stats, vary_param_1, vary_param_2):
 	shape, idxs = indices(vary_param_1, vary_param_2)
-	data = np.empty(shape)
+	data = np.empty(shape, dtype=object)
 	for idx in idxs:
 		data[idx] = NormStats(prfs[idx], pw_stats[idx])
 	return data
 
 
-
 class DistanceClassifier(object):
-	def __init__(self, train, dist_scale='none'):
+	def __init__(self, train):
 		"""
 		classifier which compares the distance from the mean of training
 		prfs to the test prf, vs the standard deviation of training prfs
@@ -250,11 +240,7 @@ class DistanceClassifier(object):
 		self.lvar = np.var(prfs, axis=0)                           # local
 		self.lstddev = np.power(self.lvar, .5)
 
-		self.dists = [get_dist(self.mean, prf) for prf in prfs]
-
-		mean_norm = norm(self.mean)
-		norms = [norm(prf) for prf in prfs]
-		self.dists = scale_dists(self.dists, mean_norm, norms, dist_scale)
+		self.dists = [distance(self.mean, prf) for prf in prfs]
 
 		self.gvar = np.mean(np.power(self.dists, 2))               # global
 		self.gstddev = self.gvar ** .5
@@ -263,7 +249,7 @@ class DistanceClassifier(object):
 
 
 	def predict(self, test, k, stddev='global'):
-		dist = get_dist(test, self.mean)
+		dist = distance(test, self.mean)
 
 		if stddev == 'global':
 			measure =  self.gstddev
@@ -287,5 +273,3 @@ def roc_data(clf, tests_true, tests_false, k_arr):
 		fpr.append(false_pos_rate)
 
 	return [fpr, tpr]
-
-

@@ -1,12 +1,9 @@
-from itertools import chain
-
 import numpy as np
 
-from PRFstats.data import roc_data, dists_to_ref, \
-	fetch_filts, variance_data, get_dist, fetch_prfs, scaler_stats, \
-	pointwise_stats
-from PRFstats.plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig, \
-	weight_functions_figs, heatmaps_figs, variance_fig
+from PRFstats.data import roc_data, dists_to_ref, fetch_filts, distance, \
+	fetch_prfs, scaler_stats, pointwise_stats
+from PRFstats.plots import dists_to_means_fig, clusters_fig, \
+	dists_to_ref_fig, weight_functions_figs, heatmaps_figs, variance_fig
 from data import DistanceClassifier, mean_dists_compare
 from plots import dual_roc_fig, samples
 from signals import Trajectory
@@ -21,7 +18,6 @@ def plot_dists_to_ref(
 		i_ref=15,
 		i_arr=np.arange(10, 20, 1),
 		weight_func=lambda i, j: 1,
-		dist_scale='none',      # 'none', 'a', or 'a + b'
 		load_saved_filts=False,
 		see_samples=5,
 		quiet=True
@@ -56,14 +52,14 @@ def plot_dists_to_ref(
 	prfs = [f.PRF() for f in filts]
 	ref_prf = ref_filt.PRF
 
-	dists = dists_to_ref(prfs, ref_prf, dist_scale)
+	dists = dists_to_ref(prfs, ref_prf)
 	base_filename = path.split('/')[-1]
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
 	if see_samples:
-		dir = 'output/PRFstats/samples'
-		clear_old_files(dir, see_samples)
-		samples(filts, see_samples, dir)
+		dir_ = 'output/PRFstats/samples'
+		clear_old_files(dir_, see_samples)
+		samples(filts, see_samples, dir_)
 
 
 def plot_dists_to_means(
@@ -71,7 +67,6 @@ def plot_dists_to_means(
 		traj2,
 		out_filename,
 		filt_params,
-		dist_scale='none',              # 'none', 'a', or 'a + b'
 		weight_func=lambda i, j: 1,
 		see_samples=False,
 		load_saved_filts=False,
@@ -81,17 +76,17 @@ def plot_dists_to_means(
 
 	filts1 = fetch_filts(
 		traj1, filt_params, load_saved_filts, quiet,
-		id=1, filts_fname=filts_fnames[0]
+		fid=1, filts_fname=filts_fnames[0]
 	)
 	filts2 = fetch_filts(
 		traj2, filt_params, load_saved_filts, quiet,
-		id=2, filts_fname=filts_fnames[1]
+		fid=2, filts_fname=filts_fnames[1]
 	)
 
 	prfs1 = fetch_prfs(filts1, weight_func, quiet=quiet)
 	prfs2 = fetch_prfs(filts2, weight_func, quiet=quiet)
 
-	refs, dists = mean_dists_compare(prfs1, prfs2, dist_scale)
+	refs, dists = mean_dists_compare(prfs1, prfs2)
 
 	dists_to_means_fig(refs, dists, traj1, traj2, out_filename)
 
@@ -110,7 +105,6 @@ def plot_clusters(
 		traj2,
 		out_filename,
 		filt_params,
-		dist_scale='none',              # 'none', 'a', or 'a + b'
 		weight_func=lambda i, j: 1,
 		see_samples=False,
 		load_saved_filts=False,
@@ -120,25 +114,25 @@ def plot_clusters(
 
 	filts1 = fetch_filts(
 		traj1, filt_params, load_saved_filts, quiet,
-		id=1, filts_fname=filts_fnames[0]
+		fid=1, filts_fname=filts_fnames[0]
 	)
 	filts2 = fetch_filts(
 		traj2, filt_params, load_saved_filts, quiet,
-		id=2, filts_fname=filts_fnames[1]
+		fid=2, filts_fname=filts_fnames[1]
 	)
 
 	prfs1 = fetch_prfs(filts1, weight_func, quiet=quiet)
 	prfs2 = fetch_prfs(filts2, weight_func, quiet=quiet)
 
-	refs, dists = mean_dists_compare(prfs1, prfs2, dist_scale)
+	refs, dists = mean_dists_compare(prfs1, prfs2)
 
-	clusters_fig(dists, filt_params, traj1.name, traj2.name,out_filename)
+	clusters_fig(dists, filt_params, traj1.name, traj2.name, out_filename)
 
 	if see_samples:
-		dir = 'output/PRFstats/samples'
-		clear_old_files(dir, see_samples)
-		samples(filts1, see_samples, dir)
-		samples(filts2, see_samples, dir)
+		dir_ = 'output/PRFstats/samples'
+		clear_old_files(dir_, see_samples)
+		samples(filts1, see_samples, dir_)
+		samples(filts2, see_samples, dir_)
 
 
 def plot_ROCs(
@@ -146,7 +140,6 @@ def plot_ROCs(
 		out_fname,
 		filt_params,
 		k,
-		dist_scale='none',
 		weight_func=lambda i, j: 1,
 		load_saved_filts=False,
 		filts_fnames=(None, None),
@@ -158,11 +151,11 @@ def plot_ROCs(
 
 	filts1 = fetch_filts(
 		traj1, filt_params, load_saved_filts, quiet, vary_param,
-		id=1, filts_fname=filts_fnames[0]
+		fid=1, filts_fname=filts_fnames[0]
 	)
 	filts2 = fetch_filts(
 		traj2, filt_params, load_saved_filts, quiet, vary_param,
-		id=2, filts_fname=filts_fnames[1]
+		fid=2, filts_fname=filts_fnames[1]
 	)
 
 
@@ -177,8 +170,8 @@ def plot_ROCs(
 		train2, test2 = prfs2_[1::2], prfs2_[::2]
 
 		print 'training classifiers...'
-		clf1 = DistanceClassifier(train1, dist_scale)
-		clf2 = DistanceClassifier(train2, dist_scale)
+		clf1 = DistanceClassifier(train1)
+		clf2 = DistanceClassifier(train2)
 
 		print 'running tests...'
 		k_arr = np.arange(*k)
@@ -190,10 +183,10 @@ def plot_ROCs(
 	dual_roc_fig(data, k, traj1, traj2, out_fname, vary_param)
 
 	if see_samples:
-		dir = 'output/PRFstats/samples'
-		clear_old_files(dir, see_samples)
-		samples(filts1, see_samples, dir, vary_param)
-		samples(filts2, see_samples, dir, vary_param)
+		dir_ = 'output/PRFstats/samples'
+		clear_old_files(dir_, see_samples)
+		samples(filts1, see_samples, dir_, vary_param)
+		samples(filts2, see_samples, dir_, vary_param)
 
 	return data
 
@@ -206,7 +199,6 @@ def plot_variance(
 		vary_param_2=None,
 		legend_labels=None,
 
-		dist_scale='b',
 		weight_func=lambda i, j: 1,
 
 		see_samples=5,
@@ -236,18 +228,21 @@ def plot_variance(
 		filts_fname=filts_fname
 	)
 
-	prfs_pre_weight, prfs = fetch_prfs(
-		filts, weight_func, vary_param_1, vary_param_2, quiet
+	prfs = fetch_prfs(
+		filts,
+		weight_func,
+		vary_param_1,
+		vary_param_2,
+		quiet=quiet
 	)
 
-
-
-	# preweight hmap data?
-
-	pw_data = pointwise_stats(prfs, vary_param_1, vary_param_2)
-	pw_data_pre_weight = pointwise_stats(
-		prfs_pre_weight, vary_param_1, vary_param_2
+	pw_data = pointwise_stats(
+		prfs, vary_param_1, vary_param_2
 	)
+	# pw_data_pre_weight = pointwise_stats(
+	# 	prfs_pre_weight, vary_param_1, vary_param_2
+	# )
+
 	scaler_data = scaler_stats(prfs, pw_data, vary_param_1, vary_param_2)
 
 	variance_fig(
@@ -262,7 +257,8 @@ def plot_variance(
 
 	heatmaps_figs(
 		pw_data,
-		pw_data_pre_weight,
+		# pw_data_pre_weight,
+		pw_data,             ## FIX ME
 		filt_params,
 		vary_param_1,
 	    vary_param_2,
@@ -273,8 +269,8 @@ def plot_variance(
 	)
 
 	if see_samples:
-		dir = 'output/PRFstats/samples'
-		clear_old_files(dir, see_samples)
+		dir_ = 'output/PRFstats/samples'
+		clear_old_files(dir_, see_samples)
 		samples(
 			filts,
 			see_samples,
@@ -283,7 +279,8 @@ def plot_variance(
 			vary_param_2
 		)
 
-	return scaler_data, pw_data, pw_data_pre_weight
+	# return scaler_data, pw_data, pw_data_pre_weight
+	return scaler_data, pw_data
 
 
 def plot_pairwise_mean_dists(
@@ -294,7 +291,6 @@ def plot_pairwise_mean_dists(
 		vary_param_2=None,
 		legend_labels=None,
 
-		dist_scale='b',
 		weight_func=lambda i, j: 1,
 
 		see_samples=5,
@@ -318,7 +314,7 @@ def plot_pairwise_mean_dists(
 	dists_array = np.zeros((prfs_means.shape[0] - 1, prfs_means.shape[1]))
 	for i in range(prfs_means.shape[0] - 1):
 		for j in range(prfs_means.shape[1]):
-			d = get_dist(prfs_means[i, j], prfs_means[i + 1, j])
+			d = distance(prfs_means[i, j], prfs_means[i + 1, j])
 			dists_array[i, j] = d
 
 	np.savetxt('output/PRFstats/pairwise_dists.txt', dists_array)

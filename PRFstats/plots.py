@@ -334,10 +334,12 @@ def weight_functions_figs(
 
 		mask = lambda x, y: x > y
 		mask = mask(xx, yy)
-		mask = np.where(mask is True, np.nan, 1)
+		nans = np.full_like(mask, np.nan)
+		ones = np.ones_like(mask)
+		mask = np.where(mask, nans, ones)
 		z = np.multiply(z, mask)
 
-		heatmap_ax(ax, cax, x, y, z)
+		heatmap_ax(ax, cax, z, dom=x)
 		plt.savefig('{}{}.png'.format(out_dir, fname))
 
 
@@ -484,16 +486,23 @@ def variance_fig(
 	ax5.set_xlabel(vary_param_1[0])
 
 
-	def plot_stats_curves(var_data):
+	def plot_stats_curves(norm_data):
+
+		mean = [d.mean for d in norm_data]
+		gvar = [d.gvar for d in norm_data]
+		gff = [d.gfanofactor for d in norm_data]
+		lvar = [d.lvar for d in norm_data]
+		lff = [d.lfanofactor for d in norm_data]
 
 		x = vary_param_1[1]
-		l, = ax1.plot(x, var_data.pointwise_mean_norm, '--o')
-		ax2.plot(x, var_data.variance, '--o')
-		ax3.plot(x, var_data.scaled_variance, '--o')
-		ax4.plot(x, var_data.pointwise_variance_norm, '--o')
-		ax5.plot(x, var_data.functional_COV_norm, '--o')
+		l, = ax1.plot(x, mean, '--o')
+		ax2.plot(x, gvar, '--o')
+		ax3.plot(x, gff, '--o')
+		ax4.plot(x, lvar, '--o')
+		ax5.plot(x, lff, '--o')
 
 		return l		# for legend
+
 
 
 	if vary_param_2:
@@ -507,8 +516,8 @@ def variance_fig(
 			]
 
 		line_list = []
-		for i, var_data in enumerate(data):
-			l = plot_stats_curves(var_data)
+		for i, norm_data in enumerate(data.T):
+			l = plot_stats_curves(norm_data)
 			line_list.append(l)
 
 		fig.legend(
@@ -518,7 +527,7 @@ def variance_fig(
 		)
 
 	else:
-		plot_stats_curves(data[0])
+		plot_stats_curves(data)
 
 	for ax in [ax1, ax2, ax3, ax4, ax5]:
 		ax.grid()

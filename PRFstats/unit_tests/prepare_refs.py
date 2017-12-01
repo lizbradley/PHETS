@@ -67,10 +67,14 @@ def ref__plot_variance():
 		filts_fname='data/viol_filts_vv.npy',
 	)
 
-	cPickle.dump(out, open('ref/plot_variance_vv.p', 'wb'))
+
+	np.save('ref/plot_variance_vv.npy', out)
+
+	# cPickle.dump(out, open('ref/plot_variance_vv.p', 'wb'))
 
 
 if __name__ == '__main__':
 	# ref__ROCs()
 	# ref__plot_dists_to_means()
+	ref__plot_variance()
 	pass

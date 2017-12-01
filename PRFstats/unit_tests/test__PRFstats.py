@@ -53,8 +53,8 @@ def test__plot_variance_vv():
 		unit_test=True,
 		see_samples=False
 	)
-	ref = cPickle.load(open('ref/plot_variance_vv.p'))
-	assert np.array_equal(out[0][0].variance, ref[0][0].variance)
+	ref = np.load('ref/plot_variance_vv.npy')
+	np.testing.assert_array_equal(out, ref)
 
 
 def test__ROCs_v():
@@ -77,4 +77,6 @@ def test__ROCs_v():
 if __name__ == '__main__':
 	# test__fetch_filts_v()
 	# test__plot_dists_to_means()
-	test__ROCs_v()
+	# test__ROCs_v()
+	# test__plot_dists_to_means()
+	test__plot_variance_vv()
