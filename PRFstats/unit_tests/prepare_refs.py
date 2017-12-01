@@ -3,7 +3,7 @@ save reference outputs for unit tests
 should be run infrequently -- only when behavior is intentionally changed
 """
 
-import cPickle, os, sys
+import os, sys
 import numpy as np
 
 from paths import root_dir, current_dir
@@ -12,6 +12,7 @@ sys.path.append(root_dir)
 os.chdir(current_dir)
 
 from common import filt_params, viol_traj, clar_traj, ellipse_traj
+from PRFstats.unit_tests.common import plot_variance__extract_output
 
 from utilities import clear_dir_rf
 from PRFstats import plot_variance, plot_ROCs, plot_dists_to_means
@@ -67,14 +68,14 @@ def ref__plot_variance():
 		filts_fname='data/viol_filts_vv.npy',
 	)
 
-
+	out = plot_variance__extract_output(out)
 	np.save('ref/plot_variance_vv.npy', out)
 
-	# cPickle.dump(out, open('ref/plot_variance_vv.p', 'wb'))
 
 
 if __name__ == '__main__':
 	# ref__ROCs()
 	# ref__plot_dists_to_means()
-	ref__plot_variance()
+	# ref__plot_variance()
+	ref__fetch_filts_v()
 	pass

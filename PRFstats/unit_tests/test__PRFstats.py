@@ -5,7 +5,8 @@ from paths import chdir; chdir()
 
 from utilities import clear_dir_rf
 from PRFstats import fetch_filts, plot_variance, plot_ROCs, plot_dists_to_means
-from common import filt_params, ellipse_traj, viol_traj, clar_traj
+from common import filt_params, ellipse_traj, viol_traj, clar_traj, \
+	plot_variance__extract_output
 
 
 def test__fetch_filts_v():
@@ -53,6 +54,7 @@ def test__plot_variance_vv():
 		unit_test=True,
 		see_samples=False
 	)
+	out = plot_variance__extract_output(out)
 	ref = np.load('ref/plot_variance_vv.npy')
 	np.testing.assert_array_equal(out, ref)
 

@@ -165,20 +165,14 @@ class PointwiseStats:
 
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore")
-			self.cov = self.var / self.mean
-
-class VarianceData:
-	pass
-
-class HeatmapData:
-	pass
+			self.fanofactor = self.var / self.mean
 
 
 class NormStats:
 	def __init__(self, prfs, pw_stats):
 		self.mean = norm(pw_stats.mean)
 		self.lvar = norm(pw_stats.var)
-		self.lfanofactor = norm(pw_stats.var / pw_stats.mean)
+		self.lfanofactor = norm(pw_stats.fanofactor)
 		self.lfanofactor2 = self.lvar / self.mean
 
 		self.gvar = self.global_variance(prfs)

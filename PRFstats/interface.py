@@ -279,8 +279,7 @@ def plot_variance(
 			vary_param_2
 		)
 
-	# return scaler_data, pw_data, pw_data_pre_weight
-	return scaler_data, pw_data
+	return scaler_data
 
 
 def plot_pairwise_mean_dists(
