@@ -12,6 +12,7 @@ class ParamError(Exception):
 class NormalPRF:
 
 	dom_area = 1        # area of PRF domain (the triangle)
+	lim = np.sqrt(dom_area * 2)
 
 	def __init__(self, prf):
 		if isinstance(prf, PRankFunction):
@@ -25,7 +26,7 @@ class NormalPRF:
 
 	@property
 	def norm(self):
-		dA = (NormalPRF.dom_area * 2.) / (self.num_div ** 2)
+		dA = (NormalPRF.lim / self.num_div) ** 2
 		return np.sqrt(np.nansum(np.square(self.data)) * dA)
 
 	def apply_weight(self, wf):
@@ -128,6 +129,7 @@ def save_filts(save, fid, filts):
 	except AttributeError:
 		np.save(default_fname(fid), filts)
 
+
 def status_string(vp1, vp2, i, j):
 	str = None
 	if vp1:
@@ -135,7 +137,6 @@ def status_string(vp1, vp2, i, j):
 	if vp2:
 		str.append(', vp2: {}'.format(vp2[1][j]))
 	return str
-
 
 
 def filt_set(
@@ -181,7 +182,8 @@ def prf_set(filts, weight_func=lambda i, j: 1, vp1=None, vp2=None):
 	depth = filts.shape[-1]
 
 	def apply_weight_prfs_(prfs_, wf):
-		return [prf.apply_weight(wf) for prf in prfs_]
+		[prf.apply_weight(wf) for prf in prfs_]
+		return [prf for prf in prfs_]
 
 	if is_weight_func(vp1):
 

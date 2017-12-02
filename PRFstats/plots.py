@@ -1,12 +1,13 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import signals, PH
 from PH.plots import heatmap_ax
 from PH.titlebox import filt_params_table
-from PRFstats.data import is_filt_param
-from utilities import print_title
+from PRFstats.data import is_filt_param, is_weight_func, NormalPRF
+from utilities import print_title, clear_temp_files
 
 
 def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
@@ -29,14 +30,11 @@ def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
 
 def samples(filts, cmd, dir, vary_param_1=None, vary_param_2=None):
 
-	if not (is_filt_param(vary_param_1) or is_filt_param(vary_param_2)):
-		filts_vv = [[filts]]
-	elif is_filt_param(vary_param_1) and not is_filt_param(vary_param_2):
-		filts_vv = [[fs] for fs in filts]
-	else:
-		filts_vv = filts
-
-	del filts
+	filts_vv = {
+		1: [[filts]],
+		2: [[f_] for f_ in filts],
+		3: filts
+	}[filts.ndim]
 
 	if isinstance(cmd, dict):
 		interval = cmd['interval']
@@ -219,3 +217,49 @@ def clusters_fig(dists, filt_params, fname1, fname2, out_fname):
 	fig.savefig(out_fname)
 
 
+def weight_functions_figs(
+		vary_param_1,
+		vary_param_2,
+		legend_labels_1,
+		legend_labels_2,
+		weight_func,
+		filt_params,
+):
+	out_dir = 'output/PRFstats/weight_functions/'
+
+	print 'plotting weight function(s)...'
+	clear_temp_files(out_dir)
+
+	if is_weight_func(vary_param_1):
+		funcs = vary_param_1[1]
+		fnames = legend_labels_1[1]
+	elif is_weight_func(vary_param_2):
+		funcs = vary_param_2[1]
+		fnames = legend_labels_2
+	else:
+		funcs = [weight_func]
+		fnames = ['f']
+
+	for fname, func in zip(fnames, funcs):
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		div = make_axes_locatable(ax)
+		cax = div.append_axes('right', size='10%', pad=.2)
+
+		lim = NormalPRF.lim
+		x = y = np.linspace(0, lim, filt_params['num_divisions'])
+		xx, yy = np.meshgrid(x, y)
+		z = func(xx, yy)
+		if isinstance(z, int):
+			z = xx * 0 + z
+
+		mask = lambda x, y: x > y
+		mask = mask(xx, yy)
+		nans = np.full_like(mask, np.nan)
+		ones = np.ones_like(mask)
+		mask = np.where(mask, nans, ones)
+		z = np.multiply(z, mask)
+
+		mesh = heatmap_ax(ax, z, dom=x)
+		plt.colorbar(mesh, cax)
+		plt.savefig('{}{}.png'.format(out_dir, fname))

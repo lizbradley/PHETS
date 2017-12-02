@@ -4,7 +4,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from PH.plots import heatmap_ax
 from PH.titlebox import filenames_table, filt_params_table
-from utilities import clear_temp_files, clear_dir
+from utilities import clear_dir
 
 
 def weight_function_fig(f, num_div, fname):
@@ -27,54 +27,6 @@ def weight_function_fig(f, num_div, fname):
 
 	heatmap_ax(ax, cax, x, y, z)
 	plt.savefig('weight_functions/{}.png'.format(fname))
-
-
-def weight_functions_figs(
-		vary_param_2,
-		legend_labels,
-		weight_func,
-		filt_params,
-		unit_test=False
-):
-	if unit_test:
-		out_dir = 'output/weight_functions/'
-		import os
-		print os.getcwd()
-	else:
-		out_dir = 'output/PRFstats/weight_functions/'
-
-	print 'plotting weight function(s)...'
-	clear_temp_files(out_dir)
-
-	if vary_param_2 and vary_param_2[0] == 'weight_func':
-		funcs = vary_param_2[1]
-		fnames = legend_labels
-
-	else:
-		funcs = [weight_func]
-		fnames = ['f']
-
-	for fname, func in zip(fnames, funcs):
-		fig = plt.figure()
-		ax = fig.add_subplot(111)
-		div = make_axes_locatable(ax)
-		cax = div.append_axes('right', size='10%', pad=.2)
-
-		x = y = np.linspace(0, 2 ** .5, filt_params['num_divisions'])
-		xx, yy = np.meshgrid(x, y)
-		z = func(xx, yy)
-		if isinstance(z, int):
-			z = xx * 0 + z
-
-		mask = lambda x, y: x > y
-		mask = mask(xx, yy)
-		nans = np.full_like(mask, np.nan)
-		ones = np.ones_like(mask)
-		mask = np.where(mask, nans, ones)
-		z = np.multiply(z, mask)
-
-		heatmap_ax(ax, cax, z, dom=x)
-		plt.savefig('{}{}.png'.format(out_dir, fname))
 
 
 def heatmaps_figs(
@@ -222,6 +174,7 @@ def variance_fig(
 		title, ticks = legend_labels_1
 		ax5.set_xlabel(title)
 		ax5.set_xticklabels(ticks)
+		ax5.set_xticks(np.arange(len(vary_param_1[1])))
 	else:
 		ax5.set_xlabel(vary_param_1[0])
 
@@ -234,7 +187,10 @@ def variance_fig(
 		lvar = [d.lvar for d in norm_data]
 		lff = [d.lfanofactor for d in norm_data]
 
-		x = vary_param_1[1]
+		if not callable(vary_param_1[1][0]):
+			x = vary_param_1[1]
+		else:
+			x = np.arange(len(vary_param_1[1]))
 		l, = ax1.plot(x, mean, '--o')
 		ax2.plot(x, lvar, '--o')
 		ax3.plot(x, gvar, '--o')

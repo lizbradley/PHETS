@@ -3,7 +3,8 @@ import numpy as np
 from data import dists_to_ref, filt_set, distance, prf_set
 from statscurves.data import pointwise_stats, scaler_stats
 from plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig
-from statscurves.plots import weight_functions_figs, variance_fig
+from statscurves.plots import variance_fig
+from PRFstats.plots import weight_functions_figs
 from data import mean_dists_compare
 from classify.data import DistanceClassifier, roc_data
 from plots import samples
@@ -187,8 +188,8 @@ def plot_variance(
 		filt_params,
 		vary_param_1,
 		vary_param_2=None,
-		legend_labels_1=None,
-		legend_labels_2=None,
+		legend_labels_1=None,       # ('axis', ('tick 1', 'tick2', 'tick3'))
+		legend_labels_2=None,       # ('legend 1', 'legend 2', 'legend 3')
 
 		weight_func=lambda i, j: 1,
 
@@ -203,14 +204,16 @@ def plot_variance(
 	def sqrt_weight_func(x, y):
 		return weight_func(x, y) ** .5
 
-	# plot_trajectory(sig)
-	weight_functions_figs(
-		vary_param_2,
-		legend_labels_2,
-		weight_func,
-		filt_params,
-		unit_test
-	)
+	if not unit_test:
+		# plot_trajectory(sig)
+		weight_functions_figs(
+			vary_param_1,
+			vary_param_2,
+			legend_labels_1,
+			legend_labels_2,
+			weight_func,
+			filt_params,
+		)
 
 	filts = filt_set(traj, filt_params, vary_param_1, vary_param_2,
 	                 load_saved=load_saved_filts, quiet=quiet)

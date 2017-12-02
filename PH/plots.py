@@ -83,7 +83,7 @@ def PD_fig(filt, out_filename):
 	plt.close(fig)
 
 
-def heatmap_ax(plot_ax, cbar_ax, z, dom=None, annot=False):
+def heatmap_ax(plot_ax, z, dom=None, cmap=None, norm=None, annot=False):
 
 	def annotate():
 		offset = (1.41 / (len(x) - 1)) / 2
@@ -108,20 +108,16 @@ def heatmap_ax(plot_ax, cbar_ax, z, dom=None, annot=False):
 		y = np.append(y, y[-1] + d)
 		return x, y
 
-	plot_ax.ticklabel_format(axis='both', style='sci',  scilimits=(0, 0))
-	plot_ax.set_aspect('equal')
-	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
-	cmap, norm = colorbar_ax(cbar_ax, levels)
 	zm = ma.masked_where(np.isnan(z), z)
 
 	if dom is None:
-		plot_ax.pcolormesh(zm, cmap=cmap, norm=norm, clip_on=False)
+		mesh = plot_ax.pcolormesh(zm, cmap=cmap, norm=norm, clip_on=False)
 	else:
 		x, y = extend_domain(dom, dom)
-		plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
+		mesh = plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
 		if annot: annotate()
+	return mesh
 
-	return cmap
 
 
 def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
@@ -133,13 +129,18 @@ def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
 		divider = make_axes_locatable(ax)
 		cbar_ax = divider.append_axes('right', size='5%', pad=0.05)
 
+	ax.ticklabel_format(axis='both', style='sci',  scilimits=(0, 0))
+	ax.set_aspect('equal')
+	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
+	cmap, norm = colorbar_ax(cbar_ax, levels)
+
 	from filtration import PRankFunction
 	if isinstance(prf, PRankFunction):
 		z = prf.data
-		heatmap_ax(ax, cbar_ax, z, dom=prf.epsilons, annot=annot_hm)
+		heatmap_ax(ax, z, prf.epsilons, cmap, norm, annot=annot_hm)
 	else:   # 2d array
 		z = prf
-		heatmap_ax(ax, cbar_ax, z, annot=annot_hm)
+		heatmap_ax(ax, z, cmap, norm, annot=annot_hm)
 
 
 
