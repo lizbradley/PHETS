@@ -196,7 +196,6 @@ def plot_variance(
 		quiet=True,
 		annot_hm=False,
 		load_saved_filts=False,
-		filts_fname=None,
 		unit_test=False
 ):
 	## TODO: plot weight functions, heatmaps
@@ -214,7 +213,7 @@ def plot_variance(
 	)
 
 	filts = filt_set(traj, filt_params, vary_param_1, vary_param_2,
-	                 load_saved_filts, quiet, in_fname=filts_fname)
+	                 load_saved=load_saved_filts, quiet=quiet)
 
 	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
 

@@ -99,26 +99,31 @@ def validate_vps(vp1, vp2):
 
 
 
+def is_filt_param(vp):
+	if vp is None:
+		return False
+	else:
+		return vp[0] in filt_params
+
+
+def is_weight_func(vp):
+	return vp and vp[0] == 'weight_func'
+
+
 def filt_set(
 		traj, params, vp1=None, vp2=None,
         load_saved=False, save=False,
 		quiet=True,
         fid=None
 ) :
-	def is_filt_param(vp):
-		if vp is None:
-			return False
-		else:
-			return vp[0] in filt_params
-	
 	suffix = fid if fid is not None else ''
 	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
 
 	if load_saved:
 		try:
-			np.load(load_saved)
-		except TypeError:
-			np.load(default_fname)
+			return np.load(load_saved)
+		except AttributeError:
+			return np.load(default_fname)
 
 	iter_1 = len(vp1[1]) if is_filt_param(vp1) else 1
 	iter_2 = len(vp2[1]) if is_filt_param(vp2) else 1
@@ -146,17 +151,11 @@ def filt_set(
 	return filts
 
 
-
-
 def prf_set(filts, weight_func=lambda i, j: 1, vp1=None, vp2=None):
-
-	def is_weight_func(vp):
-		return vp and vp[0] == 'weight_func'
-	
 	prfs = np.empty_like(filts, dtype=object)
 	for idx, filt in np.ndenumerate(filts):
 		prfs[idx] = NormalPRF(filt.PRF())
-		prfs[idx].appy_weight(weight_func)
+		prfs[idx].apply_weight(weight_func)
 		
 	lvp1 = len(vp1[1]) if vp1 is not None else None
 	lvp2 = len(vp2[1]) if vp2 is not None else None
@@ -207,11 +206,11 @@ def apply_weight(prf, weight_func):
 
 
 def distance(a, b):
-	return norm(np.subtract(a, b))
+	return (a - b).norm
 
 
 def dists_to_ref(funcs, ref_func):
-	dists = [norm(np.subtract(f, ref_func)) for f in funcs]
+	dists = [(f - ref_func).norm for f in funcs]
 	return dists
 
 
