@@ -1,6 +1,6 @@
 import numpy as np
 
-from data import distance
+from PRFstats.data import distance
 from PRFstats.data import ParamError
 
 def norm(f):

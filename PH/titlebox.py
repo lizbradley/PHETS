@@ -67,7 +67,7 @@ def filt_params_table(subplot, filt_params, fontsize=None):
 
 
 
-def update_epsilon(ax,e):
+def eps_table(ax, e):
 	ax.set_xlim([0,1])
 	ax.set_ylim([0,1])
 	ax.axis('off')
@@ -82,6 +82,20 @@ def update_epsilon(ax,e):
 	# time_table.auto_set_font_size(False)
 	# time_table.set_fontsize(8)
 
+def i_table(ax, step):
+	ax.set_xlim([0,1])
+	ax.set_ylim([0,1])
+	ax.axis('off')
+	time_table = ax.table(
+		cellText= [['step', '{}'.format(step)]],
+		bbox=[0, 0, 1, 1],    # x0, y0, width, height
+		colWidths=[.5, 1],
+		cellLoc='center',
+
+		animated=True,
+	)
+# time_table.auto_set_font_size(False)
+# time_table.set_fontsize(8)
 
 
 def movie_params_table(ax, params):

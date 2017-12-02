@@ -8,7 +8,7 @@ from PRFstats import plot_ROCs, plot_dists_to_means, plot_clusters, \
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=6)
+test, start_time = get_test(set_test=10)
 
 
 def out_fname():
@@ -328,7 +328,7 @@ if test == 10:
 		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=True
+		load_saved_filts=False
 	)
 
 
@@ -356,7 +356,7 @@ if test == 11:
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=True
+		load_saved_filts=False
 	)
 
 if test == 12:

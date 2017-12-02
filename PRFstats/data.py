@@ -110,20 +110,33 @@ def is_weight_func(vp):
 	return vp and vp[0] == 'weight_func'
 
 
+def default_fname(fid):
+	suffix = fid if fid is not None else ''
+	return 'PRFstats/data/filts{}.npy'.format(suffix)
+
+
+def load_filts(load_saved, fid):
+	try:
+		return np.load(load_saved)
+	except AttributeError:
+		return np.load(default_fname(fid))
+
+
+def save_filts(save, fid, filts):
+	try:
+		np.save(save, filts)
+	except AttributeError:
+		np.save(default_fname(fid), filts)
+
+
 def filt_set(
 		traj, params, vp1=None, vp2=None,
-        load_saved=False, save=False,
+        load_saved=False, save=True,
 		quiet=True,
         fid=None
 ) :
-	suffix = fid if fid is not None else ''
-	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
-
 	if load_saved:
-		try:
-			return np.load(load_saved)
-		except AttributeError:
-			return np.load(default_fname)
+		return load_filts(load_saved, fid)
 
 	iter_1 = len(vp1[1]) if is_filt_param(vp1) else 1
 	iter_2 = len(vp2[1]) if is_filt_param(vp2) else 1
@@ -135,19 +148,16 @@ def filt_set(
 		for j in range(iter_2):
 			if is_filt_param(vp2):
 				params.update({vp2[0]: vp2[1][j]})
-			filts_ = traj.filtrations(params, quiet)
+			status_str = 'vp1: {}, vp2: {}'.format(vp1[1][i], vp2[1][j])
+			filts_ = traj.filtrations(params, quiet, status_str)
 			filts_v.append(filts_)
 		filts_vv.append(filts_v)
 	filts_vv = np.array(filts_vv)
 	filts = np.squeeze(filts_vv)
 
-	if save: 
-		try:
-			# noinspection PyTypeChecker
-			np.save(save, filts)
-		except TypeError:
-			np.save(default_fname, filts)
-		
+	if save:
+		save_filts(save, fid, filts)
+
 	return filts
 
 
@@ -201,8 +211,6 @@ def apply_weight(prf, weight_func):
 	if isinstance(weight_func, int):
 		weight_func = np.full_like(xx, weight_func)
 	return np.multiply(z, weight_func)
-
-
 
 
 def distance(a, b):

@@ -1,15 +1,12 @@
-import numpy
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import signals, PH
 from PH.plots import heatmap_ax
-from PH.titlebox import filt_params_table, filenames_table
+from PH.titlebox import filt_params_table
 from PRFstats.data import is_filt_param
-from utilities import print_title, clear_dir, clear_temp_files
-from config import default_filtration_params as filt_params
+from utilities import print_title
 
 
 def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
@@ -30,16 +27,27 @@ def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
 
 
 
-def samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
+def samples(filts, cmd, dir, vary_param_1=None, vary_param_2=None):
 
 	if not (is_filt_param(vary_param_1) or is_filt_param(vary_param_2)):
 		filts_vv = [[filts]]
 	elif is_filt_param(vary_param_1) and not is_filt_param(vary_param_2):
-		filts_vv = [[fs] for fs in filts]
+		filts_vv = [filts]
 	else:
 		filts_vv = filts
 
 	del filts
+
+	if isinstance(cmd, dict):
+		interval = cmd['interval']
+		try:
+			filt_step = cmd['filt_step']
+		except KeyError:
+			filt_step = None
+	else:
+		interval = cmd
+		filt_step = None
+
 
 	for i, filts_v in enumerate(filts_vv):
 		for j, filts in enumerate(filts_v):
@@ -61,12 +69,17 @@ def samples(filts, interval, dir, vary_param_1=None, vary_param_2=None):
 				print_title(base_name.split('/')[-1][:-2])
 
 				PD_filename = base_name + 'PD.png'
-				PRF_filename = base_name + 'PRF.png'
-				movie_filename = base_name + 'movie.mp4'
-
 				filt.plot_PD(PD_filename)
+
+				PRF_filename = base_name + 'PRF.png'
 				filt.plot_PRF(PRF_filename)
-				filt.movie(movie_filename)
+
+				if filt_step:
+					complex_filename = base_name + 'comp.png'
+					filt.plot_complex(filt_step, complex_filename)
+				else:
+					movie_filename = base_name + 'movie.mp4'
+					filt.movie(movie_filename)
 
 
 def dists_ax(ax, d, mean, traj):
@@ -206,340 +219,3 @@ def clusters_fig(dists, filt_params, fname1, fname2, out_fname):
 	fig.savefig(out_fname)
 
 
-def roc_ax(ax, data, k, title):
-	fpr, tpr = data
-	l, = ax.plot(fpr, tpr, clip_on=False, lw=3, zorder=0)
-	k = np.arange(*k)
-
-	ax.plot([0, 1], [0, 1], '--', c='k')
-
-	def sparsify(data, k):
-		data = np.asarray(data)
-		k_args = (k % 0.5 == 0.0)
-		# k_args = (k % 1.0 == 0.0)
-		k_pts = k[k_args]
-		data_pts = data[:, k_args]
-		return data_pts, k_pts
-
-	data_sp, k_sp = sparsify(data, k)
-
-	fpr_sp, tpr_sp = data_sp
-
-	cm = ax.scatter(fpr_sp, tpr_sp, s=150, zorder=10, clip_on=False, c=k_sp)
-
-	ax.set_xlim([0, 1])
-	ax.set_ylim([0, 1])
-	ax.grid()
-	ax.set_aspect('equal')
-	ax.set_xlabel('false positive rate')
-	ax.set_ylabel('true positive rate')
-	ax.set_title(title, y=1.02)
-	return l, cm
-
-
-def dual_roc_fig(data, k, traj1, traj2, fname, vary_param):
-	fig = plt.figure(figsize=(10, 4),dpi=100)
-	ax1 = fig.add_subplot(121)
-	ax2 = fig.add_subplot(122)
-
-	fig.subplots_adjust(right=0.85)
-	cax = fig.add_axes([0.92, 0.05, 0.03, 0.9])
-
-	lines = []
-	if vary_param is None: data = [data]
-	for data_wl in data:
-		prf_data_1, prf_data_2 = data_wl
-
-		roc_ax(ax1, prf_data_1, k, 'is it {}?'.format(traj1.name))
-		l, cm = roc_ax(ax2, prf_data_2, k, 'is it {}?'.format(traj2.name))
-		lines.append(l)
-
-	bounds = np.arange(k[0], k[1] + .5, .5)
-	# bounds = np.arange(k[0], k[1] + 1, 1)
-	cb = fig.colorbar(cm, cax=cax, boundaries=bounds)
-	cb.set_label("$k$", labelpad=-1, size=19)
-
-	labels = bounds[::2]
-	loc = labels + .25
-	# loc = labels + .5
-	cb.set_ticks(loc)
-	cb.set_ticklabels([int(l) for l in labels])
-	cb.ax.tick_params(labelsize=14)
-
-	if vary_param is not None:
-		fig.legend(lines, vary_param[1], loc=3)
-		fig.suptitle('varying parameter '+vary_param[0])
-		fig.subplots_adjust(top = 0.85)
-
-	plt.savefig(fname)
-
-def weight_function_fig(f, num_div, fname):
-
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	div = make_axes_locatable(ax)
-	cax = div.append_axes('right', size='10%', pad=.2)
-
-	x = y = np.linspace(0, 2 ** .5, num_div)
-	xx, yy = np.meshgrid(x, y)
-	z = f(xx, yy)
-	if isinstance(z, int):
-		z = xx * 0 + z
-
-	mask = lambda x, y: x > y
-	mask = mask(xx, yy)
-	mask = np.where(mask is True, np.nan, 1)
-	z = np.multiply(z, mask)
-
-	heatmap_ax(ax, cax, x, y, z)
-	plt.savefig('weight_functions/{}.png'.format(fname))
-
-
-def weight_functions_figs(
-		vary_param_2,
-		legend_labels,
-		weight_func,
-		filt_params,
-		unit_test=False
-):
-	if unit_test:
-		out_dir = 'output/weight_functions/'
-		import os
-		print os.getcwd()
-	else:
-		out_dir = 'output/PRFstats/weight_functions/'
-
-	print 'plotting weight function(s)...'
-	clear_temp_files(out_dir)
-
-	if vary_param_2 and vary_param_2[0] == 'weight_func':
-		funcs = vary_param_2[1]
-		fnames = legend_labels
-
-	else:
-		funcs = [weight_func]
-		fnames = ['f']
-
-	for fname, func in zip(fnames, funcs):
-		fig = plt.figure()
-		ax = fig.add_subplot(111)
-		div = make_axes_locatable(ax)
-		cax = div.append_axes('right', size='10%', pad=.2)
-
-		x = y = np.linspace(0, 2 ** .5, filt_params['num_divisions'])
-		xx, yy = np.meshgrid(x, y)
-		z = func(xx, yy)
-		if isinstance(z, int):
-			z = xx * 0 + z
-
-		mask = lambda x, y: x > y
-		mask = mask(xx, yy)
-		nans = np.full_like(mask, np.nan)
-		ones = np.ones_like(mask)
-		mask = np.where(mask, nans, ones)
-		z = np.multiply(z, mask)
-
-		heatmap_ax(ax, cax, z, dom=x)
-		plt.savefig('{}{}.png'.format(out_dir, fname))
-
-
-def heatmaps_figs(
-		data_arr,
-		data_arr_pre_weight,
-		filt_params,
-		vary_param_1,
-        vary_param_2,
-		legend_labels,
-		filename,
-		annot_hm,
-		unit_test=False
-):
-
-	if unit_test:
-		out_dir = 'output/heatmaps/'
-		return
-	else:
-		out_dir = 'output/PRFstats/heatmaps/'
-
-	if not clear_dir(out_dir):
-		print 'skipping heatmaps'
-		return
-
-	print 'plotting heatmaps...'
-
-	def make_hmap_fig(hmap_data, hmap_data_pw):
-
-		fig = plt.figure(figsize=(12, 8))
-
-
-		ax1 = fig.add_subplot(231)
-		ax2 = fig.add_subplot(232)
-		ax3 = fig.add_subplot(233)
-		ax4 = fig.add_subplot(234)
-		ax5 = fig.add_subplot(235)
-		ax6 = fig.add_subplot(236)
-
-		cax = fig.add_axes([.935, .1, .025, .78])
-
-		import warnings
-		with warnings.catch_warnings():
-			warnings.simplefilter("ignore")
-			fig.tight_layout(pad=3, rect=(.05, 0, .95, .95))
-
-
-		x = y = np.linspace(0, np.power(2, .5), filt_params['num_divisions'])
-
-		heatmap_ax(ax1, cax, x, y, hmap_data.pointwise_mean, annot_hm)
-		heatmap_ax(ax2, cax, x, y, hmap_data.pointwise_var, annot_hm)
-		heatmap_ax(ax3, cax, x, y, hmap_data.functional_COV, annot_hm)
-		heatmap_ax(ax4, cax, x, y, hmap_data_pw.pointwise_mean, annot_hm)
-		heatmap_ax(ax5, cax, x, y, hmap_data_pw.pointwise_var, annot_hm)
-		heatmap_ax(ax6, cax, x, y, hmap_data_pw.functional_COV, annot_hm)
-
-
-		ax1.set_title('pointwise mean',		fontsize=12, y=1.05)
-		ax2.set_title('pointwise variance', fontsize=12, y=1.05)
-		ax3.set_title('functional COV', 	fontsize=12, y=1.05)
-
-		# abuse y axis label for row title
-		ax1.set_ylabel('weighted',		fontsize=12, labelpad=10)
-		ax4.set_ylabel('unweighted',	fontsize=12, labelpad=10)
-
-		ticks = np.linspace(0, 1.4, filt_params['num_divisions'], endpoint=True)
-		while len(ticks) > 6:
-			ticks = ticks[1::2]
-		for ax in [ax1, ax2, ax3, ax4, ax5, ax6]:
-			ax.xaxis.set_ticks(ticks)
-			ax.yaxis.set_ticks(ticks)
-
-		return fig
-
-
-	if vary_param_2:
-		for i, val_2 in enumerate(vary_param_2[1]):
-			for j, val_1 in enumerate(vary_param_1[1]):
-				data = data_arr[i, j]
-				if vary_param_2[0] == 'weight_func':
-					data_pw = data_arr_pre_weight[0, j]
-				else:
-					data_pw = data_arr_pre_weight[i, j]
-				fig = make_hmap_fig(data, data_pw)
-				fig.suptitle(filename.split('/')[-1])
-				if legend_labels:
-					val_2 = legend_labels[i]
-				fname = '{}_{}__{}_{}.png'.format(
-					vary_param_2[0], val_2, vary_param_1[0], val_1
-				)
-				fig.savefig(out_dir + fname)
-				plt.close(fig)
-
-	else:
-		data_arr = data_arr[0]
-		data_arr_pre_weight = data_arr_pre_weight[0]
-		for j, val_1 in enumerate(vary_param_1[1]):
-			data = data_arr[j]
-			data_pw = data_arr_pre_weight[j]
-			fig = make_hmap_fig(data, data_pw)
-			fig.suptitle(filename.split('/')[-1])
-			fname = '{}_{}.png'.format(vary_param_1[0], val_1)
-			fig.savefig(out_dir + fname)
-			plt.close(fig)
-
-
-def variance_fig(
-		data,
-		filt_params,
-		vary_param_1,
-		vary_param_2,
-        out_filename,
-		legend_labels_1,
-		legend_labels_2,
-		filename
-):
-	print 'plotting variance curves...'
-	fig = plt.figure(figsize=(14, 8), tight_layout=True)
-
-	label_kwargs = {
-		'rotation': 0,
-		'ha': 'right',
-		'va': 'center',
-		'labelpad': 10,
-	}
-
-	fname_ax =  plt.subplot2grid((5, 9), (0, 0), rowspan=1, colspan=3)
-	params_ax = plt.subplot2grid((5, 9), (1, 0), rowspan=3, colspan=3)
-
-	ax1 = plt.subplot2grid((5, 9), (0, 3), colspan=6)
-	ax2 = plt.subplot2grid((5, 9), (1, 3), colspan=6, sharex=ax1)
-	ax3 = plt.subplot2grid((5, 9), (2, 3), colspan=6, sharex=ax1, sharey=ax2)
-	ax4 = plt.subplot2grid((5, 9), (3, 3), colspan=6, sharex=ax1)
-	ax5 = plt.subplot2grid((5, 9), (4, 3), colspan=6, sharex=ax1, sharey=ax4)
-
-	filenames_table(fname_ax, [filename, out_filename])
-	filt_params_table(params_ax, filt_params)
-
-	ax1.set_ylabel('norm of mean', **label_kwargs)
-	ax2.set_ylabel('local variance', **label_kwargs)
-	ax3.set_ylabel('global variance', **label_kwargs)
-	ax4.set_ylabel('local fano factor', **label_kwargs)
-	ax5.set_ylabel('global fano factor', **label_kwargs)
-
-	if legend_labels_1:
-		title, ticks = legend_labels_1
-		ax5.set_xlabel(title)
-		ax5.set_xticklabels(ticks)
-	else:
-		ax5.set_xlabel(vary_param_1[0])
-
-
-	def plot_stats_curves(norm_data):
-
-		mean = [d.mean for d in norm_data]
-		gvar = [d.gvar for d in norm_data]
-		gff = [d.gfanofactor for d in norm_data]
-		lvar = [d.lvar for d in norm_data]
-		lff = [d.lfanofactor for d in norm_data]
-
-		x = vary_param_1[1]
-		l, = ax1.plot(x, mean, '--o')
-		ax2.plot(x, lvar, '--o')
-		ax3.plot(x, gvar, '--o')
-		ax4.plot(x, lff, '--o')
-		ax5.plot(x, gff, '--o')
-
-		return l		# for legend
-
-
-
-	if vary_param_2:
-
-		if legend_labels_2:
-			label_list = legend_labels_2
-		else:
-			label_list = [
-				'{} = {}'.format(vary_param_2[0], str(val))
-				for val in vary_param_2[1]
-			]
-
-		line_list = []
-		for i, norm_data in enumerate(data.T):
-			l = plot_stats_curves(norm_data)
-			line_list.append(l)
-
-		fig.legend(
-			line_list, label_list,
-			'lower left',
-			borderaxespad=3, borderpad=1
-		)
-
-	else:
-		plot_stats_curves(data)
-
-	for ax in [ax1, ax2, ax3, ax4, ax5]:
-		ax.grid()
-		ax.set_ylim(bottom=0)
-		if ax is not ax5:
-			plt.setp(ax.get_xticklabels(), visible=False)
-			plt.setp(ax.get_xticklines(), visible=False)
-
-	fig.savefig(out_filename)

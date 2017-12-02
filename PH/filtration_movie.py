@@ -9,7 +9,7 @@ from matplotlib import collections
 plt.ioff()
 
 
-from titlebox import filename_table, filt_params_table, update_epsilon
+from titlebox import filename_table, filt_params_table, eps_table, i_table
 from titlebox import movie_params_table
 from utilities import remove_old_frames, frames_to_movie, clear_temp_files, \
 	print_still
@@ -81,7 +81,7 @@ def plot_landmarks_2D(subplot, landmark_data):
 
 
 
-def plot_complex_2D(subplot, filtration, i, color_scheme, alpha):
+def plot_complex_2D(subplot, filtration, i, color_scheme=None, alpha=1):
 
 	complex_data = complexes_coords(filtration)
 
@@ -219,6 +219,39 @@ def plot_all_3D_gnuplot(subplot, filtration, i, camera_angle):
 	subplot.imshow(img)
 
 
+def plot_complex(
+		filt, i, out_filename,
+		camera_angle=(70, 45), alpha=1, dpi=200
+):
+	fig = plt.figure(figsize=(9, 6), tight_layout=False, dpi=dpi)
+
+	fname_ax =         plt.subplot2grid((12, 8), (0, 0), rowspan=1,  colspan=2)
+	epsilon_ax =       plt.subplot2grid((12, 8), (2, 0), rowspan=1,  colspan=2)
+	i_ax =             plt.subplot2grid((12, 8), (3, 0), rowspan=1,  colspan=2)
+	filt_params_ax =   plt.subplot2grid((12, 8), (5, 0), rowspan=7,  colspan=2)
+	plot_ax =          plt.subplot2grid((12, 8), (0, 3), rowspan=12, colspan=6)
+
+	fig.subplots_adjust(left=.05, right=.95, bottom=.1, top=.9)
+	filename_table(fname_ax, filt.name)
+	filt_params_table(filt_params_ax, filt.params)
+
+	eps_table(epsilon_ax, filt.epsilons[i])
+	i_table(i_ax, i)
+
+	witness_data = filt.witness_coords
+	landmark_data = filt.landmark_coords
+	amb_dim = filt.ambient_dim
+
+	print 'plotting complex...'
+	if amb_dim == 2:
+		plot_witnesses_2D(plot_ax, witness_data)
+		plot_landmarks_2D(plot_ax, landmark_data)
+		plot_complex_2D(plot_ax, filt, i, alpha=alpha)
+	else:
+		plot_all_3D_gnuplot(plot_ax, filt, i, camera_angle)
+	plt.savefig(out_filename)
+	plt.close(fig)
+
 def build_movie(
 		filt,
 		out_filename,
@@ -259,7 +292,7 @@ def build_movie(
 			plot_complex_2D(plot_ax, filt, i, color_scheme, alpha)
 		else:
 			plot_all_3D_gnuplot(plot_ax, filt, i, camera_angle)
-		update_epsilon(epsilon_ax, eps)
+		eps_table(epsilon_ax, eps)
 		plt.savefig('PH/frames/frame%03d.png' % i)
 		plot_ax.clear()
 

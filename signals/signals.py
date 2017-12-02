@@ -302,7 +302,7 @@ class Trajectory(BaseTrajectory):
 		self.filts = None
 
 
-	def filtrations(self, filt_params, quiet):
+	def filtrations(self, filt_params, quiet=True, status_str=None):
 		""" Compute filtration for each window of trajectory.
 
 		Parameters
@@ -320,8 +320,13 @@ class Trajectory(BaseTrajectory):
 		"""
 		if self.windows is None:
 			raise Exception('self.windows is None')
+		file_str = 'building filtrations for {}...'.format(self.name)
 
-		print_title('building filtrations for {}...'.format(self.name))
+		try:
+			print_title(' '.join((file_str, status_str)))
+		except TypeError:
+			print_title(file_str)
+
 		filts = []
 		for i, traj in enumerate(self.windows):
 			if quiet:
@@ -336,7 +341,7 @@ class Trajectory(BaseTrajectory):
 				)
 			f = Filtration(traj, filt_params, silent=quiet, save=False)
 			filts.append(f)
-		print 'done.'
+		print 'done'
 		self.filts = filts
 		return filts
 

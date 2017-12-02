@@ -388,7 +388,6 @@ class Filtration:
 		Returns
 		-------
 		array
-			TODO: PRF class
 
 		"""
 		if self._PRF is None:
@@ -423,7 +422,7 @@ class Filtration:
 		"""
 		filtration_movie.build_movie(self, filename, **kwargs)
 
-	def plot_complex(self, i, filename):
+	def plot_complex(self, i, filename, **kwargs):
 		"""
 		plot complex at ith step of the filtration
 
@@ -439,7 +438,7 @@ class Filtration:
 		None
 
 		"""
-		raise NotImplemented
+		filtration_movie.plot_complex(self, i, filename, **kwargs)
 
 	def plot_PD(self, filename):
 		"""

@@ -789,13 +789,16 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			#print("value: %f" % d[w][max_filtration_param - 1].distance)
 			if (d[w][max_filtration_param - 1].distance) > max_epsilon:
 				max_epsilon = d[w][max_filtration_param - 1].distance
-		print("Done. Filtration contains %i top simplex birth events, with the largest epsilon equal to %f.\n" % (len(filtration), max_epsilon))
+		print('''Done. Filtration contains %i top simplex birth events, with 
+		the largest epsilon equal to %f.\n''' % (len(filtration), max_epsilon))
 	else:
 		max_sb_length = 0
 		for sb in filtration:
 			if len(sb.landmark_set) > max_sb_length:
 				max_sb_length = len(sb.landmark_set)
-		print("Done. Filtration contains %i top simplex birth events, with the largest one comprised of %i landmarks.\nMax filtration parameter: %s.\n" % (len(filtration), max_sb_length, max_filtration_param))
+		print('''Done. Filtration contains %i top simplex birth events, with 
+		the largest one comprised of %i landmarks.
+		Max filtration parameter: %s.\n''' % (len(filtration), max_sb_length, max_filtration_param))
 
 	print("Filtration has been successfully built!\n")
 	return (filtration, extra_data + (max_filtration_param,), epsilons)

@@ -1,13 +1,13 @@
 import numpy as np
 
-from PRFstats.data import dists_to_ref, filt_set, distance, \
-	prf_set
-from PRFstats.statscurves import pointwise_stats, scaler_stats
-from PRFstats.plots import dists_to_means_fig, clusters_fig, \
-	dists_to_ref_fig, weight_functions_figs, heatmaps_figs, variance_fig
+from data import dists_to_ref, filt_set, distance, prf_set
+from statscurves.data import pointwise_stats, scaler_stats
+from plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig
+from statscurves.plots import weight_functions_figs, variance_fig
 from data import mean_dists_compare
-from PRFstats.classify import DistanceClassifier, roc_data
-from plots import dual_roc_fig, samples
+from classify.data import DistanceClassifier, roc_data
+from plots import samples
+from classify.plots import dual_roc_fig
 from signals import Trajectory
 from utilities import clear_old_files
 
