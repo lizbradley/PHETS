@@ -1,10 +1,12 @@
 import numpy as np
 
-from PRFstats.data import roc_data, dists_to_ref, fetch_filts, distance, \
-	fetch_prfs, scaler_stats, pointwise_stats
+from PRFstats.data import dists_to_ref, filt_set, distance, \
+	prf_set
+from PRFstats.statscurves import pointwise_stats, scaler_stats
 from PRFstats.plots import dists_to_means_fig, clusters_fig, \
 	dists_to_ref_fig, weight_functions_figs, heatmaps_figs, variance_fig
-from data import DistanceClassifier, mean_dists_compare
+from data import mean_dists_compare
+from PRFstats.classify import DistanceClassifier, roc_data
 from plots import dual_roc_fig, samples
 from signals import Trajectory
 from utilities import clear_old_files
@@ -74,17 +76,13 @@ def plot_dists_to_means(
 		quiet=True
 	):
 
-	filts1 = fetch_filts(
-		traj1, filt_params, load_saved_filts, quiet,
-		fid=1, filts_fname=filts_fnames[0]
-	)
-	filts2 = fetch_filts(
-		traj2, filt_params, load_saved_filts, quiet,
-		fid=2, filts_fname=filts_fnames[1]
-	)
+	filts1 = filt_set(traj1, filt_params, load_saved_filts, quiet,
+	                  in_fname=filts_fnames[0], fid=1)
+	filts2 = filt_set(traj2, filt_params, load_saved_filts, quiet,
+	                  in_fname=filts_fnames[1], fid=2)
 
-	prfs1 = fetch_prfs(filts1, weight_func, quiet=quiet)
-	prfs2 = fetch_prfs(filts2, weight_func, quiet=quiet)
+	prfs1 = prf_set(filts1, weight_func)
+	prfs2 = prf_set(filts2, weight_func)
 
 	refs, dists = mean_dists_compare(prfs1, prfs2)
 
@@ -112,17 +110,13 @@ def plot_clusters(
 		quiet=True
 ):
 
-	filts1 = fetch_filts(
-		traj1, filt_params, load_saved_filts, quiet,
-		fid=1, filts_fname=filts_fnames[0]
-	)
-	filts2 = fetch_filts(
-		traj2, filt_params, load_saved_filts, quiet,
-		fid=2, filts_fname=filts_fnames[1]
-	)
+	filts1 = filt_set(traj1, filt_params, load_saved_filts, quiet,
+	                  in_fname=filts_fnames[0], fid=1)
+	filts2 = filt_set(traj2, filt_params, load_saved_filts, quiet,
+	                  in_fname=filts_fnames[1], fid=2)
 
-	prfs1 = fetch_prfs(filts1, weight_func, quiet=quiet)
-	prfs2 = fetch_prfs(filts2, weight_func, quiet=quiet)
+	prfs1 = prf_set(filts1, weight_func)
+	prfs2 = prf_set(filts2, weight_func)
 
 	refs, dists = mean_dists_compare(prfs1, prfs2)
 
@@ -149,18 +143,14 @@ def plot_ROCs(
 ):
 	# TODO: weight function, vary_param_2
 
-	filts1 = fetch_filts(
-		traj1, filt_params, load_saved_filts, quiet, vary_param,
-		fid=1, filts_fname=filts_fnames[0]
-	)
-	filts2 = fetch_filts(
-		traj2, filt_params, load_saved_filts, quiet, vary_param,
-		fid=2, filts_fname=filts_fnames[1]
-	)
+	filts1 = filt_set(traj1, filt_params, vary_param, load_saved_filts, quiet,
+	                  in_fname=filts_fnames[0], fid=1)
+	filts2 = filt_set(traj2, filt_params, vary_param, load_saved_filts, quiet,
+	                  in_fname=filts_fnames[1], fid=2)
 
 
-	prfs1 = fetch_prfs(filts1, weight_func, quiet=quiet)
-	prfs2 = fetch_prfs(filts2, weight_func, quiet=quiet)
+	prfs1 = prf_set(filts1, weight_func)
+	prfs2 = prf_set(filts2, weight_func)
 
 	data = []
 
@@ -197,7 +187,8 @@ def plot_variance(
 		filt_params,
 		vary_param_1,
 		vary_param_2=None,
-		legend_labels=None,
+		legend_labels_1=None,
+		legend_labels_2=None,
 
 		weight_func=lambda i, j: 1,
 
@@ -208,6 +199,7 @@ def plot_variance(
 		filts_fname=None,
 		unit_test=False
 ):
+	## TODO: plot weight functions, heatmaps
 
 	def sqrt_weight_func(x, y):
 		return weight_func(x, y) ** .5
@@ -215,26 +207,16 @@ def plot_variance(
 	# plot_trajectory(sig)
 	weight_functions_figs(
 		vary_param_2,
-		legend_labels,
+		legend_labels_2,
 		weight_func,
 		filt_params,
 		unit_test
 	)
 
-	filts = fetch_filts(
-		traj, filt_params,
-		load_saved_filts, quiet,
-		vary_param_1, vary_param_2,
-		filts_fname=filts_fname
-	)
+	filts = filt_set(traj, filt_params, vary_param_1, vary_param_2,
+	                 load_saved_filts, quiet, in_fname=filts_fname)
 
-	prfs = fetch_prfs(
-		filts,
-		weight_func,
-		vary_param_1,
-		vary_param_2,
-		quiet=quiet
-	)
+	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
 
 	pw_data = pointwise_stats(
 		prfs, vary_param_1, vary_param_2
@@ -251,22 +233,23 @@ def plot_variance(
 		vary_param_1,
 		vary_param_2,
 	    out_filename,
-		legend_labels,
+		legend_labels_1,
+		legend_labels_2,
 		traj.fname
 	)
 
-	heatmaps_figs(
-		pw_data,
-		# pw_data_pre_weight,
-		pw_data,             ## FIX ME
-		filt_params,
-		vary_param_1,
-	    vary_param_2,
-		legend_labels,
-		out_filename,
-		annot_hm,
-		unit_test
-	)
+	# heatmaps_figs(
+	# 	pw_data,
+	# 	# pw_data_pre_weight,
+	# 	pw_data,             ## FIX ME
+	# 	filt_params,
+	# 	vary_param_1,
+	#     vary_param_2,
+	# 	legend_labels_2,
+	# 	out_filename,
+	# 	annot_hm,
+	# 	unit_test
+	# )
 
 	if see_samples:
 		dir_ = 'output/PRFstats/samples'
@@ -299,14 +282,10 @@ def plot_pairwise_mean_dists(
 		filts_fname=None,
 		unit_test=False
 ):
-	filts = fetch_filts(
-		traj, filt_params,
-		load_saved_filts, quiet,
-		vary_param_1, vary_param_2,
-		filts_fname=filts_fname
-	)
+	filts = filt_set(traj, filt_params, vary_param_1, vary_param_2,
+	                 load_saved_filts, quiet, in_fname=filts_fname)
 
-	prfs = fetch_prfs(filts, weight_func, vary_param_1, vary_param_2, quiet)
+	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
 
 	prfs_means = np.mean(prfs, axis=2)
 

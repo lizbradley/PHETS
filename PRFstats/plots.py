@@ -452,7 +452,8 @@ def variance_fig(
 		vary_param_1,
 		vary_param_2,
         out_filename,
-		legend_labels,
+		legend_labels_1,
+		legend_labels_2,
 		filename
 ):
 	print 'plotting variance curves...'
@@ -470,20 +471,25 @@ def variance_fig(
 
 	ax1 = plt.subplot2grid((5, 9), (0, 3), colspan=6)
 	ax2 = plt.subplot2grid((5, 9), (1, 3), colspan=6, sharex=ax1)
-	ax3 = plt.subplot2grid((5, 9), (2, 3), colspan=6, sharex=ax1)
-	ax4 = plt.subplot2grid((5, 9), (3, 3), colspan=6, sharex=ax1, sharey=ax2)
-	ax5 = plt.subplot2grid((5, 9), (4, 3), colspan=6, sharex=ax1)
+	ax3 = plt.subplot2grid((5, 9), (2, 3), colspan=6, sharex=ax1, sharey=ax2)
+	ax4 = plt.subplot2grid((5, 9), (3, 3), colspan=6, sharex=ax1)
+	ax5 = plt.subplot2grid((5, 9), (4, 3), colspan=6, sharex=ax1, sharey=ax4)
 
 	filenames_table(fname_ax, [filename, out_filename])
 	filt_params_table(params_ax, filt_params)
 
 	ax1.set_ylabel('norm of mean', **label_kwargs)
-	ax2.set_ylabel('global variance', **label_kwargs)
-	ax3.set_ylabel('global fano factor', **label_kwargs)
-	ax4.set_ylabel('local variance', **label_kwargs)
-	ax5.set_ylabel('local fano factor', **label_kwargs)
+	ax2.set_ylabel('local variance', **label_kwargs)
+	ax3.set_ylabel('global variance', **label_kwargs)
+	ax4.set_ylabel('local fano factor', **label_kwargs)
+	ax5.set_ylabel('global fano factor', **label_kwargs)
 
-	ax5.set_xlabel(vary_param_1[0])
+	if legend_labels_1:
+		title, ticks = legend_labels_1
+		ax5.set_xlabel(title)
+		ax5.set_xticklabels(ticks)
+	else:
+		ax5.set_xlabel(vary_param_1[0])
 
 
 	def plot_stats_curves(norm_data):
@@ -496,10 +502,10 @@ def variance_fig(
 
 		x = vary_param_1[1]
 		l, = ax1.plot(x, mean, '--o')
-		ax2.plot(x, gvar, '--o')
-		ax3.plot(x, gff, '--o')
-		ax4.plot(x, lvar, '--o')
-		ax5.plot(x, lff, '--o')
+		ax2.plot(x, lvar, '--o')
+		ax3.plot(x, gvar, '--o')
+		ax4.plot(x, lff, '--o')
+		ax5.plot(x, gff, '--o')
 
 		return l		# for legend
 
@@ -507,8 +513,8 @@ def variance_fig(
 
 	if vary_param_2:
 
-		if legend_labels:
-			label_list = legend_labels
+		if legend_labels_2:
+			label_list = legend_labels_2
 		else:
 			label_list = [
 				'{} = {}'.format(vary_param_2[0], str(val))

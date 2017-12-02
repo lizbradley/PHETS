@@ -16,15 +16,12 @@ from PRFstats.unit_tests.common import plot_variance__extract_output
 
 from utilities import clear_dir_rf
 from PRFstats import plot_variance, plot_ROCs, plot_dists_to_means
-from PRFstats.data import fetch_filts
+from PRFstats.data import filt_set
 
 
 def ref__fetch_filts_v():
-	fetch_filts(
-		ellipse_traj, filt_params, load_saved=False, quiet=False,
-		out_fname='ref/fetch_filts_v.npy',
-		vary_param_1=('ds_rate', (5, 7, 9))
-	)
+	filt_set(ellipse_traj, filt_params, vp1=('ds_rate', (5, 7, 9)),
+	         load_saved=False, quiet=False, out_fname='ref/fetch_filts_v.npy')
 
 def ref__plot_dists_to_means():
 	out = plot_dists_to_means(
@@ -51,7 +48,7 @@ def ref__plot_ROCs():
 	np.save('ref/plot_ROCs_v.npy', out)
 
 
-def ref__plot_variance():
+def ref__plot_variance_vv():
 
 	clear_dir_rf('output')
 

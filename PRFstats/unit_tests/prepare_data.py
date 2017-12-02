@@ -13,7 +13,7 @@ os.chdir(current_dir)
 
 from common import filt_params, viol_traj, clar_traj
 
-from PRFstats.data import fetch_filts
+from PRFstats.data import filt_set
 
 
 def filts2comps(fname):
@@ -28,38 +28,28 @@ def filts2comps(fname):
 
 
 def data__viol_filts():
-	fetch_filts(
-		viol_traj, filt_params, load_saved=False, quiet=False,
-		out_fname='data/viol_filts_.npy',
-	)
+	filt_set(viol_traj, filt_params, load_saved=False, quiet=False,
+	         save='data/viol_filts_.npy')
 
 def data__clar_filts():
-	fetch_filts(
-		clar_traj, filt_params, load_saved=False, quiet=False,
-		out_fname='data/clar_filts_.npy',
-	)
+	filt_set(clar_traj, filt_params, load_saved=False, quiet=False,
+	         save='data/clar_filts_.npy')
 
 def data__viol_filts_v():
-	fetch_filts(
-		viol_traj, filt_params, load_saved=False, quiet=False,
-		out_fname='data/viol_filts_v.npy',
-		vary_param_1=('ds_rate', np.arange(80, 150, 10))
-	)
+	filt_set(viol_traj, filt_params,
+	         vp1=('ds_rate', np.arange(80, 150, 10)),
+	         load_saved=False, quiet=False, save='data/viol_filts_v.npy')
 
 def data__clar_filts_v():
-	fetch_filts(
-		clar_traj, filt_params, load_saved=False, quiet=False,
-		out_fname='data/clar_filts_v.npy',
-		vary_param_1=('ds_rate', np.arange(80, 150, 10))
-	)
+	filt_set(clar_traj, filt_params,
+	         vp1=('ds_rate', np.arange(80, 150, 10)),
+	         load_saved=False, quiet=False, save='data/clar_filts_v.npy')
 
 def data__viol_filts_vv():
-	fetch_filts(
-		viol_traj, filt_params, load_saved=False, quiet=False,
-		out_fname='data/viol_filts_vv.npy',
-		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
-		vary_param_2=('max_filtration_param', (-5, -6, -7)),
-	)
+	filt_set(viol_traj, filt_params,
+	         vp1=('ds_rate', np.arange(80, 150, 10)),
+	         vp2=('max_filtration_param', (-5, -6, -7)),
+	         load_saved=False, quiet=False, save='data/viol_filts_vv.npy')
 
 
 if __name__ == '__main__':

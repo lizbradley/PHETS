@@ -1,12 +1,94 @@
-import warnings
 import numpy as np
 
+from PH.filtration import PRankFunction
 from config import default_filtration_params as filt_params
 
 
 class ParamError(Exception):
 	def __init__(self, msg):
 		Exception.__init__(self, msg)
+
+
+class NormalPRF:
+
+	dom_area = 1        # area of PRF domain (the triangle)
+
+	def __init__(self, prf):
+		if isinstance(prf, PRankFunction):
+			self.data = prf.data
+		elif isinstance(prf, np.ndarray):
+			self.data = prf
+
+		self.num_div = self.data.shape[0]
+		self.weights = []
+		self.pre_weight = None
+
+	@property
+	def norm(self):
+		dA = (NormalPRF.dom_area * 2.) / (self.num_div ** 2)
+		return np.sqrt(np.nansum(np.square(self.data)) * dA)
+
+	def apply_weight(self, wf):
+
+		if self.weights:
+			self.pre_weight = self.data.copy()
+
+		self.weights.append(wf)
+
+		x = y = np.linspace(0, np.sqrt(self.dom_area * 2), self.num_div)
+		xx, yy = np.meshgrid(x, y)
+		wf_arr = wf(xx, yy)
+		if isinstance(wf_arr, int):
+			wf_arr = np.full_like(xx, wf_arr)
+		self.data = np.multiply(self.data, wf_arr)
+
+	@classmethod
+	def mean(cls, nprfs):
+		raws = [nprf.data for nprf in nprfs]
+		return cls(np.mean(raws, axis=0))
+
+	@classmethod
+	def var(cls, nprfs):
+		raws = [nprf.data for nprf in nprfs]
+		return cls(np.var(raws, axis=0))
+
+	@staticmethod
+	def interpret(other):
+		if isinstance(other, NormalPRF):
+			return other.data
+		elif isinstance(other, (int, float, long, np.ndarray)):
+			return other
+		else:
+			raise TypeError
+
+	def __add__(self, other):
+		return NormalPRF(self.data + self.interpret(other))
+
+	def __sub__(self, other):
+		return NormalPRF(self.data - self.interpret(other))
+
+	def __mul__(self, other):
+		return NormalPRF(self.data * self.interpret(other))
+
+	def __div__(self, other):
+		return NormalPRF(self.data / self.interpret(other))
+
+	def __pow__(self, other):
+		return NormalPRF(np.power(self.data, self.interpret(other)))
+
+
+def indices(vp1, vp2):
+	if vp2 is None:
+		lim1 = len(vp1[1])
+		idxs = [i for i in range(lim1)]
+		shape = lim1
+
+	else:
+		lim1, lim2 = len(vp1[1]), len(vp2[1])
+		idxs = [(i, j) for i in range(lim1) for j in range(lim2)]
+		shape = (lim1, lim2)
+
+	return shape, idxs
 
 
 def validate_vps(vp1, vp2):
@@ -16,56 +98,99 @@ def validate_vps(vp1, vp2):
 		raise ParamError('vary_param_1[0] == vary_param_2[0]')
 
 
-def is_filt_param(vp):
-	if vp is None:
-		return False
-	else:
-		return vp[0] in filt_params
 
-
-def fetch_filts(
-		traj, params, load_saved, quiet,
-		vary_param_1=None, vary_param_2=None,
-		fid=None, filts_fname=None, out_fname=None,
-		save=True
-):
+def filt_set(
+		traj, params, vp1=None, vp2=None,
+        load_saved=False, save=False,
+		quiet=True,
+        fid=None
+) :
+	def is_filt_param(vp):
+		if vp is None:
+			return False
+		else:
+			return vp[0] in filt_params
+	
 	suffix = fid if fid is not None else ''
 	default_fname = 'PRFstats/data/filts{}.npy'.format(suffix)
 
 	if load_saved:
-		fname = default_fname if filts_fname is None else filts_fname
-		return np.load(fname)
+		try:
+			np.load(load_saved)
+		except TypeError:
+			np.load(default_fname)
 
-	iter_1 = len(vary_param_1[1]) if is_filt_param(vary_param_1) else 1
-	iter_2 = len(vary_param_2[1]) if is_filt_param(vary_param_2) else 1
-
+	iter_1 = len(vp1[1]) if is_filt_param(vp1) else 1
+	iter_2 = len(vp2[1]) if is_filt_param(vp2) else 1
 	filts_vv = []
 	for i in range(iter_1):
-		if vary_param_1 is not None:
-			params.update({vary_param_1[0]: vary_param_1[1][i]})
-
+		if is_filt_param(vp1):
+			params.update({vp1[0]: vp1[1][i]})
 		filts_v = []
 		for j in range(iter_2):
-			if vary_param_2 is not None:
-				params.update({vary_param_2[0]: vary_param_2[1][j]})
+			if is_filt_param(vp2):
+				params.update({vp2[0]: vp2[1][j]})
 			filts_ = traj.filtrations(params, quiet)
 			filts_v.append(filts_)
 		filts_vv.append(filts_v)
 	filts_vv = np.array(filts_vv)
+	filts = np.squeeze(filts_vv)
 
-	# filts = np.squeeze(filts_vv)
-	filts = {
-		(False,  False ): filts_vv[0, 0],
-		(False,  True  ): filts_vv[0, :],
-		(True,   False ): filts_vv[:, 0],
-		(True,   True  ): filts_vv
-	}[is_filt_param(vary_param_1), is_filt_param(vary_param_2)]
-
-
-
-	fname = default_fname if out_fname is None else out_fname
-	if save: np.save(fname, filts)
+	if save: 
+		try:
+			# noinspection PyTypeChecker
+			np.save(save, filts)
+		except TypeError:
+			np.save(default_fname, filts)
+		
 	return filts
+
+
+
+
+def prf_set(filts, weight_func=lambda i, j: 1, vp1=None, vp2=None):
+
+	def is_weight_func(vp):
+		return vp and vp[0] == 'weight_func'
+	
+	prfs = np.empty_like(filts, dtype=object)
+	for idx, filt in np.ndenumerate(filts):
+		prfs[idx] = NormalPRF(filt.PRF())
+		prfs[idx].appy_weight(weight_func)
+		
+	lvp1 = len(vp1[1]) if vp1 is not None else None
+	lvp2 = len(vp2[1]) if vp2 is not None else None
+	depth = filts.shape[-1]
+
+	def apply_weight_prfs_(prfs_, wf):
+		return [prf.apply_weight(wf) for prf in prfs_]
+
+	if is_weight_func(vp1):
+
+		if not vp2:
+			prfs_ = prfs
+			prfs_v = np.empty((lvp1, depth), dtype=object)
+			for i, wf in enumerate(vp1[1]):
+				prfs_v[i] = apply_weight_prfs_(prfs_, wf)
+			prfs = prfs_v
+
+		else:
+			prfs_v = prfs
+			prfs_vv = np.empty((lvp1, lvp2, depth), dtype=object)
+			for i, wf in enumerate(vp1[1]):
+				for j, prfs_ in prfs_v:
+					prfs_vv[i, j] = apply_weight_prfs_(prfs_, wf)
+			prfs = prfs_vv
+
+	if is_weight_func(vp2):
+		prfs_v = prfs
+		prfs_vv = np.empty((lvp1, lvp2, depth), dtype=object)
+		for i, prfs_ in enumerate(prfs_v):
+			for j, wf in enumerate(vp2[1]):
+				prfs_vv[i, j] = apply_weight_prfs_(prfs_, wf)
+		prfs = prfs_vv
+
+	return prfs
 
 
 def apply_weight(prf, weight_func):
@@ -73,61 +198,12 @@ def apply_weight(prf, weight_func):
 	z = prf
 	x = y = np.linspace(0, 2 ** .5, len(z))
 	xx, yy = np.meshgrid(x, y)
-
 	weight_func = weight_func(xx, yy)
 	if isinstance(weight_func, int):
 		weight_func = np.full_like(xx, weight_func)
-
-	z = np.multiply(z, weight_func)
-
-	return z
+	return np.multiply(z, weight_func)
 
 
-def fetch_prfs(
-		filts,
-		weight_func,
-		vary_param_1=None,
-		vary_param_2=None,
-		quiet=True
-	):
-	prfs = np.zeros_like(filts)
-	for idx, filt in np.ndenumerate(filts):
-		filt.silent = quiet
-		prf = filt.PRF().data
-		prfs[idx] = apply_weight(prf, weight_func)
-
-	if vary_param_1 and vary_param_1[0] == 'weight_func':
-		if not vary_param_2:
-			prfs_ = prfs
-			prfs_v = np.empty(len(vary_param_1[1]))
-			prfs_pre_weight_v = np.empty(len(vary_param_1[1]))
-			for i, wf in enumerate(vary_param_1[1]):
-				prfs_v[i] = [apply_weight(prf, wf) for prf in prfs_]
-			prfs = prfs_v
-
-		else:
-			prfs_v = prfs
-			prfs_vv = np.empty((len(vary_param_1[1]), len(vary_param_2[1])))
-			for i, wf in enumerate(vary_param_1[1]):
-				for j, prfs_ in prfs_v:
-					prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs_]
-			prfs = prfs_vv
-
-	if vary_param_2 and vary_param_2[0] == 'weight_func':
-		prfs_v = prfs
-		prfs_vv = np.empty(len(vary_param_1[1]), len(vary_param_2[1]))
-		for i, prfs_ in prfs_v:
-			for j, wf in enumerate(vary_param_2[1]):
-				prfs_vv[i, j] = [apply_weight(prf, wf) for prf in prfs_]
-		prfs = prfs_vv
-
-	return np.asarray(prfs)
-
-
-def norm(f):
-	prf_res = len(f)
-	dA = 2. / (prf_res ** 2)	  # normalize such that area of PRF domain is 1
-	return np.sqrt(np.nansum(np.power(f, 2)) * dA)
 
 
 def distance(a, b):
@@ -158,112 +234,5 @@ def mean_dists_compare(prfs1, prfs2):
 	return arr
 
 
-class PointwiseStats:
-	def __init__(self, prfs):
-		self.mean = np.mean(prfs, axis=0)
-		self.var = np.var(prfs, axis=0)
-
-		with warnings.catch_warnings():
-			warnings.simplefilter("ignore")
-			self.fanofactor = self.var / self.mean
 
 
-class NormStats:
-	def __init__(self, prfs, pw_stats):
-		self.mean = norm(pw_stats.mean)
-		self.lvar = norm(pw_stats.var)
-		self.lfanofactor = norm(pw_stats.fanofactor)
-		self.lfanofactor2 = self.lvar / self.mean
-
-		self.gvar = self.global_variance(prfs)
-		self.gfanofactor = self.gvar / self.mean
-
-		print '''
-		lfanofactor: {} 
-		lfanofactor2: {}
-		gfanofactor: {} 
-		'''.format(self.lfanofactor, self.lfanofactor2, self.gfanofactor)
-
-	@staticmethod
-	def global_variance(prfs):
-		pw_mean = np.mean(prfs)
-		dists = np.array([norm(prf - pw_mean) for prf in prfs])
-		return np.mean(dists ** 2)
-
-
-
-def indices(vp1, vp2):
-	if vp2 is None:
-		lim1 = len(vp1[1])
-		idxs = [i for i in range(lim1)]
-		shape = lim1
-
-	else:
-		lim1, lim2 = len(vp1[1]), len(vp2[1])
-		idxs = [(i, j) for i in range(lim1) for j in range(lim2)]
-		shape = (lim1, lim2)
-
-	return shape, idxs
-
-
-def pointwise_stats(prfs, vary_param_1, vary_param_2):
-	shape, idxs = indices(vary_param_1, vary_param_2)
-	data = np.empty(shape, dtype=object)
-	for idx in idxs:
-		data[idx] = PointwiseStats(prfs[idx])
-	return data
-
-
-def scaler_stats(prfs, pw_stats, vary_param_1, vary_param_2):
-	shape, idxs = indices(vary_param_1, vary_param_2)
-	data = np.empty(shape, dtype=object)
-	for idx in idxs:
-		data[idx] = NormStats(prfs[idx], pw_stats[idx])
-	return data
-
-
-class DistanceClassifier(object):
-	def __init__(self, train):
-		"""
-		classifier which compares the distance from the mean of training
-		prfs to the test prf, vs the standard deviation of training prfs
-		"""
-		prfs = train
-
-		self.mean = np.mean(prfs, axis=0)
-		self.lvar = np.var(prfs, axis=0)                           # local
-		self.lstddev = np.power(self.lvar, .5)
-
-		self.dists = [distance(self.mean, prf) for prf in prfs]
-
-		self.gvar = np.mean(np.power(self.dists, 2))               # global
-		self.gstddev = self.gvar ** .5
-
-		self.test_dists = []
-
-
-	def predict(self, test, k, stddev='global'):
-		dist = distance(test, self.mean)
-
-		if stddev == 'global':
-			measure =  self.gstddev
-		elif stddev == 'local':
-			measure = norm(self.lstddev)
-		else:
-			raise ParamError("Invalid stddev. Use 'local' or 'global'.")
-
-		return dist <= measure * k
-
-
-def roc_data(clf, tests_true, tests_false, k_arr):
-	tpr = []
-	fpr = []
-	for k in k_arr:
-		true_pos = [clf.predict(t, k) for t in tests_true]
-		false_pos = [clf.predict(t, k) for t in tests_false]
-		true_pos_rate = sum(true_pos) / float(len(true_pos))
-		false_pos_rate = sum(false_pos) / float(len(false_pos))
-		tpr.append(true_pos_rate)
-		fpr.append(false_pos_rate)
-
-	return [fpr, tpr]

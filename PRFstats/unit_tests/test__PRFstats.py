@@ -4,7 +4,7 @@ import numpy as np
 from paths import chdir; chdir()
 
 from utilities import clear_dir_rf
-from PRFstats import fetch_filts, plot_variance, plot_ROCs, plot_dists_to_means
+from PRFstats import filt_set, plot_variance, plot_ROCs, plot_dists_to_means
 from common import filt_params, ellipse_traj, viol_traj, clar_traj, \
 	plot_variance__extract_output
 
@@ -12,11 +12,9 @@ from common import filt_params, ellipse_traj, viol_traj, clar_traj, \
 def test__fetch_filts_v():
 	chdir()
 	clear_dir_rf('output')
-	out = fetch_filts(
-		ellipse_traj, filt_params, load_saved=False, quiet=True,
-		vary_param_1=('ds_rate', (5, 7, 9)),
-		save=False
-	)
+	out = filt_set(ellipse_traj, filt_params,
+	               vp1=('ds_rate', (5, 7, 9)), load_saved=False,
+	               quiet=True, save=False)
 	ref = np.load('ref/fetch_filts_v.npy')
 
 	same = True
@@ -38,13 +36,34 @@ def test__plot_dists_to_means():
 		filts_fnames=('data/clar_filts_.npy', 'data/viol_filts_.npy')
 	)
 
+def test__plot_variance_vw():
+	chdir()
+
+	f1 = lambda i, j: .1 * (i + j)
+	f2 = lambda i, j: .2 * (i + j)
+	f3 = lambda i, j: .3 * (i + j)
+
+	out = plot_variance(
+		clar_traj,
+		'output/plot_variance_vw.png',
+		filt_params,
+		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
+		vary_param_2=('weight_func', (f1, f2, f3)),
+		legend_labels_2=('k=.1', 'k=.2', 'k=.3'),
+		quiet=True,
+		load_saved_filts=True,
+		filts_fname='data/clar_filts_v.npy',
+		unit_test=True,
+		see_samples=False
+	)
+	assert True
 
 def test__plot_variance_vv():
 	chdir()
 	# clear_dir_rf('output')
 	out = plot_variance(
 		viol_traj,
-		'output/plot_variance.png',
+		'output/plot_variance_vv.png',
 		filt_params,
 		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
@@ -81,4 +100,6 @@ if __name__ == '__main__':
 	# test__plot_dists_to_means()
 	# test__ROCs_v()
 	# test__plot_dists_to_means()
-	test__plot_variance_vv()
+	# test__plot_variance_vv()
+	test__plot_variance_vw()
+	pass
