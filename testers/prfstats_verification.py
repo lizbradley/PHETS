@@ -26,7 +26,7 @@ def test_input():
 
 	return traj, filt_params
 
-test = 101
+test = 100
 
 
 ##### plot_variance #####
@@ -38,9 +38,9 @@ if test == 100:     # v
 		'output/plot_variance_v.png',
 		filt_params,
 		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
-		quiet=False,
-		annot_hm=False,
-		load_saved_filts=True
+		quiet=True,
+		load_saved_filts=True,
+		see_samples={'interval': 3, 'filt_step': 3}
 	)
 
 if test == 101:     # vv

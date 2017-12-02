@@ -44,7 +44,7 @@ def check_overwrite(out_file_name):
 def clear_old_files(path, see_samples):
 	old_files = os.listdir(path)
 	if old_files and see_samples:
-		ans = raw_input('Overwrite files in ' + path + '? (y/n/q) \n')
+		ans = raw_input('Clear files in ' + path + '? (y/n/q) \n')
 		if ans == 'y':
 			for f in old_files:
 				if f != '.gitkeep':

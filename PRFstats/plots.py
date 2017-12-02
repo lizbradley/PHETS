@@ -32,7 +32,7 @@ def samples(filts, cmd, dir, vary_param_1=None, vary_param_2=None):
 	if not (is_filt_param(vary_param_1) or is_filt_param(vary_param_2)):
 		filts_vv = [[filts]]
 	elif is_filt_param(vary_param_1) and not is_filt_param(vary_param_2):
-		filts_vv = [filts]
+		filts_vv = [[fs] for fs in filts]
 	else:
 		filts_vv = filts
 

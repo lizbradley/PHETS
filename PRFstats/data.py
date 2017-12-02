@@ -128,6 +128,15 @@ def save_filts(save, fid, filts):
 	except AttributeError:
 		np.save(default_fname(fid), filts)
 
+def status_string(vp1, vp2, i, j):
+	str = None
+	if vp1:
+		str = 'vp1: {}'.format(vp1[1][i])
+	if vp2:
+		str.append(', vp2: {}'.format(vp2[1][j]))
+	return str
+
+
 
 def filt_set(
 		traj, params, vp1=None, vp2=None,
@@ -148,7 +157,7 @@ def filt_set(
 		for j in range(iter_2):
 			if is_filt_param(vp2):
 				params.update({vp2[0]: vp2[1][j]})
-			status_str = 'vp1: {}, vp2: {}'.format(vp1[1][i], vp2[1][j])
+			status_str = status_string(vp1, vp2, i, j)
 			filts_ = traj.filtrations(params, quiet, status_str)
 			filts_v.append(filts_)
 		filts_vv.append(filts_v)
