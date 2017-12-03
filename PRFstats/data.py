@@ -200,7 +200,7 @@ def prf_set(filts, weight_func=lambda i, j: 1, vp1=None, vp2=None):
 			prfs_v = prfs
 			prfs_vv = np.empty((lvp1, lvp2, depth), dtype=object)
 			for i, wf in enumerate(vp1[1]):
-				for j, prfs_ in prfs_v:
+				for j, prfs_ in enumerate(prfs_v):
 					prfs_vv[i, j] = apply_weight_prfs_(prfs_, wf)
 			prfs = prfs_vv
 

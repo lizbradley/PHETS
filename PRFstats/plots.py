@@ -29,56 +29,6 @@ def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
 
 
 
-def samples(filts_, cmd, dir, vary_param_1=None, vary_param_2=None):
-
-	filts_vv = {
-		1: [[filts_]],
-		2: [[f_] for f_ in filts_],
-		3: filts_
-	}[filts_.ndim]
-
-	if isinstance(cmd, dict):
-		interval = cmd['interval']
-		try:
-			filt_step = cmd['filt_step']
-		except KeyError:
-			filt_step = None
-	else:
-		interval = cmd
-		filt_step = None
-
-
-	for i, filts_v in enumerate(filts_vv):
-		for j, filts_ in enumerate(filts_v):
-			for k, filt in enumerate(filts_[::interval]):
-				base_name = '{}/{}__'.format(dir, filt.name)
-
-				if is_filt_param(vary_param_1):
-					base_name = '{}{}_{}__'.format(
-						base_name,
-						vary_param_1[0], vary_param_1[1][i]
-					)
-
-				if is_filt_param(vary_param_2):
-					base_name = '{}{}_{}__'.format(
-						base_name,
-						vary_param_2[0], vary_param_2[1][j]
-					)
-
-				print_title(base_name.split('/')[-1][:-2])
-
-				PD_filename = base_name + 'PD.png'
-				filt.plot_PD(PD_filename)
-
-				PRF_filename = base_name + 'PRF.png'
-				filt.plot_PRF(PRF_filename)
-
-				if filt_step:
-					complex_filename = base_name + 'comp.png'
-					filt.plot_complex(filt_step, complex_filename)
-				else:
-					movie_filename = base_name + 'movie.mp4'
-					filt.movie(movie_filename)
 
 
 def dists_ax(ax, d, mean, traj):
@@ -216,6 +166,70 @@ def clusters_fig(dists, filt_params, fname1, fname2, out_fname):
 	plot_ax.set_ylim([0, max_lim])
 
 	fig.savefig(out_fname)
+
+
+def samples(filts, cmd, dir, vp1=None, vp2=None):
+
+	def expand_filts_arr():
+		if filts.ndim == 1:                     # single filt evo
+			# (vp1 is None and vp2 is None) or
+			# (is_weight_func(vp1) and vp2 is None)
+			return [[filts]]
+		elif filts.ndim == 2:                   # filt evo varied once
+			if is_filt_param(vp2):
+				# is_weight_func(vp1)
+				return [filts]
+			else:
+				# (is_filt_param(vp1) and vp2 is None) or
+				# (is_filt_param(vp1) and is_weight_func(vp2))
+				return np.transpose([filts], axes=(1, 0, 2))
+		else:                                   # filt evo varied twice
+			return filts
+
+	def parse_cmd():
+		if isinstance(cmd, dict):
+			try:
+				return cmd['interval'], cmd['filt_step']
+			except KeyError:
+				return cmd['interval'], None
+		else:
+			return cmd, None
+
+
+	filts_vv = expand_filts_arr()
+	interval, filt_step = parse_cmd()
+
+	for i, filts_v in enumerate(filts_vv):
+		for j, filts_ in enumerate(filts_v):
+			for k, filt in enumerate(filts_[::interval]):
+				base_name = '{}/{}__'.format(dir, filt.name)
+
+				if is_filt_param(vp1):
+					base_name = '{}{}_{}__'.format(
+						base_name,
+						vp1[0], vp1[1][i]
+					)
+
+				if is_filt_param(vp2):
+					base_name = '{}{}_{}__'.format(
+						base_name,
+						vp2[0], vp2[1][j]
+					)
+
+				print_title(base_name.split('/')[-1][:-2])
+
+				PD_filename = base_name + 'PD.png'
+				filt.plot_PD(PD_filename)
+
+				PRF_filename = base_name + 'PRF.png'
+				filt.plot_PRF(PRF_filename)
+
+				if filt_step:
+					complex_filename = base_name + 'comp.png'
+					filt.plot_complex(filt_step, complex_filename)
+				else:
+					movie_filename = base_name + 'movie.mp4'
+					filt.movie(movie_filename)
 
 
 def weight_functions_figs(

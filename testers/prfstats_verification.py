@@ -26,7 +26,7 @@ def test_input():
 
 	return traj, filt_params
 
-test = 104
+test = 105
 
 
 ##### plot_variance #####
@@ -66,7 +66,7 @@ if test == 102:     # w         # PASSING
 		'output/PRFstats/plot_variance_w.png',
 		filt_params,
 		vary_param_1=('weight_func', (f1, f2, f3)),
-		legend_labels_1=('weight function', ('k=-10', 'k=1', 'k=10')),
+		legend_labels_1=('weight function', ('k=1', 'k=2', 'k=3')),
 		quiet=False,
 		load_saved_filts=True,
 		see_samples={'interval': 4, 'filt_step': 3}
@@ -92,8 +92,24 @@ if test == 104:     # vw        # PASSING
 		see_samples={'interval': 4, 'filt_step': 3}
 	)
 
-if test == 105:     # wv
-	raise NotImplemented
+if test == 105:
+	# wv        # PASSING(samples)     # heatmaps: 15, samples: 45
+
+	traj, filt_params = test_input()
+	f1 = lambda i, j: 1 * (-i + j)
+	f2 = lambda i, j: 2 * (-i + j)
+	f3 = lambda i, j: 3 * (-i + j)
+	out = plot_variance(
+		traj,
+		'output/PRFstats/plot_variance_wv.png',
+		filt_params,
+		vary_param_1=('weight_func', (f1, f2, f3)),
+		vary_param_2=('ds_rate', np.arange(100, 150, 10)),
+		legend_labels_1=('weight_function', ('k=1', 'k=2', 'k=3')),
+		quiet=True,
+		load_saved_filts=True,
+		see_samples={'interval': 4, 'filt_step': 3}
+	)
 
 
 
