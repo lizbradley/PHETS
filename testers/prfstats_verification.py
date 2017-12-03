@@ -26,12 +26,14 @@ def test_input():
 
 	return traj, filt_params
 
-test = 105
+test = 100
 
 
 ##### plot_variance #####
 
-if test == 100:     # v         # PASSING
+if test == 100:
+	# v         # PASSING       # heatmaps: 5, samples: 45
+
 	traj, filt_params = test_input()
 	plot_variance(
 		traj,
@@ -43,7 +45,9 @@ if test == 100:     # v         # PASSING
 		see_samples={'interval': 4, 'filt_step': 3}
 	)
 
-if test == 101:     # vv        # PASSING
+if test == 101:
+	# vv        # PASSING       # heatmaps: 15, samples: 135
+
 	traj, filt_params = test_input()
 	out = plot_variance(
 		traj,
@@ -52,11 +56,13 @@ if test == 101:     # vv        # PASSING
 		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=True,
-		load_saved_filts=True,
+		load_saved_filts=False,
 		see_samples={'interval': 4, 'filt_step': 3}
 	)
 
-if test == 102:     # w         # PASSING
+if test == 102:
+	# w         # PASSING        # heatmaps: 3, samples: 9
+
 	traj, filt_params = test_input()
 	f1 = lambda i, j: 1 * (-i + j)
 	f2 = lambda i, j: 2 * (-i + j)
@@ -68,14 +74,16 @@ if test == 102:     # w         # PASSING
 		vary_param_1=('weight_func', (f1, f2, f3)),
 		legend_labels_1=('weight function', ('k=1', 'k=2', 'k=3')),
 		quiet=False,
-		load_saved_filts=True,
+		load_saved_filts=False,
 		see_samples={'interval': 4, 'filt_step': 3}
 	)
 
 if test == 103:     # ww
 	raise NotImplemented
 
-if test == 104:     # vw        # PASSING
+if test == 104:
+	# vw        # PASSING        # heatmaps: 15, samples: 45
+
 	traj, filt_params = test_input()
 	f1 = lambda i, j: 1 * (-i + j)
 	f2 = lambda i, j: 2 * (-i + j)
@@ -88,12 +96,12 @@ if test == 104:     # vw        # PASSING
 		vary_param_2=('weight_func', (f1, f2, f3)),
 		legend_labels_2=('k=1', 'k=2', 'k=3'),
 		quiet=True,
-		load_saved_filts=True,
+		load_saved_filts=False,
 		see_samples={'interval': 4, 'filt_step': 3}
 	)
 
 if test == 105:
-	# wv        # PASSING(samples)     # heatmaps: 15, samples: 45
+	# wv        # PASSING        # heatmaps: 15, samples: 45
 
 	traj, filt_params = test_input()
 	f1 = lambda i, j: 1 * (-i + j)
