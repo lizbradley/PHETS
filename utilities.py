@@ -2,6 +2,7 @@
 
 import inspect
 import subprocess
+import os
 
 from memory_profiler import profile
 
@@ -57,6 +58,9 @@ def clear_old_files(path, see_samples):
 		else:
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
+def make_dir(dir):
+	if not os.path.exists(dir):
+		os.makedirs(dir)
 
 def clear_dir(dir):
 

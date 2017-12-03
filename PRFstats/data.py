@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 
 from PH.filtration import PRankFunction
@@ -21,20 +23,18 @@ class NormalPRF:
 			self.data = prf
 
 		self.num_div = self.data.shape[0]
-		self.weights = []
-		self.pre_weight = None
+		self.weight = None
+		self.pre_weight = self
 
 	@property
 	def norm(self):
 		dA = (NormalPRF.lim / self.num_div) ** 2
 		return np.sqrt(np.nansum(np.square(self.data)) * dA)
 
-	def apply_weight(self, wf):
+	def set_weight(self, wf):
 
-		if self.weights:
-			self.pre_weight = self.data.copy()
-
-		self.weights.append(wf)
+		self.weight = wf
+		self.pre_weight = copy.copy(self)
 
 		x = y = np.linspace(0, np.sqrt(self.dom_area * 2), self.num_div)
 		xx, yy = np.meshgrid(x, y)
@@ -78,7 +78,7 @@ class NormalPRF:
 		return NormalPRF(np.power(self.data, self.interpret(other)))
 
 
-def indices(vp1, vp2):
+def all_indices(vp1, vp2):
 	if vp2 is None:
 		lim1 = len(vp1[1])
 		idxs = [i for i in range(lim1)]
@@ -175,14 +175,14 @@ def prf_set(filts, weight_func=lambda i, j: 1, vp1=None, vp2=None):
 	prfs = np.empty_like(filts, dtype=object)
 	for idx, filt in np.ndenumerate(filts):
 		prfs[idx] = NormalPRF(filt.PRF())
-		prfs[idx].apply_weight(weight_func)
+		prfs[idx].set_weight(weight_func)
 		
 	lvp1 = len(vp1[1]) if vp1 is not None else None
 	lvp2 = len(vp2[1]) if vp2 is not None else None
 	depth = filts.shape[-1]
 
 	def apply_weight_prfs_(prfs_, wf):
-		[prf.apply_weight(wf) for prf in prfs_]
+		[prf.set_weight(wf) for prf in prfs_]
 		return [prf for prf in prfs_]
 
 	if is_weight_func(vp1):

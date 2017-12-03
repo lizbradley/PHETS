@@ -3,7 +3,7 @@ import numpy as np
 from data import dists_to_ref, filt_set, distance, prf_set
 from statscurves.data import pointwise_stats, scaler_stats
 from plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig
-from statscurves.plots import variance_fig
+from statscurves.plots import variance_fig, heatmaps_figs
 from PRFstats.plots import weight_functions_figs
 from data import mean_dists_compare
 from classify.data import DistanceClassifier, roc_data
@@ -190,68 +190,56 @@ def plot_variance(
 		vary_param_2=None,
 		legend_labels_1=None,       # ('axis', ('tick 1', 'tick2', 'tick3'))
 		legend_labels_2=None,       # ('legend 1', 'legend 2', 'legend 3')
-
 		weight_func=lambda i, j: 1,
-
 		see_samples=5,
 		quiet=True,
 		annot_hm=False,
 		load_saved_filts=False,
-		unit_test=False
 ):
-	## TODO: plot weight functions, heatmaps
+	## TODO: heatmaps
 
-	def sqrt_weight_func(x, y):
-		return weight_func(x, y) ** .5
 
-	if not unit_test:
-		# plot_trajectory(sig)
-		weight_functions_figs(
-			vary_param_1,
-			vary_param_2,
-			legend_labels_1,
-			legend_labels_2,
-			weight_func,
-			filt_params,
-		)
-
-	filts = filt_set(traj, filt_params, vary_param_1, vary_param_2,
-	                 load_saved=load_saved_filts, quiet=quiet)
-
-	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
-
-	pw_data = pointwise_stats(
-		prfs, vary_param_1, vary_param_2
+	filts = filt_set(
+		traj,
+		filt_params,
+		vary_param_1,
+		vary_param_2,
+	    load_saved=load_saved_filts,
+	    quiet=quiet
 	)
-	# pw_data_pre_weight = pointwise_stats(
-	# 	prfs_pre_weight, vary_param_1, vary_param_2
-	# )
+	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
+	pointw_data = pointwise_stats(prfs, vary_param_1, vary_param_2)
+	scaler_data = scaler_stats(prfs, pointw_data, vary_param_1, vary_param_2)
 
-	scaler_data = scaler_stats(prfs, pw_data, vary_param_1, vary_param_2)
+	weight_functions_figs(
+		vary_param_1,
+		vary_param_2,
+		legend_labels_1,
+		legend_labels_2,
+		weight_func,
+		filt_params,
+		out_filename
+	)
+	heatmaps_figs(
+		pointw_data,
+		vary_param_1,
+		vary_param_2,
+		legend_labels_1,
+		legend_labels_2,
+		out_filename,
+		annot_hm,
+	)
 
 	variance_fig(
 		scaler_data,
 		filt_params,
 		vary_param_1,
 		vary_param_2,
-	    out_filename,
+		out_filename,
 		legend_labels_1,
 		legend_labels_2,
 		traj.fname
 	)
-
-	# heatmaps_figs(
-	# 	pw_data,
-	# 	# pw_data_pre_weight,
-	# 	pw_data,             ## FIX ME
-	# 	filt_params,
-	# 	vary_param_1,
-	#     vary_param_2,
-	# 	legend_labels_2,
-	# 	out_filename,
-	# 	annot_hm,
-	# 	unit_test
-	# )
 
 	if see_samples:
 		dir_ = 'output/PRFstats/samples'

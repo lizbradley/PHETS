@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -7,7 +8,7 @@ import signals, PH
 from PH.plots import heatmap_ax
 from PH.titlebox import filt_params_table
 from PRFstats.data import is_filt_param, is_weight_func, NormalPRF
-from utilities import print_title, clear_temp_files
+from utilities import print_title, clear_temp_files, make_dir
 
 
 def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
@@ -28,13 +29,13 @@ def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
 
 
 
-def samples(filts, cmd, dir, vary_param_1=None, vary_param_2=None):
+def samples(filts_, cmd, dir, vary_param_1=None, vary_param_2=None):
 
 	filts_vv = {
-		1: [[filts]],
-		2: [[f_] for f_ in filts],
-		3: filts
-	}[filts.ndim]
+		1: [[filts_]],
+		2: [[f_] for f_ in filts_],
+		3: filts_
+	}[filts_.ndim]
 
 	if isinstance(cmd, dict):
 		interval = cmd['interval']
@@ -48,17 +49,17 @@ def samples(filts, cmd, dir, vary_param_1=None, vary_param_2=None):
 
 
 	for i, filts_v in enumerate(filts_vv):
-		for j, filts in enumerate(filts_v):
-			for k, filt in enumerate(filts[::interval]):
+		for j, filts_ in enumerate(filts_v):
+			for k, filt in enumerate(filts_[::interval]):
 				base_name = '{}/{}__'.format(dir, filt.name)
 
-				if vary_param_1 is not None:
+				if is_filt_param(vary_param_1):
 					base_name = '{}{}_{}__'.format(
 						base_name,
 						vary_param_1[0], vary_param_1[1][i]
 					)
 
-				if vary_param_2 is not None:
+				if is_filt_param(vary_param_2):
 					base_name = '{}{}_{}__'.format(
 						base_name,
 						vary_param_2[0], vary_param_2[1][j]
@@ -224,8 +225,11 @@ def weight_functions_figs(
 		legend_labels_2,
 		weight_func,
 		filt_params,
+		filename
 ):
-	out_dir = 'output/PRFstats/weight_functions/'
+	out_dir, name = os.path.split(filename)
+	out_dir = out_dir + '/weight_functions'
+	make_dir(out_dir)
 
 	print 'plotting weight function(s)...'
 	clear_temp_files(out_dir)
@@ -262,4 +266,4 @@ def weight_functions_figs(
 
 		mesh = heatmap_ax(ax, z, dom=x)
 		plt.colorbar(mesh, cax)
-		plt.savefig('{}{}.png'.format(out_dir, fname))
+		plt.savefig('{}/{}.png'.format(out_dir, fname))

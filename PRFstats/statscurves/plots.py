@@ -1,10 +1,12 @@
+import os
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from PH.plots import heatmap_ax
+from PH.plots import heatmap_ax, PRF_colorbar_ax
 from PH.titlebox import filenames_table, filt_params_table
-from utilities import clear_dir
+from PRFstats.data import is_weight_func, is_filt_param
+from utilities import clear_dir, make_dir
 
 
 def weight_function_fig(f, num_div, fname):
@@ -30,33 +32,26 @@ def weight_function_fig(f, num_div, fname):
 
 
 def heatmaps_figs(
-		data_arr,
-		data_arr_pre_weight,
-		filt_params,
+		hmaps,
 		vary_param_1,
         vary_param_2,
-		legend_labels,
+		legend_labels_1,
+		legend_labels_2,
 		filename,
 		annot_hm,
-		unit_test=False
 ):
-
-	if unit_test:
-		out_dir = 'output/heatmaps/'
-		return
-	else:
-		out_dir = 'output/PRFstats/heatmaps/'
-
+	out_dir, name = os.path.split(filename)
+	out_dir = out_dir + '/heatmaps'
+	make_dir(out_dir)
 	if not clear_dir(out_dir):
 		print 'skipping heatmaps'
 		return
 
 	print 'plotting heatmaps...'
 
-	def make_hmap_fig(hmap_data, hmap_data_pw):
+	def make_hmap_fig(hmaps):
 
 		fig = plt.figure(figsize=(12, 8))
-
 
 		ax1 = fig.add_subplot(231)
 		ax2 = fig.add_subplot(232)
@@ -72,63 +67,68 @@ def heatmaps_figs(
 			warnings.simplefilter("ignore")
 			fig.tight_layout(pad=3, rect=(.05, 0, .95, .95))
 
+		cmap, norm = PRF_colorbar_ax(cax)
 
-		x = y = np.linspace(0, np.power(2, .5), filt_params['num_divisions'])
+		mean = hmaps.mean.data
+		var = hmaps.var.data
+		ff = hmaps.fanofactor.data
+		mean_pw = hmaps.mean_pre_w.data
+		var_pw = hmaps.var_pre_w.data
+		ff_pw = hmaps.fanofactor_pre_w.data
 
-		heatmap_ax(ax1, cax, x, y, hmap_data.pointwise_mean, annot_hm)
-		heatmap_ax(ax2, cax, x, y, hmap_data.pointwise_var, annot_hm)
-		heatmap_ax(ax3, cax, x, y, hmap_data.functional_COV, annot_hm)
-		heatmap_ax(ax4, cax, x, y, hmap_data_pw.pointwise_mean, annot_hm)
-		heatmap_ax(ax5, cax, x, y, hmap_data_pw.pointwise_var, annot_hm)
-		heatmap_ax(ax6, cax, x, y, hmap_data_pw.functional_COV, annot_hm)
+		kwargs = {'cmap': cmap, 'norm': norm, 'annot': annot_hm}
+
+		heatmap_ax(ax1, mean, **kwargs)
+		heatmap_ax(ax2, var, **kwargs)
+		heatmap_ax(ax3, ff, **kwargs)
+		heatmap_ax(ax4, mean_pw, **kwargs)
+		heatmap_ax(ax5, var_pw, **kwargs)
+		heatmap_ax(ax6, ff_pw, **kwargs)
 
 
-		ax1.set_title('pointwise mean',		fontsize=12, y=1.05)
-		ax2.set_title('pointwise variance', fontsize=12, y=1.05)
-		ax3.set_title('functional COV', 	fontsize=12, y=1.05)
+		ax1.set_title('mean',		    fontsize=12, y=1.05)
+		ax2.set_title('variance',       fontsize=12, y=1.05)
+		ax3.set_title('fano factor', 	fontsize=12, y=1.05)
 
 		# abuse y axis label for row title
 		ax1.set_ylabel('weighted',		fontsize=12, labelpad=10)
 		ax4.set_ylabel('unweighted',	fontsize=12, labelpad=10)
 
-		ticks = np.linspace(0, 1.4, filt_params['num_divisions'], endpoint=True)
-		while len(ticks) > 6:
-			ticks = ticks[1::2]
-		for ax in [ax1, ax2, ax3, ax4, ax5, ax6]:
-			ax.xaxis.set_ticks(ticks)
-			ax.yaxis.set_ticks(ticks)
-
 		return fig
 
+	hmaps_vv = {
+		0: [[hmaps]],
+		1: [[hm_] for hm_ in hmaps],
+		2: hmaps
+	}[hmaps.ndim]
 
-	if vary_param_2:
-		for i, val_2 in enumerate(vary_param_2[1]):
-			for j, val_1 in enumerate(vary_param_1[1]):
-				data = data_arr[i, j]
-				if vary_param_2[0] == 'weight_func':
-					data_pw = data_arr_pre_weight[0, j]
-				else:
-					data_pw = data_arr_pre_weight[i, j]
-				fig = make_hmap_fig(data, data_pw)
-				fig.suptitle(filename.split('/')[-1])
-				if legend_labels:
-					val_2 = legend_labels[i]
-				fname = '{}_{}__{}_{}.png'.format(
-					vary_param_2[0], val_2, vary_param_1[0], val_1
+	for i, hmaps_v in enumerate(hmaps_vv):
+		for j, hmaps_ in enumerate(hmaps_v):
+			base_name = name
+			if is_filt_param(vary_param_1):
+				base_name = '{}{}_{}__'.format(
+					base_name,
+					vary_param_1[0], vary_param_1[1][i]
 				)
-				fig.savefig(out_dir + fname)
-				plt.close(fig)
+			elif is_weight_func(vary_param_1):
+				base_name = '{}{}_{}__'.format(
+					base_name,
+					legend_labels_1[0], legend_labels_1[1][i]
+				)
 
-	else:
-		data_arr = data_arr[0]
-		data_arr_pre_weight = data_arr_pre_weight[0]
-		for j, val_1 in enumerate(vary_param_1[1]):
-			data = data_arr[j]
-			data_pw = data_arr_pre_weight[j]
-			fig = make_hmap_fig(data, data_pw)
-			fig.suptitle(filename.split('/')[-1])
-			fname = '{}_{}.png'.format(vary_param_1[0], val_1)
-			fig.savefig(out_dir + fname)
+			if is_filt_param(vary_param_2):
+				base_name = '{}{}_{}'.format(
+					base_name,
+					vary_param_2[0], vary_param_2[1][j]
+				)
+			elif is_weight_func(vary_param_2):
+				base_name = '{}{}_{}__'.format(
+					base_name,
+					legend_labels_2[0], legend_labels_2[1][i]
+				)
+			fig = make_hmap_fig(hmaps_)
+			fig.suptitle(name)
+			fig.savefig('{}/{}.png'.format(out_dir, base_name))
 			plt.close(fig)
 
 
@@ -187,10 +187,11 @@ def variance_fig(
 		lvar = [d.lvar for d in norm_data]
 		lff = [d.lfanofactor for d in norm_data]
 
-		if not callable(vary_param_1[1][0]):
+		if not is_weight_func(vary_param_1):
 			x = vary_param_1[1]
 		else:
 			x = np.arange(len(vary_param_1[1]))
+
 		l, = ax1.plot(x, mean, '--o')
 		ax2.plot(x, lvar, '--o')
 		ax3.plot(x, gvar, '--o')

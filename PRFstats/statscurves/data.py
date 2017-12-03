@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from PRFstats.data import indices, NormalPRF
+from PRFstats.data import all_indices, NormalPRF
 
 
 class PointwiseStats:
@@ -14,6 +14,14 @@ class PointwiseStats:
 			warnings.simplefilter("ignore")
 			self.fanofactor = self.var / self.mean
 
+		prfs_pre_weight = [prf.pre_weight for prf in prfs]
+
+		self.mean_pre_w = NormalPRF.mean(prfs_pre_weight)
+		self.var_pre_w = NormalPRF.var(prfs_pre_weight)
+
+		with warnings.catch_warnings():
+			warnings.simplefilter("ignore")
+			self.fanofactor_pre_w = self.var_pre_w / self.mean_pre_w
 
 class NormStats:
 	def __init__(self, prfs, pw_stats):
@@ -39,7 +47,7 @@ class NormStats:
 
 
 def pointwise_stats(prfs, vary_param_1, vary_param_2):
-	shape, idxs = indices(vary_param_1, vary_param_2)
+	shape, idxs = all_indices(vary_param_1, vary_param_2)
 	data = np.empty(shape, dtype=object)
 	for idx in idxs:
 		data[idx] = PointwiseStats(prfs[idx])
@@ -47,7 +55,7 @@ def pointwise_stats(prfs, vary_param_1, vary_param_2):
 
 
 def scaler_stats(prfs, pw_stats, vary_param_1, vary_param_2):
-	shape, idxs = indices(vary_param_1, vary_param_2)
+	shape, idxs = all_indices(vary_param_1, vary_param_2)
 	data = np.empty(shape, dtype=object)
 	for idx in idxs:
 		data[idx] = NormStats(prfs[idx], pw_stats[idx])

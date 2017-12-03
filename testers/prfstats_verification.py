@@ -58,15 +58,15 @@ if test == 101:     # vv
 
 if test == 102:     # w
 	traj, filt_params = test_input()
-	f1 = lambda i, j: .1 * (i + j)
-	f2 = lambda i, j: .2 * (i + j)
-	f3 = lambda i, j: .3 * (i + j)
+	f1 = lambda i, j: -100 * (i + j)
+	f2 = lambda i, j: 1 * (i + j)
+	f3 = lambda i, j: 10 * (i + j)
 	out = plot_variance(
 		traj,
 		'output/PRFstats/plot_variance_w.png',
 		filt_params,
 		vary_param_1=('weight_func', (f1, f2, f3)),
-		legend_labels_1=('weight function', ('k=.1', 'k=.2', 'k=.3')),
+		legend_labels_1=('weight function', ('k=-10', 'k=1', 'k=10')),
 		quiet=True,
 		load_saved_filts=True,
 		see_samples={'interval': 3, 'filt_step': 3}
