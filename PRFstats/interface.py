@@ -1,3 +1,4 @@
+import os
 import numpy as np
 
 from data import dists_to_ref, filt_set, distance, prf_set
@@ -196,8 +197,18 @@ def plot_variance(
 		annot_hm=False,
 		load_saved_filts=False,
 ):
-	## TODO: heatmaps
+	out_dir, out_fname = os.path.split(out_filename)
+	in_dir, in_fname = os.path.split(traj.fname)
 
+	weight_functions_figs(
+		vary_param_1,
+		vary_param_2,
+		legend_labels_1,
+		legend_labels_2,
+		weight_func,
+		filt_params,
+		out_dir
+	)
 
 	filts = filt_set(
 		traj,
@@ -207,28 +218,10 @@ def plot_variance(
 	    load_saved=load_saved_filts,
 	    quiet=quiet
 	)
+
 	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
 	pointw_data = pointwise_stats(prfs, vary_param_1, vary_param_2)
 	scaler_data = scaler_stats(prfs, pointw_data, vary_param_1, vary_param_2)
-
-	weight_functions_figs(
-		vary_param_1,
-		vary_param_2,
-		legend_labels_1,
-		legend_labels_2,
-		weight_func,
-		filt_params,
-		out_filename
-	)
-	heatmaps_figs(
-		pointw_data,
-		vary_param_1,
-		vary_param_2,
-		legend_labels_1,
-		legend_labels_2,
-		out_filename,
-		annot_hm,
-	)
 
 	variance_fig(
 		scaler_data,
@@ -239,6 +232,17 @@ def plot_variance(
 		legend_labels_1,
 		legend_labels_2,
 		traj.fname
+	)
+
+	heatmaps_figs(
+		pointw_data,
+		vary_param_1,
+		vary_param_2,
+		legend_labels_1,
+		legend_labels_2,
+		out_dir,
+		in_fname,
+		annot_hm
 	)
 
 	if see_samples:

@@ -35,7 +35,7 @@ class NormalPRF:
 	def set_weight(self, wf):
 
 		self.weight = wf
-		self.pre_weight = copy.copy(self)
+		self.pre_weight = copy.deepcopy(self)
 
 		x = y = np.linspace(0, np.sqrt(self.dom_area * 2), self.num_div)
 		xx, yy = np.meshgrid(x, y)
@@ -133,9 +133,9 @@ def save_filts(save, fid, filts):
 
 def status_string(vp1, vp2, i, j):
 	str = None
-	if vp1:
+	if is_filt_param(vp1):
 		str = 'vp1: {}'.format(vp1[1][i])
-	if vp2:
+	if is_filt_param(vp2):
 		str = '{}, vp2: {}'.format(str, vp2[1][j])
 	return str
 
@@ -183,6 +183,7 @@ def prf_set(filts, weight_func=lambda i, j: 1, vp1=None, vp2=None):
 	depth = filts.shape[-1]
 
 	def apply_weight_prfs_(prfs_, wf):
+		prfs_ = copy.deepcopy(prfs_)
 		[prf.set_weight(wf) for prf in prfs_]
 		return [prf for prf in prfs_]
 

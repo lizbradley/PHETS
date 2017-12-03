@@ -225,9 +225,8 @@ def weight_functions_figs(
 		legend_labels_2,
 		weight_func,
 		filt_params,
-		filename
+		out_dir
 ):
-	out_dir, name = os.path.split(filename)
 	out_dir = out_dir + '/weight_functions'
 	make_dir(out_dir)
 

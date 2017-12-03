@@ -37,12 +37,11 @@ def heatmaps_figs(
         vary_param_2,
 		legend_labels_1,
 		legend_labels_2,
-		filename,
+		out_dir,
+		in_fname,
 		annot_hm,
 ):
-	out_dir, name = os.path.split(filename)
 	out_dir = out_dir + '/heatmaps'
-	name = name.split('.')[0]
 	make_dir(out_dir)
 	if not clear_dir(out_dir):
 		print 'skipping heatmaps'
@@ -107,7 +106,7 @@ def heatmaps_figs(
 
 	for i, hmaps_v in enumerate(hmaps_vv):
 		for j, hmaps_ in enumerate(hmaps_v):
-			base_name = name
+			base_name = in_fname
 			if is_filt_param(vary_param_1):
 				base_name = '{}__{}_{}'.format(
 					base_name,
@@ -127,10 +126,10 @@ def heatmaps_figs(
 			elif is_weight_func(vary_param_2):
 				base_name = '__{}{}_{}'.format(
 					base_name,
-					legend_labels_2[0], legend_labels_2[1][i]
+					'weight_func', legend_labels_2[j]
 				)
 			fig = make_hmap_fig(hmaps_)
-			fig.suptitle(name)
+			fig.suptitle(in_fname)
 			fig.savefig('{}/{}.png'.format(out_dir, base_name))
 			plt.close(fig)
 
@@ -145,7 +144,7 @@ def variance_fig(
 		legend_labels_2,
 		filename
 ):
-	print 'plotting variance curves...'
+	print 'plotting stats curves...'
 	fig = plt.figure(figsize=(14, 8), tight_layout=True)
 
 	label_kwargs = {
