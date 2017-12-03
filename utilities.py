@@ -72,6 +72,8 @@ def clear_dir(dir):
 
 	if r == 'y':
 		for f in files:
+			if not dir.endswith('/'):
+				dir = dir + '/'
 			os.remove(dir + f)
 		return True
 

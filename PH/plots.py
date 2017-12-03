@@ -83,13 +83,13 @@ def PD_fig(filt, out_filename):
 	plt.close(fig)
 
 
-def heatmap_ax(plot_ax, z, dom=None, cmap=None, norm=None, annot=False):
+def heatmap_ax(ax, z, dom=None, cmap=None, norm=None, annot=False):
 
 	def annotate():
 		offset = (1.41 / (len(x) - 1)) / 2
 		for i, x_ in enumerate(x):
 			for j, y_ in enumerate(y):
-				plot_ax.text(
+				ax.text(
 					x_ + offset, y_ + offset, '%.3f' % z[j, i],
 					ha='center',
 					va='center',
@@ -108,13 +108,14 @@ def heatmap_ax(plot_ax, z, dom=None, cmap=None, norm=None, annot=False):
 		y = np.append(y, y[-1] + d)
 		return x, y
 
+	ax.set_aspect('equal')
 	zm = ma.masked_where(np.isnan(z), z)
 
 	if dom is None:
-		mesh = plot_ax.pcolormesh(zm, cmap=cmap, norm=norm, clip_on=False)
+		mesh = ax.pcolormesh(zm, cmap=cmap, norm=norm, clip_on=False)
 	else:
 		x, y = extend_domain(dom, dom)
-		mesh = plot_ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
+		mesh = ax.pcolormesh(x, y, zm, cmap=cmap, norm=norm, clip_on=False)
 		if annot: annotate()
 	return mesh
 
@@ -136,7 +137,6 @@ def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
 	cmap, norm = PRF_colorbar_ax(cbar_ax)
 
 	ax.ticklabel_format(axis='both', style='sci',  scilimits=(0, 0))
-	ax.set_aspect('equal')
 
 	z = prf.data
 	heatmap_ax(ax, z, prf.epsilons, cmap, norm, annot=annot_hm)

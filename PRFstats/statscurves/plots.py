@@ -42,6 +42,7 @@ def heatmaps_figs(
 ):
 	out_dir, name = os.path.split(filename)
 	out_dir = out_dir + '/heatmaps'
+	name = name.split('.')[0]
 	make_dir(out_dir)
 	if not clear_dir(out_dir):
 		print 'skipping heatmaps'
@@ -76,7 +77,9 @@ def heatmaps_figs(
 		var_pw = hmaps.var_pre_w.data
 		ff_pw = hmaps.fanofactor_pre_w.data
 
-		kwargs = {'cmap': cmap, 'norm': norm, 'annot': annot_hm}
+		dom = hmaps.mean.bins
+
+		kwargs = {'dom': dom, 'cmap': cmap, 'norm': norm, 'annot': annot_hm}
 
 		heatmap_ax(ax1, mean, **kwargs)
 		heatmap_ax(ax2, var, **kwargs)
@@ -106,23 +109,23 @@ def heatmaps_figs(
 		for j, hmaps_ in enumerate(hmaps_v):
 			base_name = name
 			if is_filt_param(vary_param_1):
-				base_name = '{}{}_{}__'.format(
+				base_name = '{}__{}_{}'.format(
 					base_name,
 					vary_param_1[0], vary_param_1[1][i]
 				)
 			elif is_weight_func(vary_param_1):
-				base_name = '{}{}_{}__'.format(
+				base_name = '{}__{}_{}'.format(
 					base_name,
 					legend_labels_1[0], legend_labels_1[1][i]
 				)
 
 			if is_filt_param(vary_param_2):
-				base_name = '{}{}_{}'.format(
+				base_name = '__{}{}_{}'.format(
 					base_name,
 					vary_param_2[0], vary_param_2[1][j]
 				)
 			elif is_weight_func(vary_param_2):
-				base_name = '{}{}_{}__'.format(
+				base_name = '__{}{}_{}'.format(
 					base_name,
 					legend_labels_2[0], legend_labels_2[1][i]
 				)

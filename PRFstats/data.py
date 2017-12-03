@@ -23,6 +23,7 @@ class NormalPRF:
 			self.data = prf
 
 		self.num_div = self.data.shape[0]
+		self.bins = np.linspace(0, self.lim, self.num_div)
 		self.weight = None
 		self.pre_weight = self
 
@@ -135,7 +136,7 @@ def status_string(vp1, vp2, i, j):
 	if vp1:
 		str = 'vp1: {}'.format(vp1[1][i])
 	if vp2:
-		str.append(', vp2: {}'.format(vp2[1][j]))
+		str = '{}, vp2: {}'.format(str, vp2[1][j])
 	return str
 
 
