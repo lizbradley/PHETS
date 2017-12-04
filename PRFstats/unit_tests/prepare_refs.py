@@ -19,9 +19,14 @@ from PRFstats import plot_variance, plot_ROCs, plot_dists_to_means
 from PRFstats.data import filt_set
 
 
-def ref__fetch_filts_v():
-	filt_set(ellipse_traj, filt_params, vp1=('ds_rate', (5, 7, 9)),
-	         load_saved=False, quiet=False, out_fname='ref/fetch_filts_v.npy')
+def ref__filt_set_v():
+	filt_set(
+		ellipse_traj,
+		filt_params,
+		vp1=('ds_rate', (5, 7, 9)),
+		quiet=False,
+		save='ref/filt_set_v.npy'
+	)
 
 def ref__plot_dists_to_means():
 	out = plot_dists_to_means(
@@ -33,13 +38,14 @@ def ref__plot_dists_to_means():
 	)
 	np.save('ref/plot_dists_to_means.npy', out)
 
+
 def ref__plot_ROCs():
 
 	out = plot_ROCs(
 		clar_traj, viol_traj,
 		'output/ROCs.png',
 		filt_params,
-		vary_param=('ds_rate', np.arange(80, 150, 10)),
+		vary_param=('ds_rate', np.arange(100, 150, 10)),
 		k=(0, 5.01, .1),
 		quiet=False,
 		load_saved_filts=True,
@@ -48,31 +54,101 @@ def ref__plot_ROCs():
 	np.save('ref/plot_ROCs_v.npy', out)
 
 
-def ref__plot_variance_vv():
 
-	clear_dir_rf('output')
+def ref__plot_variance_vw():
+
+	f1 = lambda i, j: .1 * (i + j)
+	f2 = lambda i, j: .2 * (i + j)
+	f3 = lambda i, j: .3 * (i + j)
+
+	out = plot_variance(
+		clar_traj,
+		'output/plot_variance_vw.png',
+		filt_params,
+		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
+		vary_param_2=('weight_func', (f1, f2, f3)),
+		legend_labels_2=('k=.1', 'k=.2', 'k=.3'),
+		load_saved_filts='data/clar_filts_v.npy',
+		see_samples=False,
+		heatmaps=False
+	)
+	out = plot_variance__extract_output(out)
+	np.save('ref/plot_variance_vw.npy', out)
+
+
+def ref__plot_variance_vv():
 
 	out = plot_variance(
 		viol_traj,
-		'output/plot_variance.png',
+		'output/plot_variance_vv.png',
 		filt_params,
-		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
+		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=False,
-		unit_test=True,
 		see_samples=False,
-		load_saved_filts=True,
-		filts_fname='data/viol_filts_vv.npy',
+		load_saved_filts='data/viol_filts_vv.npy',
+		heatmaps=False
 	)
 
 	out = plot_variance__extract_output(out)
 	np.save('ref/plot_variance_vv.npy', out)
 
 
+def ref__plot_variance_wv():
+	f1 = lambda i, j: 1 * (-i + j)
+	f2 = lambda i, j: 2 * (-i + j)
+	f3 = lambda i, j: 3 * (-i + j)
+	out = plot_variance(
+		clar_traj,
+		'output/plot_variance_wv.png',
+		filt_params,
+		vary_param_1=('weight_func', (f1, f2, f3)),
+		vary_param_2=('ds_rate', np.arange(100, 150, 10)),
+		legend_labels_1=('weight_function', ('k=1', 'k=2', 'k=3')),
+		load_saved_filts='data/clar_filts_v.npy',
+		heatmaps=False
+	)
+	out = plot_variance__extract_output(out)
+	np.save('ref/plot_variance_wv.npy', out)
+
+
+def ref__plot_variance_v():
+	out = plot_variance(
+		clar_traj,
+		'output/plot_variance_v.png',
+		filt_params,
+		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
+		quiet=True,
+		load_saved_filts='data/clar_filts_v.npy',
+		heatmaps=False
+	)
+	out = plot_variance__extract_output(out)
+	np.save('ref/plot_variance_v.npy', out)
+
+def ref__plot_variance_w():
+	f1 = lambda i, j: 1 * (-i + j)
+	f2 = lambda i, j: 2 * (-i + j)
+	f3 = lambda i, j: 3 * (-i + j)
+	out = plot_variance(
+		clar_traj,
+		'output/PRFstats/plot_variance_w.png',
+		filt_params,
+		vary_param_1=('weight_func', (f1, f2, f3)),
+		legend_labels_1=('weight function', ('k=1', 'k=2', 'k=3')),
+		quiet=False,
+		load_saved_filts='data/clar_filts_.npy',
+		heatmaps=False
+	)
+	out = plot_variance__extract_output(out)
+	np.save('ref/plot_variance_w.npy', out)
 
 if __name__ == '__main__':
-	# ref__ROCs()
+	# ref__filt_set_v()
 	# ref__plot_dists_to_means()
-	# ref__plot_variance()
-	ref__fetch_filts_v()
+	# ref__ROCs()
+	# ref__plot_variance_vw()
+	# ref__plot_variance_vv()
+	# ref__plot_variance_wv()
+	# ref__plot_variance_v()
+	# ref__plot_variance_w()
 	pass

@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from PRFstats.data import all_indices, NormalPRF
+from PRFstats.data import NormalPRF
 
 
 class PointwiseStats:
@@ -46,6 +46,20 @@ class NormStats:
 		return np.mean(dists ** 2)
 
 
+def all_indices(vp1, vp2):
+	if vp2 is None:
+		lim1 = len(vp1[1])
+		idxs = [i for i in range(lim1)]
+		shape = lim1
+
+	else:
+		lim1, lim2 = len(vp1[1]), len(vp2[1])
+		idxs = [(i, j) for i in range(lim1) for j in range(lim2)]
+		shape = (lim1, lim2)
+
+	return shape, idxs
+
+
 def pointwise_stats(prfs, vary_param_1, vary_param_2):
 	shape, idxs = all_indices(vary_param_1, vary_param_2)
 	data = np.empty(shape, dtype=object)
@@ -60,3 +74,5 @@ def scaler_stats(prfs, pw_stats, vary_param_1, vary_param_2):
 	for idx in idxs:
 		data[idx] = NormStats(prfs[idx], pw_stats[idx])
 	return data
+
+

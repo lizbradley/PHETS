@@ -192,10 +192,11 @@ def plot_variance(
 		legend_labels_1=None,       # ('axis', ('tick 1', 'tick2', 'tick3'))
 		legend_labels_2=None,       # ('legend 1', 'legend 2', 'legend 3')
 		weight_func=lambda i, j: 1,
-		see_samples=5,
+		see_samples=False,
 		quiet=True,
 		annot_hm=False,
 		load_saved_filts=False,
+		heatmaps=True
 ):
 	out_dir, out_fname = os.path.split(out_filename)
 	in_dir, in_fname = os.path.split(traj.fname)
@@ -233,17 +234,17 @@ def plot_variance(
 		legend_labels_2,
 		traj.fname
 	)
-
-	heatmaps_figs(
-		pointw_data,
-		vary_param_1,
-		vary_param_2,
-		legend_labels_1,
-		legend_labels_2,
-		out_dir,
-		in_fname,
-		annot_hm
-	)
+	if heatmaps:
+		heatmaps_figs(
+			pointw_data,
+			vary_param_1,
+			vary_param_2,
+			legend_labels_1,
+			legend_labels_2,
+			out_dir,
+			in_fname,
+			annot_hm
+		)
 
 	if see_samples:
 		dir_ = 'output/PRFstats/samples'

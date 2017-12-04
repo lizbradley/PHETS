@@ -79,26 +79,12 @@ class NormalPRF:
 		return NormalPRF(np.power(self.data, self.interpret(other)))
 
 
-def all_indices(vp1, vp2):
-	if vp2 is None:
-		lim1 = len(vp1[1])
-		idxs = [i for i in range(lim1)]
-		shape = lim1
-
-	else:
-		lim1, lim2 = len(vp1[1]), len(vp2[1])
-		idxs = [(i, j) for i in range(lim1) for j in range(lim2)]
-		shape = (lim1, lim2)
-
-	return shape, idxs
-
-
 def validate_vps(vp1, vp2):
 	if vp1 is None and vp2 is not None:
-		raise ParamError('vary_param_1 is None, vary_param_2 is not None')
-	if vp1[0] == vp2[0]:
-		raise ParamError('vary_param_1[0] == vary_param_2[0]')
-
+		raise ParamError('vary_param_1 is None and vary_param_2 is not None')
+	if not (vp1 is None or vp2 is None):
+		if vp1[0] == vp2[0]:
+			raise ParamError('vary_param_1[0] == vary_param_2[0]')
 
 
 def is_filt_param(vp):
@@ -146,6 +132,8 @@ def filt_set(
 		quiet=True,
         fid=None
 ) :
+	validate_vps(vp1, vp2)
+
 	if load_saved:
 		return load_filts(load_saved, fid)
 
@@ -214,16 +202,6 @@ def prf_set(filts, weight_func=lambda i, j: 1, vp1=None, vp2=None):
 
 	return prfs
 
-
-def apply_weight(prf, weight_func):
-	""" applies weight to _normalized_ prf"""
-	z = prf
-	x = y = np.linspace(0, 2 ** .5, len(z))
-	xx, yy = np.meshgrid(x, y)
-	weight_func = weight_func(xx, yy)
-	if isinstance(weight_func, int):
-		weight_func = np.full_like(xx, weight_func)
-	return np.multiply(z, weight_func)
 
 
 def distance(a, b):
