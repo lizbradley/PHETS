@@ -20,7 +20,10 @@ class Intervals:
 		self.write_perseus_in_file(complexes, silent)
 		self.call_perseus(silent)
 		intervals = self.read_perseus_out_file(silent)
-		self.birth_time, self.death_time = intervals[:, 0], intervals[:, 1]
+		try:
+			self.birth_time, self.death_time = intervals[:, 0], intervals[:, 1]
+		except IndexError:
+			self.birth_time, self.death_time = [], []
 		os.chdir(caller_dir)
 
 	@staticmethod
@@ -62,7 +65,7 @@ class Intervals:
 	def read_perseus_out_file(silent):
 		try:
 			with warnings.catch_warnings():
-				warnings.simplefilter('ignore')
+				# warnings.simplefilter('ignore')
 				intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=2)
 		except IOError:
 			intervals = np.empty((2, 0))

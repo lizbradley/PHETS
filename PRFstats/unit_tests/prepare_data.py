@@ -14,6 +14,7 @@ os.chdir(current_dir)
 from common import filt_params, viol_traj, clar_traj
 
 from PRFstats.data import filt_set
+from PRFstats import plot_dists_to_ref
 
 
 def filts2comps(fname):
@@ -27,23 +28,39 @@ def filts2comps(fname):
 	np.save(out_fname, comps)
 
 
+def data__dists_to_ref_filts():
+	plot_dists_to_ref(
+		root_dir + '/datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
+		'output/dists_to_ref.png',
+		filt_params,
+		i_ref=15,
+		i_arr=np.arange(2, 30, 7),
+		quiet=True,
+		save_filts='data/dists_to_ref_filts.npy',
+	)
+
+
 def data__viol_filts():
 	filt_set(viol_traj, filt_params, load_saved=False, quiet=False,
 	         save='data/viol_filts_.npy')
 
+
 def data__clar_filts():
 	filt_set(clar_traj, filt_params, load_saved=False, quiet=False,
 	         save='data/clar_filts_.npy')
+
 
 def data__viol_filts_v():
 	filt_set(viol_traj, filt_params,
 	         vp1=('ds_rate', np.arange(100, 150, 10)),
 	         load_saved=False, quiet=False, save='data/viol_filts_v.npy')
 
+
 def data__clar_filts_v():
 	filt_set(clar_traj, filt_params,
 	         vp1=('ds_rate', np.arange(100, 150, 10)),
 	         load_saved=False, quiet=False, save='data/clar_filts_v.npy')
+
 
 def data__viol_filts_vv():
 	filt_set(viol_traj, filt_params,
@@ -53,9 +70,10 @@ def data__viol_filts_vv():
 
 
 if __name__ == '__main__':
-	data__viol_filts()
-	data__clar_filts()
-	data__viol_filts_v()
-	data__clar_filts_v()
-	data__viol_filts_vv()
+	# data__dists_to_ref_filts()
+	# data__viol_filts()
+	# data__clar_filts()
+	# data__viol_filts_v()
+	# data__clar_filts_v()
+	# data__viol_filts_vv()
 	pass

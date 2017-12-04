@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from data import dists_to_ref, filt_set, distance, prf_set
+from data import dists_to_ref, filt_set, distance, prf_set, NormalPRF
 from statscurves.data import pointwise_stats, scaler_stats
 from plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig
 from statscurves.plots import variance_fig, heatmaps_figs
@@ -23,38 +23,47 @@ def plot_dists_to_ref(
 		i_arr=np.arange(10, 20, 1),
 		weight_func=lambda i, j: 1,
 		load_saved_filts=False,
-		see_samples=5,
-		quiet=True
+		see_samples=False,
+		quiet=True,
+		save_filts=True
 
 ):
 	"""
 	plots distance from reference prf over a range of trajectory input files
 	"""
 
-	# TODO: weight_func, unit test
-
 	from PH import Filtration
-	import cPickle
 	from utilities import print_title
 
+
 	if load_saved_filts:
-		filts = np.load(open('PRFstats/data/filts.p'))
-		ref_filt = np.load(open('PRFstats/data/ref_filt.p'))
+		try:
+			saved = np.load(load_saved_filts)
+		except AttributeError:
+			saved = np.load('PRFstats/data/filts.npy')
+		ref_filt, filts = saved
+
 	else:
 		filts = []
 		for i in i_arr:
 			fname = path.format(i)
 			print_title(fname)
 			traj = Trajectory(fname)
-			filts.append(Filtration(traj, filt_params, silent=quiet))
+			filts.append(
+				Filtration(traj, filt_params, silent=quiet, save=False)
+			)
 		ref_traj = Trajectory(path.format(i_ref))
-		ref_filt = Filtration(ref_traj, filt_params, silent=quiet)
-		cPickle.dump(filts, open('PRFstats/data/filts.p', 'wb'))
-		cPickle.dump(ref_filt, open('PRFstats/data/ref_filt.p', 'wb'))
+		ref_filt = Filtration(ref_traj, filt_params, silent=quiet, save=False)
+		if save_filts:
+			try:
+				np.save(save_filts, [ref_filt, filts])
+			except AttributeError:
+				np.save('PRFstats/data/filts.npy', [ref_filt, filts])
+	filts = np.array(filts)
 
-
-	prfs = [f.PRF() for f in filts]
-	ref_prf = ref_filt.PRF
+	prfs = [NormalPRF(f.PRF()) for f in filts]
+	ref_prf = NormalPRF(ref_filt.PRF())
+	[prf.set_weight(weight_func) for prf in prfs + [ref_prf]]
 
 	dists = dists_to_ref(prfs, ref_prf)
 	base_filename = path.split('/')[-1]
@@ -64,6 +73,8 @@ def plot_dists_to_ref(
 		dir_ = 'output/PRFstats/samples'
 		clear_old_files(dir_, see_samples)
 		samples(filts, see_samples, dir_)
+
+	return dists
 
 
 def plot_dists_to_means(

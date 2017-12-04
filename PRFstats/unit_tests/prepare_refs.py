@@ -14,8 +14,8 @@ os.chdir(current_dir)
 from common import filt_params, viol_traj, clar_traj, ellipse_traj
 from PRFstats.unit_tests.common import plot_variance__extract_output
 
-from utilities import clear_dir_rf
-from PRFstats import plot_variance, plot_ROCs, plot_dists_to_means
+from PRFstats import plot_variance, plot_ROCs, plot_dists_to_means, \
+	plot_dists_to_ref
 from PRFstats.data import filt_set
 
 
@@ -27,6 +27,20 @@ def ref__filt_set_v():
 		quiet=False,
 		save='ref/filt_set_v.npy'
 	)
+
+
+def ref__plot_dists_to_ref():
+	out = plot_dists_to_ref(
+		root_dir + '/datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
+		'output/dists_to_ref.png',
+		filt_params,
+		i_ref=15,
+		i_arr=np.arange(2, 30, 7),
+		quiet=True,
+		load_saved_filts='data/dists_to_ref_filts.npy',
+	)
+	np.save('ref/dists_to_ref.npy', out)
+
 
 def ref__plot_dists_to_means():
 	out = plot_dists_to_means(
@@ -40,7 +54,6 @@ def ref__plot_dists_to_means():
 
 
 def ref__plot_ROCs():
-
 	out = plot_ROCs(
 		clar_traj, viol_traj,
 		'output/ROCs.png',
@@ -52,7 +65,6 @@ def ref__plot_ROCs():
 		filts_fnames=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
 	)
 	np.save('ref/plot_ROCs_v.npy', out)
-
 
 
 def ref__plot_variance_vw():
@@ -125,6 +137,7 @@ def ref__plot_variance_v():
 	out = plot_variance__extract_output(out)
 	np.save('ref/plot_variance_v.npy', out)
 
+
 def ref__plot_variance_w():
 	f1 = lambda i, j: 1 * (-i + j)
 	f2 = lambda i, j: 2 * (-i + j)
@@ -142,8 +155,10 @@ def ref__plot_variance_w():
 	out = plot_variance__extract_output(out)
 	np.save('ref/plot_variance_w.npy', out)
 
+
 if __name__ == '__main__':
 	# ref__filt_set_v()
+	ref__plot_dists_to_ref()
 	# ref__plot_dists_to_means()
 	# ref__ROCs()
 	# ref__plot_variance_vw()

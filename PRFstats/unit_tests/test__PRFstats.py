@@ -2,9 +2,10 @@ import cPickle
 import numpy as np
 
 from paths import chdir; chdir()
-
+from paths import root_dir
 from utilities import clear_dir_rf
-from PRFstats import filt_set, plot_variance, plot_ROCs, plot_dists_to_means
+from PRFstats import filt_set, plot_variance, plot_ROCs, plot_dists_to_means, \
+	plot_dists_to_ref
 from common import filt_params, ellipse_traj, viol_traj, clar_traj, \
 	plot_variance__extract_output
 
@@ -27,6 +28,26 @@ def test__filt_set_v():
 			break
 
 	assert same
+
+def test__plot_dists_to_ref():
+	chdir()
+	filt_params.update({
+		'max_filtration_param': -10,
+		'num_divisions': 10,
+		'ds_rate': 500
+	})
+
+	out = plot_dists_to_ref(
+		root_dir + '/datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
+		'output/dists_to_ref.png',
+		filt_params,
+		i_ref=15,
+		i_arr=np.arange(2, 30, 7),
+		quiet=True,
+		load_saved_filts='data/dists_to_ref_filts.npy',
+	)
+	ref = np.load('ref/dists_to_ref.npy')
+	np.testing.assert_array_equal(out, ref)
 
 def test__plot_dists_to_means():
 	chdir()

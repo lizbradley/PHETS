@@ -8,7 +8,7 @@ from PRFstats import plot_ROCs, plot_dists_to_means, plot_clusters, \
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=10)
+test, start_time = get_test(set_test=7)
 
 
 def out_fname():
@@ -253,13 +253,14 @@ if test == 7:
 	})
 
 	plot_dists_to_ref(
-		'L63_x_m2_tau{}',
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
 		out_fname(),
 		filt_params,
 		i_ref=15,
 		i_arr=np.arange(2, 30),
 		quiet=False,
-		load_saved_filts=True
+		load_saved_filts=False,
+		see_samples={'interval': 5, 'filt_step': 5}
 	)
 
 if test == 9:

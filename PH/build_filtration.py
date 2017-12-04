@@ -796,9 +796,13 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		for sb in filtration:
 			if len(sb.landmark_set) > max_sb_length:
 				max_sb_length = len(sb.landmark_set)
-		print('''Done. Filtration contains %i top simplex birth events, with 
-		the largest one comprised of %i landmarks.
-		Max filtration parameter: %s.\n''' % (len(filtration), max_sb_length, max_filtration_param))
+		print(
+		'''Done. Filtration contains %i top simplex birth events, with the 
+		largest comprised of %i landmarks.
+		'''.format(len(filtration), max_sb_length)
+		)
+
+		print 'Max filtration parameter: {}'.format(max_filtration_param)
 
 	print("Filtration has been successfully built!\n")
 	return (filtration, extra_data + (max_filtration_param,), epsilons)
