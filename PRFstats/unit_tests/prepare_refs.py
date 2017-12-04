@@ -11,12 +11,9 @@ from paths import root_dir, current_dir
 sys.path.append(root_dir)
 os.chdir(current_dir)
 
-from common import filt_params, viol_traj, clar_traj, ellipse_traj
-from PRFstats.unit_tests.common import plot_variance__extract_output
+from common import *
 
-from PRFstats import plot_variance, plot_ROCs, plot_dists_to_means, \
-	plot_dists_to_ref
-from PRFstats.data import filt_set
+from PRFstats import *
 
 
 def ref__filt_set_v():
@@ -154,6 +151,18 @@ def ref__plot_variance_w():
 	np.save('ref/plot_variance_w.npy', out)
 
 
+def ref__pairwise_mean_dists():
+	dists = pairwise_mean_dists(
+		clar_traj,
+		filt_params,
+		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
+		vary_param_2=('max_filtration_param', (-5, -6, -7)),
+		quiet=True,
+		load_saved_filts='data/viol_filts_vv.npy',
+	)
+	np.save('ref/pairwise_mean_dists.npy', dists)
+
+
 if __name__ == '__main__':
 	# ref__filt_set_v()
 	# ref__plot_dists_to_ref()
@@ -164,4 +173,5 @@ if __name__ == '__main__':
 	# ref__plot_variance_wv()
 	# ref__plot_variance_v()
 	# ref__plot_variance_w()
+	# ref__pairwise_mean_dists()
 	pass

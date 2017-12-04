@@ -3,16 +3,12 @@ import numpy as np
 
 from paths import chdir; chdir()
 from paths import root_dir
-from utilities import clear_dir_rf
-from PRFstats import filt_set, plot_variance, plot_ROCs, plot_dists_to_means, \
-	plot_dists_to_ref
-from common import filt_params, ellipse_traj, viol_traj, clar_traj, \
-	plot_variance__extract_output
+from PRFstats import *
+from common import *
 
 
 def test__filt_set_v():
 	chdir()
-	clear_dir_rf('output')
 	out = filt_set(
 		ellipse_traj,
 		filt_params,
@@ -157,6 +153,7 @@ def test__plot_variance_v():
 	ref = np.load('ref/plot_variance_v.npy')
 	np.testing.assert_array_equal(out, ref)
 
+
 def test__plot_variance_w():
 	chdir()
 	f1 = lambda i, j: 1 * (-i + j)
@@ -178,6 +175,14 @@ def test__plot_variance_w():
 
 def test__plot_pairwise_mean_dists():
 	chdir()
+	dists = pairwise_mean_dists(
+		clar_traj,
+		filt_params,
+		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
+		vary_param_2=('max_filtration_param', (-5, -6, -7)),
+		quiet=True,
+		load_saved_filts='data/viol_filts_vv.npy',
+	)
 
 if __name__ == '__main__':
 	# test__fetch_filts_v()
