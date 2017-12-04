@@ -139,7 +139,13 @@ def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
 	ax.ticklabel_format(axis='both', style='sci',  scilimits=(0, 0))
 
 	z = prf.data
-	heatmap_ax(ax, z, prf.epsilons, cmap, norm, annot=annot_hm)
+	try:
+		eps = prf.epsilons
+	except AttributeError:
+		eps = None
+
+	heatmap_ax(ax, z, eps, cmap, norm, annot=annot_hm)
+
 
 
 

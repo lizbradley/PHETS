@@ -47,8 +47,7 @@ def ref__plot_dists_to_means():
 		clar_traj, viol_traj,
 		'output/plot_dists_to_means.png',
 		filt_params,
-		load_saved_filts=True,
-		filts_fnames=('data/clar_filts_.npy', 'data/viol_filts_.npy')
+		load_saved_filts=('data/clar_filts_.npy', 'data/viol_filts_.npy'),
 	)
 	np.save('ref/plot_dists_to_means.npy', out)
 
@@ -61,8 +60,7 @@ def ref__plot_ROCs():
 		vary_param=('ds_rate', np.arange(100, 150, 10)),
 		k=(0, 5.01, .1),
 		quiet=False,
-		load_saved_filts=True,
-		filts_fnames=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
+		load_saved_filts=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
 	)
 	np.save('ref/plot_ROCs_v.npy', out)
 
@@ -158,9 +156,9 @@ def ref__plot_variance_w():
 
 if __name__ == '__main__':
 	# ref__filt_set_v()
-	ref__plot_dists_to_ref()
+	# ref__plot_dists_to_ref()
 	# ref__plot_dists_to_means()
-	# ref__ROCs()
+	# ref__plot_ROCs()
 	# ref__plot_variance_vw()
 	# ref__plot_variance_vv()
 	# ref__plot_variance_wv()

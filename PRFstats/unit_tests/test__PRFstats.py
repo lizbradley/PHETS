@@ -29,8 +29,10 @@ def test__filt_set_v():
 
 	assert same
 
+
 def test__plot_dists_to_ref():
 	chdir()
+	fp = filt_params.copy()
 	filt_params.update({
 		'max_filtration_param': -10,
 		'num_divisions': 10,
@@ -40,7 +42,7 @@ def test__plot_dists_to_ref():
 	out = plot_dists_to_ref(
 		root_dir + '/datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
 		'output/dists_to_ref.png',
-		filt_params,
+		fp,
 		i_ref=15,
 		i_arr=np.arange(2, 30, 7),
 		quiet=True,
@@ -49,19 +51,21 @@ def test__plot_dists_to_ref():
 	ref = np.load('ref/dists_to_ref.npy')
 	np.testing.assert_array_equal(out, ref)
 
+
 def test__plot_dists_to_means():
 	chdir()
 	out = plot_dists_to_means(
 		clar_traj, viol_traj,
 		'output/dists_to_means.png',
 		filt_params,
-		# weight_func=lambda x, y: x ** 2 + y ** 2,
 		load_saved_filts=('data/clar_filts_.npy', 'data/viol_filts_.npy'),
 	)
+	ref = np.load('ref/plot_dists_to_means.npy')
+	np.testing.assert_array_equal(out, ref)
 
-def test__ROCs_v():
+
+def test__plot_ROCs_v():
 	chdir()
-	# clear_dir_rf('output')
 	out = plot_ROCs(
 		clar_traj, viol_traj,
 		'output/ROCs.png',
@@ -69,11 +73,11 @@ def test__ROCs_v():
 		vary_param=('ds_rate', np.arange(100, 150, 10)),
 		k=(0, 5.01, .1),
 		quiet=True,
-		load_saved_filts=True,
-		filts_fnames=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
+		load_saved_filts=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
 	)
 	ref = np.load('ref/plot_ROCs_v.npy')
 	np.testing.assert_array_equal(out, ref)
+
 
 def test__plot_variance_vw():
 	chdir()
@@ -175,7 +179,7 @@ def test__plot_variance_w():
 if __name__ == '__main__':
 	# test__fetch_filts_v()
 	# test__plot_dists_to_means()
-	# test__ROCs_v()
+	test__plot_ROCs_v()
 	# test__plot_dists_to_means()
 	# test__plot_variance_vv()
 	# test__plot_variance_vw()

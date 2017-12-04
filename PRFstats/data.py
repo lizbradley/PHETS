@@ -216,8 +216,8 @@ def dists_to_ref(funcs, ref_func):
 def mean_dists_compare(prfs1, prfs2):
 	"""data for plot_dists_vs_means, and plot_clusters"""
 
-	mean1 = np.mean(prfs1, axis=0)
-	mean2 = np.mean(prfs2, axis=0)
+	mean1 = NormalPRF.mean(prfs1)
+	mean2 = NormalPRF.mean(prfs2)
 
 	dists_1_vs_1 = dists_to_ref(prfs1, mean1)
 	dists_2_vs_1 = dists_to_ref(prfs2, mean1)

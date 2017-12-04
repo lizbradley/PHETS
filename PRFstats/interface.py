@@ -85,14 +85,23 @@ def plot_dists_to_means(
 		weight_func=lambda i, j: 1,
 		see_samples=False,
 		load_saved_filts=False,
-		filts_fnames=(None, None),
 		quiet=True
 	):
 
-	filts1 = filt_set(traj1, filt_params, load_saved_filts, quiet,
-	                  in_fname=filts_fnames[0], fid=1)
-	filts2 = filt_set(traj2, filt_params, load_saved_filts, quiet,
-	                  in_fname=filts_fnames[1], fid=2)
+	filts1 = filt_set(
+		traj1,
+		filt_params,
+		load_saved=load_saved_filts[0],
+		quiet=quiet,
+	    fid=1
+	)
+	filts2 = filt_set(
+		traj2,
+		filt_params,
+		load_saved=load_saved_filts[1],
+		quiet=quiet,
+	    fid=2
+	)
 
 	prfs1 = prf_set(filts1, weight_func)
 	prfs2 = prf_set(filts2, weight_func)
@@ -122,11 +131,20 @@ def plot_clusters(
 		filts_fnames=(None, None),
 		quiet=True
 ):
-
-	filts1 = filt_set(traj1, filt_params, load_saved_filts, quiet,
-	                  in_fname=filts_fnames[0], fid=1)
-	filts2 = filt_set(traj2, filt_params, load_saved_filts, quiet,
-	                  in_fname=filts_fnames[1], fid=2)
+	filts1 = filt_set(
+		traj1,
+		filt_params,
+		load_saved=load_saved_filts[0],
+		quiet=quiet,
+		fid=1
+	)
+	filts2 = filt_set(
+		traj2,
+		filt_params,
+		load_saved=load_saved_filts[1],
+		quiet=quiet,
+		fid=2
+	)
 
 	prfs1 = prf_set(filts1, weight_func)
 	prfs2 = prf_set(filts2, weight_func)
@@ -149,17 +167,28 @@ def plot_ROCs(
 		k,
 		weight_func=lambda i, j: 1,
 		load_saved_filts=False,
-		filts_fnames=(None, None),
 		see_samples=0,
 		quiet=True,
 		vary_param=None     # ('param', (100, 150, 200))
 ):
 	# TODO: weight function, vary_param_2
 
-	filts1 = filt_set(traj1, filt_params, vary_param, load_saved_filts, quiet,
-	                  in_fname=filts_fnames[0], fid=1)
-	filts2 = filt_set(traj2, filt_params, vary_param, load_saved_filts, quiet,
-	                  in_fname=filts_fnames[1], fid=2)
+	filts1 = filt_set(
+		traj1,
+		filt_params,
+		vary_param,
+		load_saved=load_saved_filts[0],
+		quiet=quiet,
+	    fid=1
+	)
+	filts2 = filt_set(
+		traj2,
+		filt_params,
+		vary_param,
+		load_saved=load_saved_filts[1],
+		quiet=quiet,
+		fid=2
+	)
 
 
 	prfs1 = prf_set(filts1, weight_func)

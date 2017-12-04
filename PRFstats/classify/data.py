@@ -1,6 +1,6 @@
 import numpy as np
 
-from PRFstats.data import distance
+from PRFstats.data import distance, NormalPRF
 from PRFstats.data import ParamError
 
 def norm(f):
@@ -16,9 +16,9 @@ class DistanceClassifier(object):
 		"""
 		prfs = train
 
-		self.mean = np.mean(prfs, axis=0)
-		self.lvar = np.var(prfs, axis=0)                           # local
-		self.lstddev = np.power(self.lvar, .5)
+		self.mean = NormalPRF.mean(prfs)
+		self.lvar = NormalPRF.var(prfs)                           # local
+		self.lstddev = np.power(self.lvar.data, .5)
 
 		self.dists = [distance(self.mean, prf) for prf in prfs]
 
