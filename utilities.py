@@ -175,14 +175,13 @@ def frames_to_movie(out_filename, frame_path, framerate=1, loglevel='error'):
 		'-y',
 		'-framerate', str(framerate),
 		'-i', frame_path,
-		'-r', str(24),
+		'-r', str(16),
 		# '-aspect', '{}:{}'.format(aspect[0], aspect[1]),
 		out_filename
 
 	]
 	subprocess.call(cmd)
 	print 'done.'
-	print 'see {}'.format(out_filename)
 
 
 # BELOW ARE MIGRATED FROM DCE MODULE, NEED CLEANUP #

@@ -39,13 +39,6 @@ def ts_ax(ax, ts):
 
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
-def ts_fig(ts, out_fname):
-	print 'plotting timeseries...'
-	fig = plt.figure(figsize=(8, 2.5), tight_layout=True, dpi=200)
-	ax = fig.add_subplot(111)
-	ts_ax(ax, ts)
-	plt.savefig(out_fname)
-
 
 def ts_crop_ax(ax, ts, show_window='all'):
 	y = ts.data
@@ -53,7 +46,7 @@ def ts_crop_ax(ax, ts, show_window='all'):
 
 	ax.set_xlabel('time ({})'.format(ts.time_units))
 
-	ax.plot(x, y, color='k')
+	ax.plot(x, y, color='k', lw=.5)
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
 	if isinstance(show_window, basestring) and show_window == 'all':
@@ -70,3 +63,19 @@ def ts_window_ax(ax, ts, window):
 	x = np.linspace(s, s + ts.window_length)
 
 	ax.plot(x, y, color='k')
+
+
+def ts_fig(ts, out_fname):
+	print 'plotting time-series...'
+	fig = plt.figure(figsize=(8, 2.5), tight_layout=True, dpi=300)
+	ax = fig.add_subplot(111)
+	ts_ax(ax, ts)
+	plt.savefig(out_fname)
+
+
+def ts_crop_fig(ts, out_fname):
+	print 'plotting time-series (crop)...'
+	fig = plt.figure(figsize=(8, 2.5), tight_layout=True, dpi=300)
+	ax = fig.add_subplot(111)
+	ts_crop_ax(ax, ts)
+	plt.savefig(out_fname)

@@ -285,6 +285,19 @@ class TimeSeries(BaseTrajectory):
 		"""
 		plots.ts_fig(self, filename)
 
+	def plot_crop(self, filename):
+		"""
+		Plot time series (crop only), save to ``filename``.
+		Parameters
+		----------
+		filename : str
+
+		Returns
+		-------
+
+		"""
+		plots.ts_crop_fig(self, filename)
+
 
 
 

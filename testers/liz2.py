@@ -13,7 +13,7 @@ from config import default_filtration_params as filt_params
 fname = '../WAIS_age_dD_d18O_xs.txt'
 # data = np.loadtxt(fname, skiprows=1, delimiter=',')
 # data = data[:, 2]                           # select column
-fname = '{}.clean'.format(fname)            # new fname
+fname = '{}.clean'.format(fname)              # new fname
 # np.savetxt(fname, data)                     # save cleaned/formatted data
 
 # initialize a TimeSeries object from formatted data file
@@ -24,8 +24,9 @@ ts = TimeSeries(
 	window_length=1000
 )
 
-# visual representation of window geometry
-ts.plot('output/liz/signal.png')
+# visual representation of window and crop geometry
+# ts.plot('output/liz/signal.png')          # full signal
+ts.plot_crop('output/liz/signal_crop.png')  # cropped section only
 
 # make embed movie from the TimeSeries, returning a Trajectory
 slide_window(ts, 'output/liz/embed_movie.mp4', m=2, tau=200)
