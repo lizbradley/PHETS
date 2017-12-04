@@ -176,6 +176,9 @@ def test__plot_variance_w():
 	ref = np.load('ref/plot_variance_w.npy')
 	np.testing.assert_array_equal(out, ref)
 
+def test__plot_pairwise_mean_dists():
+	chdir()
+
 if __name__ == '__main__':
 	# test__fetch_filts_v()
 	# test__plot_dists_to_means()

@@ -4,15 +4,15 @@ change_dir()
 import numpy as np
 from signals import TimeSeries, Trajectory
 from PRFstats import plot_ROCs, plot_dists_to_means, plot_clusters, \
-	plot_dists_to_ref, plot_variance, plot_pairwise_mean_dists
+	plot_dists_to_ref, plot_variance, pairwise_mean_dists
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=7)
+test, start_time = get_test(set_test=12)
 
 
-def out_fname():
-	return 'output/PRFstats/test_{}.png'.format(test)
+def out_fname(t='png'):
+	return 'output/PRFstats/test_{}.{}'.format(test, t)
 
 
 if test == 1:
@@ -362,6 +362,7 @@ if test == 11:
 
 if test == 12:
 
+	traj = None
 	traj = Trajectory(
 		'datasets/Lorenz/StandardLorenz63_IC123.txt',
 		crop=(10000, 150000),
@@ -374,14 +375,16 @@ if test == 12:
 		'num_divisions': 10,
 	})
 
-	plot_pairwise_mean_dists(
+	dists = pairwise_mean_dists(
 		traj,
-		out_fname(),
 		filt_params,
 		vary_param_1=('worm_length', (200, 500, 700)),
 		vary_param_2=('max_filtration_param', (-5, -8, -12)),
 		quiet=True,
-		annot_hm=False,
-		load_saved_filts=False
+		load_saved_filts=False,
+		see_samples={'interval': 4, 'filt_step': 5}
 	)
+
+	np.savetxt(out_fname(t='txt'), dists)
+
 

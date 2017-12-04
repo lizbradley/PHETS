@@ -300,37 +300,50 @@ def plot_variance(
 	return scaler_data
 
 
-def plot_pairwise_mean_dists(
+def pairwise_mean_dists(
 		traj,
-		out_filename,
 		filt_params,
 		vary_param_1,
-		vary_param_2=None,
-		legend_labels=None,
-
+		vary_param_2,
 		weight_func=lambda i, j: 1,
-
-		see_samples=5,
+		see_samples=False,
 		quiet=True,
-		annot_hm=False,
 		load_saved_filts=False,
-		filts_fname=None,
-		unit_test=False
 ):
-	filts = filt_set(traj, filt_params, vary_param_1, vary_param_2,
-	                 load_saved_filts, quiet, in_fname=filts_fname)
+	filts = filt_set(
+		traj,
+		filt_params,
+		vary_param_1,
+		vary_param_2,
+		load_saved=load_saved_filts,
+		quiet=quiet,
+	)
 
 	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
 
-	prfs_means = np.mean(prfs, axis=2)
+	means = np.empty(prfs.shape[:-1], dtype=object)
 
-	dists_array = np.zeros((prfs_means.shape[0] - 1, prfs_means.shape[1]))
-	for i in range(prfs_means.shape[0] - 1):
-		for j in range(prfs_means.shape[1]):
-			d = distance(prfs_means[i, j], prfs_means[i + 1, j])
-			dists_array[i, j] = d
+	for idx in np.ndindex(*means.shape):
+		mean = NormalPRF.mean(prfs[idx])
+		means[idx] = mean
 
-	np.savetxt('output/PRFstats/pairwise_dists.txt', dists_array)
+	dists = np.zeros((means.shape[0] - 1, means.shape[1]))
+	for i in range(means.shape[0] - 1):
+		for j in range(means.shape[1]):
+			d = distance(means[i, j], means[i + 1, j])
+			dists[i, j] = d
 
+	if see_samples:
+		dir_ = 'output/PRFstats/samples'
+		clear_old_files(dir_, see_samples)
+		samples(
+			filts,
+			see_samples,
+			'output/PRFstats/samples',
+			vary_param_1,
+			vary_param_2
+		)
+
+	return dists
 
 
