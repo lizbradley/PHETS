@@ -16,13 +16,10 @@ processing technique.
 
 PHETS encompasses four submodules:
 
-.. toctree::
-   :maxdepth: 2
-
-   signals
-   PH
-   DCE
-   PRFstats
+- signals
+- PH
+- DCE
+- PRFstats
 
 
 
@@ -49,7 +46,7 @@ take one or two ``Trajectory`` objects, create PRFs from the windows of the the
 
 
 
-MacOS troubleshooting
+OSX troubleshooting
 ---------------------
 PHETS requires the OpenMP C library ``omp.h``. From what I can tell, OpenMP
 is not included in clang (the default C compiler on macOS), and may only be
@@ -72,16 +69,10 @@ the PHETS directory. This script will remove a number of temporary files and
 attempt to compile ``find_landmarks.c``
 
 If the compiler is still giving errors (don't mind warnings), try
-```bash
-brew upgrade gcc
-```
-or
-```bash
-brew reinstall gcc --without-multilib
-```
+``brew upgrade gcc`` or ``brew reinstall gcc --without-multilib``
 
-See [here](https://stackoverflow.com/questions/35134681/installing-openmp-on-mac-os-x-10-11)
-and [here](https://stackoverflow.com/questions/29057437/compile-openmp-programs-with-gcc-compiler-on-os-x-yosemite)
+See `here <https://stackoverflow.com/questions/35134681/installing-openmp-on-mac-os-x-10-11>`_
+and `here <https://stackoverflow.com/questions/29057437/compile-openmp-programs-with-gcc-compiler-on-os-x-yosemite>`_
 for more information.
 
 
@@ -89,14 +80,14 @@ Regression Tests
 ---------------------
 pytest is used for testing. To run the test suite, type ``pytest --tb=short``
 from the top-level directory. (Running pytest within a subdirectory will only
-execute the submodule.)
+execute the tests for that submodule.)
 
 Each submodule contains a ``unit_test`` directory. The tests themselves are
 defined in <submodule>/unit_tests/test__<submodule>.py. These are not exactly
-unit tests. Rather, each one calls or initializes a user-facing feature and
+unit tests -- rather, each one calls or initializes a user-facing feature and
 compares the result to a saved reference. The input data is found in
 ``<submodule>/unit_tests/data`` and the references in
-``<submodule>/unit_tests/ref>``. In the case of :py:module:`PRFstats`, the
+``<submodule>/unit_tests/ref>``. In the case of :py:mod:`PRFstats`, the
 input data is pre-computed sets of Filtration objects, to keep test execution
 time low. A small, correct change to PHETS can break the ability to load these
 objects from file, breaking the tests. I this case, run
@@ -109,10 +100,13 @@ you aren't intentionally modifying).
 
 This Documentation
 ------------------
-This documentation is built with Sphinx. The autodoc feature is used to
-generate the API reference from Python docstrings in Numpy format.
+This documentation is built with Sphinx. The autodoc extension is used to
+generate the `library reference <Reference>`_ from docstrings in the Python code. The
+text and layout for all other sections (eg this paragraph) is defined in
+``docs/source/index.rst``.
 
 To build this documentation, TeX must be installed, along with the following:
+
 - texlive-latex-recommended
 - texlive-fonts-recommended
 - texlive-latex-extra
@@ -120,17 +114,18 @@ To build this documentation, TeX must be installed, along with the following:
 
 I used ``sudo apt-get install <package>`` for each.
 
-Now, simply:
+Now, simply
 .. code-block::
    cd docs
    make latexpdf
 The updated documentation is saved to ``docs/latex/PHETS.pdf``.
 
 
-Indices and tables
-==================
+Reference
+---------
+.. toctree::
+   signals
+   PH
+   DCE
+   PRFstats
 
-* :ref:`genindex`
-* :ref:`search`
-
-.. * :ref:`modindex`
