@@ -2,12 +2,12 @@
 
 **P**ersistent **H**omology on **E**mbedded **T**ime-**S**eries
 
-This package offers high-level tools for exploration and visualization of delay coordinate 
-embedding and persistent homology. It is used to investigate the utilization of these tools together as a signal 
-processing technique.
+This package offers high-level tools for exploration and visualization of delay
+coordinate embedding and persistent homology. It is used to investigate the
+utilization of these tools together as a signal processing technique.
 
-Also included is a dataset of time-series (mostly musical instrument recordings) and 
-higher dimensional trajectories as .txt files.
+Also included is a dataset of time-series (mostly musical instrument recordings)
+and higher dimensional trajectories as .txt files.
 
 
 
@@ -19,7 +19,6 @@ higher dimensional trajectories as .txt files.
 * gnuplot (with pngcairo)
 
 
-#### Install Dependencies
 
 ##### Debian-based 
 ```bash
@@ -28,7 +27,16 @@ sudo apt-get install gnuplot-x11
 ```
 
 ##### macOS
-[coming soon]
+```bash
+brew install ffmpeg
+brew install gnuplot --with-cairo
+```
+If you're running into an error about compiling `find_landmarks.c`, see
+documentation [link] for information about C compiler / library dependencies on
+macOS.
+
+
+
 
 #### Install PHETS
 

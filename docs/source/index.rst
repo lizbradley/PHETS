@@ -47,6 +47,46 @@ take one or two ``Trajectory`` objects, create PRFs from the windows of the the
 
 
 
+
+
+macOS Installation Troubleshooting
+==================================
+PHETS requires the OpenMP C library `omp.h`. From what I can tell, OpenMP
+is not included in clang (the default C compiler on macOS), and may only be
+installed /configured for recent versions, and not with great ease. For these reasons, we've
+never tried to run PHETS on clang, and cannot guarantee it will work
+correctly.
+
+On the other hand, OpenMP works with gcc out of the box, and you
+may already have a version of gcc installed. If so, determine the version and edit
+`find_landmarks_c_compile_str` in `config.py` to match. (NOTE: on macOS,
+`gcc` is a symlink for clang. This is avoided by including the version number,
+eg `gcc-5`.)
+
+If you do not have gcc installed, you can do
+```bash
+brew install gcc
+```
+and then, as above, tweak `config.py`. You can also tell brew to install a
+particular version if you would like (anything 5+ should work).
+
+A quick way to test if things are working is to run ```python refresh.py``` in
+the PHETS directory. This script will remove a number of temporary files and
+attempt to compile `find_landmarks.c`
+
+If the compiler is still giving errors (don't mind warnings), try
+```bash
+brew upgrade gcc
+```
+or
+```bash
+brew reinstall gcc --without-multilib
+```
+
+See [here](https://stackoverflow.com/questions/35134681/installing-openmp-on-mac-os-x-10-11)
+and [here](https://stackoverflow.com/questions/29057437/compile-openmp-programs-with-gcc-compiler-on-os-x-yosemite)
+for more information.
+
 Indices and tables
 ==================
 
