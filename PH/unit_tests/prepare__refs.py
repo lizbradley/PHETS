@@ -66,5 +66,5 @@ if __name__ == '__main__':
 	# ref__hamn10_filt()
 	# ref__hamn1_filt()
 	# ref__ham1_filt()
-	ref__euc_prf()
+	# ref__euc_prf()
 	pass

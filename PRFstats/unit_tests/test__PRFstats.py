@@ -165,7 +165,7 @@ def test__plot_variance_w():
 		filt_params,
 		vary_param_1=('weight_func', (f1, f2, f3)),
 		legend_labels_1=('weight function', ('k=1', 'k=2', 'k=3')),
-		quiet=False,
+		quiet=True,
 		load_saved_filts='data/clar_filts_.npy',
 		heatmaps=False
 	)
