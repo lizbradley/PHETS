@@ -59,7 +59,6 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PHETS'
-# copyright = u'2017, Elliott Shugerman'
 author = u'Elliott Shugerman'
 
 # The version info for the project you're documenting, acts as replacement for
