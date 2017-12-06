@@ -226,7 +226,8 @@ class Filtration:
 				print 'Sorry, PHETS requires linux or macOS.'
 				sys.exit()
 			subprocess.call(compile_str, shell=True)
-			print '''find_landmarks compilation attempt complete. If 
+			print '''
+			find_landmarks compilation attempt complete. If 
 			successful, please repeat your test. If problem persists, you will 
 			need to tweak find_landmarks_c_compile_str in config.py to compile 
 			find_landmarks.c on your system. '''
