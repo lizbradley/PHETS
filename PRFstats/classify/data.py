@@ -3,10 +3,12 @@ import numpy as np
 from PRFstats.data import distance, NormalPRF
 from PRFstats.data import ParamError
 
+
 def norm(f):
 	prf_res = len(f)
 	dA = 2. / (prf_res ** 2)	  # normalize such that area of PRF domain is 1
 	return np.sqrt(np.nansum(np.power(f, 2)) * dA)
+
 
 class DistanceClassifier(object):
 	def __init__(self, train):

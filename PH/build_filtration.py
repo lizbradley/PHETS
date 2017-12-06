@@ -15,7 +15,6 @@ import subprocess
 
 # f = open("output/run_info/build_filtration_memory.txt","wb")
 # @profile(stream=f)
-
 def build_filtration(input_file_name, parameter_set, silent=False):
 	"""
 	Parameters

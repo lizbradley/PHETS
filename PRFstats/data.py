@@ -39,7 +39,7 @@ class NormalPRF:
 			self.data = prf
 
 		self.num_div = self.data.shape[0]
-		self.epsilons = np.linspace(0, self.lim, self.num_div)
+		self.epsilons = np.linspace(0, self.lim, self.num_div) # move to class level
 		self.weight = None
 		self.pre_weight = self
 

@@ -3,12 +3,11 @@ change_dir()
 
 import numpy as np
 from signals import TimeSeries, Trajectory
-from PRFstats import plot_ROCs, plot_dists_to_means, plot_clusters, \
-	plot_dists_to_ref, plot_variance, pairwise_mean_dists
+from PRFstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=12)
+test, start_time = get_test(set_test=5)
 
 
 def out_fname(t='png'):
@@ -201,7 +200,8 @@ if test == 5:
 		traj1, traj2,
 		out_fname(),
 		filt_params,
-		quiet=False
+		quiet=False,
+		see_samples={'interval': 1, 'filt_step': 5}
 	)
 
 

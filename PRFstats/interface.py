@@ -76,6 +76,12 @@ def plot_dists_to_ref(
 
 	return dists
 
+def parse_load_cmd(cmd):
+	try:
+		load_cmd_1, load_cmd_2 = cmd
+	except TypeError:
+		load_cmd_1, load_cmd_2 = None, None
+	return load_cmd_1, load_cmd_2
 
 def plot_dists_to_means(
 		traj1,
@@ -88,17 +94,19 @@ def plot_dists_to_means(
 		quiet=True
 	):
 
+	load_cmd_1, load_cmd_2 = parse_load_cmd(load_saved_filts)
+
 	filts1 = filt_set(
 		traj1,
 		filt_params,
-		load_saved=load_saved_filts[0],
+		load_saved=load_cmd_1,
 		quiet=quiet,
 	    fid=1
 	)
 	filts2 = filt_set(
 		traj2,
 		filt_params,
-		load_saved=load_saved_filts[1],
+		load_saved=load_cmd_2,
 		quiet=quiet,
 	    fid=2
 	)
@@ -128,20 +136,21 @@ def plot_clusters(
 		weight_func=lambda i, j: 1,
 		see_samples=False,
 		load_saved_filts=False,
-		filts_fnames=(None, None),
 		quiet=True
 ):
+	load_cmd_1, load_cmd_2 = parse_load_cmd(load_saved_filts)
+
 	filts1 = filt_set(
 		traj1,
 		filt_params,
-		load_saved=load_saved_filts[0],
+		load_saved=load_cmd_1,
 		quiet=quiet,
 		fid=1
 	)
 	filts2 = filt_set(
 		traj2,
 		filt_params,
-		load_saved=load_saved_filts[1],
+		load_saved=load_cmd_2,
 		quiet=quiet,
 		fid=2
 	)
@@ -171,13 +180,14 @@ def plot_ROCs(
 		quiet=True,
 		vary_param=None     # ('param', (100, 150, 200))
 ):
-	# TODO: weight function, vary_param_2
+
+	load_cmd_1, load_cmd_2 = parse_load_cmd(load_saved_filts)
 
 	filts1 = filt_set(
 		traj1,
 		filt_params,
 		vary_param,
-		load_saved=load_saved_filts[0],
+		load_saved=load_cmd_1,
 		quiet=quiet,
 	    fid=1
 	)
@@ -185,7 +195,7 @@ def plot_ROCs(
 		traj2,
 		filt_params,
 		vary_param,
-		load_saved=load_saved_filts[1],
+		load_saved=load_cmd_2,
 		quiet=quiet,
 		fid=2
 	)
@@ -240,6 +250,7 @@ def plot_variance(
 ):
 	out_dir, out_fname = os.path.split(out_filename)
 	in_dir, in_fname = os.path.split(traj.fname)
+
 
 	weight_functions_figs(
 		vary_param_1,

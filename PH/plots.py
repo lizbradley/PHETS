@@ -112,6 +112,7 @@ def heatmap_ax(ax, z, dom=None, cmap=None, norm=None, annot=False):
 	zm = ma.masked_where(np.isnan(z), z)
 
 	if dom is None:
+		ax.axis('off')
 		mesh = ax.pcolormesh(zm, cmap=cmap, norm=norm, clip_on=False)
 	else:
 		x, y = extend_domain(dom, dom)

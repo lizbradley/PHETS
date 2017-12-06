@@ -4,15 +4,11 @@ import inspect
 import subprocess
 import os
 
-from memory_profiler import profile
+# from memory_profiler import profile
 
 def root_path():
 	return os.path.dirname(__file__)
 
-def mem_profile(f, flag):
-	if flag: return profile(stream=f)
-
-	else: return lambda x: x
 
 
 def normalize_volume(sig):
