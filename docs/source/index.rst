@@ -6,9 +6,8 @@
 Welcome to PHETS's documentation!
 =================================
 
-Introduction
+introduction
 ------------
-
 
 This package offers high-level tools for exploration and visualization of delay coordinate
 embedding and persistent homology. It is used to investigate the utilization of these tools together as a signal
@@ -16,11 +15,10 @@ processing technique.
 
 PHETS encompasses four submodules:
 
-- signals
-- PH
-- DCE
-- PRFstats
-
+- :py:mod:`signals`
+- :py:mod:`PH`
+- :py:mod:`DCE`
+- :py:mod:`PRFstats`
 
 
 ``signals`` holds the ``TimeSeries`` and ``Trajectory`` classes, which can be
@@ -46,8 +44,17 @@ take one or two ``Trajectory`` objects, create PRFs from the windows of the the
 
 
 
-OSX troubleshooting
----------------------
+troubleshooting
+---------------
+
+matplotlib backend error
+~~~~~~~~~~~~~~~~~~~~~~~~
+Comment out the first line of ``PHETS/matplotlibrc``
+
+
+compiling ``find_landmarks.c`` on OSX
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 PHETS requires the OpenMP C library ``omp.h``. From what I can tell, OpenMP
 is not included in clang (the default C compiler on macOS), and may only be
 installed /configured for recent versions, and not with great ease. For these reasons, we've
@@ -83,27 +90,28 @@ from the top-level directory. (Running pytest within a subdirectory will only
 execute the tests for that submodule.)
 
 Each submodule contains a ``unit_test`` directory. The tests themselves are
-defined in <submodule>/unit_tests/test__<submodule>.py. These are not exactly
+defined in ``unit_tests/test__<submodule>.py``. These are not exactly
 unit tests -- rather, each one calls or initializes a user-facing feature and
 compares the result to a saved reference. The input data is found in
-``<submodule>/unit_tests/data`` and the references in
-``<submodule>/unit_tests/ref>``. In the case of :py:mod:`PRFstats`, the
-input data is pre-computed sets of Filtration objects, to keep test execution
-time low. A small, correct change to PHETS can break the ability to load these
-objects from file, breaking the tests. I this case, run
-``PRFstats/unit_tests/prepare__data.py``, and the tests will work correctly.
-Routines in ``<submodule>/unit_tests/prepare__refs.py`` should be run `only
-when you wish to change the behavior of existing functionality`. They should
-also be run and individually (that is, don't change the refs for features that
-you aren't intentionally modifying).
+``unit_tests/data`` and the references in ``<unit_tests/ref>``.
+
+In the case of the ``PRFstats``module, in order to keep test execution time
+lwo, the input data is pre-computed sets of Filtration objects to keep test
+execution time low. A small, correct change to PHETS can break Python's
+ability to load these objects from file, breaking the tests. I this case,
+run the routines in ``PRFstats/unit_tests/prepare__data.py``, and the tests
+should work correctly. Routines in ``unit_tests/prepare__refs.py`` should be
+run `only when you wish to change the behavior of existing functionality`. They
+should also be run and individually (that is, don't change the refs for
+features that you aren't intentionally modifying).
 
 
 This Documentation
 ------------------
 This documentation is built with Sphinx. The autodoc extension is used to
-generate the `library reference <Reference>`_ from docstrings in the Python code. The
-text and layout for all other sections (eg this paragraph) is defined in
-``docs/source/index.rst``.
+generate the `library reference <Reference>`_ from docstrings in the Python
+code. The text and layout for all other sections (eg this paragraph) is defined
+in ``docs/source/index.rst``.
 
 To build this documentation, TeX must be installed, along with the following:
 

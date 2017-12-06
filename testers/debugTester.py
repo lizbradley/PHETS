@@ -255,5 +255,5 @@ if test == 9:
 
 	traj = Trajectory(in_fname)
 	filt = Filtration(traj, params)
-	filt.plot_PD(pd_fname(test))
+	filt.plot_pd(pd_fname(test))
 

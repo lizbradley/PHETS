@@ -51,7 +51,7 @@ def ref__ham1_filt():
 
 
 def ref__euc_prf():
-	np.save('ref/euc_prf.npy', euc_filt.PRF(new_format=True))
+	np.save('ref/euc_prf.npy', euc_filt.prf(new_format=True))
 
 
 

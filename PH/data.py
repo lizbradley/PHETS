@@ -18,11 +18,10 @@ def compile_find_landmarks_c():
 		sys.exit()
 	subprocess.call(compile_str, shell=True)
 	print '''
-	find_landmarks compilation attempt complete. If 
-	successful, please repeat your test. If problem persists, you will 
-	need to tweak find_landmarks_c_compile_str in config.py to compile 
-	find_landmarks.c on your system. '''
-	sys.exit()
+	find_landmarks compilation attempt complete. If successful, please repeat 
+	your test. If problem persists, you will need to tweak 
+	'find_landmarks_c_compile_str' in config.py to compile find_landmarks.c on 
+	your system. '''
 
 
 def write_perseus_in_file(filt_array, silent):
@@ -75,6 +74,7 @@ def read_perseus_out_file(silent):
 
 
 class Intervals:
+	"""birth and death times for holes in the complex filtration"""
 	def __init__(self, filtration):
 		complexes = filtration.complexes
 		silent = filtration.silent
@@ -85,14 +85,17 @@ class Intervals:
 		call_perseus(silent)
 		intervals = read_perseus_out_file(silent)
 		try:
-			self.birth_time, self.death_time = intervals[:, 0], intervals[:, 1]
+			self.birth_time = intervals[:, 0]
+			self.death_time = intervals[:, 1]
 		except IndexError:
-			self.birth_time, self.death_time = [], []
+			self.birth_time = []
+			self.death_time = []
 		os.chdir(caller_dir)
 
 
 
-class PDiagram:
+class PD:
+	"""persistence diagram"""
 	def __init__(self, intervals):
 		self.epsilons = intervals.epsilons
 		self.lim = self.epsilons[-1]
@@ -142,7 +145,8 @@ class PDiagram:
 		return mortal, immortal
 
 
-class PRankFunction:
+class PRF:
+	"""persistence rank function"""
 	def __init__(self, pd):
 		self.epsilons = pd.epsilons
 		self.data = self._build(pd)
@@ -180,19 +184,20 @@ class Filtration:
 		Parameters
 		----------
 		traj : Trajectory
+			trajectory from which to build the filtration
 		params : dict
+			options for landmark selection, witness complex, distance
+			modification, etc.
 			see :py:func:`build_filtration.build_filtration`
 		silent : bool, optional
-			Suppress stdout
+			suppress stdout
 		save : bool or str, optional
-			Save the filtration to file for later use. \n
-			if ``save`` is a string:
-				save filtration to ``save``\n
-				should end with ``'.p'``
-			elif ``save`` is True:
-				save filtration to ``'PH/filtrations/filt.p'``\n
-				filtration may be loaded by calling :py:func:`load_filtration`
-				without specifying filename
+			Save the filtration to file for later use. If ``save`` is a
+			path/filename, save filtration to ``save``; ``save`` should end
+			with ``.p``. Otherwise, if ``save`` is True, save filtration to
+			``PH/filtrations/filt.p``. In this case, filtration may be loaded
+			by calling :py:func:`load_filtration` without providing the
+			filename parameter.\n
 			default: True
 
 		"""
@@ -218,8 +223,8 @@ class Filtration:
 		assert(self.num_div == len(self.epsilons))
 
 		self._intervals = None
-		self._PD = None
-		self._PRF = None
+		self._pd = None
+		self._prf = None
 
 		os.chdir(caller_dir)
 
@@ -251,6 +256,7 @@ class Filtration:
 		except OSError:
 			print "WARNING: invalid PH/find_landmarks binary. Recompiling..."
 			compile_find_landmarks_c()
+			sys.exit()
 
 		os.remove('temp/worm_data.txt')
 
@@ -354,54 +360,45 @@ class Filtration:
 		return ID_array
 
 	def intervals(self):
+		"""
+		Returns
+		-------
+		Intervals
+			birth and death times for holes in the complex filtration
+
+		"""
 		if self._intervals is None:
 			self._intervals = Intervals(self)
 		return self._intervals
 
-	def PD(self):
+	def pd(self):
 		"""
-		if called for the first time:
-			calls perseus, generates persistence diagram, sets, :py:attr:`_PD`,
-			returns :py:attr:`_PD`
-		else:
-			returns :py:attr:`_PD`
 		Returns
 		-------
-		PDData
+		PD
+			persistence diagram
 
 		"""
-		if self._PD is None:
-			self._PD = PDiagram(self.intervals())
-		return self._PD
+		if self._pd is None:
+			self._pd = PD(self.intervals())
+		return self._pd
 
-	def PRF(self):
+	def prf(self):
 		"""
-		if called for the first time:
-			if :py:meth:`PD` has not been called:
-				calls perseus, generates persistence diagram, sets,
-				:py:attr:`_PD`, generates persistence rank function, sets,
-				:py:attr:`_PRF`, returns :py:attr:`_PRF`
-			else:
-				generates persistence rank function, sets, :py:attr:`_PRF`,
-				returns :py:attr:`_PRF`
-		else:
-			returns :py:attr:`_PRF`
-
-		Parameters
-		----------
-
 		Returns
 		-------
-		array
+		PRF
+			persistence rank function
 
 		"""
-		if self._PRF is None:
-			self._PRF = PRankFunction(self.PD())
-		return self._PRF
+		if self._prf is None:
+			self._prf = PRF(self.pd())
+		return self._prf
 
 
 	def movie(self, filename, **kwargs):
 		"""
+		build filtration visualization
 
 		Parameters
 		----------
@@ -445,7 +442,7 @@ class Filtration:
 		"""
 		filtration_movie.plot_complex(self, i, filename, **kwargs)
 
-	def plot_PD(self, filename):
+	def plot_pd(self, filename):
 		"""
 		plot the persistence diagram
 
@@ -460,9 +457,9 @@ class Filtration:
 		None
 
 		"""
-		plots.PD_fig(self, filename)
+		plots.pd_fig(self, filename)
 
-	def plot_PRF(self, filename):
+	def plot_prf(self, filename):
 		"""
 		plot the persistence rank function
 
@@ -478,7 +475,7 @@ class Filtration:
 		None
 
 		"""
-		plots.PRF_fig(self, filename)
+		plots.prf_fig(self, filename)
 
 
 
@@ -490,7 +487,7 @@ def load_filtration(filename=None):
 	Parameters
 	----------
 	filename : str
-		Path/filename. Should end with ``'.p'``
+		Path/filename. Should end with ``.p``
 
 	Returns
 	-------

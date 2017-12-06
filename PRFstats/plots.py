@@ -219,10 +219,10 @@ def samples(filts, cmd, dir, vp1=None, vp2=None):
 				print_title(base_name.split('/')[-1][:-2])
 
 				PD_filename = base_name + 'PD.png'
-				filt.plot_PD(PD_filename)
+				filt.plot_pd(PD_filename)
 
 				PRF_filename = base_name + 'PRF.png'
-				filt.plot_PRF(PRF_filename)
+				filt.plot_prf(PRF_filename)
 
 				if filt_step:
 					complex_filename = base_name + 'comp.png'

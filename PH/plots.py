@@ -65,7 +65,7 @@ def PD_ax(ax, cbar_ax, pd):
 
 
 
-def PD_fig(filt, out_filename):
+def pd_fig(filt, out_filename):
 	print 'plotting persistence diagram...'
 
 	fig = plt.figure(figsize=(10, 6), tight_layout=True, dpi=100)
@@ -75,7 +75,7 @@ def PD_fig(filt, out_filename):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-	PD_ax(plot_ax, cbar_ax, filt.PD())
+	PD_ax(plot_ax, cbar_ax, filt.pd())
 	filename_table(fname_ax, filt.name)
 	filt_params_table(params_ax, filt.params)
 
@@ -149,7 +149,7 @@ def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
 
 
 
-def PRF_fig(filt, out_filename, annot_hm=False):
+def prf_fig(filt, out_filename, annot_hm=False):
 	print "plotting PRF..."
 
 	fig = plt.figure(figsize=(10, 6), tight_layout=True, dpi=100)
@@ -158,7 +158,7 @@ def PRF_fig(filt, out_filename, annot_hm=False):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-	PRF_ax(filt.PRF(), plot_ax, cbar_ax, annot_hm)
+	PRF_ax(filt.prf(), plot_ax, cbar_ax, annot_hm)
 
 	filename_table(fname_ax, filt.name)
 	filt_params_table(params_ax, filt.params)

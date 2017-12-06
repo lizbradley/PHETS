@@ -25,7 +25,7 @@ ts = TimeSeries(
 # window of the time series
 tau = (1 / idx_to_freq(49)) / np.pi      # choose tau = period / e
 
-traj = slide_window(ts, 'output/demo/embed_movie.mp4', m=2, tau=tau)
+slide_window(ts, 'output/demo/embed_movie.mp4', m=2, tau=tau)
 
 # alternatively, we could skip the movie and embed explicitly:
 traj = ts.embed(m=2, tau=tau)
@@ -51,8 +51,8 @@ filt.movie(
     alpha=.5,
     color_scheme='highlight new'
 )
-filt.plot_PD('output/demo/PD.png')          # plot the persistence diagram
-filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
+filt.plot_pd('output/demo/PD.png')          # plot the persistence diagram
+filt.plot_prf('output/demo/PRF.png')        # plot the persistence rank function
 
 
 

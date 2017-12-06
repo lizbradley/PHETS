@@ -88,7 +88,7 @@ def test__ham_euc_equiv():
 
 def test__euc_prf():
 	ref = np.load('ref/euc_prf.npy')
-	out = euc_filt.PRF().data
+	out = euc_filt.prf().data
 	np.testing.assert_array_equal(ref, out)
 
 

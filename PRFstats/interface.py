@@ -61,8 +61,8 @@ def plot_dists_to_ref(
 				np.save('PRFstats/data/filts.npy', [ref_filt, filts])
 	filts = np.array(filts)
 
-	prfs = [NormalPRF(f.PRF()) for f in filts]
-	ref_prf = NormalPRF(ref_filt.PRF())
+	prfs = [NormalPRF(f.prf()) for f in filts]
+	ref_prf = NormalPRF(ref_filt.prf())
 	[prf.set_weight(weight_func) for prf in prfs + [ref_prf]]
 
 	dists = dists_to_ref(prfs, ref_prf)

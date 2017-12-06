@@ -504,8 +504,8 @@ if test == 202:
 	filt = load_filtration()
 
 	filt.movie(out_fname('mp4'))
-	filt.plot_PD(out_fname('_PD.png'))
-	filt.plot_PRF('_PRF.png')
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf('_PRF.png')
 
 
 if test == 203:
@@ -525,8 +525,8 @@ if test == 203:
 	filt = load_filtration()
 
 	filt.movie(out_fname('.mp4'))
-	filt.plot_PD(out_fname('_PD.png'))
-	filt.plot_PRF(out_fname('_PRF.png'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
