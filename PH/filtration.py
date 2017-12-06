@@ -8,6 +8,70 @@ from config import find_landmarks_c_compile_str
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
+def compile_find_landmarks_c():
+	if sys.platform == "linux" or sys.platform == "linux2":
+		compile_str = find_landmarks_c_compile_str['linux']
+	elif sys.platform == 'darwin':
+		compile_str = find_landmarks_c_compile_str['macOS']
+	else:
+		print 'Sorry, PHETS requires linux or macOS.'
+		sys.exit()
+	subprocess.call(compile_str, shell=True)
+	print '''
+	find_landmarks compilation attempt complete. If 
+	successful, please repeat your test. If problem persists, you will 
+	need to tweak find_landmarks_c_compile_str in config.py to compile 
+	find_landmarks.c on your system. '''
+	sys.exit()
+
+
+def write_perseus_in_file(filt_array, silent):
+	if not silent: print 'building perseus_in.txt...'
+	out_file = open('perseus/perseus_in.txt', 'a')
+	out_file.truncate(0)
+	out_file.write('1\n')
+	for idx, row in enumerate(filt_array):
+		for simplex in row:
+			#   format for perseus...
+			line_str = str(len(simplex) - 1) + ' ' + ' '.join(
+				str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
+			out_file.write(line_str)
+	out_file.close()
+
+
+def call_perseus(silent):
+	os.chdir('perseus')
+	for f in os.listdir('.'):
+		if f.startswith('perseus_out'):
+			os.remove(f)
+	perseus_cmd = './{} nmfsimtop perseus_in.txt perseus_out'
+	if sys.platform == 'linux' or sys.platform == 'linux2':
+		perseus_cmd = perseus_cmd.format('perseusLin')
+	elif sys.platform == 'darwin':  # macOS
+		perseus_cmd = perseus_cmd.format('perseusMac')
+
+	if silent:
+		p = subprocess.Popen(perseus_cmd,
+		                     shell=True, stdout=subprocess.PIPE)
+		out, err = p.communicate()
+	else:
+		p = subprocess.Popen(perseus_cmd, shell=True)
+		p.communicate()		# wait
+	os.chdir('..')
+
+
+def read_perseus_out_file(silent):
+	try:
+		with warnings.catch_warnings():
+			# warnings.simplefilter('ignore')
+			intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=2)
+	except IOError:
+		intervals = np.empty((2, 0))
+		if not silent: print "WARNING: no homology for this window"
+
+	intervals[intervals == -1] = np.nan
+
+	return intervals
 
 
 class Intervals:
@@ -17,63 +81,15 @@ class Intervals:
 		self.epsilons = filtration.epsilons
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
-		self.write_perseus_in_file(complexes, silent)
-		self.call_perseus(silent)
-		intervals = self.read_perseus_out_file(silent)
+		write_perseus_in_file(complexes, silent)
+		call_perseus(silent)
+		intervals = read_perseus_out_file(silent)
 		try:
 			self.birth_time, self.death_time = intervals[:, 0], intervals[:, 1]
 		except IndexError:
 			self.birth_time, self.death_time = [], []
 		os.chdir(caller_dir)
 
-	@staticmethod
-	def write_perseus_in_file(filt_array, silent):
-		if not silent: print 'building perseus_in.txt...'
-		out_file = open('perseus/perseus_in.txt', 'a')
-		out_file.truncate(0)
-		out_file.write('1\n')
-		for idx, row in enumerate(filt_array):
-			for simplex in row:
-				#   format for perseus...
-				line_str = str(len(simplex) - 1) + ' ' + ' '.join(
-					str(ID) for ID in simplex) + ' ' + str(idx + 1) + '\n'
-				out_file.write(line_str)
-		out_file.close()
-
-	@staticmethod
-	def call_perseus(silent):
-		os.chdir('perseus')
-		for f in os.listdir('.'):
-			if f.startswith('perseus_out'):
-				os.remove(f)
-		perseus_cmd = './{} nmfsimtop perseus_in.txt perseus_out'
-		if sys.platform == 'linux' or sys.platform == 'linux2':
-			perseus_cmd = perseus_cmd.format('perseusLin')
-		elif sys.platform == 'darwin':  # macOS
-			perseus_cmd = perseus_cmd.format('perseusMac')
-
-		if silent:
-			p = subprocess.Popen(perseus_cmd,
-			                     shell=True, stdout=subprocess.PIPE)
-			out, err = p.communicate()
-		else:
-			p = subprocess.Popen(perseus_cmd, shell=True)
-			p.communicate()		# wait
-		os.chdir('..')
-
-	@staticmethod
-	def read_perseus_out_file(silent):
-		try:
-			with warnings.catch_warnings():
-				# warnings.simplefilter('ignore')
-				intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=2)
-		except IOError:
-			intervals = np.empty((2, 0))
-			if not silent: print "WARNING: no homology for this window"
-
-		intervals[intervals == -1] = np.nan
-
-		return intervals
 
 
 class PDiagram:
@@ -217,22 +233,6 @@ class Filtration:
 
 	def _build(self, traj, params):
 
-		def compile_find_landmarks_c():
-			if sys.platform == "linux" or sys.platform == "linux2":
-				compile_str = find_landmarks_c_compile_str['linux']
-			elif sys.platform == 'darwin':
-				compile_str = find_landmarks_c_compile_str['macOS']
-			else:
-				print 'Sorry, PHETS requires linux or macOS.'
-				sys.exit()
-			subprocess.call(compile_str, shell=True)
-			print '''
-			find_landmarks compilation attempt complete. If 
-			successful, please repeat your test. If problem persists, you will 
-			need to tweak find_landmarks_c_compile_str in config.py to compile 
-			find_landmarks.c on your system. '''
-			sys.exit()
-
 		silent = self.silent
 		if not silent: print "building filtration..."
 
@@ -247,6 +247,7 @@ class Filtration:
 				'temp/worm_data.txt', params, silent=silent
 			)
 			if silent: enablePrint()
+
 		except OSError:
 			print "WARNING: invalid PH/find_landmarks binary. Recompiling..."
 			compile_find_landmarks_c()
@@ -478,6 +479,8 @@ class Filtration:
 
 		"""
 		plots.PRF_fig(self, filename)
+
+
 
 
 def load_filtration(filename=None):
