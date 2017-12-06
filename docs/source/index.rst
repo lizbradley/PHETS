@@ -3,10 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PHETS's documentation!
-=================================
-
-introduction
+Introduction
 ------------
 
 This package offers high-level tools for exploration and visualization of delay coordinate
@@ -44,7 +41,7 @@ take one or two ``Trajectory`` objects, create PRFs from the windows of the the
 
 
 
-troubleshooting
+Troubleshooting
 ---------------
 
 matplotlib backend error
