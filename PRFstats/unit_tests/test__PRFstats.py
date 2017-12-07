@@ -9,21 +9,17 @@ from common import *
 
 def test__filt_set_v():
 	chdir()
+	fp = filt_params.copy()
 	out = filt_set(
 		ellipse_traj,
-		filt_params,
+		fp,
 	    vp1=('ds_rate', (5, 7, 9)),
 		save=False
 	)
+	out = filt_set_extract_output(out)
 	ref = np.load('ref/filt_set_v.npy')
 
-	same = True
-	for index, f_ref in np.ndenumerate(ref):
-		if not np.array_equal(f_ref.complexes, out[index].complexes):
-			same = False
-			break
-
-	assert same
+	np.testing.assert_array_equal(out, ref)
 
 
 def test__plot_dists_to_ref():
@@ -187,7 +183,7 @@ def test__plot_pairwise_mean_dists():
 if __name__ == '__main__':
 	# test__fetch_filts_v()
 	# test__plot_dists_to_means()
-	test__plot_ROCs_v()
+	# test__plot_ROCs_v()
 	# test__plot_dists_to_means()
 	# test__plot_variance_vv()
 	# test__plot_variance_vw()

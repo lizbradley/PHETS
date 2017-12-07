@@ -38,3 +38,10 @@ def plot_variance__extract_output(out):
 	for idx, ns in np.ndenumerate(out):
 		out_ext[idx] = [ns.mean, ns.lvar, ns.gvar]
 	return out_ext
+
+
+def filt_set_extract_output(out):
+	extracted = []
+	for idx, filt in np.ndenumerate(out):
+		extracted.append(filt.complexes)
+	return extracted

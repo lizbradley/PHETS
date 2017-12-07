@@ -17,13 +17,16 @@ from PRFstats import *
 
 
 def ref__filt_set_v():
-	filt_set(
+	fp = filt_params.copy()
+	out = filt_set(
 		ellipse_traj,
-		filt_params,
+		fp,
 		vp1=('ds_rate', (5, 7, 9)),
 		quiet=False,
-		save='ref/filt_set_v.npy'
+		save=False
 	)
+	out = filt_set_extract_output(out)
+	np.save('ref/filt_set_v.npy', out)
 
 
 def ref__plot_dists_to_ref():
@@ -164,7 +167,7 @@ def ref__pairwise_mean_dists():
 
 
 if __name__ == '__main__':
-	# ref__filt_set_v()
+	ref__filt_set_v()
 	# ref__plot_dists_to_ref()
 	# ref__plot_dists_to_means()
 	# ref__plot_ROCs()
