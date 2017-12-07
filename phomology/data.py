@@ -205,13 +205,14 @@ class Filtration:
 		self.name = traj.name
 		self.fname = traj.fname
 		self.ambient_dim = traj.dim
-		self.params = params.copy()
 		self.silent = silent
+
+		self.params = self._parse_params(params, traj)
 
 		caller_dir = os.getcwd()
 		os.chdir(SCRIPT_DIR)
 
-		arr = self._build(traj, params)
+		arr = self._build(traj)
 
 		self.epsilons = arr[3]
 		self.witness_coords = arr[0]
@@ -236,20 +237,38 @@ class Filtration:
 				fname = 'phomology/filtrations/filt.p'
 			cPickle.dump(self, open(fname, 'wb'))
 
-	def _build(self, traj, params):
+	@staticmethod
+	def _parse_params(params, traj):
+
+		params = params.copy()
+
+		if params['worm_length'] is None:
+			params['worm_length'] = traj.data.shape[0]
+
+		if params['ds_rate'] < 0:
+			ds_rate = params['worm_length'] / abs(params['ds_rate'])
+			params['ds_rate'] = ds_rate
+
+		for p, val in params.iteritems():
+			if isinstance(val, tuple):
+				arg, f = val
+				params[p] = f(params[arg])
+
+		return params
+
+	def _build(self, traj):
+
 
 		silent = self.silent
 		if not silent: print "building filtration..."
 
-		if params['worm_length'] is None:
-			params['worm_length'] = traj.data.shape[0]
 		np.savetxt('temp/worm_data.txt', traj.data)
 		start_time = time.time()
 
 		try:
 			if silent: blockPrint()
 			filtration = build_filtration.build_filtration(
-				'temp/worm_data.txt', params, silent=silent
+				'temp/worm_data.txt', self.params, silent=silent
 			)
 			if silent: enablePrint()
 

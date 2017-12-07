@@ -7,7 +7,7 @@ from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=13)
+test, start_time = get_test(set_test=14)
 
 
 def out_fname(t='png'):
@@ -411,5 +411,33 @@ if test == 13:
 		vary_param_1=('worm_length', (1000, 1300, 1700, 2000)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=False
+		load_saved_filts=False,
+		see_samples={'interval': 4, 'filt_step': 5}
+	)
+
+if test == 14:
+	ts = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+		window_length=2000,
+		vol_norm=(0, 0, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+	filt_params.update({
+		'ds_rate': ('worm_length', lambda x: x / 20),   # note: '/' does floor division
+		'num_divisions': 10,
+		'max_filtration_param': -8
+	})
+
+	plot_variance(
+		traj,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (1000, 1300, 1700, 2000)),
+		quiet=False,
+		annot_hm=False,
+		load_saved_filts=False,
+		see_samples={'interval': 4, 'filt_step': 5}
 	)

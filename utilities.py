@@ -116,7 +116,7 @@ def print_still(str):
 	sys.stdout.write('\r{}\t\t'.format(str))
 	sys.stdout.flush()
 
-def count_lines(dir, blanks=True):
+def count_lines(dir, blanks=False):
 
 	def file_len(fname):
 		count = 0
@@ -126,17 +126,23 @@ def count_lines(dir, blanks=True):
 					count += 1
 		return count
 
+	def conditions(path, file):
+		return (
+			file.endswith('.py'),
+			not name.endswith('Tester.py'),
+			'unit_tests' not in path,
+			'docs' not in path,
+		)
+
 	count_f = 0
 	count_l = 0
 	for root, dirs, files in os.walk(dir, topdown=False):
 		for name in files:
-			if name.endswith('.py') and not name.endswith('Tester.py') and 'unit_tests' not in root:
+			if all(conditions(root, name)):
 				fname = os.path.join(root, name)
 				length = file_len(fname)
-
 				count_f += 1
 				count_l += length
-
 				print '{}: {}'.format(fname, length)
 
 	print_title('num files: {}\tnum lines: {}'.format(count_f, count_l))
