@@ -1,2 +1,2 @@
-PRFstats
+prfstats
 ========

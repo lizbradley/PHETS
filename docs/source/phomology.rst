@@ -1,4 +1,4 @@
-PH
+phomology
 ==
 
 .. autoclass:: PH.Filtration
