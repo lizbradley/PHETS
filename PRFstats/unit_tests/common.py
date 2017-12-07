@@ -1,8 +1,9 @@
 import numpy as np
 
 from signals import TimeSeries, Trajectory
-from config import default_filtration_params as filt_params
+from config import default_filtration_params as dfp
 
+filt_params = dfp.copy()
 filt_params.update({
 	'ds_rate': 100,
 	'num_divisions': 10,

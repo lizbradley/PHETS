@@ -9,27 +9,23 @@ from common import *
 
 def test__filt_set_v():
 	chdir()
+	fp = filt_params.copy()
 	out = filt_set(
 		ellipse_traj,
-		filt_params,
+		fp,
 	    vp1=('ds_rate', (5, 7, 9)),
 		save=False
 	)
+	out = filt_set_extract_output(out)
 	ref = np.load('ref/filt_set_v.npy')
 
-	same = True
-	for index, f_ref in np.ndenumerate(ref):
-		if not np.array_equal(f_ref.complexes, out[index].complexes):
-			same = False
-			break
-
-	assert same
+	np.testing.assert_array_equal(out, ref)
 
 
 def test__plot_dists_to_ref():
 	chdir()
 	fp = filt_params.copy()
-	filt_params.update({
+	fp.update({
 		'max_filtration_param': -10,
 		'num_divisions': 10,
 		'ds_rate': 500
@@ -101,11 +97,11 @@ def test__plot_variance_vw():
 
 def test__plot_variance_vv():
 	chdir()
-	# clear_dir_rf('output')
+	fp = filt_params.copy()
 	out = plot_variance(
 		viol_traj,
 		'output/plot_variance_vv.png',
-		filt_params,
+		fp,
 		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=True,
@@ -183,11 +179,13 @@ def test__plot_pairwise_mean_dists():
 		quiet=True,
 		load_saved_filts='data/viol_filts_vv.npy',
 	)
+	ref = np.load('ref/pairwise_mean_dists.npy')
+	np.testing.assert_array_equal(dists, ref)
 
 if __name__ == '__main__':
 	# test__fetch_filts_v()
 	# test__plot_dists_to_means()
-	test__plot_ROCs_v()
+	# test__plot_ROCs_v()
 	# test__plot_dists_to_means()
 	# test__plot_variance_vv()
 	# test__plot_variance_vw()

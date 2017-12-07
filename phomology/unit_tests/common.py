@@ -1,6 +1,8 @@
 from signals import Trajectory
 from phomology import Filtration
-from config import default_filtration_params as filt_params
+from config import default_filtration_params as dfp
+
+filt_params = dfp.copy()
 
 
 ellipse_traj = Trajectory('data/ellipse.txt')

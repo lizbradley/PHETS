@@ -4,6 +4,7 @@ should be run infrequently -- only when behavior is intentionally changed
 """
 
 import os, sys
+import numpy as np
 
 from paths import root_dir, current_dir
 
@@ -16,13 +17,16 @@ from PRFstats import *
 
 
 def ref__filt_set_v():
-	filt_set(
+	fp = filt_params.copy()
+	out = filt_set(
 		ellipse_traj,
-		filt_params,
+		fp,
 		vp1=('ds_rate', (5, 7, 9)),
 		quiet=False,
-		save='ref/filt_set_v.npy'
+		save=False
 	)
+	out = filt_set_extract_output(out)
+	np.save('ref/filt_set_v.npy', out)
 
 
 def ref__plot_dists_to_ref():
