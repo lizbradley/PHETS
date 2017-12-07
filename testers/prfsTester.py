@@ -7,7 +7,7 @@ from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=5)
+test, start_time = get_test(set_test=13)
 
 
 def out_fname(t='png'):
@@ -388,3 +388,28 @@ if test == 12:
 	np.savetxt(out_fname(t='txt'), dists)
 
 
+if test == 13:
+	ts = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+		window_length=2000,
+		vol_norm=(0, 0, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+	filt_params.update({
+		'ds_rate': -20,
+		'num_divisions': 10,
+		'max_filtration_param': -8
+	})
+
+	plot_variance(
+		traj,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (1000, 1300, 1700, 2000)),
+		quiet=False,
+		annot_hm=False,
+		load_saved_filts=False
+	)

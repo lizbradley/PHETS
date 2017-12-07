@@ -76,7 +76,7 @@ def heatmaps_figs(
 		var_pw = hmaps.var_pre_w.data
 		ff_pw = hmaps.fanofactor_pre_w.data
 
-		dom = hmaps.mean.bins
+		dom = hmaps.mean.epsilons
 
 		kwargs = {'dom': dom, 'cmap': cmap, 'norm': norm, 'annot': annot_hm}
 

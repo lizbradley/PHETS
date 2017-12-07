@@ -238,6 +238,11 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		else: downsample_rate = number_of_datapoints / abs(downsample_rate)
 
 	number_of_vertices = int(number_of_datapoints/downsample_rate)
+
+	print 'number of witnesses: {}'.format(number_of_datapoints)
+	print 'number of landmarks: {}'.format(number_of_vertices)
+	print 'downsample rate: {}'.format(downsample_rate)
+
 	stop = start + counter
 
 	if max_filtration_param < 0:
