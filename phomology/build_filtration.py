@@ -210,8 +210,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	## Read data into witness and landmark lists.
 	witnesses = []
 	landmarks = []
-	ls = get_param("landmark_selector")
-	downsample_rate = get_param("ds_rate")
+
 	counter = 0
 	for i in xrange(start):         # Where to start reading data
 		input_file.readline()
@@ -232,6 +231,12 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 				break
 
 	number_of_datapoints = len(witnesses)
+	downsample_rate = get_param("ds_rate")
+	if downsample_rate < 0:
+		if worm_length:
+			downsample_rate = worm_length / abs(downsample_rate)
+		else: downsample_rate = number_of_datapoints / abs(downsample_rate)
+
 	number_of_vertices = int(number_of_datapoints/downsample_rate)
 	stop = start + counter
 
@@ -242,6 +247,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			 'worm_length'.'''.format(max_filtration_param, number_of_vertices)
 			raise Exception(msg)
 
+	ls = get_param("landmark_selector")
 	if ls=="EST":
 		if always_euclidean:
 			if graph_induced:
