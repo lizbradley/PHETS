@@ -1,10 +1,8 @@
 import numpy as np
-import os
 
 from paths import chdir; chdir()
 
-from common import euc_filt, ham5_filt, doamp5_filt, m2d10_filt, dcov20_filt, \
-	dcovn20_filt, gi_filt, hamn10_filt, hamn1_filt, ham1_filt
+from common import *
 
 
 def test__euc_filt():
@@ -18,7 +16,7 @@ def test__ham5_filt():
 	chdir()
 	ref = np.load('ref/ham5_filt.npy')
 	out = ham5_filt.complexes
-	assert np.array_equal(ref, out)
+	np.testing.assert_array_equal(ref, out)
 
 
 def test__doamp5_filt():
@@ -93,5 +91,5 @@ def test__euc_prf():
 
 
 if __name__ == '__main__':
-	test__euc_prf()
+	# test__euc_prf()
 	pass

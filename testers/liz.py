@@ -5,7 +5,7 @@ import numpy as np
 from embed import embed, plot_signal
 from embed.Plots import plot_dce
 from embed.movies_old import slide_window, vary_tau
-from PH import Filtration, make_movie, PD, PRF
+from phomology import Filtration, make_movie, PD, PRF
 from config import default_filtration_params as filt_params
 
 test, start_time = get_test(set_test=0)

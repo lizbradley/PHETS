@@ -10,7 +10,7 @@ import numpy as np
 from ROC import PRF_vs_FFT_v2
 from config import default_filtration_params as filt_params
 from embed.data import embed
-from PH import Filtration, make_movie, load_filtration
+from phomology import Filtration, make_movie, load_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
 from utilities import sec_to_samp
 

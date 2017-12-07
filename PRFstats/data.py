@@ -2,7 +2,7 @@ import copy
 
 import numpy as np
 
-from PH.data import PRF
+from phomology.data import PRF
 from helpers import *
 
 

@@ -4,7 +4,7 @@ change_dir()
 
 from matplotlib.pyplot import ioff; ioff()
 from signals import Trajectory
-from PH import Filtration
+from phomology import Filtration
 from PRFstats import plot_variance
 from config import default_filtration_params as parameter_set
 

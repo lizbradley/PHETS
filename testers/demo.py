@@ -5,7 +5,7 @@ import numpy as np
 from signals import TimeSeries
 from utilities import idx_to_freq
 from embed.movies import slide_window
-from PH import Filtration, load_filtration
+from phomology import Filtration, load_filtration
 from PRFstats import plot_ROCs
 from config import default_filtration_params as filt_params
 

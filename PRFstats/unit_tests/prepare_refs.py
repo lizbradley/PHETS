@@ -4,7 +4,6 @@ should be run infrequently -- only when behavior is intentionally changed
 """
 
 import os, sys
-import numpy as np
 
 from paths import root_dir, current_dir
 

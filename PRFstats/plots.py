@@ -4,9 +4,9 @@ from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import signals, PH
-from PH.plots import heatmap_ax
-from PH.titlebox import filt_params_table
+import signals, phomology
+from phomology.plots import heatmap_ax
+from phomology.titlebox import filt_params_table
 from PRFstats.data import NormalPRF
 from PRFstats.helpers import is_filt_param, is_weight_func
 from utilities import print_title, clear_temp_files, make_dir
@@ -83,7 +83,7 @@ def dists_to_means_fig(refs, dists, traj1, traj2, out_filename):
 	plt.setp(ax2.get_xticklabels(), visible=False)
 	plt.setp(ax2.get_xticklines(), visible=False)
 
-	PH.plots.PRF_ax(mean_prf_1, ax3, annot_hm=False)
+	phomology.plots.PRF_ax(mean_prf_1, ax3, annot_hm=False)
 
 	dists_ax(ax4, d_1_vs_2, mean_12, traj1)
 	plt.setp(ax4.get_xticklabels(), visible=False)
@@ -94,7 +94,7 @@ def dists_to_means_fig(refs, dists, traj1, traj2, out_filename):
 	plt.setp(ax5.get_xticklabels(), visible=False)
 	plt.setp(ax5.get_xticklines(), visible=False)
 
-	PH.plots.PRF_ax(mean_prf_2, ax6, annot_hm=False)
+	phomology.plots.PRF_ax(mean_prf_2, ax6, annot_hm=False)
 
 	signals.plots.ts_crop_ax(ax7, ts1)
 	ax7.grid(axis='x', zorder=0)

@@ -31,7 +31,7 @@ def plot_dists_to_ref(
 	plots distance from reference prf over a range of trajectory input files
 	"""
 
-	from PH import Filtration
+	from phomology import Filtration
 	from utilities import print_title
 
 
