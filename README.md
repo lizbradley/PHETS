@@ -32,7 +32,7 @@ brew install ffmpeg
 brew install gnuplot --with-cairo
 ```
 If you're running into an error about compiling `find_landmarks.c`, see
-documentation [link] for information about C compiler / library dependencies on
+`documentation.pdf` for information about C compiler / library dependencies on
 macOS.
 
 

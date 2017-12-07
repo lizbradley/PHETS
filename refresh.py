@@ -16,8 +16,8 @@ for subdir, dirs, files in os.walk('.'):
 
 
 
-remove_files_by_type('DCE/frames/', '.txt')
-remove_files_by_type('DCE/temp_data/', '.txt')
+remove_files_by_type('embed/frames/', '.txt')
+remove_files_by_type('embed/temp_data/', '.txt')
 remove_files_by_type('PH/temp/', '.txt')
 remove_files_by_type('PH/frames/', '.png')
 remove_files_by_type('PH/perseus/', '.txt')

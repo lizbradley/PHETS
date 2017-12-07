@@ -4,7 +4,7 @@ from boilerplate import change_dir
 change_dir()
 
 from signals import TimeSeries
-from DCE.movies import slide_window
+from embed.movies import slide_window
 from PH import Filtration
 from config import default_filtration_params as filt_params
 

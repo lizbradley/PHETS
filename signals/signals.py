@@ -2,7 +2,7 @@ import sys
 import numpy as np
 
 import plots
-from DCE import embed
+from embed import embed
 from PH import Filtration
 from config import SAMPLE_RATE
 from utilities import print_title, print_still

@@ -11,8 +11,8 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from DCE.Plots import plot_signal_zoom
-from DCE.signal_proc import auto_crop
+from embed.Plots import plot_signal_zoom
+from embed.signal_proc import auto_crop
 
 from config import SAMPLE_RATE
 

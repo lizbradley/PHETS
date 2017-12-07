@@ -7,7 +7,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import signals, PH
 from PH.plots import heatmap_ax
 from PH.titlebox import filt_params_table
-from PRFstats.data import is_filt_param, is_weight_func, NormalPRF
+from PRFstats.data import NormalPRF
+from PRFstats.helpers import is_filt_param, is_weight_func
 from utilities import print_title, clear_temp_files, make_dir
 
 

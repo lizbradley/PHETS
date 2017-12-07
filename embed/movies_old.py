@@ -1,9 +1,7 @@
-import DCE
-# from MovieTools import frames_to_movie
+import data
 import numpy as np
-import sys
 
-from utilities import frames_to_movie
+from utilities import frames_to_movie, remove_old_frames
 
 from signal_proc import auto_tau, auto_crop, crop_sig
 
@@ -62,7 +60,7 @@ def slide_window(
 	for i, start in enumerate(np.arange(0, sig_length, window_step)):
 		print 'frame %i of %i' % (i, sig_length / window_step)
 		window = [start, start + window_size]
-		traj = DCE.embed(
+		traj = data.embed(
 			sig, tau, m, crop=window, ds_rate=ds_rate, time_units=time_units
 		)
 		trajs.append(traj)
@@ -114,8 +112,8 @@ def vary_tau(
 		print 'building movie...'
 		for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 			print 'frame {} of {}'.format(i, num_frames)
-			traj = DCE.embed(sig, tau, m,
-							 ds_rate=ds_rate, time_units=time_units)
+			traj = data.embed(sig, tau, m,
+			                  ds_rate=ds_rate, time_units=time_units)
 			trajs.append(traj)
 			title_info.update({'frame #': i})
 			title_info.update({'tau': tau})
@@ -148,8 +146,8 @@ def compare_vary_tau(
 	for i, tau in enumerate(np.arange(tau_lims[0], tau_lims[1], tau_inc)):
 		print 'frame %i of %i' % (i + 1, int((tau_lims[1] - tau_lims[0]) / tau_inc))
 		sig_1, sig_2 = np.loadtxt(in_filename_1), np.loadtxt(in_filename_2)
-		DCE.embed_v1(sig_1, 'DCE/temp/embedded_coords_comp1.txt', embed_crop, tau, m, ds_rate=ds_rate)
-		DCE.embed_v1(sig_2, 'DCE/temp/embedded_coords_comp2.txt', embed_crop, tau, m, ds_rate=ds_rate)
+		data.embed_v1(sig_1, 'DCE/temp/embedded_coords_comp1.txt', embed_crop, tau, m, ds_rate=ds_rate)
+		data.embed_v1(sig_2, 'DCE/temp/embedded_coords_comp2.txt', embed_crop, tau, m, ds_rate=ds_rate)
 
 		if save_trajectories: save_worms_double('{:d}-txt_wave_file1'.format(i), '{:d}-txt_wave_file2'.format(i), i, tau, tau, embed_crop, embed_crop)
 
@@ -263,8 +261,8 @@ def compare_multi(
 
 		computed_tables = get_comp_tables(f_ideal, filename_1, filename_2, f_disp_1, f_disp_2, tau_1, tau_2, crop_1, crop_2)
 
-		DCE.embed_v1(sig_1, 'DCE/temp/embedded_coords_comp1.txt', crop_1, tau_1, m, ds_rate=ds_rate)
-		DCE.embed_v1(sig_2, 'DCE/temp/embedded_coords_comp2.txt', crop_2, tau_2, m, ds_rate=ds_rate)
+		data.embed_v1(sig_1, 'DCE/temp/embedded_coords_comp1.txt', crop_1, tau_1, m, ds_rate=ds_rate)
+		data.embed_v1(sig_2, 'DCE/temp/embedded_coords_comp2.txt', crop_2, tau_2, m, ds_rate=ds_rate)
 
 		if save_trajectories: save_worms_double(filename_1, filename_2, i, tau_1, tau_2, crop_1, crop_2)
 

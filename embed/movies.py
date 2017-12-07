@@ -25,8 +25,8 @@ def slide_window(ts, out_fname, m, tau, framerate=1):
 
 	"""
 	traj = ts.embed(m=m, tau=tau)
-	remove_old_frames('DCE/frames/')
-	frame_fname = 'DCE/frames/frame%03d.png'
+	remove_old_frames('embed/frames/')
+	frame_fname = 'embed/frames/frame%03d.png'
 
 	for i in range(traj.num_windows):
 		print_still('frame {} of {}'.format(i, traj.num_windows))
@@ -40,14 +40,10 @@ def slide_window(ts, out_fname, m, tau, framerate=1):
 
 
 def vary_tau():
-	""" not yet implemented """
-	pass
-
+	raise NotImplemented
 
 def compare_vary_tau():
-	""" not yet implemented """
-	pass
-
+	raise NotImplemented
 
 def compare_multi():
-	""" not yet implemented """
+	raise NotImplemented
