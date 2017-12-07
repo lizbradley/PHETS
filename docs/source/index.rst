@@ -13,9 +13,9 @@ processing technique.
 PHETS encompasses four submodules:
 
 - :py:mod:`signals`
-- :py:mod:`PH`
-- :py:mod:`DCE`
-- :py:mod:`PRFstats`
+- :py:mod:`phomology`
+- :py:mod:`embed`
+- :py:mod:`prfstats`
 
 
 ``signals`` holds the ``TimeSeries`` and ``Trajectory`` classes, which can be
@@ -24,16 +24,16 @@ initialized from arrays or text files. Calling the ``embed`` method of a
 ``Trajectory`` returns a ``TimeSeries``. ``TimeSeries`` and ``Trajectory`` both inherit from
 ``BaseTrajectory``, where all cropping, windowing, and normalization is handled.
 
-``PH`` holds the ``Filtration`` class, which is initialized from a ``Trajectory`` and a
+``phomology`` holds the ``Filtration`` class, which is initialized from a ``Trajectory`` and a
 dict of filtration parameters. Filtration movies, persistence diagrams, and
 persistence rank functions are created by calling the respective methods of
 the Filtration class.
 
-``DCE`` holds the embed function, as well as functions for generating embedding
+``embed`` holds the ``embed`` function, as well as functions for generating
 movies. The movies functions take one or more ``TimeSeries`` and return one or
 more ``Trajectory`` objects (created in the process of building the movies).
 
-``PRFstats`` holds functions for statistical analysis of PRFs. Generally, they
+``prfstats`` holds functions for statistical analysis of PRFs. Generally, they
 take one or two ``Trajectory`` objects, create PRFs from the windows of the the
 ``Trajectory`` objects, do some analysis, and then save plots from the results.
 
@@ -92,11 +92,11 @@ unit tests -- rather, each one calls or initializes a user-facing feature and
 compares the result to a saved reference. The input data is found in
 ``unit_tests/data`` and the references in ``<unit_tests/ref>``.
 
-In the case of the ``PRFstats``module, in order to keep test execution time
+In the case of the ``prfstats``module, in order to keep test execution time
 lwo, the input data is pre-computed sets of Filtration objects to keep test
 execution time low. A small, correct change to PHETS can break Python's
 ability to load these objects from file, breaking the tests. I this case,
-run the routines in ``PRFstats/unit_tests/prepare__data.py``, and the tests
+run the routines in ``prfstats/unit_tests/prepare__data.py``, and the tests
 should work correctly. Routines in ``unit_tests/prepare__refs.py`` should be
 run `only when you wish to change the behavior of existing functionality`. They
 should also be run and individually (that is, don't change the refs for
@@ -130,7 +130,7 @@ Reference
 ---------
 .. toctree::
    signals
-   PH
-   DCE
-   PRFstats
+   phomology
+   embed
+   prfstats
 
