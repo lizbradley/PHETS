@@ -3,7 +3,7 @@ change_dir()
 
 import numpy as np
 from signals import TimeSeries, Trajectory
-from PRFstats import *
+from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
@@ -11,7 +11,7 @@ test, start_time = get_test(set_test=5)
 
 
 def out_fname(t='png'):
-	return 'output/PRFstats/test_{}.{}'.format(test, t)
+	return 'output/prfstats/test_{}.{}'.format(test, t)
 
 
 if test == 1:
@@ -33,8 +33,8 @@ if test == 1:
 		vol_norm=(0, 0, 1)
 	)
 
-	ts1.plot('output/PRFstats/ts1.png')
-	ts2.plot('output/PRFstats/ts2.png')
+	ts1.plot('output/prfstats/ts1.png')
+	ts2.plot('output/prfstats/ts2.png')
 
 	traj1 = ts1.embed(tau=32, m=2)
 	traj2 = ts2.embed(tau=32, m=2)
@@ -46,7 +46,7 @@ if test == 1:
 		'ds_rate': 20
 	})
 
-	plot_ROCs(
+	plot_l2rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -84,7 +84,7 @@ if test == 2:
 		'num_divisions': 10,
 	})
 
-	plot_ROCs(
+	plot_l2rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -122,7 +122,7 @@ if test == 3:
 		'num_divisions': 10,
 	})
 
-	plot_ROCs(
+	plot_l2rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -291,7 +291,7 @@ if test == 9:
 		'max_filtration_param': -8
 	})
 
-	plot_ROCs(
+	plot_l2rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,

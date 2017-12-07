@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from PRFstats.data import NormalPRF
+from prfstats.data import NormalPRF
 
 
 class PointwiseStats:

@@ -108,14 +108,14 @@ A filtration can be summarized by its homology, which may be expressed as a pers
 
 Or as a persistence rank function:
 ```python
-filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
+filt.plot_prf('output/demo/prf.png')        # plot the persistence rank function
 ```
 
-![perseistence rank function](docs/readme/PRF.png "PRF.png")
+![perseistence rank function](docs/readme/prf.png "prf.png")
 
-Persistence rank functions are amenable to statistical analysis. `PRFstats.DistanceClassifier`, upon initialization, computes 
-a mean PRF and variance from a set of training PRFs; subsequently, `DistanceClassifier.predict(PRF, k)` returns `True` if the distance (L1 or L2) 
-distance from `PRF` to the mean PRF is smaller than `k` times the standard deviation. `PRFstats.L2ROCs` takes two pre-windowed `Trajectory`s, `traj1` and `traj2`,
+Persistence rank functions are amenable to statistical analysis. `prfstats.L2Classifier`, upon initialization, computes
+a mean PRF and variance from a set of training PRFs; subsequently, `L2Classifier.predict(PRF, k)` returns `True` if the distance (L1 or L2)
+distance from `PRF` to the mean PRF is smaller than `k` times the standard deviation. `prfstats.plot_l2rocs` takes two pre-windowed `Trajectory`s, `traj1` and `traj2`,
 and partitions the windows roughly as follows:
 ```
 windows1, windows2 = traj1.windows, = traj2.windows
@@ -123,11 +123,11 @@ train1, test1 = windows1[1::2], windows1[::2]
 train2, test2 = windows2[1::2], windows2[::2]
 ```
 
-Two `DistanceClassifier`s are initialized:
+Two `L2Classifier`s are initialized:
 
 ```
-clf1 = DistanceClassifier(train1)
-clf2 = DistanceClassifier(train2)
+clf1 = L2Classifier(train1)
+clf2 = L2Classifier(train2)
 ```
 
 `clf1.predict` and `clf2.predict` are each called on both `test1` and `test2` for a range of `k`, and the results are plotted as ROC curves.
@@ -157,7 +157,7 @@ filt_params.update({
     'ds_rate': 20
 })
 
-plot_ROCs(
+plot_l2rocs(
     traj1, traj2,
     'clarinet', 'viol',
     'output/demo/ROCs.png',
@@ -169,4 +169,4 @@ plot_ROCs(
 
 For this case, at least, the classifiers preform very well:
 
-![DistanceClassifier ROCs](docs/readme/ROCs.png "ROCs.png")
+![DistanceClassifier ROCs](docs/readme/rocs.png "rocs.png")

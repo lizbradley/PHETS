@@ -13,8 +13,8 @@ os.chdir(current_dir)
 
 from common import filt_params, viol_traj, clar_traj
 
-from PRFstats.data import filt_set
-from PRFstats import plot_dists_to_ref
+from prfstats.data import filt_set
+from prfstats import plot_dists_to_ref
 
 
 def filts2comps(fname):

@@ -5,9 +5,9 @@ from data import dists_to_ref, filt_set, distance, prf_set, NormalPRF
 from _plot_variance.data import pointwise_stats, scaler_stats
 from plots import dists_to_means_fig, clusters_fig, dists_to_ref_fig
 from _plot_variance.plots import variance_fig, heatmaps_figs
-from PRFstats.plots import weight_functions_figs, dual_roc_fig
+from prfstats.plots import weight_functions_figs, dual_roc_fig
 from data import mean_dists_compare
-from PRFstats.data import DistanceClassifier, roc_data
+from prfstats.data import L2Classifier, roc_data
 from plots import samples
 from signals import Trajectory
 from utilities import clear_old_files
@@ -39,7 +39,7 @@ def plot_dists_to_ref(
 		try:
 			saved = np.load(load_saved_filts)
 		except AttributeError:
-			saved = np.load('PRFstats/data/filts.npy')
+			saved = np.load('prfstats/data/filts.npy')
 		ref_filt, filts = saved
 
 	else:
@@ -57,7 +57,7 @@ def plot_dists_to_ref(
 			try:
 				np.save(save_filts, [ref_filt, filts])
 			except AttributeError:
-				np.save('PRFstats/data/filts.npy', [ref_filt, filts])
+				np.save('prfstats/data/filts.npy', [ref_filt, filts])
 	filts = np.array(filts)
 
 	prfs = [NormalPRF(f.prf()) for f in filts]
@@ -69,7 +69,7 @@ def plot_dists_to_ref(
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
 	if see_samples:
-		dir_ = 'output/PRFstats/samples'
+		dir_ = 'output/prfstats/samples'
 		clear_old_files(dir_, see_samples)
 		samples(filts, see_samples, dir_)
 
@@ -118,7 +118,7 @@ def plot_dists_to_means(
 	dists_to_means_fig(refs, dists, traj1, traj2, out_filename)
 
 	if see_samples:
-		dir = 'output/PRFstats/samples'
+		dir = 'output/prfstats/samples'
 		clear_old_files(dir, see_samples)
 		samples(filts1, see_samples, dir)
 		samples(filts2, see_samples, dir)
@@ -162,13 +162,13 @@ def plot_clusters(
 	clusters_fig(dists, filt_params, traj1.name, traj2.name, out_filename)
 
 	if see_samples:
-		dir_ = 'output/PRFstats/samples'
+		dir_ = 'output/prfstats/samples'
 		clear_old_files(dir_, see_samples)
 		samples(filts1, see_samples, dir_)
 		samples(filts2, see_samples, dir_)
 
 
-def plot_ROCs(
+def plot_l2rocs(
 		traj1, traj2,
 		out_fname,
 		filt_params,
@@ -211,8 +211,8 @@ def plot_ROCs(
 		train2, test2 = prfs2_[1::2], prfs2_[::2]
 
 		print 'training classifiers...'
-		clf1 = DistanceClassifier(train1)
-		clf2 = DistanceClassifier(train2)
+		clf1 = L2Classifier(train1)
+		clf2 = L2Classifier(train2)
 
 		print 'running tests...'
 		k_arr = np.arange(*k)
@@ -224,7 +224,7 @@ def plot_ROCs(
 	dual_roc_fig(data, k, traj1, traj2, out_fname, vary_param)
 
 	if see_samples:
-		dir_ = 'output/PRFstats/samples'
+		dir_ = 'output/prfstats/samples'
 		clear_old_files(dir_, see_samples)
 		samples(filts1, see_samples, dir_, vary_param)
 		samples(filts2, see_samples, dir_, vary_param)
@@ -297,12 +297,12 @@ def plot_variance(
 		)
 
 	if see_samples:
-		dir_ = 'output/PRFstats/samples'
+		dir_ = 'output/prfstats/samples'
 		clear_old_files(dir_, see_samples)
 		samples(
 			filts,
 			see_samples,
-			'output/PRFstats/samples',
+			'output/prfstats/samples',
 			vary_param_1,
 			vary_param_2
 		)
@@ -344,12 +344,12 @@ def pairwise_mean_dists(
 			dists[i, j] = d
 
 	if see_samples:
-		dir_ = 'output/PRFstats/samples'
+		dir_ = 'output/prfstats/samples'
 		clear_old_files(dir_, see_samples)
 		samples(
 			filts,
 			see_samples,
-			'output/PRFstats/samples',
+			'output/prfstats/samples',
 			vary_param_1,
 			vary_param_2
 		)

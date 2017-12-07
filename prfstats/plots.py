@@ -7,8 +7,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import signals, phomology
 from phomology.plots import heatmap_ax
 from phomology.titlebox import filt_params_table
-from PRFstats.data import NormalPRF
-from PRFstats.helpers import is_filt_param, is_weight_func
+from prfstats.data import NormalPRF
+from prfstats.helpers import is_filt_param, is_weight_func
 from utilities import print_title, clear_temp_files, make_dir
 
 
@@ -219,10 +219,10 @@ def samples(filts, cmd, dir, vp1=None, vp2=None):
 
 				print_title(base_name.split('/')[-1][:-2])
 
-				PD_filename = base_name + 'PD.png'
+				PD_filename = base_name + 'PRF.png'
 				filt.plot_pd(PD_filename)
 
-				PRF_filename = base_name + 'PRF.png'
+				PRF_filename = base_name + 'prf.png'
 				filt.plot_prf(PRF_filename)
 
 				if filt_step:

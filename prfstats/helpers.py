@@ -29,7 +29,7 @@ def is_weight_func(vp):
 
 def default_fname(fid):
 	suffix = fid if fid is not None else ''
-	return 'PRFstats/data/filts{}.npy'.format(suffix)
+	return 'prfstats/data/filts{}.npy'.format(suffix)
 
 
 def load_filts(load_saved, fid):

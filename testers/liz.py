@@ -72,5 +72,5 @@ filt_params.update(
 filt = Filtration(traj, filt_params)
 
 # make_movie(filt, 'output/liz/filt_movie.mp4')
-# make_PD(filt, 'output/liz/PD.png')  # make the persistence diagram
-# make_PRF_plot(filt, 'output/liz/PRF.png')
+# make_PD(filt, 'output/liz/PRF.png')  # make the persistence diagram
+# make_PRF_plot(filt, 'output/liz/prf.png')

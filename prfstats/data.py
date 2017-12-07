@@ -239,7 +239,7 @@ def mean_dists_compare(prfs1, prfs2):
 	return arr
 
 
-class DistanceClassifier(object):
+class L2Classifier(object):
 	def __init__(self, train):
 		"""
 		classifier which compares the distance from the mean of training

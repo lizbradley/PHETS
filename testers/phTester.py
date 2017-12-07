@@ -33,11 +33,11 @@ if test == 14:
 		'output/phomology/test14.mp4',
 	)
 
-	PRF(filtration, 'output/phomology/test14_PRF.png')
+	PRF(filtration, 'output/phomology/test14_prf.png')
 
 	PD(
 		filtration,
-		'output/phomology/test14_PD.png'
+		'output/phomology/test14_PRF.png'
 	)
 if test == 15:
 	in_filename = 'datasets/trajectories/49/C134C.txt'
@@ -58,11 +58,11 @@ if test == 15:
 		'output/phomology/test15.mp4',
 	)
 
-	PRF(filtration, 'output/phomology/test15_PRF.png')
+	PRF(filtration, 'output/phomology/test15_prf.png')
 
 	PD(
 		filtration,
-		'output/phomology/test15_PD.png'
+		'output/phomology/test15_PRF.png'
 	)
 
 
@@ -86,11 +86,11 @@ if test == 16:
 		'output/phomology/test16.mp4',
 	)
 
-	PRF(filtration, 'output/phomology/test16_PRF.png')
+	PRF(filtration, 'output/phomology/test16_prf.png')
 
 	PD(
 		filtration,
-		'output/phomology/test16_PD.png'
+		'output/phomology/test16_PRF.png'
 	)
 
 
@@ -113,11 +113,11 @@ if test == 17:
 
 	filtration = Filtration(in_filename, filt_params)
 
-	PRF(filtration, 'output/phomology/test17_PRF.png')
+	PRF(filtration, 'output/phomology/test17_prf.png')
 
 	PD(
 		filtration,
-		'output/phomology/test17_PD.png'
+		'output/phomology/test17_PRF.png'
 	)
 
 
@@ -504,8 +504,8 @@ if test == 202:
 	filt = load_filtration()
 
 	filt.movie(out_fname('mp4'))
-	filt.plot_pd(out_fname('_PD.png'))
-	filt.plot_prf('_PRF.png')
+	filt.plot_pd(out_fname('_PRF.png'))
+	filt.plot_prf('_prf.png')
 
 
 if test == 203:
@@ -525,8 +525,8 @@ if test == 203:
 	filt = load_filtration()
 
 	filt.movie(out_fname('.mp4'))
-	filt.plot_pd(out_fname('_PD.png'))
-	filt.plot_prf(out_fname('_PRF.png'))
+	filt.plot_pd(out_fname('_PRF.png'))
+	filt.plot_prf(out_fname('_prf.png'))
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

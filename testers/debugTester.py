@@ -5,7 +5,7 @@ change_dir()
 from matplotlib.pyplot import ioff; ioff()
 from signals import Trajectory
 from phomology import Filtration
-from PRFstats import plot_variance
+from prfstats import plot_variance
 from config import default_filtration_params as parameter_set
 
 test, start_time = get_test(set_test=9)
@@ -15,10 +15,10 @@ def movie_fname(test, str=''):
 
 
 def pd_fname(test, str=''):
-	return 'output/debug/test_{}_{}_PD.png'.format(test, str)
+	return 'output/debug/test_{}_{}_PRF.png'.format(test, str)
 
 def prf_fname(test, str=''):
-	return 'output/debug/test_{}_{}_PRF.png'.format(test, str)
+	return 'output/debug/test_{}_{}_prf.png'.format(test, str)
 
 if test == 1:
 	in_fname = 'datasets/trajectories/hopf/NewHopf_app1.txt'
@@ -36,7 +36,7 @@ if test == 1:
 	filt = Filtration(in_fname, params)  # BUG: filtration only has 7 steps !!
 	# make_movie(filt, movie_fname(test), color_scheme='highlight new')
 	PD(filt, pd_fname(test))
-	PRF(filt, 'output/debug/test_1_PRF.png')
+	PRF(filt, 'output/debug/test_1_prf.png')
 
 
 if test == 2:

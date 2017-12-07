@@ -53,5 +53,5 @@ filt_params.update(
 filt = Filtration(traj_window, filt_params)
 
 filt.movie('output/liz/filt_movie.mp4')     # save the filtration/complexes movie
-filt.plot_pd('output/liz/PD.png')           # save the persistence diagram
-filt.plot_prf('output/liz/PRF.png')         # save the persistence rank function
+filt.plot_pd('output/liz/pd.png')           # save the persistence diagram
+filt.plot_prf('output/liz/prf.png')         # save the persistence rank function
