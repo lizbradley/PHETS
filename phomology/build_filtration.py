@@ -232,7 +232,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 
 	number_of_datapoints = len(witnesses)
 	downsample_rate = get_param("ds_rate")
-	if downsample_rate < 0:
+	if downsample_rate < 0:     # num landmarks
 		if worm_length:
 			downsample_rate = worm_length / abs(downsample_rate)
 		else: downsample_rate = number_of_datapoints / abs(downsample_rate)
