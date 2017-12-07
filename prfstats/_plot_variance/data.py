@@ -28,16 +28,11 @@ class NormStats:
 		self.mean = pw_stats.mean.norm
 		self.lvar = pw_stats.var.norm
 		self.lfanofactor = pw_stats.fanofactor.norm
-		self.lfanofactor2 = self.lvar / self.mean
 
 		self.gvar = self.global_variance(prfs)
 		self.gfanofactor = self.gvar / self.mean
 
-		print '''
-		lfanofactor: {} 
-		lfanofactor2: {}
-		gfanofactor: {} 
-		'''.format(self.lfanofactor, self.lfanofactor2, self.gfanofactor)
+		# self.lgfanofactor = self.lvar / self.mean
 
 	@staticmethod
 	def global_variance(prfs):
