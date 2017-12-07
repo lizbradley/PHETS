@@ -1,11 +1,11 @@
 embed
-===
+=====
 
 
-.. autofunction:: DCE.embed
+.. autofunction:: embed.embed
 
 
-.. automodule:: DCE.movies
+.. automodule:: embed.movies
     :members:
     :undoc-members:
     :show-inheritance:

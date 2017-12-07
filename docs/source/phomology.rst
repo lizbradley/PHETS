@@ -1,9 +1,9 @@
 phomology
-==
+=========
 
-.. autoclass:: PH.Filtration
+.. autoclass:: phomology.Filtration
     :members:
 
-.. autofunction:: PH.load_filtration
+.. autofunction:: phomology.load_filtration
 
-.. autofunction:: PH.build_filtration.build_filtration
+.. autofunction:: phomology.build_filtration.build_filtration
