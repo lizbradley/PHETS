@@ -11,13 +11,13 @@ def test__TS_windows():
 	chdir()
 	out = [w.data for w in clar_ts.windows]
 	ref = np.load('ref/clar_ts.npy')
-	assert np.array_equal(out, ref)
+	np.testing.assert_allclose(out, ref)
 
 def test__Traj_windows():
 	chdir()
 	out = [w.data for w in ellipse_traj.windows]
 	ref = np.load('ref/ellipse_traj.npy')
-	assert np.array_equal(out, ref)
+	np.testing.assert_array_equal(out, ref)
 
 if __name__ == '__main__':
 	test__TS_windows()

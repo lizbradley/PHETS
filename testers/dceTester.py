@@ -2,7 +2,7 @@ from boilerplate import change_dir, get_test
 
 change_dir()
 
-from signals import TimeSeries
+from utilities import timeit
 from embed.movies import *
 
 test, start_time = get_test(set_test=2)
@@ -22,12 +22,14 @@ if test == 1:
 	)
 	slide_window(ts, out_fname(), m=2, tau=.001)
 
-import time
-
 if test == 2:
+
 	ts = TimeSeries(
 		'datasets/time_series/C135B/49-C135B.txt',
 		crop=(50000, 55000),
 		time_units='samples'
 	)
-	vary_tau(ts, out_fname(), m=2, tau=range(15))
+
+	timeit(vary_tau)(ts, out_fname(), m=2, tau=range(100))
+
+

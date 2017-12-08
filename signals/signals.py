@@ -205,7 +205,7 @@ class BaseTrajectory(object):
 		crop_0, crop_1 = self.crop_lim
 		start_points = np.linspace(
 			crop_0, crop_1, num_windows, endpoint=False
-		)
+		) - crop_0
 
 		start_points_idxs = [self._to_samples(s) for s in start_points]
 
@@ -215,7 +215,7 @@ class BaseTrajectory(object):
 		else:
 			window_length_samp = self._to_samples(window_length)
 
-		windows = [self.data_full[sp:sp + window_length_samp]
+		windows = [self.data[sp:sp + window_length_samp]
 		           for sp in start_points_idxs]
 
 		if self.norm_vol[2]:
@@ -236,7 +236,7 @@ class TimeSeries(BaseTrajectory):
 		self.source_traj = None
 		self.project_axis = None
 
-	def embed(self, tau, m):
+	def embed(self, tau, m, crop_only=True):
 		"""
 		Embed ``data_full``, re-apply crop and slicing.
 
@@ -254,6 +254,10 @@ class TimeSeries(BaseTrajectory):
 		"""
 		if self.time_units == 'seconds':
 			tau = int(tau * SAMPLE_RATE)
+
+		if crop_only:
+			data = embed(self.data, tau, m)
+
 		data = embed(self.data_full, tau, m)
 		traj = Trajectory(
 			data,

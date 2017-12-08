@@ -5,6 +5,8 @@ import subprocess
 import os
 
 # from memory_profiler import profile
+import time
+
 
 def root_path():
 	return os.path.dirname(__file__)
@@ -246,3 +248,13 @@ def batch_flac_to_wav(dir):
 			os.remove(f)
 
 
+def timeit(method):
+	def timed(*args, **kw):
+		ts = time.time()
+		result = method(*args, **kw)
+		te = time.time()
+
+		print '%r  %2.2f ms' % (method.__name__, (te - ts) * 1000)
+		return result
+
+	return timed

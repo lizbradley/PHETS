@@ -7,7 +7,8 @@ from config import SAMPLE_RATE
 
 
 def _highlight_window(ax, ts, window):
-	start = ts.win_start_pts[window]
+	start_pts = ts.win_start_pts + ts.crop_lim[0]
+	start = start_pts[window]
 	window_lim = (start, start + ts.window_length)
 
 	if window_lim[1] - window_lim[0] < .005 * (ts.crop_lim[1] - ts.crop_lim[0]):
