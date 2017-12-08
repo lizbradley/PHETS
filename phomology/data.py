@@ -176,6 +176,14 @@ class PRF:
 		return zz
 
 
+def phdir(method):
+	def wrapped(*args, **kw):
+		caller_dir = os.getcwd()
+		os.chdir(SCRIPT_DIR)
+		result = method(*args, **kw)
+		os.chdir(caller_dir)
+		return result
+	return wrapped
 
 class Filtration:
 
@@ -195,8 +203,8 @@ class Filtration:
 			Save the filtration to file for later use. If ``save`` is a
 			path/filename, save filtration to ``save``; ``save`` should end
 			with ``.p``. Otherwise, if ``save`` is True, save filtration to
-			``phomology/filtrations/filt.p``. In this case, filtration may be loaded
-			by calling :py:func:`load_filtration` without providing the
+			``phomology/filtrations/filt.p``. In this case, filtration may be
+			loaded by calling :py:func:`load_filtration` without providing the
 			filename parameter.\n
 			default: True
 
@@ -206,19 +214,15 @@ class Filtration:
 		self.fname = traj.fname
 		self.ambient_dim = traj.dim
 		self.silent = silent
-
 		self.params = self._parse_params(params, traj)
 
-		caller_dir = os.getcwd()
-		os.chdir(SCRIPT_DIR)
-
 		arr = self._build(traj)
-
 		self.epsilons = arr[3]
 		self.witness_coords = arr[0]
 		self.landmark_coords = arr[1]
 		if not silent: print 'unpacking...'
 		self.complexes = self._unpack_complexes(arr[2], silent)
+
 		self.ambient_dim = self.witness_coords.shape[1]
 		self.num_div = len(self.complexes)
 		assert(self.num_div == len(self.epsilons))
@@ -227,7 +231,6 @@ class Filtration:
 		self._pd = None
 		self._prf = None
 
-		os.chdir(caller_dir)
 
 		if save:
 			if not silent: print 'pickling...'
@@ -256,6 +259,7 @@ class Filtration:
 
 		return params
 
+	@phdir
 	def _build(self, traj):
 
 
@@ -358,7 +362,7 @@ class Filtration:
 				row[:] = unique_row
 			return ID_arr
 
-
+		@phdir
 		def count_triangles(ID_arr):
 			tri_count = 0
 			f = open('../output/run_info/num_triangles.txt', 'w')
