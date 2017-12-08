@@ -49,7 +49,9 @@ def ts_crop_ax(ax, ts, show_window='all'):
 	ax.plot(x, y, color='k', lw=.5)
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
-	if isinstance(show_window, basestring) and show_window == 'all':
+	if ts.num_windows is None:
+		pass
+	elif isinstance(show_window, basestring) and show_window == 'all':
 		for i in range(ts.num_windows):
 			_highlight_window(ax, ts, i)
 	elif isinstance(show_window, int):

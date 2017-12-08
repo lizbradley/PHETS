@@ -70,3 +70,23 @@ def slide_window_frame(traj, window, out_fname):
 	signals.plots.ts_crop_ax(ts_ax, traj.source_ts, window)
 	plt.savefig(out_fname)
 	plt.close(fig)
+
+
+def vary_tau_frame(traj, window, out_fname):
+	fig = plt.figure(figsize=(8.5, 6), tight_layout=True, dpi=100)
+	# fig.subplots_adjust(hspace=.2)
+
+	gs = gridspec.GridSpec(8, 10)
+
+	fname_ax =        fig.add_subplot(gs[0:2,    :4])
+	param_ax =        fig.add_subplot(gs[2:5,    :4])
+	ts_ax =           fig.add_subplot(gs[6:8,   :10])
+	if traj.dim == 2:
+		dce_ax =      fig.add_subplot(gs[0:6,  4:10])
+	else: dce_ax =    fig.add_subplot(gs[0:6,  4:10], projection='3d')
+
+	plot_title(fname_ax, param_ax, traj, window)
+	plot_dce(fig, dce_ax, traj.data)
+	signals.plots.ts_crop_ax(ts_ax, traj.source_ts)
+	plt.savefig(out_fname)
+	plt.close(fig)
