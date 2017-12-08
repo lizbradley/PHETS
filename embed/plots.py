@@ -6,7 +6,7 @@ import titlebox
 import signals
 
 
-def plot_title(fname_ax, param_ax, traj, window):
+def slide_window_title(fname_ax, param_ax, traj, window):
 	""" for slide window movies """
 
 	titlebox.title_table(fname_ax, traj.name, window)
@@ -18,6 +18,20 @@ def plot_title(fname_ax, param_ax, traj, window):
 		'time_units': traj.time_units,
 		'window_length': traj.window_length,
 		'window_step': traj.num_windows,
+	}
+
+	titlebox.param_table(param_ax, params)
+
+def vary_tau_title(fname_ax, param_ax, traj):
+	""" for slide window movies """
+
+	titlebox.title_table(fname_ax, traj.name)
+
+	params = {
+		'tau': traj.embed_params['tau'],
+		'm': traj.embed_params['m'],
+		'crop': traj.crop_lim,
+		'time_units': traj.time_units,
 	}
 
 	titlebox.param_table(param_ax, params)
@@ -65,14 +79,14 @@ def slide_window_frame(traj, window, out_fname):
 		dce_ax =      fig.add_subplot(gs[0:6,  4:10])
 	else: dce_ax =    fig.add_subplot(gs[0:6,  4:10], projection='3d')
 
-	plot_title(fname_ax, param_ax, traj, window)
+	slide_window_title(fname_ax, param_ax, traj, window)
 	plot_dce(fig, dce_ax, traj.windows[window].data)
 	signals.plots.ts_crop_ax(ts_ax, traj.source_ts, window)
 	plt.savefig(out_fname)
 	plt.close(fig)
 
 
-def vary_tau_frame(traj, window, out_fname):
+def vary_tau_frame(traj, out_fname):
 	fig = plt.figure(figsize=(8.5, 6), tight_layout=True, dpi=100)
 	# fig.subplots_adjust(hspace=.2)
 
@@ -85,7 +99,7 @@ def vary_tau_frame(traj, window, out_fname):
 		dce_ax =      fig.add_subplot(gs[0:6,  4:10])
 	else: dce_ax =    fig.add_subplot(gs[0:6,  4:10], projection='3d')
 
-	plot_title(fname_ax, param_ax, traj, window)
+	vary_tau_title(fname_ax, param_ax, traj)
 	plot_dce(fig, dce_ax, traj.data)
 	signals.plots.ts_crop_ax(ts_ax, traj.source_ts)
 	plt.savefig(out_fname)

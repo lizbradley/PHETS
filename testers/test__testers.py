@@ -1,7 +1,7 @@
 import subprocess
 
 def test__dce():
-	subprocess.call(['python', 'dceTester.py', '-1'])
+	subprocess.call(['python', 'embedTester.py', '-1'])
 
 def test__ph():
 	subprocess.call(['python', 'phTester.py', '-1'])

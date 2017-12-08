@@ -11,7 +11,8 @@ def test__TS_windows():
 	chdir()
 	out = [w.data for w in clar_ts.windows]
 	ref = np.load('ref/clar_ts.npy')
-	np.testing.assert_allclose(out, ref)
+	# np.testing.assert_allclose(out, ref)
+	np.testing.assert_array_equal(out, ref)
 
 def test__Traj_windows():
 	chdir()

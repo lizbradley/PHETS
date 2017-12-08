@@ -128,6 +128,8 @@ class BaseTrajectory(object):
 		"""
 		to_samples, from_samples = self._to_samples, self._from_samples
 
+		if crop_cmd is None:
+			crop_cmd = (None, None)
 		crop_lim = list(crop_cmd)
 		if crop_cmd[0] is None:
 			crop_lim[0] = 0
@@ -257,17 +259,22 @@ class TimeSeries(BaseTrajectory):
 
 		if crop_only:
 			data = embed(self.data, tau, m)
+			crop = None
+		else:
+			data = embed(self.data_full, tau, m)
+			crop = self.crop_cmd
 
-		data = embed(self.data_full, tau, m)
 		traj = Trajectory(
 			data,
 			fname=self.fname,
-			crop=self.crop_cmd,
+			crop=crop,
 			num_windows=self.num_windows,
 			window_length=self.window_length,
 			vol_norm=self.norm_vol,
 			time_units=self.time_units
 		)
+
+		traj.crop_lim = self.crop_lim
 
 		traj.source_ts = self
 		traj.embed_params = {'tau': tau, 'm': m}

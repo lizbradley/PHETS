@@ -1,5 +1,5 @@
 
-def title_table(ax, name, window):
+def title_table(ax, name, window=False):
 	ax.axis('off')
 	ax.axis('off')
 	ax.set_xlim([0, 1])
@@ -10,11 +10,12 @@ def title_table(ax, name, window):
 		bbox=[0, .5, 1, .5],
 		cellLoc='center'
 	)
-	window_table = ax.table(
-		cellText=[['window #', window]],
-		bbox=[0, 0, 1, .5],
-		cellLoc='center'
-	)
+	if window:
+		window_table = ax.table(
+			cellText=[['window #', window]],
+			bbox=[0, 0, 1, .5],
+			cellLoc='center'
+		)
 	# window_table.auto_set_font_size(False)
 	# window_table.auto_set_font_size(6)
 

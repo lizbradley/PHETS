@@ -29,7 +29,6 @@ if test == 2:
 		crop=(50000, 55000),
 		time_units='samples'
 	)
-
-	timeit(vary_tau)(ts, out_fname(), m=2, tau=range(100))
+	timeit(vary_tau)(ts, out_fname(), m=2, tau=range(50), framerate=10)
 
 
