@@ -6,7 +6,7 @@ from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=15)
+test, start_time = get_test(set_test=4)
 
 
 def out_fname(t='png'):

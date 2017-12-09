@@ -128,8 +128,6 @@ class BaseTrajectory(object):
 		"""
 		to_samples, from_samples = self._to_samples, self._from_samples
 
-		if crop_cmd is None:
-			crop_cmd = (None, None)
 		crop_lim = list(crop_cmd)
 		if crop_cmd[0] is None:
 			crop_lim[0] = 0
@@ -207,7 +205,7 @@ class BaseTrajectory(object):
 		crop_0, crop_1 = self.crop_lim
 		start_points = np.linspace(
 			crop_0, crop_1, num_windows, endpoint=False
-		) - crop_0
+		)
 
 		start_points_idxs = [self._to_samples(s) for s in start_points]
 
@@ -217,7 +215,7 @@ class BaseTrajectory(object):
 		else:
 			window_length_samp = self._to_samples(window_length)
 
-		windows = [self.data[sp:sp + window_length_samp]
+		windows = [self.data_full[sp:sp + window_length_samp]
 		           for sp in start_points_idxs]
 
 		if self.norm_vol[2]:
@@ -238,7 +236,7 @@ class TimeSeries(BaseTrajectory):
 		self.source_traj = None
 		self.project_axis = None
 
-	def embed(self, tau, m, crop_only=True):
+	def embed(self, tau, m):
 		"""
 		Embed ``data_full``, re-apply crop and slicing.
 
@@ -256,25 +254,17 @@ class TimeSeries(BaseTrajectory):
 		"""
 		if self.time_units == 'seconds':
 			tau = int(tau * SAMPLE_RATE)
-
-		if crop_only:
-			data = embed(self.data, tau, m)
-			crop = None
-		else:
-			data = embed(self.data_full, tau, m)
-			crop = self.crop_cmd
-
+		data = embed(self.data_full, tau, m)
 		traj = Trajectory(
 			data,
 			fname=self.fname,
-			crop=crop,
+			name=self.name,
+			crop=self.crop_cmd,
 			num_windows=self.num_windows,
 			window_length=self.window_length,
 			vol_norm=self.norm_vol,
 			time_units=self.time_units
 		)
-
-		traj.crop_lim = self.crop_lim
 
 		traj.source_ts = self
 		traj.embed_params = {'tau': tau, 'm': m}
@@ -387,6 +377,7 @@ class Trajectory(BaseTrajectory):
 		ts = TimeSeries(
 			data,
 			fname=self.fname,
+			name=self.name,
 			crop=self.crop_lim,
 			num_windows=self.num_windows,
 			# window_length=self.window_length + tau  # + 1 ??

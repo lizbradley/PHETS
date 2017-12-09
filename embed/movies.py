@@ -43,7 +43,11 @@ def slide_window(ts, out_fname, m, tau, framerate=1):
 def vary_tau(ts, out_fname, m, tau, framerate=1):
 	""" movie depicting embedding of `ts` over a range of tau"""
 
-	trajs = [ts.embed(t, m) for t in tau]
+	# ts.embed() does the full signal so we'll take crop only, for efficiency
+	ts_crop = TimeSeries(ts.data, name=ts.name)
+	trajs = [ts_crop.embed(t, m) for t in tau]
+	for t in trajs:
+		t.source_ts = ts
 
 	remove_old_frames('embed/frames/')
 	frame_fname = 'embed/frames/frame%03d.png'

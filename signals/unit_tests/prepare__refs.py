@@ -8,6 +8,8 @@ os.chdir(current_dir)
 
 from common import clar_ts, ellipse_traj
 
+import pickle
+
 def prepare_clar_ts():
 	raw_windows = [w.data for w in clar_ts.windows]
 	np.save('ref/clar_ts.npy', raw_windows)

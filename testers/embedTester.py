@@ -5,7 +5,7 @@ change_dir()
 from utilities import timeit
 from embed.movies import *
 
-test, start_time = get_test(set_test=1)
+test, start_time = get_test(set_test=2)
 
 
 def out_fname():
@@ -29,7 +29,7 @@ if test == 2:
 		crop=(50000, 55000),
 		time_units='samples'
 	)
-	timeit(vary_tau)(ts, out_fname(), m=2, tau=range(50), framerate=10)
+	vary_tau(ts, out_fname(), m=2, tau=range(15), framerate=10)
 
 
 if test == 3:
