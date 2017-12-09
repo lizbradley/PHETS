@@ -8,6 +8,8 @@ from DCE.movies import slide_window
 from PH import Filtration
 from config import default_filtration_params as filt_params
 
+# need to run this from PHETS, not PHETS/testers
+
 # first, format data file
 # fname = 'datasets/time_series/WAIS_age_dD_d18O_xs.txt'
 fname = '../WAIS_age_dD_d18O_xs.txt'
@@ -21,7 +23,8 @@ ts = TimeSeries(
 	fname,
     crop=(20000, 40000),
 	num_windows=10,
-	window_length=1000
+	window_length=1000 # by default, just evenly spaces the windows
+        # if you comment out the window_length line, makes them crop/num_window long
 )
 
 # visual representation of window geometry
