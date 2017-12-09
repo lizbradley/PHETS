@@ -16,16 +16,16 @@ for subdir, dirs, files in os.walk('.'):
 
 
 
-remove_files_by_type('DCE/frames/', '.txt')
-remove_files_by_type('DCE/temp_data/', '.txt')
-remove_files_by_type('PH/temp/', '.txt')
-remove_files_by_type('PH/frames/', '.png')
-remove_files_by_type('PH/perseus/', '.txt')
+remove_files_by_type('embed/frames/', '.txt')
+remove_files_by_type('embed/temp_data/', '.txt')
+remove_files_by_type('phomology/temp/', '.txt')
+remove_files_by_type('phomology/frames/', '.png')
+remove_files_by_type('phomology/perseus/', '.txt')
 
 
 
 print 'recompiling find_landmarks.c...'
-os.chdir('PH')
+os.chdir('phomology')
 if sys.platform == "linux" or sys.platform == "linux2":
     compile_str = find_landmarks_c_compile_str['linux']
 elif sys.platform == 'darwin':

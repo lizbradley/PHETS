@@ -4,8 +4,8 @@ from boilerplate import change_dir
 change_dir()
 
 from signals import TimeSeries
-from DCE.movies import slide_window
-from PH import Filtration
+from embed.movies import slide_window
+from phomology import Filtration
 from config import default_filtration_params as filt_params
 
 # need to run this from PHETS, not PHETS/testers
@@ -15,7 +15,7 @@ from config import default_filtration_params as filt_params
 fname = '../WAIS_age_dD_d18O_xs.txt'
 # data = np.loadtxt(fname, skiprows=1, delimiter=',')
 # data = data[:, 2]                           # select column
-fname = '{}.clean'.format(fname)            # new fname
+fname = '{}.clean'.format(fname)              # new fname
 # np.savetxt(fname, data)                     # save cleaned/formatted data
 
 # initialize a TimeSeries object from formatted data file
@@ -27,8 +27,9 @@ ts = TimeSeries(
         # if you comment out the window_length line, makes them crop/num_window long
 )
 
-# visual representation of window geometry
-ts.plot('output/liz/signal.png')
+# visual representation of window and crop geometry
+# ts.plot('output/liz/signal.png')          # full signal
+ts.plot_crop('output/liz/signal_crop.png')  # cropped section only
 
 # make embed movie from the TimeSeries, returning a Trajectory
 slide_window(ts, 'output/liz/embed_movie.mp4', m=2, tau=200)
@@ -55,5 +56,5 @@ filt_params.update(
 filt = Filtration(traj_window, filt_params)
 
 filt.movie('output/liz/filt_movie.mp4')     # save the filtration/complexes movie
-filt.plot_PD('output/liz/PD.png')           # save the persistence diagram
-filt.plot_PRF('output/liz/PRF.png')         # save the persistence rank function
+filt.plot_pd('output/liz/pd.png')           # save the persistence diagram
+filt.plot_prf('output/liz/prf.png')         # save the persistence rank function

@@ -2,8 +2,8 @@ import sys
 import numpy as np
 
 import plots
-from DCE import embed
-from PH import Filtration
+from embed import embed
+from phomology import Filtration
 from config import SAMPLE_RATE
 from utilities import print_title, print_still
 
@@ -216,7 +216,7 @@ class BaseTrajectory(object):
 			window_length_samp = self._to_samples(window_length)
 
 		windows = [self.data_full[sp:sp + window_length_samp]
-				   for sp in start_points_idxs]
+		           for sp in start_points_idxs]
 
 		if self.norm_vol[2]:
 			windows = [self._normalize(w) for w in windows]
@@ -285,6 +285,19 @@ class TimeSeries(BaseTrajectory):
 		"""
 		plots.ts_fig(self, filename)
 
+	def plot_crop(self, filename):
+		"""
+		Plot time series (crop only), save to ``filename``.
+		Parameters
+		----------
+		filename : str
+
+		Returns
+		-------
+
+		"""
+		plots.ts_crop_fig(self, filename)
+
 
 
 
@@ -302,7 +315,7 @@ class Trajectory(BaseTrajectory):
 		self.filts = None
 
 
-	def filtrations(self, filt_params, quiet):
+	def filtrations(self, filt_params, quiet=True, status_str=None):
 		""" Compute filtration for each window of trajectory.
 
 		Parameters
@@ -319,12 +332,16 @@ class Trajectory(BaseTrajectory):
 
 		"""
 		if self.windows is None:
-			print 'ERROR: self.windows is None'
-			sys.exit()
+			raise Exception('self.windows is None')
+		file_str = 'building filtrations for {}...'.format(self.name)
 
-		print_title('building filtrations for {}...'.format(self.name))
+		try:
+			print_title(' '.join((file_str, status_str)))
+		except TypeError:
+			print_title(file_str)
+
 		filts = []
-		for i, t in enumerate(self.windows):
+		for i, traj in enumerate(self.windows):
 			if quiet:
 				print_still(
 					'window {} of {}...'.format(i + 1, len(self.windows))
@@ -335,9 +352,9 @@ class Trajectory(BaseTrajectory):
 						self.name, i + 1, len(self.windows)
 					)
 				)
-			f = Filtration(t, filt_params, silent=quiet, save=False)
+			f = Filtration(traj, filt_params, silent=quiet, save=False)
 			filts.append(f)
-		print 'done.'
+		print 'done'
 		self.filts = filts
 		return filts
 

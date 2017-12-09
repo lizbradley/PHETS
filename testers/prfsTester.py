@@ -3,16 +3,15 @@ change_dir()
 
 import numpy as np
 from signals import TimeSeries, Trajectory
-from PRFstats import plot_ROCs, plot_dists_to_means, plot_clusters, \
-	plot_dists_to_ref, plot_variance, plot_pairwise_mean_dists
+from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=12)
+test, start_time = get_test(set_test=14)
 
 
-def out_fname():
-	return 'output/PRFstats/test_{}.png'.format(test)
+def out_fname(t='png'):
+	return 'output/prfstats/test_{}.{}'.format(test, t)
 
 
 if test == 1:
@@ -34,8 +33,8 @@ if test == 1:
 		vol_norm=(0, 0, 1)
 	)
 
-	ts1.plot('output/PRFstats/ts1.png')
-	ts2.plot('output/PRFstats/ts2.png')
+	ts1.plot('output/prfstats/ts1.png')
+	ts2.plot('output/prfstats/ts2.png')
 
 	traj1 = ts1.embed(tau=32, m=2)
 	traj2 = ts2.embed(tau=32, m=2)
@@ -47,7 +46,7 @@ if test == 1:
 		'ds_rate': 20
 	})
 
-	plot_ROCs(
+	plot_l2rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -85,7 +84,7 @@ if test == 2:
 		'num_divisions': 10,
 	})
 
-	plot_ROCs(
+	plot_l2rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -123,7 +122,7 @@ if test == 3:
 		'num_divisions': 10,
 	})
 
-	plot_ROCs(
+	plot_l2rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -201,7 +200,8 @@ if test == 5:
 		traj1, traj2,
 		out_fname(),
 		filt_params,
-		quiet=False
+		quiet=False,
+		see_samples={'interval': 1, 'filt_step': 5}
 	)
 
 
@@ -240,7 +240,7 @@ if test == 6:
 		out_fname(),
 		filt_params,
 		quiet=False,
-		load_saved_filts=False
+		load_saved_filts=True
 	)
 
 
@@ -253,15 +253,14 @@ if test == 7:
 	})
 
 	plot_dists_to_ref(
-		'datasets/trajectories/L63_x_m2',
-		'L63_x_m2_tau',
-		'base i',
+		'datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
 		out_fname(),
 		filt_params,
 		i_ref=15,
 		i_arr=np.arange(2, 30),
 		quiet=False,
-		load_saved_filts=True
+		load_saved_filts=False,
+		see_samples={'interval': 5, 'filt_step': 5}
 	)
 
 if test == 9:
@@ -292,7 +291,7 @@ if test == 9:
 		'max_filtration_param': -8
 	})
 
-	plot_ROCs(
+	plot_l2rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -330,7 +329,7 @@ if test == 10:
 		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=True
+		load_saved_filts=False
 	)
 
 
@@ -358,11 +357,12 @@ if test == 11:
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=True
+		load_saved_filts=False
 	)
 
 if test == 12:
 
+	traj = None
 	traj = Trajectory(
 		'datasets/Lorenz/StandardLorenz63_IC123.txt',
 		crop=(10000, 150000),
@@ -375,14 +375,69 @@ if test == 12:
 		'num_divisions': 10,
 	})
 
-	plot_pairwise_mean_dists(
+	dists = pairwise_mean_dists(
 		traj,
-		out_fname(),
 		filt_params,
 		vary_param_1=('worm_length', (200, 500, 700)),
 		vary_param_2=('max_filtration_param', (-5, -8, -12)),
 		quiet=True,
-		annot_hm=False,
-		load_saved_filts=False
+		load_saved_filts=False,
+		see_samples={'interval': 4, 'filt_step': 5}
 	)
 
+	np.savetxt(out_fname(t='txt'), dists)
+
+
+if test == 13:
+	ts = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+		window_length=2000,
+		vol_norm=(0, 0, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+	filt_params.update({
+		'ds_rate': -20,
+		'num_divisions': 10,
+		'max_filtration_param': -8
+	})
+
+	plot_variance(
+		traj,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (1000, 1300, 1700, 2000)),
+		quiet=False,
+		annot_hm=False,
+		load_saved_filts=False,
+		see_samples={'interval': 4, 'filt_step': 5}
+	)
+
+if test == 14:
+	ts = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+		window_length=2000,
+		vol_norm=(0, 0, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+	filt_params.update({
+		'ds_rate': ('worm_length', lambda x: x / 20),   # note: '/' does floor division
+		'num_divisions': 10,
+		'max_filtration_param': -8
+	})
+
+	plot_variance(
+		traj,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (1000, 1300, 1700, 2000)),
+		quiet=False,
+		annot_hm=False,
+		load_saved_filts=False,
+		see_samples={'interval': 4, 'filt_step': 5}
+	)

@@ -37,7 +37,9 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages']
+    'sphinx.ext.githubpages',
+    ]
+
 
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
@@ -57,7 +59,6 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PHETS'
-# copyright = u'2017, Elliott Shugerman'
 author = u'Elliott Shugerman'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -122,31 +123,11 @@ html_sidebars = {
     ]
 }
 
-
-# -- Options for HTMLHelp output ------------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'PHETSdoc'
-
-
 # -- Options for LaTeX output ---------------------------------------------
 
+
 latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
+    'classoptions': ',openany,oneside'
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -154,54 +135,9 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'PHETS.tex', u'PHETS Documentation',
-     u'Elliott Shugerman', 'manual'),
-]
-
-
-# -- Options for manual page output ---------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'phets', u'PHETS Documentation',
-     [author], 1)
-]
-
-
-# -- Options for Texinfo output -------------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'PHETS', u'PHETS Documentation',
-     author, 'PHETS', 'One line description of project.',
-     'Miscellaneous'),
+     u'', 'manual'),
 ]
 
 
 
-# -- Options for Epub output ----------------------------------------------
 
-# Bibliographic Dublin Core info.
-# epub_title = project
-# epub_author = author
-# epub_publisher = author
-# epub_copyright = copyright
-#
-# # The unique identifier of the text. This can be a ISBN number
-# # or the project homepage.
-# #
-# # epub_identifier = ''
-#
-# # A unique identification for the text.
-# #
-# # epub_uid = ''
-#
-# # A list of files that should not be packed into the epub file.
-# epub_exclude_files = ['search.html']
-#
-#
-#
-# # Example configuration for intersphinx: refer to the Python standard library.
-# intersphinx_mapping = {'https://docs.python.org/': None}

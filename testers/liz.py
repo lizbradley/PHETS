@@ -2,10 +2,10 @@ from boilerplate import change_dir, get_test
 change_dir()
 
 import numpy as np
-from DCE import embed, plot_signal
-from DCE.Plots import plot_dce
-from DCE.movies_old import slide_window, vary_tau
-from PH import Filtration, make_movie, PD, PRF
+from embed import embed, plot_signal
+from embed.Plots import plot_dce
+from embed.movies_old import slide_window, vary_tau
+from phomology import Filtration, make_movie, PD, PRF
 from config import default_filtration_params as filt_params
 
 test, start_time = get_test(set_test=0)
@@ -33,7 +33,7 @@ plot_signal('output/liz/signal.png', sig, window=crop, time_units=time_units)
 # returns a list of the embeddings (trajectories), one for each window
 # can comment out these lines if you load the data into trajs from a file
 # using the lines below.
-# this code puts the frames in PHETS/DCE/frames if you want them
+# this code puts the frames in PHETS/embed/frames if you want them
 trajs = slide_window(
 	sig,
 	'output/liz/embed_movie.mp4',
@@ -72,5 +72,5 @@ filt_params.update(
 filt = Filtration(traj, filt_params)
 
 # make_movie(filt, 'output/liz/filt_movie.mp4')
-# make_PD(filt, 'output/liz/PD.png')  # make the persistence diagram
-# make_PRF_plot(filt, 'output/liz/PRF.png')
+# make_PD(filt, 'output/liz/PRF.png')  # make the persistence diagram
+# make_PRF_plot(filt, 'output/liz/prf.png')

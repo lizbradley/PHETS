@@ -2,16 +2,13 @@
 
 import inspect
 import subprocess
+import os
 
-from memory_profiler import profile
+# from memory_profiler import profile
 
 def root_path():
 	return os.path.dirname(__file__)
 
-def mem_profile(f, flag):
-	if flag: return profile(stream=f)
-
-	else: return lambda x: x
 
 
 def normalize_volume(sig):
@@ -44,7 +41,7 @@ def check_overwrite(out_file_name):
 def clear_old_files(path, see_samples):
 	old_files = os.listdir(path)
 	if old_files and see_samples:
-		ans = raw_input('Overwrite files in ' + path + '? (y/n/q) \n')
+		ans = raw_input('Clear files in ' + path + '? (y/n/q) \n')
 		if ans == 'y':
 			for f in old_files:
 				if f != '.gitkeep':
@@ -57,6 +54,9 @@ def clear_old_files(path, see_samples):
 		else:
 			print 'Proceeding... conflicting files will be overwritten, otherwise old files will remain. \n'
 
+def make_dir(dir):
+	if not os.path.exists(dir):
+		os.makedirs(dir)
 
 def clear_dir(dir):
 
@@ -68,6 +68,8 @@ def clear_dir(dir):
 
 	if r == 'y':
 		for f in files:
+			if not dir.endswith('/'):
+				dir = dir + '/'
 			os.remove(dir + f)
 		return True
 
@@ -114,7 +116,7 @@ def print_still(str):
 	sys.stdout.write('\r{}\t\t'.format(str))
 	sys.stdout.flush()
 
-def count_lines(dir, blanks=True):
+def count_lines(dir, blanks=False):
 
 	def file_len(fname):
 		count = 0
@@ -124,17 +126,23 @@ def count_lines(dir, blanks=True):
 					count += 1
 		return count
 
+	def conditions(path, file):
+		return (
+			file.endswith('.py'),
+			not name.endswith('Tester.py'),
+			'unit_tests' not in path,
+			'docs' not in path,
+		)
+
 	count_f = 0
 	count_l = 0
 	for root, dirs, files in os.walk(dir, topdown=False):
 		for name in files:
-			if name.endswith('.py') and not name.endswith('Tester.py') and 'unit_tests' not in root:
+			if all(conditions(root, name)):
 				fname = os.path.join(root, name)
 				length = file_len(fname)
-
 				count_f += 1
 				count_l += length
-
 				print '{}: {}'.format(fname, length)
 
 	print_title('num files: {}\tnum lines: {}'.format(count_f, count_l))
@@ -169,14 +177,13 @@ def frames_to_movie(out_filename, frame_path, framerate=1, loglevel='error'):
 		'-y',
 		'-framerate', str(framerate),
 		'-i', frame_path,
-		'-r', str(24),
+		'-r', str(16),
 		# '-aspect', '{}:{}'.format(aspect[0], aspect[1]),
 		out_filename
 
 	]
 	subprocess.call(cmd)
 	print 'done.'
-	print 'see {}'.format(out_filename)
 
 
 # BELOW ARE MIGRATED FROM DCE MODULE, NEED CLEANUP #

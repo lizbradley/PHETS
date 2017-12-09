@@ -9,8 +9,8 @@ import numpy as np
 
 from ROC import PRF_vs_FFT_v2
 from config import default_filtration_params as filt_params
-from DCE.DCE import embed
-from PH import Filtration, make_movie, load_filtration
+from embed.data import embed
+from phomology import Filtration, make_movie, load_filtration
 from PubPlots import plot_filtration_pub, plot_PD_pub, plot_waveform_sec, plot_dce_pub
 from utilities import sec_to_samp
 
@@ -328,7 +328,7 @@ def fig5():
 	)
 
 
-from DCE import plot_signal
+from embed import plot_signal
 
 
 def fig6():

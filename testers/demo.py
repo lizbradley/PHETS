@@ -4,9 +4,9 @@ change_dir()
 import numpy as np
 from signals import TimeSeries
 from utilities import idx_to_freq
-from DCE.movies import slide_window
-from PH import Filtration, load_filtration
-from PRFstats import plot_ROCs
+from embed.movies import slide_window
+from phomology import Filtration, load_filtration
+from prfstats import plot_l2rocs
 from config import default_filtration_params as filt_params
 
 # first load data into a TimeSeries instance. we have the choice of specifying
@@ -25,7 +25,7 @@ ts = TimeSeries(
 # window of the time series
 tau = (1 / idx_to_freq(49)) / np.pi      # choose tau = period / e
 
-traj = slide_window(ts, 'output/demo/embed_movie.mp4', m=2, tau=tau)
+slide_window(ts, 'output/demo/embed_movie.mp4', m=2, tau=tau)
 
 # alternatively, we could skip the movie and embed explicitly:
 traj = ts.embed(m=2, tau=tau)
@@ -51,8 +51,8 @@ filt.movie(
     alpha=.5,
     color_scheme='highlight new'
 )
-filt.plot_PD('output/demo/PD.png')          # plot the persistence diagram
-filt.plot_PRF('output/demo/PRF.png')        # plot the persistence rank function
+filt.plot_pd('output/demo/PRF.png')          # plot the persistence diagram
+filt.plot_prf('output/demo/prf.png')        # plot the persistence rank function
 
 
 
@@ -74,8 +74,8 @@ ts2 = TimeSeries(
     vol_norm=(0, 0, 1)
 )
 
-ts1.plot('output/PRFstats/ts1.png')
-ts2.plot('output/PRFstats/ts2.png')
+ts1.plot('output/demo/ts1.png')
+ts2.plot('output/demo/ts2.png')
 
 traj1 = ts1.embed(tau=32, m=2)
 traj2 = ts2.embed(tau=32, m=2)
@@ -87,9 +87,9 @@ filt_params.update({
     'ds_rate': 20
 })
 
-plot_ROCs(
+plot_l2rocs(
     traj1, traj2,
-    'output/demo/ROCs.png',
+    'output/demo/rocs.png',
     filt_params,
     k=(0, 10.01, .01)
 )

@@ -5,14 +5,14 @@ change_dir()    # PHETS imports must come after this line
 import time
 
 from signals import Trajectory
-from PH import Filtration, load_filtration
+from phomology import Filtration, load_filtration
 from config import default_filtration_params as filt_params
 
 test, start_time = get_test(set_test=110)
 
 
 def out_fname(str):
-	return 'output/PH/test_{}{}'.format(test, str)
+	return 'output/phomology/test_{}{}'.format(test, str)
 
 if test == 14:
 	in_filename = 'datasets/trajectories/49/C134C.txt'
@@ -30,14 +30,14 @@ if test == 14:
 
 	make_movie(
 		filtration,
-		'output/PH/test14.mp4',
+		'output/phomology/test14.mp4',
 	)
 
-	PRF(filtration, 'output/PH/test14_PRF.png')
+	PRF(filtration, 'output/phomology/test14_prf.png')
 
 	PD(
 		filtration,
-		'output/PH/test14_PD.png'
+		'output/phomology/test14_PRF.png'
 	)
 if test == 15:
 	in_filename = 'datasets/trajectories/49/C134C.txt'
@@ -55,14 +55,14 @@ if test == 15:
 	
 	make_movie(
 		filtration,
-		'output/PH/test15.mp4',
+		'output/phomology/test15.mp4',
 	)
 
-	PRF(filtration, 'output/PH/test15_PRF.png')
+	PRF(filtration, 'output/phomology/test15_prf.png')
 
 	PD(
 		filtration,
-		'output/PH/test15_PD.png'
+		'output/phomology/test15_PRF.png'
 	)
 
 
@@ -83,14 +83,14 @@ if test == 16:
 
 	make_movie(
 		filtration,
-		'output/PH/test16.mp4',
+		'output/phomology/test16.mp4',
 	)
 
-	PRF(filtration, 'output/PH/test16_PRF.png')
+	PRF(filtration, 'output/phomology/test16_prf.png')
 
 	PD(
 		filtration,
-		'output/PH/test16_PD.png'
+		'output/phomology/test16_PRF.png'
 	)
 
 
@@ -113,17 +113,17 @@ if test == 17:
 
 	filtration = Filtration(in_filename, filt_params)
 
-	PRF(filtration, 'output/PH/test17_PRF.png')
+	PRF(filtration, 'output/phomology/test17_prf.png')
 
 	PD(
 		filtration,
-		'output/PH/test17_PD.png'
+		'output/phomology/test17_PRF.png'
 	)
 
 
 	make_movie(
 		filtration,
-		'output/PH/test17.mp4',
+		'output/phomology/test17.mp4',
 		alpha=.5
 	)
 
@@ -149,7 +149,7 @@ if test == 100:
 	# filtration = load_saved_filtration()		# reuses previous filtration
 
 
-	filtration.movie('output/PH/test_euc.mp4')
+	filtration.movie('output/phomology/test_euc.mp4')
 
 # test = 101
 if test == 101:
@@ -171,7 +171,7 @@ if test == 101:
 
 	make_movie(
 		filtration,
-		'output/PH/test_ham_p_5.mp4',
+		'output/phomology/test_ham_p_5.mp4',
 	)
 
 # test = 102
@@ -196,7 +196,7 @@ if test == 101:
 #
 # 	make_movie(
 # 		filtration,
-# 		'output/PH/test_speed5.mp4',
+# 		'output/phomology/test_speed5.mp4',
 # 	)
 
 
@@ -221,7 +221,7 @@ if test == 103:
 
 	make_movie(
 		filtration,
-		'output/PH/test_orient5.mp4',
+		'output/phomology/test_orient5.mp4',
 	)
 
 
@@ -247,7 +247,7 @@ if test == 103:
 #
 # 	make_movie(
 # 		filtration,
-# 		'output/PH/test_stretch5.mp4',
+# 		'output/phomology/test_stretch5.mp4',
 # 	)
 
 
@@ -273,7 +273,7 @@ if test == 103:
 #
 # 	make_movie(
 # 		filtration,
-# 		'output/PH/test_ray5.mp4',
+# 		'output/phomology/test_ray5.mp4',
 # 	)
 
 
@@ -299,7 +299,7 @@ if test == 103:
 #
 # 	make_movie(
 # 		filtration,
-# 		'output/PH/test_ne.mp4',
+# 		'output/phomology/test_ne.mp4',
 # 	)
 
 if test == 107:
@@ -323,7 +323,7 @@ if test == 107:
 
 	make_movie(
 		filtration,
-		'output/PH/test_m2d10.mp4',
+		'output/phomology/test_m2d10.mp4',
 	)
 
 
@@ -349,7 +349,7 @@ if test == 108:
 
 	make_movie(
 		filtration,
-		'output/PH/test_dcov+20.mp4',
+		'output/phomology/test_dcov+20.mp4',
 	)
 
 if test == 109:
@@ -372,7 +372,7 @@ if test == 109:
 
 	make_movie(
 		filtration,
-		'output/PH/test_dcov-20.mp4',
+		'output/phomology/test_dcov-20.mp4',
 	)
 
 if test == 110:
@@ -392,9 +392,9 @@ if test == 110:
 	# filtration = Filtration(in_filename, filt_params)
 	traj = Trajectory(in_filename)
 	filtration = Filtration(traj, filt_params)
-	filtration.movie('output/PH/test_110.mp4')
+	filtration.movie('output/phomology/test_110.mp4')
 
-	# make_movie(filtration, 'output/PH/test_110.mp4')
+	# make_movie(filtration, 'output/phomology/test_110.mp4')
 
 
 if test == 200:
@@ -504,8 +504,8 @@ if test == 202:
 	filt = load_filtration()
 
 	filt.movie(out_fname('mp4'))
-	filt.plot_PD(out_fname('_PD.png'))
-	filt.plot_PRF('_PRF.png')
+	filt.plot_pd(out_fname('_PRF.png'))
+	filt.plot_prf('_prf.png')
 
 
 if test == 203:
@@ -525,8 +525,8 @@ if test == 203:
 	filt = load_filtration()
 
 	filt.movie(out_fname('.mp4'))
-	filt.plot_PD(out_fname('_PD.png'))
-	filt.plot_PRF(out_fname('_PRF.png'))
+	filt.plot_pd(out_fname('_PRF.png'))
+	filt.plot_prf(out_fname('_prf.png'))
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

@@ -1,20 +1,24 @@
 from boilerplate import change_dir, get_test
+
 change_dir()
 
 from matplotlib.pyplot import ioff; ioff()
-from PH import Filtration, make_movie, PD, PRF
-from PRFstats import plot_variance
+from signals import Trajectory
+from phomology import Filtration
+from prfstats import plot_variance
 from config import default_filtration_params as parameter_set
 
-test, start_time = get_test(set_test=1)
+test, start_time = get_test(set_test=9)
 
 def movie_fname(test, str=''):
 	return 'output/debug/test_{}_{}_movie.mp4'.format(test, str)
 
 
 def pd_fname(test, str=''):
-	return 'output/debug/test_{}_{}_PD.png'.format(test, str)
+	return 'output/debug/test_{}_{}_PRF.png'.format(test, str)
 
+def prf_fname(test, str=''):
+	return 'output/debug/test_{}_{}_prf.png'.format(test, str)
 
 if test == 1:
 	in_fname = 'datasets/trajectories/hopf/NewHopf_app1.txt'
@@ -32,7 +36,7 @@ if test == 1:
 	filt = Filtration(in_fname, params)  # BUG: filtration only has 7 steps !!
 	# make_movie(filt, movie_fname(test), color_scheme='highlight new')
 	PD(filt, pd_fname(test))
-	PRF(filt, 'output/debug/test_1_PRF.png')
+	PRF(filt, 'output/debug/test_1_prf.png')
 
 
 if test == 2:
@@ -240,7 +244,7 @@ if test == 9:
 	params = parameter_set
 	params.update(
 		{
-			'max_filtration_param': -3,
+			'max_filtration_param': -2,
 			'num_divisions': 5,
 			'ds_rate': 20,
 			'd_use_hamiltonian': -2,
@@ -249,6 +253,7 @@ if test == 9:
 
 		})
 
-	filt = Filtration(in_fname, params)
-	make_movie(filt, movie_fname(test), alpha=.5)
+	traj = Trajectory(in_fname)
+	filt = Filtration(traj, params)
+	filt.plot_pd(pd_fname(test))
 
