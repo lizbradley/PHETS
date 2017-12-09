@@ -26,7 +26,7 @@ piano_traj = embed(
 eps_bins = 20
 simps_cutoff = -21
 
-paper_path = '/home/elliott/Desktop/IDA2017/'
+paper_path = 'output/ida2017/'
 ticks = [-1, -.33, .33, 1]
 # ticks = None
 
