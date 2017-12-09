@@ -142,7 +142,7 @@ def ref__plot_variance_w():
 	f3 = lambda i, j: 3 * (-i + j)
 	out = plot_variance(
 		clar_traj,
-		'output/prfstats/plot_variance_w.png',
+		'output/plot_variance_w.png',
 		filt_params,
 		vary_param_1=('weight_func', (f1, f2, f3)),
 		legend_labels_1=('weight function', ('k=1', 'k=2', 'k=3')),
