@@ -261,6 +261,7 @@ def plot_variance(
 		out_dir
 	)
 
+
 	filts = filt_set(
 		traj,
 		filt_params,

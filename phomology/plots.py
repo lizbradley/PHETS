@@ -28,7 +28,7 @@ def colorbar_ax(cbar_ax, levels):
 	return cmap, norm
 
 
-def PD_ax(ax, cbar_ax, pd):
+def pd_ax(ax, cbar_ax, pd):
 
 	ax.set_aspect('equal')
 	min_lim = 0
@@ -75,7 +75,7 @@ def pd_fig(filt, out_filename):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-	PD_ax(plot_ax, cbar_ax, filt.pd())
+	pd_ax(plot_ax, cbar_ax, filt.pd())
 	filename_table(fname_ax, filt.name)
 	filt_params_table(params_ax, filt.params)
 
@@ -121,13 +121,13 @@ def heatmap_ax(ax, z, dom=None, cmap=None, norm=None, annot=False):
 	return mesh
 
 
-def PRF_colorbar_ax(cbar_ax):
+def prf_colorbar_ax(cbar_ax):
 	levels = np.concatenate([[0, .0001], np.arange(1, 10), [50, 100]])
 	cmap, norm = colorbar_ax(cbar_ax, levels)
 	return cmap, norm
 
 
-def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
+def prf_ax(prf, ax, cbar_ax=None, annot_hm=False):
 
 	ax.set_xlabel('birth ($\epsilon$)')
 	ax.set_ylabel('death ($\epsilon$)')
@@ -135,7 +135,7 @@ def PRF_ax(prf, ax, cbar_ax=None, annot_hm=False):
 	if cbar_ax is None:
 		divider = make_axes_locatable(ax)
 		cbar_ax = divider.append_axes('right', size='5%', pad=0.05)
-	cmap, norm = PRF_colorbar_ax(cbar_ax)
+	cmap, norm = prf_colorbar_ax(cbar_ax)
 
 	ax.ticklabel_format(axis='both', style='sci',  scilimits=(0, 0))
 
@@ -159,7 +159,7 @@ def prf_fig(filt, out_filename, annot_hm=False):
 	plot_ax = 		plt.subplot2grid((6, 10), (0, 3), rowspan=6, colspan=6)
 	cbar_ax = 		plt.subplot2grid((6, 10), (0, 9), rowspan=6)
 
-	PRF_ax(filt.prf(), plot_ax, cbar_ax, annot_hm)
+	prf_ax(filt.prf(), plot_ax, cbar_ax, annot_hm)
 
 	filename_table(fname_ax, filt.name)
 	filt_params_table(params_ax, filt.params)

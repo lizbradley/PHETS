@@ -262,7 +262,6 @@ class Filtration:
 	@phdir
 	def _build(self, traj):
 
-
 		silent = self.silent
 		if not silent: print "building filtration..."
 

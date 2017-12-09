@@ -1,4 +1,4 @@
-from plots import slide_window_frame, vary_tau_frame
+from plots import slide_window_frame, vary_tau_frame, compare_vary_tau_frame
 from signals import TimeSeries
 from utilities import remove_old_frames, print_still, frames_to_movie
 
@@ -43,7 +43,7 @@ def slide_window(ts, out_fname, m, tau, framerate=1):
 def vary_tau(ts, out_fname, m, tau, framerate=1):
 	""" movie depicting embedding of `ts` over a range of tau"""
 
-	trajs = [ts.embed(traj, m) for traj in tau]
+	trajs = [ts.embed(t, m) for t in tau]
 
 	remove_old_frames('embed/frames/')
 	frame_fname = 'embed/frames/frame%03d.png'
@@ -58,8 +58,23 @@ def vary_tau(ts, out_fname, m, tau, framerate=1):
 	return trajs
 
 
-def compare_vary_tau():
-	raise NotImplemented
+def compare_vary_tau(ts1, ts2, out_fname, m, tau, framerate=1):
+	trajs1 = [ts1.embed(t, m) for t in tau]
+	trajs2 = [ts2.embed(t, m) for t in tau]
+
+	remove_old_frames('embed/frames/')
+	frame_fname = 'embed/frames/frame%03d.png'
+
+	for i, trajs in enumerate(zip(trajs1, trajs2)):
+		print_still('frame {} of {}'.format(i + 1, len(tau)))
+		traj1, traj2 = trajs
+		compare_vary_tau_frame(traj1, traj2, frame_fname % i, tau[i])
+	print ''
+
+	frames_to_movie(out_fname, frame_fname, framerate, loglevel='error')
+
+	return trajs1, trajs2
+
 
 def compare_multi():
 	raise NotImplemented

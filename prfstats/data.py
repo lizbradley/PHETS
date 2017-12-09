@@ -4,6 +4,7 @@ import numpy as np
 
 from phomology.data import PRF
 from helpers import *
+from utilities import timeit
 
 
 class NormalPRF:
@@ -133,6 +134,7 @@ class NormalPRF:
 		return NormalPRF(np.power(self.data, self._interpret(other)))
 
 
+@timeit
 def filt_set(
 		traj, params, vp1=None, vp2=None,
         load_saved=False, save=True,

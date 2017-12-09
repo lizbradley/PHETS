@@ -1,13 +1,12 @@
 from boilerplate import change_dir, get_test
 change_dir()
 
-import numpy as np
 from signals import TimeSeries, Trajectory
 from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=14)
+test, start_time = get_test(set_test=15)
 
 
 def out_fname(t='png'):
@@ -441,3 +440,33 @@ if test == 14:
 		load_saved_filts=False,
 		see_samples={'interval': 4, 'filt_step': 5}
 	)
+
+if test == 15:
+	ts = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+		window_length=5000,
+		vol_norm=(0, 0, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+	filt_params.update({
+		'ds_rate': ('worm_length', lambda x: x / 50),
+		'num_divisions': 10,
+		'max_filtration_param': -8
+	})
+
+	plot_variance(
+		traj,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (3500, 4000, 4500, 5000)),
+		quiet=False,
+		load_saved_filts=False,
+	)
+
+
+# no ops: 57.7s
+
+

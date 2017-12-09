@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from phomology.plots import heatmap_ax, PRF_colorbar_ax
+from phomology.plots import heatmap_ax, prf_colorbar_ax
 from phomology.titlebox import filenames_table, filt_params_table
 from prfstats.helpers import is_filt_param, is_weight_func
 from utilities import clear_dir, make_dir
@@ -67,7 +67,7 @@ def heatmaps_figs(
 			warnings.simplefilter("ignore")
 			fig.tight_layout(pad=3, rect=(.05, 0, .95, .95))
 
-		cmap, norm = PRF_colorbar_ax(cax)
+		cmap, norm = prf_colorbar_ax(cax)
 
 		mean = hmaps.mean.data
 		var = hmaps.var.data

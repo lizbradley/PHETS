@@ -248,13 +248,11 @@ def batch_flac_to_wav(dir):
 			os.remove(f)
 
 
-def timeit(method):
+def timeit(f):
 	def timed(*args, **kw):
 		ts = time.time()
-		result = method(*args, **kw)
+		result = f(*args, **kw)
 		te = time.time()
-
-		print '%r  %2.2f ms' % (method.__name__, (te - ts) * 1000)
+		print '{} time elapsed: {:.6f}s'.format(f.__name__, (te - ts))
 		return result
-
 	return timed

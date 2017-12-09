@@ -48,7 +48,7 @@ def ts_crop_ax(ax, ts, show_window='all'):
 	ax.set_xlabel('time ({})'.format(ts.time_units))
 
 	ax.plot(x, y, color='k', lw=.5)
-	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+	ax.yaxis.set_major_formatter(FormatStrFormatter('%.2g'))
 
 	if ts.num_windows is None:
 		pass
