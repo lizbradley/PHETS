@@ -6,7 +6,7 @@ from signals import TimeSeries
 from utilities import idx_to_freq
 from embed.movies import slide_window
 from phomology import Filtration, load_filtration
-from prfstats import plot_l2rocs
+from prfstats import plot_rocs
 from config import default_filtration_params as filt_params
 
 # first load data into a TimeSeries instance. we have the choice of specifying
@@ -87,7 +87,7 @@ filt_params.update({
     'ds_rate': 20
 })
 
-plot_l2rocs(
+plot_rocs(
     traj1, traj2,
     'output/demo/rocs.png',
     filt_params,

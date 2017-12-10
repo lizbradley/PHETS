@@ -45,14 +45,14 @@ if test == 1:
 		'ds_rate': 20
 	})
 
-	plot_l2rocs(
+	plot_rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
 		load_filts=False,
 		quiet=False,
-		see_samples=2
+		samples=2
 	)
 
 
@@ -83,7 +83,7 @@ if test == 2:
 		'num_divisions': 10,
 	})
 
-	plot_l2rocs(
+	plot_rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -91,7 +91,7 @@ if test == 2:
 		load_filts=False,
 		quiet=True,
 		vary_param=('max_filtration_param', (-3, -6)),
-		see_samples=5
+		samples=5
 
 	)
 
@@ -121,7 +121,7 @@ if test == 3:
 		'num_divisions': 10,
 	})
 
-	plot_l2rocs(
+	plot_rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -129,7 +129,7 @@ if test == 3:
 		load_filts=False,
 		quiet=True,
 		vary_param=('max_filtration_param', (-3, -6)),
-		see_samples=5
+		samples=5
 
 	)
 
@@ -290,7 +290,7 @@ if test == 9:
 		'max_filtration_param': -8
 	})
 
-	plot_l2rocs(
+	plot_rocs(
 		traj1, traj2,
 		out_fname(),
 		filt_params,
@@ -299,7 +299,7 @@ if test == 9:
 		quiet=False,
 		vary_param=('d_use_hamiltonion', (-1, 1)),
 		# vary_param=('d_use_hamiltonion', (1, -1)),
-		see_samples=5
+		samples=5
 
 	)
 

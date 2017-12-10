@@ -53,7 +53,7 @@ def ref__plot_dists_to_means():
 
 
 def ref__plot_ROCs():
-	out = plot_l2rocs(
+	out = plot_rocs(
 		clar_traj, viol_traj,
 		'output/rocs.png',
 		filt_params,

@@ -58,7 +58,7 @@ def test__plot_dists_to_means():
 
 def test__plot_ROCs_v():
 	chdir()
-	out = plot_l2rocs(
+	out = plot_rocs(
 		clar_traj, viol_traj,
 		'output/rocs.png',
 		filt_params,

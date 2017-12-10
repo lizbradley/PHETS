@@ -62,6 +62,8 @@ class NormalPRF:
 		wf: lambda
 			weight function as a lambda function, eg ``lambda i, j: -i + j``
 		"""
+		if wf is None:
+			return
 		self.weight = wf
 		self.pre_weight = copy.deepcopy(self)
 
