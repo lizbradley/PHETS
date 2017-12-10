@@ -2,7 +2,7 @@ import os, sys, time, cPickle, warnings, subprocess, itertools
 import numpy as np
 
 import build_filtration, plots, filtration_movie
-from utilities import blockPrint, enablePrint
+from utilities import block_print, enable_print
 from config import find_landmarks_c_compile_str
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -269,11 +269,11 @@ class Filtration:
 		start_time = time.time()
 
 		try:
-			if silent: blockPrint()
+			if silent: block_print()
 			filtration = build_filtration.build_filtration(
 				'temp/worm_data.txt', self.params, silent=silent
 			)
-			if silent: enablePrint()
+			if silent: enable_print()
 
 		except OSError:
 			print "WARNING: invalid phomology/find_landmarks binary. Recompiling..."

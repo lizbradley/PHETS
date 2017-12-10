@@ -101,10 +101,10 @@ def clear_temp_files(dir):
 def lambda_to_str(f):
 	return inspect.getsourcelines(f)[0][0].split(':')[1]
 
-def blockPrint():
+def block_print():
 	sys.stdout = open(os.devnull, 'w')
 
-def enablePrint():
+def enable_print():
 	sys.stdout = sys.__stdout__
 
 

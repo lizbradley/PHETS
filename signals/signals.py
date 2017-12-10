@@ -252,8 +252,7 @@ class TimeSeries(BaseTrajectory):
 		Trajectory
 
 		"""
-		if self.time_units == 'seconds':
-			tau = int(tau * SAMPLE_RATE)
+		tau = self._to_samples(tau)
 		data = embed(self.data_full, tau, m)
 		traj = Trajectory(
 			data,

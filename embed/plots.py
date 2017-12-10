@@ -78,7 +78,7 @@ def vary_tau_frame(traj, out_fname):
 	plt.close(fig)
 
 
-def compare_vary_tau_frame(traj1, traj2, out_fname, tau):
+def compare_frame(traj1, traj2, out_fname, tau):
 	fig = plt.figure(figsize=(10, 5), dpi=100)
 	gs = gridspec.GridSpec(8, 16)
 
@@ -104,10 +104,12 @@ def compare_vary_tau_frame(traj1, traj2, out_fname, tau):
 	compare_vary_tau_title(title_ax, traj1, traj2, tau)
 
 	traj_ax(dce1_ax, traj1.data)
-	signals.plots.ts_crop_ax(ts1_ax, traj1.source_ts)
+	signals.plots.ts_ax(ts1_ax, traj1.source_ts)
 
 	traj_ax(dce2_ax, traj2.data)
-	signals.plots.ts_crop_ax(ts2_ax, traj2.source_ts)
+	signals.plots.ts_ax(ts2_ax, traj2.source_ts)
 
 	plt.savefig(out_fname)
 	plt.close(fig)
+
+

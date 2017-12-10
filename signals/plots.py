@@ -35,7 +35,11 @@ def ts_ax(ax, ts):
 		ax.axvspan(x[0], ts.crop_lim[0], color='k', alpha=.3, zorder=1)
 		ax.axvspan(ts.crop_lim[1], x[-1], color='k', alpha=.3, zorder=1)
 
-	for i in range(ts.num_windows):
+	if ts.num_windows is None:
+		n = 0
+	else:
+		n = ts.num_windows
+	for i in range(n):
 		_highlight_window(ax, ts, i)
 
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))

@@ -1,11 +1,11 @@
+import numpy as np
 from boilerplate import change_dir, get_test
 
 change_dir()
 
-from utilities import timeit
 from embed.movies import *
 
-test, start_time = get_test(set_test=2)
+test, start_time = get_test(set_test=4)
 
 
 def out_fname():
@@ -46,3 +46,18 @@ if test == 3:
 		time_units='samples'
 	)
 	compare_vary_tau(ts1, ts2, out_fname(), m=2, tau=range(15), framerate=10)
+
+if test == 4:
+
+	compare_multi(
+		'datasets/time_series/C134C/{:02d}-C134C.txt',
+		'datasets/time_series/C135B/{:02d}-C135B.txt',
+		np.arange(1, 60, 10),
+		out_fname(),
+		crop=(1, 1.1),
+		time_units='seconds',
+		m=2,
+		tau=.001
+	)
+
+
