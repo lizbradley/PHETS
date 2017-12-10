@@ -1,8 +1,10 @@
 import numpy as np
 
+
 class EmbedError(Exception):
 	def __init__(self, msg):
 		Exception.__init__(self, msg)
+
 
 def embed(data, tau, m):
 	"""

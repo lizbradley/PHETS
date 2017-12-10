@@ -1,5 +1,4 @@
-from plots import slide_window_frame, vary_tau_frame, compare_frame, \
-	compare_multi_frame
+from plots import slide_window_frame, vary_tau_frame, compare_frame
 from signals import TimeSeries
 from utilities import remove_old_frames, print_still, frames_to_movie
 from utilities import block_print, enable_print
@@ -116,7 +115,7 @@ def compare_multi(
 		trajs2.append(trajs2)
 
 		print_still('frame {} of {}'.format(ii + 1, len(i_arr)))
-		compare_multi_frame(traj1, traj2, frame_fname % ii, tau)
+		compare_frame(traj1, traj2, frame_fname % ii, tau)
 	print ''
 
 	frames_to_movie(out_fname, frame_fname, framerate)

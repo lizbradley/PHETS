@@ -32,8 +32,8 @@ if test == 1:
 		vol_norm=(0, 0, 1)
 	)
 
-	ts1.plot('output/prfstats/ts1.png')
-	ts2.plot('output/prfstats/ts2.png')
+	ts1.plot_full('output/prfstats/ts1.png')
+	ts2.plot_full('output/prfstats/ts2.png')
 
 	traj1 = ts1.embed(tau=32, m=2)
 	traj2 = ts2.embed(tau=32, m=2)

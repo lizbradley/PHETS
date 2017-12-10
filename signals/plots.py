@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+
+from matplotlib import gridspec
 from matplotlib.ticker import FormatStrFormatter
 
 from config import SAMPLE_RATE
@@ -17,7 +19,7 @@ def _highlight_window(ax, ts, window):
 		ax.axvspan(window_lim[0], window_lim[1], fc='r', alpha=0.5, zorder=1)
 
 
-def ts_ax(ax, ts):
+def ts_full_ax(ax, ts):
 	y = ts.data_full
 
 	if ts.time_units == 'samples':
@@ -45,7 +47,7 @@ def ts_ax(ax, ts):
 	ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
 
-def ts_crop_ax(ax, ts, show_window='all'):
+def ts_ax(ax, ts, show_window='all'):
 	y = ts.data
 	x = np.linspace(ts.crop_lim[0], ts.crop_lim[1], len(ts.data))
 
@@ -72,17 +74,60 @@ def ts_window_ax(ax, ts, window):
 	ax.plot(x, y, color='k')
 
 
-def ts_fig(ts, out_fname):
+def ts_full_fig(ts, out_fname):
 	print 'plotting time-series...'
 	fig = plt.figure(figsize=(8, 2.5), tight_layout=True, dpi=300)
 	ax = fig.add_subplot(111)
-	ts_ax(ax, ts)
+	ts_full_ax(ax, ts)
+	ax.set_title(ts.name)
 	plt.savefig(out_fname)
 
 
-def ts_crop_fig(ts, out_fname):
+def ts_fig(ts, out_fname):
 	print 'plotting time-series (crop)...'
 	fig = plt.figure(figsize=(8, 2.5), tight_layout=True, dpi=300)
 	ax = fig.add_subplot(111)
-	ts_crop_ax(ax, ts)
+	ts_ax(ax, ts)
+	ax.set_title(ts.name)
 	plt.savefig(out_fname)
+
+
+def traj_full_ax(ax, traj):
+	data = traj.data_full
+	ax.scatter(*data.T, color='black', s=.1)
+	ax.set(aspect='equal', adjustable='datalim', anchor='C')
+
+
+def traj_ax(ax, traj):
+	data = traj.data
+	ax.scatter(*data.T, color='black', s=.1)
+	ax.set(aspect='equal', adjustable='datalim', anchor='C')
+
+
+def traj_full_fig(traj, out_fname):
+	fig = plt.figure(figsize=(6, 5), tight_layout=True, dpi=300)
+	if traj.dim == 2:
+		ax = fig.add_subplot(111)
+	else:
+		ax = fig.add_subplot(111, projection='3d')
+	traj_full_ax(ax, traj)
+	ax.set_title(traj.name)
+
+	plt.savefig(out_fname)
+	plt.close(fig)
+
+
+def traj_fig(traj, out_fname):
+
+	fig = plt.figure(figsize=(6, 5), tight_layout=True, dpi=300)
+	if traj.dim == 2:
+		ax = fig.add_subplot(111)
+	else:
+		ax = fig.add_subplot(111, projection='3d')
+	traj_ax(ax, traj)
+	ax.set_title(traj.name)
+
+	plt.savefig(out_fname)
+	plt.close(fig)
+
+

@@ -95,11 +95,11 @@ def dists_to_means_fig(refs, dists, traj1, traj2, out_filename):
 
 	phomology.plots.prf_ax(mean_prf_2, ax6, annot_hm=False)
 
-	signals.plots.ts_crop_ax(ax7, ts1)
+	signals.plots.ts_ax(ax7, ts1)
 	ax7.grid(axis='x', zorder=0)
 	# ax7.set_xlim(left=0)
 
-	signals.plots.ts_crop_ax(ax8, ts2)
+	signals.plots.ts_ax(ax8, ts2)
 	ax8.grid(axis='x', zorder=0)
 	# ax8.set_xlim(left=0)
 

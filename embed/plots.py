@@ -9,20 +9,7 @@ from embed.titlebox import slide_window_title, vary_tau_title, \
 
 def traj_ax(ax, data):
 	""" plot trajectory `data` to `ax`"""
-
-	amb_dim = data.shape[1]
-
-	if amb_dim == 2:
-		x = data[:, 0]
-		y = data[:, 1]
-		ax.scatter(x, y, color='black', s=.1)
-
-	elif amb_dim == 3:
-		x = data[:, 0]
-		y = data[:, 1]
-		z = data[:, 2]
-		ax.scatter(x, y, z, color='black', s=.1)
-
+	ax.scatter(*data.T, color='black', s=.1)
 	ax.set(aspect='equal', adjustable='datalim', anchor='C')
 
 	# choose second outermost auto ticks
@@ -48,13 +35,9 @@ def slide_window_frame(traj, window, out_fname):
 		dce_ax =      fig.add_subplot(gs[0:6,  4:10])
 	else: dce_ax =    fig.add_subplot(gs[0:6,  4:10], projection='3d')
 
-	# fig.subplots_adjust(
-	#   left=.07, bottom=.07, right=.90, top=.93, wspace=.5, hspace=.5
-	# )
-
 	slide_window_title(fname_ax, param_ax, traj, window)
 	traj_ax(dce_ax, traj.windows[window].data)
-	signals.plots.ts_crop_ax(ts_ax, traj.source_ts, window)
+	signals.plots.ts_ax(ts_ax, traj.source_ts, window)
 	plt.savefig(out_fname)
 	plt.close(fig)
 
@@ -73,7 +56,7 @@ def vary_tau_frame(traj, out_fname):
 
 	vary_tau_title(fname_ax, param_ax, traj)
 	traj_ax(dce_ax, traj.data)
-	signals.plots.ts_crop_ax(ts_ax, traj.source_ts)
+	signals.plots.ts_ax(ts_ax, traj.source_ts)
 	plt.savefig(out_fname)
 	plt.close(fig)
 
@@ -104,10 +87,10 @@ def compare_frame(traj1, traj2, out_fname, tau):
 	compare_vary_tau_title(title_ax, traj1, traj2, tau)
 
 	traj_ax(dce1_ax, traj1.data)
-	signals.plots.ts_ax(ts1_ax, traj1.source_ts)
+	signals.plots.ts_full_ax(ts1_ax, traj1.source_ts)
 
 	traj_ax(dce2_ax, traj2.data)
-	signals.plots.ts_ax(ts2_ax, traj2.source_ts)
+	signals.plots.ts_full_ax(ts2_ax, traj2.source_ts)
 
 	plt.savefig(out_fname)
 	plt.close(fig)

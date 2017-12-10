@@ -270,7 +270,7 @@ class TimeSeries(BaseTrajectory):
 
 		return traj
 
-	def plot(self, filename):
+	def plot_full(self, filename):
 		"""
 		Plot full time series with crop and windows demarcated, save to
 		``filename``.
@@ -283,9 +283,9 @@ class TimeSeries(BaseTrajectory):
 		-------
 
 		"""
-		plots.ts_fig(self, filename)
+		plots.ts_full_fig(self, filename)
 
-	def plot_crop(self, filename):
+	def plot(self, filename):
 		"""
 		Plot time series (crop only), save to ``filename``.
 		Parameters
@@ -296,7 +296,7 @@ class TimeSeries(BaseTrajectory):
 		-------
 
 		"""
-		plots.ts_crop_fig(self, filename)
+		plots.ts_fig(self, filename)
 
 
 
@@ -389,5 +389,27 @@ class Trajectory(BaseTrajectory):
 		ts.project_axis = axis
 
 		return ts
+
+
+	def plot_full(self, filename):
+		"""
+		Plot full trajectory save to ``filename``.
+
+		Parameters
+		----------
+		filename : str
+
+		"""
+		plots.traj_full_fig(self, filename)
+
+	def plot(self, filename):
+		"""
+		Plot time series (crop only), save to ``filename``.
+		Parameters
+		----------
+		filename : str
+
+		"""
+		plots.traj_fig(self, filename)
 
 

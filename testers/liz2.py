@@ -25,8 +25,8 @@ ts = TimeSeries(
 )
 
 # visual representation of window and crop geometry
-# ts.plot('output/liz/signal.png')          # full signal
-ts.plot_crop('output/liz/signal_crop.png')  # cropped section only
+# ts.plot_full('output/liz/signal.png')          # full signal
+ts.plot('output/liz/signal_crop.png')            # cropped section only
 
 # make embed movie from the TimeSeries, returning a Trajectory
 slide_window(ts, 'output/liz/embed_movie.mp4', m=2, tau=200)
