@@ -90,7 +90,7 @@ if test == 3:
 		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
 
 		normalize_volume=True,
-		see_samples=3,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
+		samples=3,				 	# interval to build filt movies and PDs. 0 means no PDs or movies.
 		quiet=False
 	)
 
@@ -126,7 +126,7 @@ if test == 4:
 		weight_func=lambda x, y: 1,
 
 		normalize_volume=True,
-		see_samples=1,
+		samples=1,
 		quiet=True
 	)
 
@@ -158,7 +158,7 @@ if test == 5:
 		weight_func=lambda x, y: 1,  	# no weighting (constant). see test 4 for other examples
 
 		normalize_volume=False,
-		see_samples=5,					# interval to build filt movies and PDs. 0 means no PDs or movies.
+		samples=5,					# interval to build filt movies and PDs. 0 means no PDs or movies.
 		quiet=False
 	)
 
@@ -191,7 +191,7 @@ if test == 6:
 		# no weighting (constant). see test 4 for other examples
 
 		normalize_volume=False,
-		see_samples=10,
+		samples=10,
 		# interval to build filt movies and PDs. 0 means no PDs or movies.
 		quiet=True
 	)

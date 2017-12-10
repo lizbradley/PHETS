@@ -87,7 +87,7 @@ def test__plot_variance_vw():
 		legend_labels_2=('k=.1', 'k=.2', 'k=.3'),
 		quiet=True,
 		load_filts='data/clar_filts_v.npy',
-		see_samples=False,
+		samples=False,
 		heatmaps=False
 	)
 	out = plot_variance__extract_output(out)
@@ -106,7 +106,7 @@ def test__plot_variance_vv():
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=True,
 		load_filts='data/viol_filts_vv.npy',
-		see_samples=False,
+		samples=False,
 		heatmaps=False
 	)
 	out = plot_variance__extract_output(out)

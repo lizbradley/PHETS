@@ -200,7 +200,7 @@ if test == 5:
 		out_fname(),
 		filt_params,
 		quiet=False,
-		see_samples={'interval': 1, 'filt_step': 5}
+		samples={'interval': 1, 'filt_step': 5}
 	)
 
 
@@ -259,7 +259,7 @@ if test == 7:
 		i_arr=np.arange(2, 30),
 		quiet=False,
 		load_filts=False,
-		see_samples={'interval': 5, 'filt_step': 5}
+		samples={'interval': 5, 'filt_step': 5}
 	)
 
 if test == 9:
@@ -381,7 +381,7 @@ if test == 12:
 		vary_param_2=('max_filtration_param', (-5, -8, -12)),
 		quiet=True,
 		load_filts=False,
-		see_samples={'interval': 4, 'filt_step': 5}
+		samples={'interval': 4, 'filt_step': 5}
 	)
 
 	np.savetxt(out_fname(t='txt'), dists)
@@ -411,7 +411,7 @@ if test == 13:
 		quiet=False,
 		annot_hm=False,
 		load_filts=False,
-		see_samples={'interval': 4, 'filt_step': 5}
+		samples={'interval': 4, 'filt_step': 5}
 	)
 
 if test == 14:
@@ -438,7 +438,7 @@ if test == 14:
 		quiet=False,
 		annot_hm=False,
 		load_filts=False,
-		see_samples={'interval': 4, 'filt_step': 5}
+		samples={'interval': 4, 'filt_step': 5}
 	)
 
 if test == 15:
