@@ -55,3 +55,10 @@ def status_string(vp1, vp2, i, j):
 	return str
 
 
+def parse_load_save_cmd(cmd):
+	try:
+		load_cmd_1, load_cmd_2 = cmd
+	except TypeError:
+		load_cmd_1, load_cmd_2 = cmd, cmd
+	return load_cmd_1, load_cmd_2
+

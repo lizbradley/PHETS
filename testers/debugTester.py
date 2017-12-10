@@ -81,7 +81,7 @@ if test == 3:
 
 		('ds_rate', (20, 30, 40)),
 
-		load_saved_filts=False,
+		load_filts=False,
 
 		time_units='samples',
 		crop=(5000, 2005000),    		# (start, stop) in time_units, or 'auto'
@@ -117,7 +117,7 @@ if test == 4:
 		('d_use_hamiltonion', (-1, -5, -10, -50, -100)),
 		('ds_rate', (15, 20, 25)),
 
-		load_saved_filts=False,
+		load_filts=False,
 
 		time_units='samples',
 		crop=(5000, 2005000),
@@ -149,7 +149,7 @@ if test == 5:
 		('d_use_hamiltonian', (0, .1, 1, 10, 100)),		# vary param 1
 		('ds_rate', (10, 100, 200)),
 
-		load_saved_filts=False,
+		load_filts=False,
 
 		time_units='samples',
 		crop=(5000, 2005000),    		# (start, stop) in time_units, or 'auto'
@@ -181,7 +181,7 @@ if test == 6:
 		('max_filtration_param', (-2, -5, -10)),
 		('landmark_selector', ("EST", "maxmin")),
 
-		load_saved_filts=True,
+		load_filts=True,
 
 		time_units='samples',
 		crop=(5000, 2005000),  # (start, stop) in time_units, or 'auto'

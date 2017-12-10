@@ -41,32 +41,32 @@ def data__dists_to_ref_filts():
 
 
 def data__viol_filts():
-	filt_set(viol_traj, filt_params, load_saved=False, quiet=False,
+	filt_set(viol_traj, filt_params, load=False, quiet=False,
 	         save='data/viol_filts_.npy')
 
 
 def data__clar_filts():
-	filt_set(clar_traj, filt_params, load_saved=False, quiet=False,
+	filt_set(clar_traj, filt_params, load=False, quiet=False,
 	         save='data/clar_filts_.npy')
 
 
 def data__viol_filts_v():
 	filt_set(viol_traj, filt_params,
 	         vp1=('ds_rate', np.arange(100, 150, 10)),
-	         load_saved=False, quiet=False, save='data/viol_filts_v.npy')
+	         load=False, quiet=False, save='data/viol_filts_v.npy')
 
 
 def data__clar_filts_v():
 	filt_set(clar_traj, filt_params,
 	         vp1=('ds_rate', np.arange(100, 150, 10)),
-	         load_saved=False, quiet=False, save='data/clar_filts_v.npy')
+	         load=False, quiet=False, save='data/clar_filts_v.npy')
 
 
 def data__viol_filts_vv():
 	filt_set(viol_traj, filt_params,
 	         vp1=('ds_rate', np.arange(100, 150, 10)),
 	         vp2=('max_filtration_param', (-5, -6, -7)),
-	         load_saved=False, quiet=False, save='data/viol_filts_vv.npy')
+	         load=False, quiet=False, save='data/viol_filts_vv.npy')
 
 
 if __name__ == '__main__':

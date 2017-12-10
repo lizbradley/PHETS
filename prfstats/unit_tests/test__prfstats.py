@@ -38,7 +38,7 @@ def test__plot_dists_to_ref():
 		i_ref=15,
 		i_arr=np.arange(2, 30, 7),
 		quiet=True,
-		load_saved_filts='data/dists_to_ref_filts.npy',
+		load_filts='data/dists_to_ref_filts.npy',
 	)
 	ref = np.load('ref/dists_to_ref.npy')
 	np.testing.assert_array_equal(out, ref)
@@ -50,7 +50,7 @@ def test__plot_dists_to_means():
 		clar_traj, viol_traj,
 		'output/dists_to_means.png',
 		filt_params,
-		load_saved_filts=('data/clar_filts_.npy', 'data/viol_filts_.npy'),
+		load_filts=('data/clar_filts_.npy', 'data/viol_filts_.npy'),
 	)
 	ref = np.load('ref/plot_dists_to_means.npy')
 	np.testing.assert_array_equal(out, ref)
@@ -65,7 +65,7 @@ def test__plot_ROCs_v():
 		vary_param=('ds_rate', np.arange(100, 150, 10)),
 		k=(0, 5.01, .1),
 		quiet=True,
-		load_saved_filts=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
+		load_filts=('data/clar_filts_v.npy', 'data/viol_filts_v.npy'),
 	)
 	ref = np.load('ref/plot_ROCs_v.npy')
 	np.testing.assert_array_equal(out, ref)
@@ -86,7 +86,7 @@ def test__plot_variance_vw():
 		vary_param_2=('weight_func', (f1, f2, f3)),
 		legend_labels_2=('k=.1', 'k=.2', 'k=.3'),
 		quiet=True,
-		load_saved_filts='data/clar_filts_v.npy',
+		load_filts='data/clar_filts_v.npy',
 		see_samples=False,
 		heatmaps=False
 	)
@@ -105,7 +105,7 @@ def test__plot_variance_vv():
 		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=True,
-		load_saved_filts='data/viol_filts_vv.npy',
+		load_filts='data/viol_filts_vv.npy',
 		see_samples=False,
 		heatmaps=False
 	)
@@ -126,7 +126,7 @@ def test__plot_variance_wv():
 		vary_param_1=('weight_func', (f1, f2, f3)),
 		vary_param_2=('ds_rate', np.arange(100, 150, 10)),
 		legend_labels_1=('weight_function', ('k=1', 'k=2', 'k=3')),
-		load_saved_filts='data/clar_filts_v.npy',
+		load_filts='data/clar_filts_v.npy',
 		heatmaps=False
 	)
 	out = plot_variance__extract_output(out)
@@ -142,7 +142,7 @@ def test__plot_variance_v():
 		filt_params,
 		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
 		quiet=True,
-		load_saved_filts='data/clar_filts_v.npy',
+		load_filts='data/clar_filts_v.npy',
 		heatmaps=False
 	)
 	out = plot_variance__extract_output(out)
@@ -162,7 +162,7 @@ def test__plot_variance_w():
 		vary_param_1=('weight_func', (f1, f2, f3)),
 		legend_labels_1=('weight function', ('k=1', 'k=2', 'k=3')),
 		quiet=True,
-		load_saved_filts='data/clar_filts_.npy',
+		load_filts='data/clar_filts_.npy',
 		heatmaps=False
 	)
 	out = plot_variance__extract_output(out)
@@ -177,7 +177,7 @@ def test__plot_pairwise_mean_dists():
 		vary_param_1=('ds_rate', np.arange(100, 150, 10)),
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=True,
-		load_saved_filts='data/viol_filts_vv.npy',
+		load_filts='data/viol_filts_vv.npy',
 	)
 	ref = np.load('ref/pairwise_mean_dists.npy')
 	np.testing.assert_array_equal(dists, ref)

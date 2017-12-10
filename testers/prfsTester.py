@@ -6,7 +6,7 @@ from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=4)
+test, start_time = get_test(set_test=7)
 
 
 def out_fname(t='png'):
@@ -50,7 +50,7 @@ if test == 1:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved_filts=False,
+		load_filts=False,
 		quiet=False,
 		see_samples=2
 	)
@@ -88,7 +88,7 @@ if test == 2:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved_filts=False,
+		load_filts=False,
 		quiet=True,
 		vary_param=('max_filtration_param', (-3, -6)),
 		see_samples=5
@@ -126,7 +126,7 @@ if test == 3:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved_filts=False,
+		load_filts=False,
 		quiet=True,
 		vary_param=('max_filtration_param', (-3, -6)),
 		see_samples=5
@@ -239,7 +239,7 @@ if test == 6:
 		out_fname(),
 		filt_params,
 		quiet=False,
-		load_saved_filts=True
+		load_filts=True
 	)
 
 
@@ -258,7 +258,7 @@ if test == 7:
 		i_ref=15,
 		i_arr=np.arange(2, 30),
 		quiet=False,
-		load_saved_filts=False,
+		load_filts=False,
 		see_samples={'interval': 5, 'filt_step': 5}
 	)
 
@@ -295,7 +295,7 @@ if test == 9:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_saved_filts=False,
+		load_filts=False,
 		quiet=False,
 		vary_param=('d_use_hamiltonion', (-1, 1)),
 		# vary_param=('d_use_hamiltonion', (1, -1)),
@@ -328,7 +328,7 @@ if test == 10:
 		vary_param_1=('ds_rate', np.arange(80, 150, 10)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=False
+		load_filts=False
 	)
 
 
@@ -356,7 +356,7 @@ if test == 11:
 		vary_param_2=('max_filtration_param', (-5, -6, -7)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=False
+		load_filts=False
 	)
 
 if test == 12:
@@ -380,7 +380,7 @@ if test == 12:
 		vary_param_1=('worm_length', (200, 500, 700)),
 		vary_param_2=('max_filtration_param', (-5, -8, -12)),
 		quiet=True,
-		load_saved_filts=False,
+		load_filts=False,
 		see_samples={'interval': 4, 'filt_step': 5}
 	)
 
@@ -410,7 +410,7 @@ if test == 13:
 		vary_param_1=('worm_length', (1000, 1300, 1700, 2000)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=False,
+		load_filts=False,
 		see_samples={'interval': 4, 'filt_step': 5}
 	)
 
@@ -437,7 +437,7 @@ if test == 14:
 		vary_param_1=('worm_length', (1000, 1300, 1700, 2000)),
 		quiet=False,
 		annot_hm=False,
-		load_saved_filts=False,
+		load_filts=False,
 		see_samples={'interval': 4, 'filt_step': 5}
 	)
 
@@ -463,7 +463,7 @@ if test == 15:
 		filt_params,
 		vary_param_1=('worm_length', (3500, 4000, 4500, 5000)),
 		quiet=False,
-		load_saved_filts=False,
+		load_filts=False,
 	)
 
 

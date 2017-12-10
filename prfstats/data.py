@@ -137,14 +137,14 @@ class NormalPRF:
 @timeit
 def filt_set(
 		traj, params, vp1=None, vp2=None,
-        load_saved=False, save=True,
+        load=False, save=True,
 		quiet=True,
         fid=None
 ) :
 	validate_vps(vp1, vp2)
 
-	if load_saved:
-		return load_filts(load_saved, fid)
+	if load:
+		return load_filts(load, fid)
 
 	iter_1 = len(vp1[1]) if is_filt_param(vp1) else 1
 	iter_2 = len(vp2[1]) if is_filt_param(vp2) else 1

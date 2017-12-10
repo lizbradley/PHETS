@@ -127,7 +127,9 @@ html_sidebars = {
 
 
 latex_elements = {
-    'classoptions': ',openany,oneside'
+    'classoptions': ',openany,oneside',
+    'preamble': '''\usepackage[document]{ragged2e}   
+    \usepackage[none]{hyphenat}''',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
