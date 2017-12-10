@@ -184,9 +184,10 @@ def test__plot_pairwise_mean_dists():
 
 if __name__ == '__main__':
 	# test__fetch_filts_v()
-	test__plot_dists_to_means()
+	# test__plot_dists_to_means()
 	# test__plot_ROCs_v()
 	# test__plot_dists_to_means()
+	test__plot_variance_v()
 	# test__plot_variance_vv()
 	# test__plot_variance_vw()
 	pass

@@ -254,8 +254,11 @@ def weight_functions_figs(
 		funcs = vary_param_2[1]
 		fnames = legend_labels_2
 	else:
-		funcs = [weight_func]
-		fnames = ['f']
+		if weight_func is None:
+			funcs, fnames = [], []
+		else:
+			funcs = [weight_func]
+			fnames = ['f']
 
 	for fname, func in zip(fnames, funcs):
 		fig = plt.figure()
