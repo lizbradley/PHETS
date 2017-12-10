@@ -504,12 +504,11 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	## Build and sort distance matrix.
 	landmarks_file = open("temp/landmark_outputs.txt","rb")
 
-	line = landmarks_file.readlines()
+	lines = landmarks_file.readlines()
 	sys.stdout.write("Reading in distance calculations...")
 	sys.stdout.flush()
 	landmark_index = 0
-	witness_to_landmark = {}
-	for line in line:
+	for line in lines:
 		f = line.strip('\n')
 		if "#" not in f:
 			landmark = int(f.split(":")[0])
@@ -517,8 +516,9 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			distances = [float(i) for i in f.split(":")[1].split(",")]
 
 			for witness_index in range(0, len(distances)):
-				d[witness_index].append(LandmarkDistance(landmark_index,
-														 distances[witness_index]))
+				d[witness_index].append(
+					LandmarkDistance(landmark_index, distances[witness_index])
+				)
 
 			landmarks.append(witnesses[landmark])
 			landmark_indices.append(landmark)
@@ -534,8 +534,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	sys.stdout.flush()
 
 
-	inputs=[]
-	for w in range(0,len(witnesses)):
+	inputs = []
+	for w in range(0, len(witnesses)):
 		inputs.append(w)
 		d[w].sort()
 

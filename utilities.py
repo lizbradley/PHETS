@@ -5,6 +5,8 @@ import subprocess
 import os
 
 # from memory_profiler import profile
+import time
+
 
 def root_path():
 	return os.path.dirname(__file__)
@@ -99,10 +101,10 @@ def clear_temp_files(dir):
 def lambda_to_str(f):
 	return inspect.getsourcelines(f)[0][0].split(':')[1]
 
-def blockPrint():
+def block_print():
 	sys.stdout = open(os.devnull, 'w')
 
-def enablePrint():
+def enable_print():
 	sys.stdout = sys.__stdout__
 
 
@@ -246,3 +248,11 @@ def batch_flac_to_wav(dir):
 			os.remove(f)
 
 
+def timeit(f):
+	def timed(*args, **kw):
+		ts = time.time()
+		result = f(*args, **kw)
+		te = time.time()
+		print '{} time elapsed: {:.6f}s'.format(f.__name__, (te - ts))
+		return result
+	return timed

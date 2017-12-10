@@ -37,8 +37,7 @@ def dists_ax(ax, d, mean, traj):
 	num_windows = traj.num_windows
 	t = np.linspace(crop[0], crop[1], num_windows, endpoint=False)
 	ticks = np.linspace(crop[0], crop[1], num_windows + 1, endpoint=True)
-	offset = (t[1] - t[0]) / 2
-	ax.plot(t + offset, d, marker='o', linestyle='None', ms=10, zorder=3)
+	ax.plot(t, d, marker='o', linestyle='None', ms=10, zorder=3)
 	ax.axhline(y=mean, linestyle='--', color='forestgreen', lw=2)
 	ax.grid(axis='x')
 	ax.set_xticks(ticks)
@@ -83,7 +82,7 @@ def dists_to_means_fig(refs, dists, traj1, traj2, out_filename):
 	plt.setp(ax2.get_xticklabels(), visible=False)
 	plt.setp(ax2.get_xticklines(), visible=False)
 
-	phomology.plots.PRF_ax(mean_prf_1, ax3, annot_hm=False)
+	phomology.plots.prf_ax(mean_prf_1, ax3, annot_hm=False)
 
 	dists_ax(ax4, d_1_vs_2, mean_12, traj1)
 	plt.setp(ax4.get_xticklabels(), visible=False)
@@ -94,13 +93,13 @@ def dists_to_means_fig(refs, dists, traj1, traj2, out_filename):
 	plt.setp(ax5.get_xticklabels(), visible=False)
 	plt.setp(ax5.get_xticklines(), visible=False)
 
-	phomology.plots.PRF_ax(mean_prf_2, ax6, annot_hm=False)
+	phomology.plots.prf_ax(mean_prf_2, ax6, annot_hm=False)
 
-	signals.plots.ts_crop_ax(ax7, ts1)
+	signals.plots.ts_ax(ax7, ts1)
 	ax7.grid(axis='x', zorder=0)
 	# ax7.set_xlim(left=0)
 
-	signals.plots.ts_crop_ax(ax8, ts2)
+	signals.plots.ts_ax(ax8, ts2)
 	ax8.grid(axis='x', zorder=0)
 	# ax8.set_xlim(left=0)
 

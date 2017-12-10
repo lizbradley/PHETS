@@ -74,8 +74,8 @@ ts2 = TimeSeries(
     vol_norm=(0, 0, 1)
 )
 
-ts1.plot('output/demo/ts1.png')
-ts2.plot('output/demo/ts2.png')
+ts1.plot_full('output/demo/ts1.png')
+ts2.plot_full('output/demo/ts2.png')
 
 traj1 = ts1.embed(tau=32, m=2)
 traj2 = ts2.embed(tau=32, m=2)
