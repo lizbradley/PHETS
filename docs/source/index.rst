@@ -3,12 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+Welcome to the PHETS documentation!
+===================================
+
 Introduction
 ------------
 
-This package offers high-level tools for exploration and visualization of delay coordinate
-embedding and persistent homology. It is used to investigate the utilization of these tools together as a signal
-processing technique.
+This package offers high-level tools for exploration and visualization
+of delay coordinate embedding and persistent homology. It is used to
+investigate the utilization of these together as a signal processing
+technique.
 
 PHETS encompasses four submodules:
 
@@ -21,13 +25,14 @@ PHETS encompasses four submodules:
 ``signals`` holds the ``TimeSeries`` and ``Trajectory`` classes, which can be
 initialized from arrays or text files. Calling the ``embed`` method of a
 ``TimeSeries`` returns a ``Trajectory``; calling the ``project`` method of
-``Trajectory`` returns a ``TimeSeries``. ``TimeSeries`` and ``Trajectory`` both inherit from
-``BaseTrajectory``, where all cropping, windowing, and normalization is handled.
+``Trajectory`` returns a ``TimeSeries``. ``TimeSeries`` and ``Trajectory`` both
+inherit from ``BaseTrajectory``, where all cropping, windowing, and
+normalization is handled.
 
-``phomology`` holds the ``Filtration`` class, which is initialized from a ``Trajectory`` and a
-dict of filtration parameters. Filtration movies, persistence diagrams, and
-persistence rank functions are created by calling the respective methods of
-the Filtration class.
+``phomology`` holds the ``Filtration`` class, which is initialized from a
+``Trajectory`` and a dict of filtration parameters. Filtration movies,
+persistence diagrams, and persistence rank functions are created by calling the
+respective methods of the Filtration class.
 
 ``embed`` holds the ``embed`` function, as well as functions for generating
 movies. The movies functions take one or more ``TimeSeries`` and return one or
@@ -36,7 +41,6 @@ more ``Trajectory`` objects (created in the process of building the movies).
 ``prfstats`` holds functions for statistical analysis of PRFs. Generally, they
 take one or two ``Trajectory`` objects, create PRFs from the windows of the the
 ``Trajectory`` objects, do some analysis, and then save plots from the results.
-
 
 
 
@@ -87,12 +91,18 @@ unit tests -- rather, each one calls or initializes a user-facing feature and
 compares the result to a saved reference. The input data is found in
 ``unit_tests/data`` and the references in ``<unit_tests/ref>``.
 
-In the case of the ``prfstats``module, in order to keep test execution time
-lwo, the input data is pre-computed sets of Filtration objects to keep test
-execution time low. A small, correct change to PHETS can break Python's
-ability to load these objects from file, breaking the tests. I this case,
-run the routines in ``prfstats/unit_tests/prepare__data.py``, and the tests
-should work correctly. Routines in ``unit_tests/prepare__refs.py`` should be
+``prfstats/unit_tests/prepare__data.py`` should be run regularly.
+In the case of the ``prfstats`` module, in order to keep test execution time
+lwo, the input data is pre-computed sets of Filtration instances. A small,
+correct change to PHETS can break Python's ability to load these objects from
+file, breaking the tests. In this case, run the routines in
+``prfstats/unit_tests/prepare__data.py``, and the tests should work correctly.
+Further, while an incorrect change should make at least one or two tests fail,
+many ``prfstats`` tests will not fail until the test data is re-generated with
+``prepare__data.py``. If a couple tests fail, run this file to see what else is
+broken down the pipeline, and always do so when a major change is completed.
+
+failRoutines in ``unit_tests/prepare__refs.py`` should be
 run `only when you wish to change the behavior of existing functionality`. They
 should also be run and individually (that is, don't change the refs for
 features that you aren't intentionally modifying).
@@ -114,10 +124,11 @@ To build this documentation, TeX must be installed, along with the following:
 
 I used ``sudo apt-get install <package>`` for each.
 
-Now, simply
+To update the documentation:
 .. code-block::
    cd docs
    make latexpdf
+   mv build/latex/PHETS.pdf ../documentation.pdf
 
 The updated documentation is saved to ``docs/latex/PHETS.pdf``.
 

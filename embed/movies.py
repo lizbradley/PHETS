@@ -5,7 +5,8 @@ from utilities import block_print, enable_print
 
 
 def slide_window(ts, out_fname, m, tau, framerate=1):
-	""" movie depicting embedding of each window of `ts`.
+	"""
+	Movie depicting embedding of each window of `ts`.
 
 	Parameters
 	----------
@@ -13,13 +14,14 @@ def slide_window(ts, out_fname, m, tau, framerate=1):
 		pre-windowed (e.g., initalized with `num_windows` or call `slice`
 		method before passing to this function).
 	out_fname : str
-		filename
+		path/filename for movie, should probably end with ``.mp4``
 	m : int
 		embedding dimension
 	tau : int or float
 		embedding delay, observes `ts.time_units`
-
-	framerate : int
+	framerate : int, optional
+		movie frames per second\n
+		default: 1
 
 	Returns
 	-------
@@ -42,7 +44,28 @@ def slide_window(ts, out_fname, m, tau, framerate=1):
 
 
 def vary_tau(ts, out_fname, m, tau, framerate=1):
-	""" movie depicting embedding of `ts` over a range of tau"""
+	"""
+	Movie depicting embedding of `ts` over a range of tau.
+
+	Parameters
+	----------
+	ts : TimeSeries
+	out_fname : str
+		path/filename for movie, should probably end with ``.mp4``
+	m : int
+		embedding dimension
+	tau : int or float
+		observes ``ts.time_units``
+	framerate : int, optional
+		movie frames per second\n
+		default: 1
+
+	Returns
+	-------
+	1-d array
+		array of ``Trajectory`` instances
+
+	"""
 
 	# ts.embed() does the full signal so we'll take crop only, for efficiency
 	ts_crop = TimeSeries(ts.data, name=ts.name)
@@ -64,6 +87,29 @@ def vary_tau(ts, out_fname, m, tau, framerate=1):
 
 
 def compare_vary_tau(ts1, ts2, out_fname, m, tau, framerate=1):
+	"""
+	Like vary_tau, but two signals side-by-side.
+
+	Parameters
+	----------
+	ts1 : TimeSeries
+	ts2 : TimeSeries
+	out_fname : str
+		path/filename for movie, should probably end with ``.mp4``
+	m : int
+		embedding dimension
+	tau : int or float
+		embedding delay, observes `ts.time_units`
+	framerate : int, optional
+		movie frames per second\n
+		default: 1
+
+	Returns
+	-------
+	2d array of ``Trajectory`` instances
+		``[trajs1, trajs2]``
+
+	"""
 	trajs1 = [ts1.embed(t, m) for t in tau]
 	trajs2 = [ts2.embed(t, m) for t in tau]
 
@@ -92,6 +138,39 @@ def compare_multi(
 		tau,
 		framerate=1
 ):
+	"""
+	Embed two sets of files, varying  file index, and view side-by-side
+
+	Parameters
+	----------
+	path1 : str
+		format-ready string, eg
+		``'datasets/time_series/C134C/{:02d}-C134C.txt'``
+	path2 : str
+		format-ready string, eg
+		``'datasets/time_series/C135B/{:02d}-C135B.txt'``
+	i_arr : array
+		file indices
+	out_fname : str
+		path/filename for movie, should probably end with ``.mp4``
+	crop : 2-tuple of int or float
+		(start, stop). observes `time_units`. (None, None) works.
+	time_units : str
+		'samples' or 'seconds', used for crop and tau
+	m : int
+		embedding dimension
+	tau : int or float
+		embedding delay, observes `time_units
+	framerate : int, optional
+		movies frames per second\n
+		default: 1
+
+	Returns
+	-------
+	2d array of ``Trajectory`` instances
+		``[trajs1, trajs2]``
+
+	"""
 	remove_old_frames('embed/frames/')
 	frame_fname = 'embed/frames/frame%03d.png'
 
