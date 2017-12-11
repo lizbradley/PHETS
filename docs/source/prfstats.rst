@@ -10,7 +10,7 @@ prfstats
 
 .. autofunction:: plot_clusters
 
-.. autofunction:: plot_l2rocs
+.. autofunction:: plot_rocs
 
 .. autofunction:: plot_variance
 

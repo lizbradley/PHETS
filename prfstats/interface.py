@@ -138,8 +138,8 @@ def plot_dists_to_means(
 	----------
 	traj1: Trajectory
 		Must be pre-windowed. This is accomplished by initializing with the
-		 ``num_windows`` parameter, calling the ``slice`` method, or using
-		 ``TimeSeries.embed()``.
+		``num_windows`` parameter, calling the ``slice`` method, or using
+		``TimeSeries.embed()``.
 	traj2: Trajectory
 		see `traj1`
 	out_filename: str
@@ -285,8 +285,8 @@ def plot_rocs(
 	----------
 	traj1: Trajectory
 		Must be pre-windowed. This is accomplished by initializing with the
-		 ``num_windows`` parameter, calling the ``slice`` method, or using
-		 ``TimeSeries.embed()``.
+		``num_windows`` parameter, calling the ``slice`` method, or using
+		``TimeSeries.embed()``.
 	traj2: Trajectory
 		see `traj1`
 	out_filename: str
@@ -409,8 +409,8 @@ def plot_variance(
 	----------
 	traj: Trajectory
 		Must be pre-windowed. This is accomplished by initializing with the
-		 ``num_windows`` parameter, calling the ``slice`` method, or using
-		 ``TimeSeries.embed()``.
+		``num_windows`` parameter, calling the ``slice`` method, or using
+		``TimeSeries.embed()``.
 	out_filename: str
 		Path/filename for plot output. Should probably end with ``.png``.
 	filt_params: dict
@@ -542,8 +542,8 @@ def pairwise_mean_dists(
 	----------
 	traj: Trajectory
 		Must be pre-windowed. This is accomplished by initializing with the
-		 ``num_windows`` parameter, calling the ``slice`` method, or using
-		 ``TimeSeries.embed()``.
+		``num_windows`` parameter, calling the ``slice`` method, or using
+		``TimeSeries.embed()``.
 	filt_params: dict
 		See :py:func:`phomology.build_filtration.build_filtration`
 	vary_param_1: tuple

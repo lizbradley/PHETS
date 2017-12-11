@@ -44,11 +44,6 @@ take one or two ``Trajectory`` objects, create PRFs from the windows of the the
 Troubleshooting
 ---------------
 
-matplotlib backend error
-~~~~~~~~~~~~~~~~~~~~~~~~
-Comment out the first line of ``PHETS/matplotlibrc``
-
-
 compiling ``find_landmarks.c`` on OSX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -103,7 +98,7 @@ should also be run and individually (that is, don't change the refs for
 features that you aren't intentionally modifying).
 
 
-This Documentation
+Documentation
 ------------------
 This documentation is built with Sphinx. The autodoc extension is used to
 generate the `library reference <Reference>`_ from docstrings in the Python
@@ -123,6 +118,7 @@ Now, simply
 .. code-block::
    cd docs
    make latexpdf
+
 The updated documentation is saved to ``docs/latex/PHETS.pdf``.
 
 
