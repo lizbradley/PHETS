@@ -1,6 +1,8 @@
 prfstats
 ========
 
+.. automodule:: prfstats
+
 .. autofunction:: plot_dists_to_ref
 
 .. autofunction:: plot_dists_to_means

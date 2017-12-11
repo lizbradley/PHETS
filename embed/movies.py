@@ -154,13 +154,13 @@ def compare_multi(
 	out_fname : str
 		path/filename for movie, should probably end with ``.mp4``
 	crop : 2-tuple of int or float
-		(start, stop). observes `time_units`. (None, None) works.
+		(start, stop). observes `time_units`. ``(None, None)`` works.
 	time_units : str
 		'samples' or 'seconds', used for crop and tau
 	m : int
 		embedding dimension
 	tau : int or float
-		embedding delay, observes `time_units
+		embedding delay, observes `time_units`
 	framerate : int, optional
 		movies frames per second\n
 		default: 1

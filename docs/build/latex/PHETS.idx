@@ -1,0 +1,38 @@
+\indexentry{signals (module)|hyperpage}{6}
+\indexentry{BaseTrajectory (class in signals)|hyperpage}{6}
+\indexentry{crop() (signals.BaseTrajectory method)|hyperpage}{6}
+\indexentry{slice() (signals.BaseTrajectory method)|hyperpage}{6}
+\indexentry{TimeSeries (class in signals)|hyperpage}{6}
+\indexentry{embed() (signals.TimeSeries method)|hyperpage}{7}
+\indexentry{plot() (signals.TimeSeries method)|hyperpage}{7}
+\indexentry{plot\_full() (signals.TimeSeries method)|hyperpage}{7}
+\indexentry{Trajectory (class in signals)|hyperpage}{7}
+\indexentry{filtrations() (signals.Trajectory method)|hyperpage}{7}
+\indexentry{plot() (signals.Trajectory method)|hyperpage}{7}
+\indexentry{plot\_full() (signals.Trajectory method)|hyperpage}{7}
+\indexentry{project() (signals.Trajectory method)|hyperpage}{7}
+\indexentry{phomology (module)|hyperpage}{7}
+\indexentry{Filtration (class in phomology)|hyperpage}{7}
+\indexentry{intervals() (phomology.Filtration method)|hyperpage}{8}
+\indexentry{movie() (phomology.Filtration method)|hyperpage}{8}
+\indexentry{pd() (phomology.Filtration method)|hyperpage}{8}
+\indexentry{plot\_complex() (phomology.Filtration method)|hyperpage}{8}
+\indexentry{plot\_pd() (phomology.Filtration method)|hyperpage}{8}
+\indexentry{plot\_prf() (phomology.Filtration method)|hyperpage}{9}
+\indexentry{prf() (phomology.Filtration method)|hyperpage}{9}
+\indexentry{load\_filtration() (in module phomology)|hyperpage}{9}
+\indexentry{build\_filtration() (in module phomology.build\_filtration)|hyperpage}{9}
+\indexentry{embed (module)|hyperpage}{11}
+\indexentry{embed() (in module embed)|hyperpage}{11}
+\indexentry{embed.movies (module)|hyperpage}{12}
+\indexentry{compare\_multi() (in module embed.movies)|hyperpage}{12}
+\indexentry{compare\_vary\_tau() (in module embed.movies)|hyperpage}{12}
+\indexentry{slide\_window() (in module embed.movies)|hyperpage}{12}
+\indexentry{vary\_tau() (in module embed.movies)|hyperpage}{13}
+\indexentry{prfstats (module)|hyperpage}{13}
+\indexentry{plot\_dists\_to\_ref() (in module prfstats)|hyperpage}{13}
+\indexentry{plot\_dists\_to\_means() (in module prfstats)|hyperpage}{14}
+\indexentry{plot\_clusters() (in module prfstats)|hyperpage}{15}
+\indexentry{plot\_rocs() (in module prfstats)|hyperpage}{15}
+\indexentry{plot\_variance() (in module prfstats)|hyperpage}{16}
+\indexentry{pairwise\_mean\_dists() (in module prfstats)|hyperpage}{17}

@@ -1,6 +1,8 @@
 phomology
 =========
 
+.. automodule:: phomology
+
 .. autoclass:: phomology.Filtration
     :members:
 

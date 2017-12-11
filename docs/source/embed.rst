@@ -1,6 +1,9 @@
 embed
 =====
 
+.. automodule:: embed
+
+
 .. autofunction:: embed.embed
 
 

@@ -98,14 +98,32 @@ correct change to PHETS can break Python's ability to load these objects from
 file, breaking the tests. In this case, run the routines in
 ``prfstats/unit_tests/prepare__data.py``, and the tests should work correctly.
 Further, while an incorrect change should make at least one or two tests fail,
-many ``prfstats`` tests will not fail until the test data is re-generated with
+many ``prfstats`` tesss will not fail until the test data is re-generated with
 ``prepare__data.py``. If a couple tests fail, run this file to see what else is
 broken down the pipeline, and always do so when a major change is completed.
 
-failRoutines in ``unit_tests/prepare__refs.py`` should be
-run `only when you wish to change the behavior of existing functionality`. They
-should also be run and individually (that is, don't change the refs for
-features that you aren't intentionally modifying).
+Routines in ``unit_tests/prepare__refs.py`` should be run `only when you wish
+to change the behavior of existing functionality`. They should also be run and
+individually (that is, don't change the refs for features that you aren't
+intentionally modifying).
+
+ToDo
+----
+Here are a couple ideas for how PHETS can be improved:
+
+- speed up generation of movies by streaming images to ffmpeg over stdin rather than saving to file, `like so <https://stackoverflow.com/a/13298538>`_
+
+- rewrite embed.embed with numpy for performance -- can it be done without a for loop?
+
+- improve ``build_filtration.py`` readability
+
+- implement switch for memory profiling of filtration construction
+
+- integrate new ``utilities.timeit`` decorator
+
+- find a faster way than text files to pass data from ``find_landmarks`` to Python
+
+- streamline passage of params to ``find_landmarks``
 
 
 Documentation
@@ -125,12 +143,13 @@ To build this documentation, TeX must be installed, along with the following:
 I used ``sudo apt-get install <package>`` for each.
 
 To update the documentation:
-.. code-block::
+
+.. code-block:: bash
+
    cd docs
    make latexpdf
    mv build/latex/PHETS.pdf ../documentation.pdf
 
-The updated documentation is saved to ``docs/latex/PHETS.pdf``.
 
 
 Reference
