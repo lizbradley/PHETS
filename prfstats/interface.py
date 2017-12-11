@@ -11,7 +11,7 @@ from data import mean_dists_compare
 from prfstats.data import L2Classifier, roc_data
 from plots import samples as plot_samples
 from signals import Trajectory
-from utilities import clear_old_files, print_title
+from utilities import print_title, clear_dir
 from phomology import Filtration
 
 
@@ -112,9 +112,8 @@ def plot_dists_to_ref(
 	base_filename = path.split('/')[-1]
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
-	if samples:
-		dir_ = 'output/prfstats/samples'
-		clear_old_files(dir_, samples)
+	dir_ = 'output/prfstats/samples'
+	if clear_dir(dir_):
 		plot_samples(filts, samples, dir_)
 
 	return dists
@@ -205,9 +204,8 @@ def plot_dists_to_means(
 
 	dists_to_means_fig(refs, dists, traj1, traj2, out_filename)
 
-	if samples:
-		dir_ = 'output/prfstats/samples'
-		clear_old_files(dir_, samples)
+	dir_ = 'output/prfstats/samples'
+	if clear_dir(dir_):
 		plot_samples(filts1, samples, dir_)
 		plot_samples(filts2, samples, dir_)
 
@@ -258,9 +256,8 @@ def plot_clusters(
 
 	clusters_fig(dists, filt_params, traj1.name, traj2.name, out_filename)
 
-	if samples:
-		dir_ = 'output/prfstats/samples'
-		clear_old_files(dir_, samples)
+	dir_ = 'output/prfstats/samples'
+	if clear_dir(dir_):
 		plot_samples(filts1, samples, dir_)
 		plot_samples(filts2, samples, dir_)
 
@@ -324,8 +321,8 @@ def plot_rocs(
 	)
 
 
-	prfs1 = prf_set(filts1, weight_func)
-	prfs2 = prf_set(filts2, weight_func)
+	prfs1 = prf_set(filts1, weight_func, vary_param)
+	prfs2 = prf_set(filts2, weight_func, vary_param)
 
 	data = []
 
@@ -347,9 +344,8 @@ def plot_rocs(
 
 	dual_roc_fig(data, k, traj1, traj2, out_filename, vary_param)
 
-	if samples:
-		dir_ = 'output/prfstats/samples'
-		clear_old_files(dir_, samples)
+	dir_ = 'output/prfstats/samples'
+	if clear_dir(dir_):
 		plot_samples(filts1, samples, dir_, vary_param)
 		plot_samples(filts2, samples, dir_, vary_param)
 
@@ -448,16 +444,9 @@ def plot_variance(
 			annot_hm
 		)
 
-	if samples:
-		dir_ = 'output/prfstats/samples'
-		clear_old_files(dir_, samples)
-		plot_samples(
-			filts,
-			samples,
-			'output/prfstats/samples',
-			vary_param_1,
-			vary_param_2
-		)
+	dir_ = 'output/prfstats/samples'
+	if clear_dir(dir_):
+		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
 	return scaler_data
 
@@ -517,15 +506,8 @@ def pairwise_mean_dists(
 			d = distance(means[i, j], means[i + 1, j])
 			dists[i, j] = d
 
-	if samples:
-		dir_ = 'output/prfstats/samples'
-		clear_old_files(dir_, samples)
-		plot_samples(
-			filts,
-			samples,
-			'output/prfstats/samples',
-			vary_param_1,
-			vary_param_2
-		)
+	dir_ = 'output/prfstats/samples'
+	if clear_dir(dir_):
+		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
 	return dists

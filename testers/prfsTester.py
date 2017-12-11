@@ -6,7 +6,7 @@ from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-test, start_time = get_test(set_test=7)
+test, start_time = get_test(set_test=9)
 
 
 def out_fname(t='png'):
@@ -256,9 +256,10 @@ if test == 7:
 		out_fname(),
 		filt_params,
 		i_ref=15,
-		i_arr=np.arange(2, 30),
+		i_arr=np.arange(2, 30, 3),
 		quiet=False,
-		load_filts=False,
+		# save_filts='testing.npy',
+		load_filts='testing.npy',
 		samples={'interval': 5, 'filt_step': 5}
 	)
 
@@ -295,10 +296,10 @@ if test == 9:
 		out_fname(),
 		filt_params,
 		k=(0, 5.01, .01),
-		load_filts=False,
+		# save_filts=('testing1.npy', 'testing2.npy'),
+		# load_filts=('testing1.npy', 'testing2.npy'),
 		quiet=False,
-		vary_param=('d_use_hamiltonion', (-1, 1)),
-		# vary_param=('d_use_hamiltonion', (1, -1)),
+		vary_param=('d_use_hamiltonian', (-1, 1)),
 		samples=5
 
 	)

@@ -9,7 +9,7 @@ from phomology.plots import heatmap_ax
 from phomology.titlebox import filt_params_table
 from prfstats.data import NormalPRF
 from prfstats.helpers import is_filt_param, is_weight_func
-from utilities import print_title, clear_temp_files, make_dir
+from utilities import print_title, clear_temp_files, make_dir, clear_dir
 
 
 def dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename):
@@ -168,7 +168,7 @@ def clusters_fig(dists, filt_params, fname1, fname2, out_fname):
 	fig.savefig(out_fname)
 
 
-def samples(filts, cmd, dir, vp1=None, vp2=None):
+def samples(filts, cmd, dir_, vp1=None, vp2=None):
 
 	def expand_filts_arr():
 		if filts.ndim == 1:                     # single filt evo
@@ -195,6 +195,9 @@ def samples(filts, cmd, dir, vp1=None, vp2=None):
 		else:
 			return cmd, None
 
+	if not cmd:
+		return
+
 
 	filts_vv = expand_filts_arr()
 	interval, filt_step = parse_cmd()
@@ -202,7 +205,7 @@ def samples(filts, cmd, dir, vp1=None, vp2=None):
 	for i, filts_v in enumerate(filts_vv):
 		for j, filts_ in enumerate(filts_v):
 			for k, filt in enumerate(filts_[::interval]):
-				base_name = '{}/{}__'.format(dir, filt.name)
+				base_name = '{}/{}__'.format(dir_, filt.name)
 
 				if is_filt_param(vp1):
 					base_name = '{}{}_{}__'.format(
