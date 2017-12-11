@@ -166,7 +166,7 @@ def variance_fig(
 	filenames_table(fname_ax, [filename, out_filename])
 	filt_params_table(params_ax, filt_params)
 
-	ax1.set_ylabel('norm of mean', **label_kwargs)
+	ax1.set_ylabel('mean', **label_kwargs)
 	ax2.set_ylabel('local variance', **label_kwargs)
 	ax3.set_ylabel('global variance', **label_kwargs)
 	ax4.set_ylabel('local fano factor', **label_kwargs)

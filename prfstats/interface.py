@@ -113,7 +113,7 @@ def plot_dists_to_ref(
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
 	dir_ = 'output/prfstats/samples'
-	if clear_dir(dir_):
+	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_)
 
 	return dists
@@ -204,7 +204,7 @@ def plot_dists_to_means(
 	dists_to_means_fig(refs, dists, traj1, traj2, out_filename)
 
 	dir_ = 'output/prfstats/samples'
-	if clear_dir(dir_):
+	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_)
 		plot_samples(filts2, samples, dir_)
 
@@ -256,7 +256,7 @@ def plot_clusters(
 	clusters_fig(dists, filt_params, traj1.name, traj2.name, out_filename)
 
 	dir_ = 'output/prfstats/samples'
-	if clear_dir(dir_):
+	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_)
 		plot_samples(filts2, samples, dir_)
 
@@ -377,7 +377,7 @@ def plot_rocs(
 	dual_roc_fig(data, k, traj1, traj2, out_filename, vary_param)
 
 	dir_ = 'output/prfstats/samples'
-	if clear_dir(dir_):
+	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_, vary_param)
 		plot_samples(filts2, samples, dir_, vary_param)
 
@@ -519,7 +519,7 @@ def plot_variance(
 		)
 
 	dir_ = 'output/prfstats/samples'
-	if clear_dir(dir_):
+	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
 	return scaler_data
@@ -607,7 +607,7 @@ def pairwise_mean_dists(
 			dists[i, j] = d
 
 	dir_ = 'output/prfstats/samples'
-	if clear_dir(dir_):
+	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
 	return dists

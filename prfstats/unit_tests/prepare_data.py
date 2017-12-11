@@ -37,6 +37,7 @@ def data__dists_to_ref_filts():
 		i_arr=np.arange(2, 30, 7),
 		quiet=True,
 		save_filts='data/dists_to_ref_filts.npy',
+		samples=False
 	)
 
 
