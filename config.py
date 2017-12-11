@@ -1,8 +1,8 @@
 SAMPLE_RATE = 44100.
 
 find_landmarks_c_compile_str = {
-	'linux': 'gcc -fopenmp -lm -o find_landmarks find_landmarks.c',
-	'macOS': 'gcc-5 -fopenmp -o find_landmarks find_landmarks.c'
+	'linux': 'gcc -fopenmp -lm -o find_landmarks -O3 find_landmarks.c',
+	'macOS': 'gcc-5 -fopenmp -o find_landmarks -03 find_landmarks.c'
 }
 
 gnuplot_str = 'gnuplot'
