@@ -107,7 +107,7 @@ to change the behavior of existing functionality`. They should also be run and
 individually (that is, don't change the refs for features that you aren't
 intentionally modifying).
 
-ToDo
+To Do
 ----
 Here are a couple ideas for how PHETS can be improved:
 
