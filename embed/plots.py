@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import FormatStrFormatter
 
