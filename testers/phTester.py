@@ -3,16 +3,20 @@ from boilerplate import change_dir, get_test
 change_dir()    # PHETS imports must come after this line
 
 import time
+import numpy as np
 
-from signals import Trajectory
+from embed import embed
+from signals import Trajectory, TimeSeries
 from phomology import Filtration, load_filtration
 from config import default_filtration_params as filt_params
 
-test, start_time = get_test(set_test=110)
+test, start_time = get_test(set_test=505)
 
 
 def out_fname(str):
 	return 'output/phomology/test_{}{}'.format(test, str)
+	
+
 
 if test == 14:
 	in_filename = 'datasets/trajectories/49/C134C.txt'
@@ -527,6 +531,198 @@ if test == 203:
 	filt.movie(out_fname('.mp4'))
 	filt.plot_pd(out_fname('_PRF.png'))
 	filt.plot_prf(out_fname('_prf.png'))
+	
+	
+
+
+if test == 500:
+	ts = TimeSeries(
+		"datasets/time_series/C135B/49-C135B.txt",
+		crop=(75900, 78000),
+		num_windows=10,
+		window_length=2000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = ts.embed(tau=53, m=2)
+
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 2200,
+			'max_filtration_param': -15,
+			'num_divisions': 20,
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+	
+## 1/7: Nikki just testing around with new witness complexes on neuron data - not great results :/ ; something so sensitive to  local changes of direct vs midrange direction ?	
+if test == 501:
+	ts = TimeSeries(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 12000),
+		num_windows=2,
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = Trajectory('datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 11000),
+		num_windows=2,
+		window_length=1000,
+		vol_norm=(1, 1, 1)
+	)
+
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 1000,
+			'max_filtration_param': -20,
+			'num_divisions': 10,
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+	
+if test == 502:
+	ts = TimeSeries(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 12000),
+		num_windows=2,
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = Trajectory('datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 11000),
+		num_windows=2,
+		window_length=1000,
+		vol_norm=(1, 1, 1)
+	)
+
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 1000,
+			'max_filtration_param': -20,
+			'num_divisions': 10,
+			'd_use_hamiltonian': -1.01
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+	
+if test == 503:
+	ts = TimeSeries(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 12000),
+		num_windows=2,
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = Trajectory('datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 11000),
+		num_windows=2,
+		window_length=1000,
+		vol_norm=(1, 1, 1)
+	)
+
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 1000,
+			'max_filtration_param': -20,
+			'num_divisions': 10,
+			'd_use_hamiltonian': -1.001
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+	
+	
+if test == 504:
+	ts = TimeSeries(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 12000),
+		num_windows=2,
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = Trajectory('datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 11000),
+		num_windows=2,
+		window_length=1000,
+		vol_norm=(1, 1, 1)
+	)
+
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 1000,
+			'max_filtration_param': -20,
+			'num_divisions': 10,
+			'd_use_hamiltonian': -1.0001
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+	
+	
+if test == 505:
+	ts = TimeSeries(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 12000),
+		num_windows=2,
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = Trajectory('datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(10000, 11000),
+		num_windows=2,
+		window_length=1000,
+		vol_norm=(1, 1, 1)
+	)
+
+	filt_params.update(
+		{
+			'ds_rate': 10,
+			'worm_length': 1000,
+			'max_filtration_param': -20,
+			'num_divisions': 10,
+			'd_orientation_amplify': 2
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

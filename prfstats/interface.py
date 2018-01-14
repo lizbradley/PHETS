@@ -611,3 +611,54 @@ def pairwise_mean_dists(
 		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
 	return dists
+<<<<<<< Updated upstream
+=======
+
+### CURRENTLY DE-BUGGING THE FOLLOWING SCRIPT PIECE: works! correctly! 
+
+def toward_3D_plot(traj,
+		filt_params,
+		vary_param_1,
+		vary_param_2,
+		weight_func=lambda i, j: 1,
+		see_samples=False,
+		quiet=True,
+		load_saved_filts=False,
+):
+	filts = filt_set(
+		traj,
+		filt_params,
+		vary_param_1,
+		vary_param_2,
+		load_saved=load_saved_filts,
+		quiet=quiet,
+	)
+
+	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
+	
+	means = np.empty(prfs.shape[:-1], dtype=object)
+	for idx in np.ndindex(*means.shape):
+		mean = NormalPRF.mean(prfs[idx])
+		means[idx] = mean	
+		
+	ref_func = np.subtract(prfs[-1][-1][-1],prfs[-1][-1][-1])
+	norms = dists_to_ref(means, ref_func)
+	print np.shape(norms)
+
+	return norms
+
+#### JUST GETTING STARTED ON THIS PIECE 		
+def toward_wrapper_cluster(
+	base_name,
+	filt_params,
+	weight_func=lambda i, j: 1,
+	see_samples=False,
+	quiet=True,
+	load_saved_filts=False
+):
+
+	for i in xrange(1,5):
+		for j in xrange(2,9):
+			file_name = 'something' # WRITE TO OPEN AND THEN DELETE FILE SO ONLY SO MANY ARE OPEN AT A GIVEN TIME
+	
+>>>>>>> Stashed changes

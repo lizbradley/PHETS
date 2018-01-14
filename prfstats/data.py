@@ -50,7 +50,8 @@ class NormalPRF:
 
 		"""
 		dA = (NormalPRF.lim / self.num_div) ** 2
-		return np.sqrt(np.nansum(np.square(self.data)) * dA)
+		b = np.power(np.nansum(np.square(self.data) * dA),.5)
+		return b
 
 
 	def set_weight(self, wf):
@@ -220,8 +221,21 @@ def distance(a, b):
 
 
 def dists_to_ref(funcs, ref_func):
-	dists = [(f - ref_func).norm for f in funcs]
-	return dists
+			
+	#dists = [NormalPRF(f - ref_func).norm for f in funcs]
+	dists = []
+	for i in xrange(len(funcs)):
+		for j in xrange(len(funcs[-1])):
+			#print funcs[i][j].data
+			e = funcs[i][j].data - ref_func.data
+			#print e
+			f = NormalPRF(e)
+			g = f.norm
+			print g
+			dists.append(g)
+	dists2 = np.reshape(dists,(len(funcs),len(funcs[-1])))
+	print np.shape(dists2)
+	return dists2
 
 
 def mean_dists_compare(prfs1, prfs2):
