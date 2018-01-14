@@ -6,11 +6,9 @@ from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq
 
-<<<<<<< Updated upstream
-test, start_time = get_test(set_test=9)
-=======
+
 test, start_time = get_test(set_test=64)
->>>>>>> Stashed changes
+
 
 
 def out_fname(t='png'):
@@ -445,10 +443,7 @@ if test == 14:
 		load_filts=False,
 		samples={'interval': 4, 'filt_step': 5}
 	)
-<<<<<<< Updated upstream
 
-if test == 15:
-=======
 # start Nikki tests: 
 if test == 15:
 	ts = TimeSeries(
@@ -1861,24 +1856,19 @@ if test == 64:
 ## 1/9: Nikki to re-run basic investigation of W and L on music and neurons with weight function
 
 if test == 65:
->>>>>>> Stashed changes
+
 	ts = TimeSeries(
 		'datasets/time_series/viol/40-viol.txt',
 		crop=(35000, 140000),
 		num_windows=10,
-<<<<<<< Updated upstream
+
 		window_length=5000,
 		vol_norm=(0, 0, 1)
 	)
 
 	traj = ts.embed(tau=32, m=2)
-	filt_params.update({
-		'ds_rate': ('worm_length', lambda x: x / 50),
-=======
-		vol_norm=(1, 1, 1)
-	)
-
-	traj = ts.embed(tau=32, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+	
+	
 	filt_params.update({
 		'ds_rate': ('worm_length', lambda x: x / 100),   # note: '/' does floor division - ###!! FIGURING OUT FROM TEST ABOVE! :D HAI METHODOLOGY 
 		'num_divisions': 10,
@@ -1990,7 +1980,7 @@ if test == 69:
 
 	filt_params.update({
 		'worm_length': 3000,   # note: '/' does floor division
->>>>>>> Stashed changes
+
 		'num_divisions': 10,
 		'max_filtration_param': -8
 	})
@@ -1999,25 +1989,14 @@ if test == 69:
 		traj,
 		out_fname(),
 		filt_params,
-<<<<<<< Updated upstream
-		vary_param_1=('worm_length', (3500, 4000, 4500, 5000)),
-		quiet=False,
-		load_filts=False,
-	)
-
-
-# no ops: 57.7s
-
-
-=======
-		vary_param_1=('ds_rate', (1, 10, 15, 20, 30,50, 100, 150, 200, 300)),
+		vary_param_1=('worm_length', (200, 500, 800, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3300, 3600, 3900, 4200, 4500, 4800, 5100)),
 		vary_param_2=('FIGURE OUT SYNTAX FOR WEIGHT FUNCTION'),
 		quiet=False,
 		annot_hm=False,
 		load_saved_filts=False,
 		see_samples={'interval': 4, 'filt_step': 5}
 	)
-	
+
 	
 if test == 70:
 	traj = Trajectory(
@@ -2126,4 +2105,3 @@ if test == 73:
 		load_saved_filts=False,
 		see_samples={'interval': 4, 'filt_step': 5}
 	)	
->>>>>>> Stashed changes

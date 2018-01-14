@@ -611,8 +611,7 @@ def pairwise_mean_dists(
 		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
 	return dists
-<<<<<<< Updated upstream
-=======
+
 
 ### CURRENTLY DE-BUGGING THE FOLLOWING SCRIPT PIECE: works! correctly! 
 
@@ -630,7 +629,6 @@ def toward_3D_plot(traj,
 		filt_params,
 		vary_param_1,
 		vary_param_2,
-		load_saved=load_saved_filts,
 		quiet=quiet,
 	)
 
@@ -661,4 +659,4 @@ def toward_wrapper_cluster(
 		for j in xrange(2,9):
 			file_name = 'something' # WRITE TO OPEN AND THEN DELETE FILE SO ONLY SO MANY ARE OPEN AT A GIVEN TIME
 	
->>>>>>> Stashed changes
+
