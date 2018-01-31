@@ -4,6 +4,7 @@ import numpy as np
 import build_filtration, plots, filtration_movie
 from utilities import block_print, enable_print
 from config import find_landmarks_c_compile_str
+from misc import randomness
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -209,7 +210,6 @@ class Filtration:
 			default: True
 
 		"""
-
 		self.name = traj.name
 		self.fname = traj.fname
 		self.ambient_dim = traj.dim
@@ -262,16 +262,17 @@ class Filtration:
 	@phdir
 	def _build(self, traj):
 
+		file_suffix = randomness.get_suffix();
 		silent = self.silent
 		if not silent: print "building filtration..."
 
-		np.savetxt('temp/worm_data.txt', traj.data)
+		np.savetxt('temp/worm_data.txt.' + file_suffix, traj.data)
 		start_time = time.time()
 
 		try:
 			if silent: block_print()
 			filtration = build_filtration.build_filtration(
-				'temp/worm_data.txt', self.params, silent=silent
+				'temp/worm_data.txt.' + file_suffix, self.params, silent=silent
 			)
 			if silent: enable_print()
 
@@ -280,7 +281,7 @@ class Filtration:
 			compile_find_landmarks_c()
 			sys.exit()
 
-		os.remove('temp/worm_data.txt')
+		os.remove('temp/worm_data.txt.' + file_suffix)
 
 		witness_coords = np.array(filtration[1][1])
 		landmark_coords = np.array(filtration[1][0])

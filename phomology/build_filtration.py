@@ -10,7 +10,7 @@ import itertools
 import numpy as np
 import math
 import subprocess
-
+from misc import randomness
 
 
 # f = open("output/run_info/build_filtration_memory.txt","wb")
@@ -204,6 +204,8 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	absolute = get_param("absolute")
 	num_divisions = get_param("num_divisions")
 	simplex_cutoff = get_param("simplex_cutoff")
+	file_suffix = randomness.get_suffix() 
+	landmark_out_str = "temp/landmark_outputs.txt." + file_suffix;
 
 	##################### begin edits by Sam and Elliott ######################
 
@@ -253,6 +255,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			raise Exception(msg)
 
 	ls = get_param("landmark_selector")
+
 	if ls=="EST":
 		if always_euclidean:
 			if graph_induced:
@@ -262,7 +265,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m }".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -283,7 +286,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -303,7 +306,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -323,7 +326,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -343,7 +346,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -362,7 +365,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -380,7 +383,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -400,7 +403,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -419,7 +422,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -438,7 +441,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					"-l {}".format(number_of_vertices),
 					"-w {}-{}".format(start,stop),
 					"-i {}".format(input_file_name),
-					"-o temp/landmark_outputs.txt",
+					"-o " + landmark_out_str,
 					"-m {}".format(int(m2_d)),
 					"-a {}".format(speed_amplify),
 					"-y {}".format(orientation_amplify),
@@ -486,14 +489,16 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		values[arg_idx] = param
 
 	values = [None if v == '' else v for v in values]
-	np.savetxt('temp/find_landmark_arg_switches.txt', switches, fmt='%i')
-	np.savetxt('temp/find_landmark_arg_vals.txt', values, fmt='%s')
+	switch_file = 'temp/find_landmark_arg_switches.txt.' + file_suffix
+	val_file = 'temp/find_landmark_arg_vals.txt.' + file_suffix
+	np.savetxt(switch_file, switches, fmt='%i')
+	np.savetxt(val_file, values, fmt='%s')
 
 	if silent:
-		p = subprocess.Popen('./find_landmarks', stdout=subprocess.PIPE)
+		p = subprocess.Popen(["./find_landmarks", file_suffix], stdout=subprocess.PIPE)
 		out, err = p.communicate()
 	else:
-		p = subprocess.Popen('./find_landmarks')
+		p = subprocess.Popen(['./find_landmarks', file_suffix])
 		p.communicate()
 
 
@@ -502,7 +507,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		number_of_datapoints = int(number_of_datapoints-m2_d)
 
 	## Build and sort distance matrix.
-	landmarks_file = open("temp/landmark_outputs.txt","rb")
+	landmarks_file = open(landmark_out_str,"rb")
 
 	lines = landmarks_file.readlines()
 	sys.stdout.write("Reading in distance calculations...")
@@ -553,7 +558,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		def wit_ids_2_land_ids(simplex):
 			return [w2l_id_dict[wit_id] for wit_id in simplex]
 
-		with open('temp/gi_edge_filtration.txt', 'r') as f:
+		with open('temp/gi_edge_filtration.txt.' + file_suffix, 'r') as f:
 			lines = f.readlines()
 
 		eps, filt_diffs = [], []

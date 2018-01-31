@@ -258,9 +258,24 @@ int main(int argc, char* argv[])
 
     int switches [NUMBER_ARGS];
     char vals [NUMBER_ARGS][STRING_MAX_SIZE];
+    
+    FILE *sfile, *vfile;
 
-    FILE *sfile = fopen("temp/find_landmark_arg_switches.txt", "r");
-    FILE *vfile = fopen("temp/find_landmark_arg_vals.txt", "r");
+    if (argc == 2) {
+	char sfile_str[100];
+	strcpy(sfile_str, "temp/find_landmark_arg_switches.txt.");
+	strcat(sfile_str, argv[1]);
+	sfile = fopen(sfile_str, "r");
+
+	char vfile_str[100];
+	strcpy(vfile_str, "temp/find_landmark_arg_vals.txt.");
+	strcat(vfile_str, argv[1]);
+	vfile = fopen(vfile_str, "r");
+
+    } else {
+	sfile = fopen("temp/find_landmark_arg_switches.txt", "r");
+	vfile = fopen("temp/find_landmark_arg_vals.txt", "r");
+    }
 
     int switch_;
     char value [STRING_MAX_SIZE];
@@ -271,8 +286,7 @@ int main(int argc, char* argv[])
         switches[i] = switch_;
         i++;
     }
-
-
+    
     i = 0;
     while (fscanf(vfile, "%s", &value) > 0)
     {
@@ -836,7 +850,15 @@ int main(int argc, char* argv[])
 
 
 
-		fp = fopen("temp/gi_edge_filtration.txt","w");
+		if (argc == 2) {
+		    char out_str[100];
+		    strcpy(out_str, "temp/gi_edge_filtration.txt.");
+		    strcat(out_str, argv[1]);
+		    fp = fopen(out_str, "w");
+		} else {
+		    fp = fopen("temp/gi_edge_filtration.txt","w");
+		}
+
 		if (fp == NULL) {
     		printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
     		fflush(stdout);
@@ -980,7 +1002,15 @@ int main(int argc, char* argv[])
 /************* Writing landmarks distances to file ****************/
 	printf("Writing landmarks to file...");
 	fflush(stdout);
-	fp=fopen("temp/landmark_outputs.txt","w");
+	if (argc == 2) {
+	    char out_str[100];
+	    strcpy(out_str, "temp/landmark_outputs.txt.");
+	    strcat(out_str, argv[1]);
+	    fp = fopen(out_str, "w");
+	} else {
+	    fp=fopen("temp/landmark_outputs.txt","w");
+	}
+
 	if (fp == NULL) {
     	printf("\n\n\t\t ERROR: Failed to open output file %s!\n",wfile);
     	fflush(stdout);

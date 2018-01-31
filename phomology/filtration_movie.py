@@ -5,6 +5,7 @@ import matplotlib.markers
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import collections
+from misc import randomness
 
 plt.ioff()
 
@@ -148,12 +149,13 @@ def plot_all_3D_gnuplot(subplot, filtration, i, camera_angle):
 
 
 	def write_gnuplot_script():
+		file_suffix = randomness.get_suffix();
 		witness_data = filtration.witness_coords
 		landmark_data = filtration.landmark_coords
 		complex_data = complexes_coords(filtration)
 
-		np.savetxt('phomology/temp/witnesses.txt', witness_data)
-		np.savetxt('phomology/temp/landmarks.txt', landmark_data)
+		np.savetxt('phomology/temp/witnesses.txt.' + file_suffix, witness_data)
+		np.savetxt('phomology/temp/landmarks.txt.' + file_suffix, landmark_data)
 
 
 		cmds = [
@@ -180,22 +182,22 @@ def plot_all_3D_gnuplot(subplot, filtration, i, camera_angle):
 
 
 		# plot witnesses and landmarks
-		wits_arg = '"phomology/temp/witnesses.txt" with points pt 7 ps .1 ' \
-				   'lc "black" notitle'
-		lands_arg = '"phomology/temp/landmarks.txt" with points pt 7 ps 1 notitle'
-		lands_arg = '"phomology/temp/landmarks.txt" with points pt 7 ps 1 ' \
-		            'lc rgb "#00FF7F" notitle'
+		wits_arg = '"phomology/temp/witnesses.txt.%s" with points pt 7 ps .1 ' \
+				   'lc "black" notitle' % (file_suffix)
+		lands_arg = '"phomology/temp/landmarks.txt.%s" with points pt 7 ps 1 notitle' % (file_suffix)
+		lands_arg = '"phomology/temp/landmarks.txt.%s" with points pt 7 ps 1 ' \
+		            'lc rgb "#00FF7F" notitle' % (file_suffix)
 		cmds.append('splot {}, {}'.format(wits_arg, lands_arg))
 
 		cmds.append('q')
 
-		with open('phomology/temp/gnuplot_cmds.txt', 'w') as f:
+		with open('phomology/temp/gnuplot_cmds.txt' + file_suffix, 'w') as f:
 			f.write('\n'.join(cmds))
 
 	write_gnuplot_script()
 
 	try:
-		p = subprocess.Popen([gnuplot_str, 'phomology/temp/gnuplot_cmds.txt'],
+		p = subprocess.Popen([gnuplot_str, 'phomology/temp/gnuplot_cmds.txt' + file_suffix],
 						 stdout=subprocess.PIPE)
 	except OSError:
 		print '''ERROR: Unable to open gnuplot. Ensure that 'gnuplot_str' in 
