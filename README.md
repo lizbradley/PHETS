@@ -5,11 +5,17 @@
 This package offers high-level tools for exploration and visualization
 of delay coordinate embedding and persistent homology. It is used to
 investigate the utilization of these together as a signal processing
-technique.
+technique. Also included is a dataset of time-series (mostly musical
+instrument recordings) and higher dimensional trajectories as .txt files.
 
-Also included is a dataset of time-series (mostly musical instrument
-recordings) and higher dimensional trajectories as .txt files.
+PHETS uses [Perseus](http://people.maths.ox.ac.uk/nanda/perseus/) to
+compute persitent homology.
 
+PHETS was originally developed for the research detailed 
+[here](https://arxiv.org/pdf/1708.09359.pdf). If you find PHETS useful 
+in your research work, please cite this paper.
+
+Please direct inquires to lizb@colorado.edu.
 
 
 ## Installation
@@ -115,8 +121,7 @@ filt.plot_prf('output/demo/prf.png')        # plot the persistence rank function
 ![perseistence rank function](docs/readme/prf.png "prf.png")
 
 Persistence rank functions are amenable to statistical analysis. `prfstats.L2Classifier`, upon initialization, computes
-a mean PRF and variance from a set of training PRFs; subsequently, `L2Classifier.predict(PRF, k)` returns `True` if the distance (L1 or L2)
-distance from `PRF` to the mean PRF is smaller than `k` times the standard deviation. `prfstats.plot_l2rocs` takes two pre-windowed `Trajectory`s, `traj1` and `traj2`,
+a mean PRF and variance from a set of training PRFs; subsequently, `L2Classifier.predict(PRF, k)` returns `True` if the L2 distance from `PRF` to the mean PRF is smaller than `k` times the standard deviation. `prfstats.plot_l2rocs` takes two pre-windowed `Trajectory`s, `traj1` and `traj2`,
 and partitions the windows roughly as follows:
 ```
 windows1, windows2 = traj1.windows, = traj2.windows
