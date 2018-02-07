@@ -10,5 +10,8 @@ class randomness:
   
   @staticmethod
   def get_suffix():
+    
+    if randomness.suffix == 0:
+	randomness.generate_suffix();
     return randomness.suffix;
 
