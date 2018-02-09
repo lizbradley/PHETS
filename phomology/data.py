@@ -27,7 +27,8 @@ def compile_find_landmarks_c():
 
 def write_perseus_in_file(filt_array, silent):
 	if not silent: print 'building perseus_in.txt...'
-	out_file = open('perseus/perseus_in.txt', 'a')
+	suffix = randomness.get_suffix();	
+	out_file = open('perseus/perseus_in.txt.' + suffix, 'a')
 	out_file.truncate(0)
 	out_file.write('1\n')
 	for idx, row in enumerate(filt_array):
@@ -44,7 +45,14 @@ def call_perseus(silent):
 	for f in os.listdir('.'):
 		if f.startswith('perseus_out'):
 			os.remove(f)
-	perseus_cmd = './{} nmfsimtop perseus_in.txt perseus_out'
+	
+	suffix = randomness.get_suffix();	
+	in_file = 'perseus_in.txt.' + suffix
+	out_file = 'perseus_out'
+	print(in_file)
+	print(out_file)
+	  
+	perseus_cmd = './{} nmfsimtop %s %s' % (in_file, out_file)
 	if sys.platform == 'linux' or sys.platform == 'linux2':
 		perseus_cmd = perseus_cmd.format('perseusLin')
 	elif sys.platform == 'darwin':  # macOS
@@ -62,9 +70,13 @@ def call_perseus(silent):
 
 def read_perseus_out_file(silent):
 	try:
+		suffix = randomness.get_suffix();	
 		with warnings.catch_warnings():
+			old_out_file = 'perseus/perseus_out_1.txt'
+			out_file = old_out_file + '.' + suffix
+			os.rename(old_out_file, out_file)
 			# warnings.simplefilter('ignore')
-			intervals = np.loadtxt('perseus/perseus_out_1.txt', ndmin=2)
+			intervals = np.loadtxt(out_file, ndmin=2)
 	except IOError:
 		intervals = np.empty((2, 0))
 		if not silent: print "WARNING: no homology for this window"
