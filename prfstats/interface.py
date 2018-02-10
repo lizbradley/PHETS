@@ -13,7 +13,7 @@ from plots import samples as plot_samples
 from signals import Trajectory
 from utilities import print_title, clear_dir
 from phomology import Filtration
-
+from misc import output_paths
 
 
 def plot_dists_to_ref(
@@ -83,7 +83,7 @@ def plot_dists_to_ref(
 		if isinstance(load_filts, basestring):
 			saved = np.load(load_filts)
 		else:
-			saved = np.load('prfstats/data/filts.npy')
+			saved = output_paths.get_prfstats_filts_path();
 		ref_filt, filts = saved
 
 	else:
@@ -101,7 +101,8 @@ def plot_dists_to_ref(
 			if isinstance(save_filts, basestring):
 				np.save(save_filts, [ref_filt, filts])
 			else:
-				np.save('prfstats/data/filts.npy', [ref_filt, filts])
+				path = output_paths.get_prfstats_filts_path();
+				np.save(path, [ref_filt, filts])
 	filts = np.array(filts)
 
 	prfs = [NormalPRF(f.prf()) for f in filts]
@@ -112,7 +113,7 @@ def plot_dists_to_ref(
 	base_filename = path.split('/')[-1]
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
-	dir_ = 'output/prfstats/samples'
+	dir_ = output_paths.get_prfstats_samples_dir();
 	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_)
 
@@ -203,7 +204,7 @@ def plot_dists_to_means(
 
 	dists_to_means_fig(refs, dists, traj1, traj2, out_filename)
 
-	dir_ = 'output/prfstats/samples'
+	dir_ = output_paths.get_prfstats_samples_dir();
 	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_)
 		plot_samples(filts2, samples, dir_)
@@ -255,7 +256,7 @@ def plot_clusters(
 
 	clusters_fig(dists, filt_params, traj1.name, traj2.name, out_filename)
 
-	dir_ = 'output/prfstats/samples'
+	dir_ = output_paths.get_prfstats_samples_dir();
 	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_)
 		plot_samples(filts2, samples, dir_)
@@ -376,7 +377,7 @@ def plot_rocs(
 
 	dual_roc_fig(data, k, traj1, traj2, out_filename, vary_param)
 
-	dir_ = 'output/prfstats/samples'
+	dir_ = output_paths.get_prfstats_samples_dir();
 	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_, vary_param)
 		plot_samples(filts2, samples, dir_, vary_param)
@@ -518,7 +519,7 @@ def plot_variance(
 			annot_hm
 		)
 
-	dir_ = 'output/prfstats/samples'
+	dir_ = output_paths.get_prfstats_samples_dir();
 	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
@@ -606,7 +607,7 @@ def pairwise_mean_dists(
 			d = distance(means[i, j], means[i + 1, j])
 			dists[i, j] = d
 
-	dir_ = 'output/prfstats/samples'
+	dir_ = output_paths.get_prfstats_samples_dir();
 	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
@@ -624,6 +625,7 @@ def toward_3D_plot(traj,
 		quiet=True,
 		load_saved_filts=False,
 ):
+
 	filts = filt_set(
 		traj,
 		filt_params,
