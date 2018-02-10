@@ -48,9 +48,7 @@ def call_perseus(silent):
 	
 	suffix = randomness.get_suffix();	
 	in_file = 'perseus_in.txt.' + suffix
-	out_file = 'perseus_out'
-	print(in_file)
-	print(out_file)
+	out_file = 'perseus_out_' + suffix
 	  
 	perseus_cmd = './{} nmfsimtop %s %s' % (in_file, out_file)
 	if sys.platform == 'linux' or sys.platform == 'linux2':
@@ -72,9 +70,7 @@ def read_perseus_out_file(silent):
 	try:
 		suffix = randomness.get_suffix();	
 		with warnings.catch_warnings():
-			old_out_file = 'perseus/perseus_out_1.txt'
-			out_file = old_out_file + '.' + suffix
-			os.rename(old_out_file, out_file)
+			out_file = 'perseus/perseus_out_' + suffix + '_1.txt'
 			# warnings.simplefilter('ignore')
 			intervals = np.loadtxt(out_file, ndmin=2)
 	except IOError:
