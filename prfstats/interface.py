@@ -11,9 +11,10 @@ from data import mean_dists_compare
 from prfstats.data import L2Classifier, roc_data
 from plots import samples as plot_samples
 from signals import Trajectory
-from utilities import print_title, clear_dir
+from utilities import print_title, clear_dir, make_dir
 from phomology import Filtration
-from misc import output_paths
+from misc import randomness 
+from misc import output_paths 
 
 
 def plot_dists_to_ref(
@@ -79,6 +80,9 @@ def plot_dists_to_ref(
 		distances to reference prf
 
 	"""
+
+	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+
 	if load_filts:
 		if isinstance(load_filts, basestring):
 			saved = np.load(load_filts)
@@ -113,7 +117,8 @@ def plot_dists_to_ref(
 	base_filename = path.split('/')[-1]
 	dists_to_ref_fig(base_filename, i_ref, i_arr, dists, out_filename)
 
-	dir_ = output_paths.get_prfstats_samples_dir();
+	dir_ = out_dir + '/samples/';
+	make_dir(dir_);
 	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_)
 
@@ -177,6 +182,8 @@ def plot_dists_to_means(
 		``[dists_1_vs_1, dists_2_vs_1, dists_1_vs_2, dists_2_vs_2]``
 	"""
 
+	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+
 	load_cmd_1, load_cmd_2 = parse_load_save_cmd(load_filts)
 	save_cmd_1, save_cmd_2 = parse_load_save_cmd(save_filts)
 
@@ -204,7 +211,8 @@ def plot_dists_to_means(
 
 	dists_to_means_fig(refs, dists, traj1, traj2, out_filename)
 
-	dir_ = output_paths.get_prfstats_samples_dir();
+	dir_ = out_dir + '/samples/';
+	make_dir(dir_);
 	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_)
 		plot_samples(filts2, samples, dir_)
@@ -228,6 +236,8 @@ def plot_clusters(
 	Just like :py:func:`plot_dists_to_means` except distances are plotted in a
 	more succinct manner.
 	"""
+	
+	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
 
 	load_cmd_1, load_cmd_2 = parse_load_save_cmd(load_filts)
 	save_cmd_1, save_cmd_2 = parse_load_save_cmd(save_filts)
@@ -256,7 +266,8 @@ def plot_clusters(
 
 	clusters_fig(dists, filt_params, traj1.name, traj2.name, out_filename)
 
-	dir_ = output_paths.get_prfstats_samples_dir();
+	dir_ = out_dir + '/samples/';
+	make_dir(dir_);
 	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_)
 		plot_samples(filts2, samples, dir_)
@@ -331,6 +342,9 @@ def plot_rocs(
 		roc data for both classifiers
 
 	"""
+
+	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+
 	load_cmd_1, load_cmd_2 = parse_load_save_cmd(load_filts)
 	save_cmd_1, save_cmd_2 = parse_load_save_cmd(save_filts)
 
@@ -377,7 +391,8 @@ def plot_rocs(
 
 	dual_roc_fig(data, k, traj1, traj2, out_filename, vary_param)
 
-	dir_ = output_paths.get_prfstats_samples_dir();
+        dir_ = out_dir + '/samples/' 
+	make_dir(dir_);
 	if samples and clear_dir(dir_):
 		plot_samples(filts1, samples, dir_, vary_param)
 		plot_samples(filts2, samples, dir_, vary_param)
@@ -468,10 +483,10 @@ def plot_variance(
 		scaler statistics
 
 	"""
-	out_dir, out_filename = os.path.split(out_filename)
+	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+        
 	in_dir, in_fname = os.path.split(traj.fname)
-
-
+        
 	weight_functions_figs(
 		vary_param_1,
 		vary_param_2,
@@ -519,7 +534,8 @@ def plot_variance(
 			annot_hm
 		)
 
-	dir_ = output_paths.get_prfstats_samples_dir();
+        dir_ = out_dir + '/samples'
+	make_dir(dir_);
 	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
@@ -583,6 +599,8 @@ def pairwise_mean_dists(
 		distances
 
 	"""
+	out_dir, out_filename = output_paths.get_prfstats_path('/output/prfstats/');
+
 	filts = filt_set(
 		traj,
 		filt_params,
@@ -607,7 +625,8 @@ def pairwise_mean_dists(
 			d = distance(means[i, j], means[i + 1, j])
 			dists[i, j] = d
 
-	dir_ = output_paths.get_prfstats_samples_dir();
+	dir_ = out_dir + '/samples'; 
+	make_dir(dir_);
 	if samples and clear_dir(dir_):
 		plot_samples(filts, samples, dir_, vary_param_1, vary_param_2 )
 
