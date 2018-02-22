@@ -11,10 +11,8 @@ from data import mean_dists_compare
 from prfstats.data import L2Classifier, roc_data
 from plots import samples as plot_samples
 from signals import Trajectory
-from utilities import print_title, clear_dir, make_dir
+from utilities import print_title, clear_dir, make_dir, get_prfstats_path, get_prfstats_filts_path
 from phomology import Filtration
-from misc import randomness 
-from misc import output_paths 
 
 
 def plot_dists_to_ref(
@@ -81,13 +79,13 @@ def plot_dists_to_ref(
 
 	"""
 
-	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+	out_dir, out_filename = get_prfstats_path(out_filename);
 
 	if load_filts:
 		if isinstance(load_filts, basestring):
 			saved = np.load(load_filts)
 		else:
-			saved = output_paths.get_prfstats_filts_path();
+			saved = get_prfstats_filts_path();
 		ref_filt, filts = saved
 
 	else:
@@ -105,7 +103,7 @@ def plot_dists_to_ref(
 			if isinstance(save_filts, basestring):
 				np.save(save_filts, [ref_filt, filts])
 			else:
-				path = output_paths.get_prfstats_filts_path();
+				path = get_prfstats_filts_path();
 				np.save(path, [ref_filt, filts])
 	filts = np.array(filts)
 
@@ -182,7 +180,7 @@ def plot_dists_to_means(
 		``[dists_1_vs_1, dists_2_vs_1, dists_1_vs_2, dists_2_vs_2]``
 	"""
 
-	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+	out_dir, out_filename = get_prfstats_path(out_filename);
 
 	load_cmd_1, load_cmd_2 = parse_load_save_cmd(load_filts)
 	save_cmd_1, save_cmd_2 = parse_load_save_cmd(save_filts)
@@ -237,7 +235,7 @@ def plot_clusters(
 	more succinct manner.
 	"""
 	
-	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+	out_dir, out_filename = get_prfstats_path(out_filename);
 
 	load_cmd_1, load_cmd_2 = parse_load_save_cmd(load_filts)
 	save_cmd_1, save_cmd_2 = parse_load_save_cmd(save_filts)
@@ -343,7 +341,7 @@ def plot_rocs(
 
 	"""
 
-	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+	out_dir, out_filename = get_prfstats_path(out_filename);
 
 	load_cmd_1, load_cmd_2 = parse_load_save_cmd(load_filts)
 	save_cmd_1, save_cmd_2 = parse_load_save_cmd(save_filts)
@@ -483,7 +481,7 @@ def plot_variance(
 		scaler statistics
 
 	"""
-	out_dir, out_filename = output_paths.get_prfstats_path(out_filename);
+	out_dir, out_filename = get_prfstats_path(out_filename);
         
 	in_dir, in_fname = os.path.split(traj.fname)
         
@@ -599,7 +597,7 @@ def pairwise_mean_dists(
 		distances
 
 	"""
-	out_dir, out_filename = output_paths.get_prfstats_path('/output/prfstats/');
+	out_dir, out_filename = get_prfstats_path('/output/prfstats/');
 
 	filts = filt_set(
 		traj,

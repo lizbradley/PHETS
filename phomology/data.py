@@ -2,9 +2,8 @@ import os, sys, time, cPickle, warnings, subprocess, itertools
 import numpy as np
 
 import build_filtration, plots, filtration_movie
-from utilities import block_print, enable_print
+from utilities import block_print, enable_print, get_label
 from config import find_landmarks_c_compile_str
-from misc import randomness
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,7 +26,7 @@ def compile_find_landmarks_c():
 
 def write_perseus_in_file(filt_array, silent):
 	if not silent: print 'building perseus_in.txt...'
-	suffix = randomness.get_suffix();	
+	suffix = get_label();
 	out_file = open('perseus/perseus_in.txt.' + suffix, 'a')
 	out_file.truncate(0)
 	out_file.write('1\n')
@@ -46,7 +45,7 @@ def call_perseus(silent):
 		if f.startswith('perseus_out'):
 			os.remove(f)
 	
-	suffix = randomness.get_suffix();	
+	suffix = get_label();
 	in_file = 'perseus_in.txt.' + suffix
 	out_file = 'perseus_out_' + suffix
 	  
@@ -68,7 +67,7 @@ def call_perseus(silent):
 
 def read_perseus_out_file(silent):
 	try:
-		suffix = randomness.get_suffix();	
+	        suffix = get_label();
 		with warnings.catch_warnings():
 			out_file = 'perseus/perseus_out_' + suffix + '_1.txt'
 			# warnings.simplefilter('ignore')
@@ -270,7 +269,7 @@ class Filtration:
 	@phdir
 	def _build(self, traj):
 
-		file_suffix = randomness.get_suffix();
+	        file_suffix = get_label();
 		silent = self.silent
 		if not silent: print "building filtration..."
 

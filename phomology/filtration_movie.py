@@ -5,7 +5,7 @@ import matplotlib.markers
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import collections
-from misc import randomness
+from utilities import get_label
 
 plt.ioff()
 
@@ -149,7 +149,7 @@ def plot_all_3D_gnuplot(subplot, filtration, i, camera_angle):
 
 
 	def write_gnuplot_script():
-		file_suffix = randomness.get_suffix();
+		file_suffix = get_label();
 		witness_data = filtration.witness_coords
 		landmark_data = filtration.landmark_coords
 		complex_data = complexes_coords(filtration)

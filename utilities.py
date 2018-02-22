@@ -6,11 +6,47 @@ import sys
 import os
 import time
 import numpy as np
+import datetime
 from scipy.io import wavfile
 
 from config import SAMPLE_RATE
 
 
+label = '';
+
+def generate_label(label_str):
+    global label
+    label = label_str;
+
+def get_label():
+    
+    global label 
+    if label == '':
+        generate_label(datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"));
+    return label;
+
+
+def get_prfstats_path(out_filename):
+    
+    out_dir, out_filename = os.path.split(out_filename)
+    suffix = get_label();
+    out_dir = out_dir + '/' + suffix
+    make_dir(out_dir)
+    out_filename = out_dir + '/' + out_filename
+
+    return out_dir, out_filename;
+
+def get_prfstats_filts_path():
+    
+    suffix = get_label();
+    base = 'prfstats/data/' + suffix;
+
+    try:
+	os.makedirs(base);
+    except OSError:
+	pass
+
+    return (base + '/filts.npy')
 
 
 def idx_to_freq(idx):

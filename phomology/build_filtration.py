@@ -10,7 +10,7 @@ import itertools
 import numpy as np
 import math
 import subprocess
-from misc import randomness
+from utilities import get_label
 
 
 # f = open("output/run_info/build_filtration_memory.txt","wb")
@@ -204,7 +204,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	absolute = get_param("absolute")
 	num_divisions = get_param("num_divisions")
 	simplex_cutoff = get_param("simplex_cutoff")
-	file_suffix = randomness.get_suffix() 
+	file_suffix = get_label();
 	landmark_out_str = "temp/landmark_outputs.txt." + file_suffix;
 
 	##################### begin edits by Sam and Elliott ######################
@@ -238,7 +238,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	# 	if worm_length:
 	# 		downsample_rate = worm_length / abs(downsample_rate)
 	# 	else: downsample_rate = number_of_datapoints / abs(downsample_rate)
-
+        
 	number_of_vertices = int(number_of_datapoints/downsample_rate)
 
 	print 'number of witnesses: {}'.format(number_of_datapoints)
