@@ -4,11 +4,18 @@ change_dir()
 from signals import TimeSeries, Trajectory
 from prfstats import *
 from config import default_filtration_params as filt_params
-from utilities import idx_to_freq
+from utilities import idx_to_freq, generate_label
+import sys
 
+test_num = 21412
+test_label = ''
 
-test, start_time = get_test(set_test=64)
+if len(sys.argv) == 3:
+    test_num = int(sys.argv[1]);
+    test_label = sys.argv[2];
+    generate_label(test_label);
 
+test, start_time = get_test(set_test=test_num)
 
 
 def out_fname(t='png'):
@@ -2105,3 +2112,82 @@ if test == 73:
 		load_saved_filts=False,
 		see_samples={'interval': 4, 'filt_step': 5}
 	)	
+
+if test == 21413:
+
+	ts1 = TimeSeries(
+		'datasets/time_series/Clarinet/40-clarinet.txt',
+		crop=(35000, 140000),
+		num_windows=2,
+
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj1 = ts1.embed(tau=32, m=2)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -5
+	})
+	
+	ts2 = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=32, m=2)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -5,
+		'worm_length': 4000,
+	})
+
+
+	plot_rocs(
+		traj1, 
+		traj2,
+		out_fname(),
+		filt_params,
+		k= [0,5],
+		vary_param=('ds_rate',(('worm_length', lambda x: x / 10), ('worm_length', lambda x: x / 25))),
+	)
+
+if test == 21412:
+
+	ts = TimeSeries(
+		'datasets/time_series/Clarinet/40-clarinet.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -9
+	})
+
+	plot_variance(
+		traj,
+		out_fname(),
+		filt_params,
+		#vary_param_1=('worm_length', (101, 200, 500, 800, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3300, 3600,3900, 4200,4500, 4800,5100)),
+		vary_param_1=('worm_length', (101, 200, 500, 800)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 100),('worm_length', lambda x: x / 100))),
+		weight_func=lambda i, j: 1,
+		quiet=True,
+		annot_hm=False,
+		samples={'interval': 5}
+	)
