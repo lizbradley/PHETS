@@ -263,13 +263,13 @@ int main(int argc, char* argv[])
 
     if (argc == 2) {
 	char sfile_str[100];
-	strcpy(sfile_str, "temp/find_landmark_arg_switches.txt.");
-	strcat(sfile_str, argv[1]);
+	strcpy(sfile_str, argv[1]);
+	strcat(sfile_str, "/find_landmark_arg_switches.txt");
 	sfile = fopen(sfile_str, "r");
 
 	char vfile_str[100];
-	strcpy(vfile_str, "temp/find_landmark_arg_vals.txt.");
-	strcat(vfile_str, argv[1]);
+	strcpy(vfile_str, argv[1]);
+	strcat(vfile_str, "/find_landmark_arg_vals.txt");
 	vfile = fopen(vfile_str, "r");
 
     } else {
@@ -852,8 +852,8 @@ int main(int argc, char* argv[])
 
 		if (argc == 2) {
 		    char out_str[100];
-		    strcpy(out_str, "temp/gi_edge_filtration.txt.");
-		    strcat(out_str, argv[1]);
+		    strcpy(out_str, argv[1]);
+		    strcat(out_str, "/gi_edge_filtration.txt");
 		    fp = fopen(out_str, "w");
 		} else {
 		    fp = fopen("temp/gi_edge_filtration.txt","w");
@@ -1004,8 +1004,8 @@ int main(int argc, char* argv[])
 	fflush(stdout);
 	if (argc == 2) {
 	    char out_str[100];
-	    strcpy(out_str, "temp/landmark_outputs.txt.");
-	    strcat(out_str, argv[1]);
+	    strcpy(out_str, argv[1]);
+	    strcat(out_str, "/landmark_outputs.txt");
 	    fp = fopen(out_str, "w");
 	} else {
 	    fp=fopen("temp/landmark_outputs.txt","w");

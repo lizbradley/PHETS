@@ -2,11 +2,13 @@ import os, sys, time, cPickle, warnings, subprocess, itertools
 import numpy as np
 
 import build_filtration, plots, filtration_movie
-from utilities import block_print, enable_print, get_label
+from utilities import block_print, enable_print, get_label, make_dir
 from config import find_landmarks_c_compile_str
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+def get_perseus_path():
+    return ('../output/phomology/' + get_label() + '/perseus'); 
 
 def compile_find_landmarks_c():
 	if sys.platform == "linux" or sys.platform == "linux2":
@@ -26,8 +28,9 @@ def compile_find_landmarks_c():
 
 def write_perseus_in_file(filt_array, silent):
 	if not silent: print 'building perseus_in.txt...'
-	suffix = get_label();
-	out_file = open('perseus/perseus_in.txt.' + suffix, 'a')
+	intermediate_path = get_perseus_path();
+	make_dir(intermediate_path)
+	out_file = open(intermediate_path + '/perseus_in.txt', 'a')
 	out_file.truncate(0)
 	out_file.write('1\n')
 	for idx, row in enumerate(filt_array):
@@ -40,20 +43,19 @@ def write_perseus_in_file(filt_array, silent):
 
 
 def call_perseus(silent):
-	os.chdir('perseus')
-	for f in os.listdir('.'):
+	intermediate_path = get_perseus_path();
+	for f in os.listdir(intermediate_path):
 		if f.startswith('perseus_out'):
-			os.remove(f)
+			os.remove(intermediate_path + '/' + f)
 	
-	suffix = get_label();
-	in_file = 'perseus_in.txt.' + suffix
-	out_file = 'perseus_out_' + suffix
+	in_file = intermediate_path + '/perseus_in.txt'
+	out_file = intermediate_path + '/perseus_out'
 	  
 	perseus_cmd = './{} nmfsimtop %s %s' % (in_file, out_file)
 	if sys.platform == 'linux' or sys.platform == 'linux2':
-		perseus_cmd = perseus_cmd.format('perseusLin')
+		perseus_cmd = perseus_cmd.format('perseus/perseusLin')
 	elif sys.platform == 'darwin':  # macOS
-		perseus_cmd = perseus_cmd.format('perseusMac')
+		perseus_cmd = perseus_cmd.format('perseus/perseusMac')
 
 	if silent:
 		p = subprocess.Popen(perseus_cmd,
@@ -62,14 +64,12 @@ def call_perseus(silent):
 	else:
 		p = subprocess.Popen(perseus_cmd, shell=True)
 		p.communicate()		# wait
-	os.chdir('..')
 
 
 def read_perseus_out_file(silent):
 	try:
-	        suffix = get_label();
 		with warnings.catch_warnings():
-			out_file = 'perseus/perseus_out_' + suffix + '_1.txt'
+			out_file = get_perseus_path() + '/perseus_out_1.txt'
 			# warnings.simplefilter('ignore')
 			intervals = np.loadtxt(out_file, ndmin=2)
 	except IOError:

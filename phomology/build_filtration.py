@@ -10,7 +10,7 @@ import itertools
 import numpy as np
 import math
 import subprocess
-from utilities import get_label
+from utilities import make_dir, get_label
 
 
 # f = open("output/run_info/build_filtration_memory.txt","wb")
@@ -205,7 +205,9 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	num_divisions = get_param("num_divisions")
 	simplex_cutoff = get_param("simplex_cutoff")
 	file_suffix = get_label();
-	landmark_out_str = "temp/landmark_outputs.txt." + file_suffix;
+        intermediate_path = '../output/phomology/' + file_suffix
+	make_dir(intermediate_path);
+	landmark_out_str = intermediate_path + "/landmark_outputs.txt"
 
 	##################### begin edits by Sam and Elliott ######################
 
@@ -489,19 +491,19 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		values[arg_idx] = param
 
 	values = [None if v == '' else v for v in values]
-	switch_file = 'temp/find_landmark_arg_switches.txt.' + file_suffix
-	val_file = 'temp/find_landmark_arg_vals.txt.' + file_suffix
+	switch_file = intermediate_path + '/find_landmark_arg_switches.txt'
+	val_file = intermediate_path + '/find_landmark_arg_vals.txt'
 	np.savetxt(switch_file, switches, fmt='%i')
 	np.savetxt(val_file, values, fmt='%s')
 
 	if silent:
-		p = subprocess.Popen(["./find_landmarks", file_suffix], stdout=subprocess.PIPE)
+		p = subprocess.Popen(["./find_landmarks", intermediate_path], stdout=subprocess.PIPE)
 		out, err = p.communicate()
+		print(out, err);
 	else:
-		p = subprocess.Popen(['./find_landmarks', file_suffix])
+		p = subprocess.Popen(['./find_landmarks', intermediate_path])
 		p.communicate()
-
-
+		print(out, err);
 
 	if m2_d!=0:
 		number_of_datapoints = int(number_of_datapoints-m2_d)
@@ -558,7 +560,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 		def wit_ids_2_land_ids(simplex):
 			return [w2l_id_dict[wit_id] for wit_id in simplex]
 
-		with open('temp/gi_edge_filtration.txt.' + file_suffix, 'r') as f:
+		with open(intermediate_path + '/gi_edge_filtration.txt', 'r') as f:
 			lines = f.readlines()
 
 		eps, filt_diffs = [], []
