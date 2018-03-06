@@ -2191,3 +2191,50 @@ if test == 21412:
 		annot_hm=False,
 		samples={'interval': 5}
 	)
+
+
+if test == 55555:
+	ts1 = TimeSeries(
+		'datasets/time_series/40-viol.txt',
+		crop=(65000, 170000),
+		num_windows=10,
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj1 = ts1.embed(tau=32, m=2)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -9
+	})
+	
+	ts2 = TimeSeries(
+		'datasets/time_series/viol/40-viol.txt',
+		crop=(35000, 140000),
+		num_windows=10,
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=32, m=2)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'worm_length': 500,
+		'ds_rate': ('worm_length', lambda x: x / 100),
+	})
+
+
+	plot_rocs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k= [0,3],
+		vary_param=('max_filtration_param', (-5,-8,-11,-14,-17,-20)),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+	)
+	
