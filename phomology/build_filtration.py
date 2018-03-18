@@ -499,11 +499,9 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	if silent:
 		p = subprocess.Popen(["./find_landmarks", intermediate_path], stdout=subprocess.PIPE)
 		out, err = p.communicate()
-		print(out, err);
 	else:
 		p = subprocess.Popen(['./find_landmarks', intermediate_path])
 		p.communicate()
-		print(out, err);
 
 	if m2_d!=0:
 		number_of_datapoints = int(number_of_datapoints-m2_d)
