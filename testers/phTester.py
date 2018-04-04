@@ -723,6 +723,91 @@ if test == 505:
 	filt.plot_pd(out_fname('_PD.png'))
 	filt.plot_prf(out_fname('_PRF.png'))
 
+if test == 506:
+
+	ts = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(65000, 90000),
+		num_windows=10,
+
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+
+	filt_params.update(
+		{
+			'ds_rate': 40,
+			'worm_length': 4000,
+			'max_filtration_param': -9,
+			'num_divisions': 10
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+	
+	
+if test == 507:
+
+	ts = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(65000, 90000),
+		num_windows=10,
+
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+
+	filt_params.update(
+		{
+			'ds_rate': 1,
+			'worm_length': 4000,
+			'max_filtration_param': -9,
+			'num_divisions': 10
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+	
+if test == 508:
+
+	ts = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(65000, 90000),
+		num_windows=10,
+
+		window_length=100000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = ts.embed(tau=32, m=2)
+
+	filt_params.update(
+		{
+			'ds_rate': 100,
+			'worm_length': 4000,
+			'max_filtration_param': -9,
+			'num_divisions': 10
+		})
+
+	filt = Filtration(traj, filt_params, save=True)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+
 
 
 print("time elapsed: %d seconds" % (time.time() - start_time))

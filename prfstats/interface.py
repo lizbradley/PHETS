@@ -640,7 +640,8 @@ def toward_3D_plot(traj,
 		weight_func=lambda i, j: 1,
 		see_samples=False,
 		quiet=True,
-		load_saved_filts=False,
+		load_filts=False,
+		save_filts=True,
 ):
 
 	filts = filt_set(
@@ -671,7 +672,8 @@ def toward_wrapper_cluster(
 	weight_func=lambda i, j: 1,
 	see_samples=False,
 	quiet=True,
-	load_saved_filts=False
+	load_filts=False,
+	save_filts = True
 ):
 
 	for i in xrange(1,5):

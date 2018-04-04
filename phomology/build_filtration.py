@@ -11,7 +11,7 @@ import numpy as np
 import math
 import subprocess
 from utilities import make_dir, get_label
-
+from geometricinfo import GeometricInfo
 
 # f = open("output/run_info/build_filtration_memory.txt","wb")
 # @profile(stream=f)
@@ -503,7 +503,7 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 	else:
 		p = subprocess.Popen(['./find_landmarks', intermediate_path])
 		p.communicate()
-		print(out, err);
+		#print(out, err);
 
 	if m2_d!=0:
 		number_of_datapoints = int(number_of_datapoints-m2_d)
@@ -739,7 +739,11 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 			if done:
 				break
 			#	print 'We are done with threshold %f' % threshold
+	
+	
+	
 	else:
+		depth = int(-max_filtration_param)
 		if max_filtration_param < 0: # Automatically determine max.
 			depth = int(-max_filtration_param)
 			min_distance = None
@@ -750,6 +754,34 @@ def build_filtration(input_file_name, parameter_set, silent=False):
 					if min_distance ==0:
 						print "witness ",w
 			max_filtration_param = min_distance
+		
+			
+		## 2/23: NIKKI WRITING DENSITY_DIAMETER_KTOP_EMAX TEXT FILE
+		
+		min_landmark_distances = [];
+		max_landmark_distances = [];
+		print landmark_indices
+		for i in landmark_indices:
+			k = d[i][1].distance
+			j = d[i][-1].distance
+			print d[i]
+			print 'Max is:' 
+			print d[i][-1]
+			print 'Min is:'
+			print d[i][1]
+			print 'Distance to self should be:'
+			print d[i][0]
+			min_landmark_distances.append(k)
+			max_landmark_distances.append(j)
+		print min_landmark_distances
+		print np.amax(min_landmark_distances)
+		density = np.average(min_landmark_distances);
+		diameter = np.amax(max_landmark_distances);
+		
+		
+		GeometricInfo.add_tricks([depth, density, diameter, max_filtration_param])         # NEED TO INITIALIZE EARLIER LIKE IN INTERFACE(S?) OR EACH TESTER
+		
+		## 
 
 		step = float(max_filtration_param - min_filtration_param)/float(num_divisions) # Change in epsilon at each step.
 		progress_index = [0]*number_of_datapoints
