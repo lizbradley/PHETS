@@ -5,6 +5,7 @@ from signals import TimeSeries, Trajectory
 from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq, generate_label
+from geometricinfo import GeometricInfo
 import sys
 
 test_num = 21412
@@ -2191,3 +2192,525 @@ if test == 21412:
 		annot_hm=False,
 		samples={'interval': 5}
 	)
+
+# 3/6: Nikki ran, results not good - suggests distance to mean is not good at seeing same as same for clarinet at roughly different times; re-run to calibrate, make sure code runs correct and gives same ROCs for identical inputs; also TP mirrors FP, so diagonal of varying speed.  
+
+if test == 55555:
+
+
+	traj1 = Trajectory(
+		'datasets/40-viol.txt',
+		crop=(1000, 22000),
+		num_windows=5,
+		window_length=20000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -9
+	})
+	
+
+	ts2 = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(65000, 170000),
+		num_windows=5,
+		window_length=20000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=32, m=2)
+
+	filt_params.update({
+		'num_divisions': 10,
+		'worm_length': 500,
+		'ds_rate': ('worm_length', lambda x: x / 100),
+	})
+
+
+	plot_rocs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k= [0,3,.01],
+		vary_param=('max_filtration_param', (-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20)),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+		samples = {'interval': 5}
+	)
+	
+	GeomInf = GeometricInfo.get_tricks()
+	
+	print GeomInf
+	
+	np.savetxt('GeomInf_55555.txt', GeomInf, delimiter=',', fmt='%.4f')
+
+if test == 55554:
+
+
+	traj1 = Trajectory(
+		'datasets/40-viol.txt',
+		crop=(1000, 22000),
+		num_windows=5,
+		window_length=20000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -9
+	})
+	
+
+	ts2 = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(65000, 170000),
+		num_windows=5,
+		window_length=20000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=32, m=2)
+
+	filt_params.update({
+		'num_divisions': 10,
+		'worm_length': 5000,
+		'ds_rate': ('worm_length', lambda x: x / 100),
+	})
+
+
+	plot_rocs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k= [0,3,.01],
+		vary_param=('max_filtration_param', (-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20)),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+		samples = {'interval': 5}
+	)
+	
+	GeomInf = GeometricInfo.get_tricks()
+	
+	print GeomInf
+	
+	np.savetxt('GeomInf_55554.txt', GeomInf, delimiter=',', fmt='%.4f')
+
+if test == 66666:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(1000, 30000),
+		num_windows=2,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	traj2 = Trajectory(
+		'datasets/trajectories/Rossler.txt',
+		crop=(1000, 30000),
+		num_windows=2,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'worm_length': 10000,
+		'ds_rate': ('worm_length', lambda x: x / 100),
+	})
+
+
+	plot_rocs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k= [0,3,.01],
+		vary_param=('max_filtration_param', (-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,17,-18,-19,-20)),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+	)	
+	
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_66666.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	print GeomInf
+	
+
+if test == 66665:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(5000, 100000),
+		num_windows=5,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	traj2 = Trajectory(
+		'datasets/trajectories/Rossler.txt',
+		crop=(5000, 100000),
+		num_windows=5,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+	})
+
+
+	plot_rocs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k= [0,3,.01],
+		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 10),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+		quiet = False
+	)	
+	
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_66665.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	print GeomInf
+	
+if test == 66664:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(1000, 30000),
+		num_windows=2,
+		window_length=25000,
+		vol_norm=(0,0,0)
+	)
+	
+	traj2 = Trajectory(
+		'datasets/trajectories/Rossler.txt',
+		crop=(1000, 30000),
+		num_windows=2,
+		window_length=25000,
+		vol_norm=(0,0,0)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'worm_length': 10000,
+		'ds_rate': ('worm_length', lambda x: x / 100),
+	})
+
+
+	plot_rocs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k= [0,3,.01],
+		vary_param=('max_filtration_param', (-17,-30)),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+		quiet=False,
+		
+	)	
+	
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_66664.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	print GeomInf
+# next run for 2D reconstruction of lorenz/rossler
+if test == 77777:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(1000, 30000),
+		num_windows=5,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	traj2 = Trajectory(
+		'datasets/trajectories/Rossler.txt',
+		crop=(1000, 30000),
+		num_windows=5,
+		max_filtration_param = -10,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'worm_length': 10000,
+		'ds_rate': ('worm_length', lambda x: x / 100),
+	})
+	
+	plot_variance(
+		traj,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (500, 800, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3300, 3600, 3900, 4200, 4500, 4800, 5100)),
+		vary_param_2=('ds_rate', (('worm_length', lambda x: x / 12), ('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 200),('worm_length', lambda x: x / 400))),
+	)
+
+### 3/19: Nikki to get Lorenz, Rossler contours - 3/20 , 6;38 am got test 9995
+
+if test == 9995:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(5000, 100000),
+		num_windows=5,
+		window_length=90000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+	})
+
+
+
+	o_norms = toward_3D_plot(traj1,
+		filt_params,
+		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
+		weight_func=lambda i, j: 1,
+		save_filts=True,
+		quiet = False	
+	)
+
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_9995.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	np.savetxt('Norms_9995.txt', o_norms, delimiter=',', fmt='%.4f')
+	
+	#print GeomInf
+	
+# 3/20: Nikki picking it back up
+
+if test == 8995:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(5000, 100000),
+		num_windows=5,
+		window_length=90000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+	})
+
+
+	o_norms = toward_3D_plot(traj1,
+		filt_params,
+		vary_param_1=('worm_length', (44000, 48000, 52000, 56000, 60000, 64000, 68000, 72000, 76000, 80000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150))),
+		weight_func=lambda i, j: 1,
+		save_filts=True,
+		quiet = False	
+	)
+
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_8995.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	np.savetxt('Norms_8995.txt', o_norms, delimiter=',', fmt='%.4f')
+	
+	print GeomInf
+	
+if test == 7995:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(5000, 100000),
+		num_windows=5,
+		window_length=90000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+	})
+
+
+	o_norms = toward_3D_plot(traj1,
+		filt_params,
+		vary_param_1=('worm_length', (501, )),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150))),
+		weight_func=lambda i, j: 1,
+		save_filts=True,
+		quiet = False	
+	)
+
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_7995.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	np.savetxt('Norms_7995.txt', o_norms, delimiter=',', fmt='%.4f')
+	
+	print GeomInf
+	
+# From 3/19 Still to Run
+	
+if test == 1995:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(5000, 100000),
+		num_windows=5,
+		window_length=90000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+	})
+
+
+
+	o_norms = toward_3D_plot(traj1,
+		filt_params,
+		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
+		load_filts=True,
+		weight_func=lambda i, j: 5.17*np.exp(2*(j-i-np.sqrt(2))),
+		quiet = True	
+	)
+
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_1995.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	np.savetxt('Norms_1995.txt', o_norms, delimiter=',', fmt='%.4f')
+	
+	
+	
+if test == 2995:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(5000, 100000),
+		num_windows=5,
+		window_length=90000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+	})
+
+
+
+	o_norms = toward_3D_plot(traj1,
+		filt_params,
+		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
+		load_filts=True,
+		weight_func=lambda i, j: 2.12*np.exp(2*(j-np.sqrt(2))),
+		quiet = False	
+	)
+
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_2995.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	np.savetxt('Norms_2995.txt', o_norms, delimiter=',', fmt='%.4f')
+	
+
+
+if test == 3995:
+	
+	traj1 = Trajectory(
+		'datasets/Lorenz/StandardLorenz63_IC123.txt',
+		crop=(5000, 100000),
+		num_windows=5,
+		window_length=90000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+	})
+
+
+
+	o_norms = toward_3D_plot(traj1,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
+		load_filts=True,
+		weight_func=lambda i, j: 2.12*np.exp(2*(-i)),
+		quiet = False	
+	)
+
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_3995.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	np.savetxt('Norms_3995.txt', o_norms, delimiter=',', fmt='%.4f')
+	
+	
+	
+if test == 9994:
+	
+	traj1 = Trajectory(
+		'datasets/trajectories/Rossler.txt',
+		crop=(5000, 100000),
+		num_windows=4,
+		window_length=90000,
+		vol_norm=(1,1,1)
+	)
+	
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+	})
+
+
+
+	o_norms = toward_3D_plot(traj1,
+		out_fname(),
+		filt_params,
+		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+		quiet = False	
+	)
+
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_9994.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	np.savetxt('Norms_9994.txt', o_norms, delimiter=',', fmt='%.4f')
+	
+	print GeomInf
+	
+	
