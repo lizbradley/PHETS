@@ -1,5 +1,6 @@
 import os, sys, time, cPickle, warnings, subprocess, itertools
 import numpy as np
+from shutil import copyfile
 
 import build_filtration, plots, filtration_movie
 from utilities import block_print, enable_print, get_label, make_dir
@@ -65,11 +66,14 @@ def call_perseus(silent):
 		p = subprocess.Popen(perseus_cmd, shell=True)
 		p.communicate()		# wait
 
-
+counter = 0;
 def read_perseus_out_file(silent):
-	try:
+	try: 
 		with warnings.catch_warnings():
 			out_file = get_perseus_path() + '/perseus_out_1.txt'
+			global counter;
+			counter += 1;
+			copyfile(out_file, get_perseus_path() + '/perseus_' + str(counter) + '.txt');
 			# warnings.simplefilter('ignore')
 			intervals = np.loadtxt(out_file, ndmin=2)
 	except IOError:
