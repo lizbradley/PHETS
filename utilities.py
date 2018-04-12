@@ -36,7 +36,7 @@ def get_prfstats_path(out_filename):
 
     return out_dir, out_filename;
 
-def get_prfstats_filts_path():
+def get_prfstats_filts_path(second_suffix=''):
     
     suffix = get_label();
     base = 'prfstats/data/' + suffix;
@@ -46,7 +46,7 @@ def get_prfstats_filts_path():
     except OSError:
 	pass
 
-    return (base + '/filts.npy')
+    return (base + '/filts{}.npy'.format(second_suffix))
 
 
 def idx_to_freq(idx):
