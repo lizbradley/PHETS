@@ -1,7 +1,7 @@
 import numpy as np
 
-from config import default_filtration_params as filt_params
-
+from config import default_filtration_params as filt_params 
+from utilities import get_prfstats_filts_path
 
 class ParamError(Exception):
 	def __init__(self, msg):
@@ -29,7 +29,8 @@ def is_weight_func(vp):
 
 def default_fname(fid):
 	suffix = fid if fid is not None else ''
-	return 'prfstats/data/filts{}.npy'.format(suffix)
+	#return 'prfstats/data/filts{}.npy'.format(suffix)
+	return get_prfstats_filts_path(suffix);
 
 
 def load_filts(load_saved, fid):
