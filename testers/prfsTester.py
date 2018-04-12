@@ -2569,13 +2569,13 @@ if test == 7995:
 	
 	print GeomInf
 	
-# From 3/19 Still to Run
+# From 3/19 Still to Run - - - 4/9, running...
 	
 if test == 1995:
 	
 	traj1 = Trajectory(
 		'datasets/Lorenz/StandardLorenz63_IC123.txt',
-		crop=(5000, 100000),
+		crop=(5000, 1000000),
 		num_windows=5,
 		window_length=90000,
 		vol_norm=(1, 1, 1)
@@ -2592,7 +2592,7 @@ if test == 1995:
 	o_norms = toward_3D_plot(traj1,
 		filt_params,
 		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
-		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200))),
 		load_filts=True,
 		weight_func=lambda i, j: 5.17*np.exp(2*(j-i-np.sqrt(2))),
 		quiet = True	
@@ -2604,7 +2604,7 @@ if test == 1995:
 	
 	np.savetxt('Norms_1995.txt', o_norms, delimiter=',', fmt='%.4f')
 	
-	
+# SAVED L = 300, 400, 500 for later: ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500)	
 	
 if test == 2995:
 	
@@ -2627,10 +2627,9 @@ if test == 2995:
 	o_norms = toward_3D_plot(traj1,
 		filt_params,
 		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
-		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
-		load_filts=True,
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200))),
 		weight_func=lambda i, j: 2.12*np.exp(2*(j-np.sqrt(2))),
-		quiet = False	
+		quiet = True	
 	)
 
 	GeomInf = GeometricInfo.get_tricks()
@@ -2639,7 +2638,7 @@ if test == 2995:
 	
 	np.savetxt('Norms_2995.txt', o_norms, delimiter=',', fmt='%.4f')
 	
-
+# took out L = 300, 400, 500, ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500)
 
 if test == 3995:
 	
