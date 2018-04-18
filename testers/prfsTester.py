@@ -2675,43 +2675,62 @@ if test == 3995:
 	
 	np.savetxt('Norms_3995.txt', o_norms, delimiter=',', fmt='%.4f')
 	
+
+############	
 	
+if test == 131313:
 	
-if test == 9994:
-	
-	traj1 = Trajectory(
-		'datasets/trajectories/Rossler.txt',
-		crop=(5000, 100000),
-		num_windows=4,
-		window_length=90000,
-		vol_norm=(1,1,1)
+	ts2 = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(75000, 180000),
+		num_windows=5,
+		window_length=5000,
+		vol_norm=(1, 1, 1)
 	)
 	
-	
+
+#	ts1 = TimeSeries(
+	#	'datasets/40-viol.txt',
+	#	crop=(5000, 20000),
+	#	num_windows=10,
+	#	window_length=14000,
+	#	vol_norm=(1, 1, 1)
+	#)
+
+
+	#traj1 = ts1.embed(tau=32, m=2)
+	traj2 = ts2.embed(tau=32, m=2)
+
+
+
+	traj1 = Trajectory(
+		'datasets/40-viol.txt',
+		crop=(5000, 20000),
+		num_windows=5,
+		window_length=5000,
+		vol_norm=(1, 1, 1)
+		)
+		
 	filt_params.update({
 		'num_divisions': 10,
-		'max_filtration_param': -15,
+		'max_filtration_param': -9,
+		'ds_rate': ('worm_length', lambda x: x / 10)
+		
 	})
-
-
-
-	o_norms = toward_3D_plot(traj1,
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
 		out_fname(),
 		filt_params,
-		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
-		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 4000)),
 		save_filts=True,
 		weight_func=lambda i, j: 1,
-		quiet = False	
+		#samples = {'interval': 5}
 	)
+	
 
-	GeomInf = GeometricInfo.get_tricks()
-	
-	np.savetxt('GeomInf_9994.txt', GeomInf, delimiter=',', fmt='%.4f')
-	
-	np.savetxt('Norms_9994.txt', o_norms, delimiter=',', fmt='%.4f')
-	
-	print GeomInf
+	np.savetxt('ViolClarinet_AUC_varyW_131313.txt', AUCs)
 	
 	
 if test == 1024:
