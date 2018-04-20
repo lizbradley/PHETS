@@ -5,6 +5,7 @@ from signals import TimeSeries, Trajectory
 from prfstats import *
 from config import default_filtration_params as filt_params
 from utilities import idx_to_freq, generate_label
+from prfstats.data import filt_set
 from geometricinfo import GeometricInfo
 import sys
 
@@ -2733,6 +2734,7 @@ if test == 131313:
 	np.savetxt('ViolClarinet_AUC_varyW_131313.txt', AUCs)
 	
 	
+<<<<<<< HEAD
 if test == 131311:
 	
 	ts2 = TimeSeries(
@@ -3115,3 +3117,29 @@ if test == 223:
 	np.savetxt('I4G6_I2G5_AUC_L10.txt', AUCs)
 	
 	
+=======
+if test == 1024:
+   traj = Trajectory('datasets/trajectories/fancy_pendulum.txt', 
+		      num_windows=4);
+    
+   filts = filt_set(
+	    traj,
+	    filt_params,
+	    vp1 = ('d_use_hamiltonian', (1, -1.01, -1.1, -1.5, -2, -3)),
+	    quiet=True,
+	    load=False,
+	    save=False,
+	fid=1
+   )
+
+   print(filts.shape);
+    
+   counter = 0;
+   for idx, filt in np.ndenumerate(filts):
+       print("VRD: ", counter);
+       counter += 1;
+       filt.plot_pd('output/pendulum/{}.png'.format(counter));
+       filt.movie('output/pendulum/' + str(counter) + '_filt_movie.mp4')     # save the filtration/complexes movie
+       filt.plot_pd('output/pendulum/' + str(counter) + '_pd.png')           # save the persistence diagram
+       filt.plot_prf('output/pendulum/' + str(counter) + '_prf.png')         # save the persistence rank function
+>>>>>>> d12ef4c386f1fe3ac647cb2b2c27a7c93e9d1e35
