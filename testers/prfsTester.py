@@ -2640,6 +2640,8 @@ if test == 2995:
 	
 # took out L = 300, 400, 500, ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500)
 
+# NS running, 4/18
+
 if test == 3995:
 	
 	traj1 = Trajectory(
@@ -2659,11 +2661,9 @@ if test == 3995:
 
 
 	o_norms = toward_3D_plot(traj1,
-		out_fname(),
 		filt_params,
 		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
-		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200), ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500))),
-		load_filts=True,
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200))),
 		weight_func=lambda i, j: 2.12*np.exp(2*(-i)),
 		quiet = False	
 	)
@@ -2674,6 +2674,7 @@ if test == 3995:
 	
 	np.savetxt('Norms_3995.txt', o_norms, delimiter=',', fmt='%.4f')
 	
+# ('worm_length', lambda x: x / 300), ('worm_length', lambda x: x / 400), ('worm_length', lambda x: x / 500)
 
 ############	
 	
@@ -2683,7 +2684,7 @@ if test == 131313:
 		'datasets/40-clarinet.txt',
 		crop=(75000, 180000),
 		num_windows=5,
-		window_length=5000,
+		window_length=7000,
 		vol_norm=(1, 1, 1)
 	)
 	
@@ -2704,9 +2705,9 @@ if test == 131313:
 
 	traj1 = Trajectory(
 		'datasets/40-viol.txt',
-		crop=(5000, 20000),
+		crop=(10, 20000),
 		num_windows=5,
-		window_length=5000,
+		window_length=7000,
 		vol_norm=(1, 1, 1)
 		)
 		
@@ -2722,7 +2723,7 @@ if test == 131313:
 		out_fname(),
 		filt_params,
 		k = [0,5,.01],
-		vary_param=('worm_length', (500, 4000)),
+		vary_param=('worm_length', (500, 1000, 4000, 5000)),
 		save_filts=True,
 		weight_func=lambda i, j: 1,
 		#samples = {'interval': 5}
@@ -2730,5 +2731,387 @@ if test == 131313:
 	
 
 	np.savetxt('ViolClarinet_AUC_varyW_131313.txt', AUCs)
+	
+	
+if test == 131311:
+	
+	ts2 = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(75000, 180000),
+		num_windows=5,
+		window_length=7000,
+		vol_norm=(1, 1, 1)
+	)
+	
+
+#	ts1 = TimeSeries(
+	#	'datasets/40-viol.txt',
+	#	crop=(5000, 20000),
+	#	num_windows=10,
+	#	window_length=14000,
+	#	vol_norm=(1, 1, 1)
+	#)
+
+
+	#traj1 = ts1.embed(tau=32, m=2)
+	traj2 = ts2.embed(tau=32, m=2)
+
+
+
+	traj1 = Trajectory(
+		'datasets/40-viol.txt',
+		crop=(10, 20000),
+		num_windows=5,
+		window_length=7000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -9,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 4000, 5000)),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('ViolClarinet_AUC_varyW_131311.txt', AUCs)
+
+if test == 131312:
+	
+	ts2 = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(75000, 180000),
+		num_windows=5,
+		window_length=7000,
+		vol_norm=(1, 1, 1)
+	)
+	
+
+#	ts1 = TimeSeries(
+	#	'datasets/40-viol.txt',
+	#	crop=(5000, 20000),
+	#	num_windows=10,
+	#	window_length=14000,
+	#	vol_norm=(1, 1, 1)
+	#)
+
+
+	#traj1 = ts1.embed(tau=32, m=2)
+	traj2 = ts2.embed(tau=32, m=2)
+
+
+
+	traj1 = Trajectory(
+		'datasets/40-viol.txt',
+		crop=(10, 20000),
+		num_windows=5,
+		window_length=7000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -9,
+		'ds_rate': ('worm_length', lambda x: x / 200)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 4000, 5000)),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('ViolClarinet_AUC_varyW_131312.txt', AUCs)	
+
+
+if test == 141312:
+	
+	ts2 = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(75000, 180000),
+		num_windows=5,
+		window_length=7000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+#	ts1 = TimeSeries(
+	#	'datasets/40-viol.txt',
+	#	crop=(5000, 20000),
+	#	num_windows=10,
+	#	window_length=14000,
+	#	vol_norm=(1, 1, 1)
+	#)
+
+
+	#traj1 = ts1.embed(tau=32, m=2)
+	traj2 = ts2.embed(tau=32, m=2)
+
+
+
+	traj1 = Trajectory(
+		'datasets/40-viol.txt',
+		crop=(10, 20000),
+		num_windows=5,
+		window_length=7000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -9,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 4000, 5000)),
+		save_filts=True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('ViolClarinet_AUC_varyW_141312.txt', AUCs)
+	
+if test == 151312:
+	
+	ts2 = TimeSeries(
+		'datasets/40-clarinet.txt',
+		crop=(75000, 180000),
+		num_windows=5,
+		window_length=7000,
+		vol_norm=(1, 1, 1)
+	)
+	
+	
+#	ts1 = TimeSeries(
+	#	'datasets/40-viol.txt',
+	#	crop=(5000, 20000),
+	#	num_windows=10,
+	#	window_length=14000,
+	#	vol_norm=(1, 1, 1)
+	#)
+
+
+	#traj1 = ts1.embed(tau=32, m=2)
+	traj2 = ts2.embed(tau=32, m=2)
+
+
+
+	traj1 = Trajectory(
+		'datasets/40-viol.txt',
+		crop=(10, 20000),
+		num_windows=5,
+		window_length=7000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -9,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 4000, 5000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('ViolClarinet_AUC_varyW_151312.txt', AUCs)
+	
+	
+##### Nikki: 4/19 to set up bifurcation heuristic and ROC for Neuron Data - - - PHETS_NeuronVoltageDATA > I4G6_Exc_Avg_3thru7_dcem3t200, I2G5, I1G4p5, I2G3
+
+if test == 220:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem3t200.txt',
+		crop=(1000, 100000),
+		num_windows=5,
+		window_length=15000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem3t200.txt',
+		crop=(1000, 100000),
+		num_windows=5,
+		window_length=15000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('I4G6_I2G5_AUC_L50.txt', AUCs)
+	
+if test == 221:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem3t200.txt',
+		crop=(1000, 100000),
+		num_windows=5,
+		window_length=15000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem3t200.txt',
+		crop=(1000, 100000),
+		num_windows=5,
+		window_length=15000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G5_AUC_L100.txt', AUCs)
+	
+if test == 222:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem3t200.txt',
+		crop=(1000, 100000),
+		num_windows=5,
+		window_length=15000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem3t200.txt',
+		crop=(1000, 100000),
+		num_windows=5,
+		window_length=15000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G5_AUC_L500.txt', AUCs)
+	
+if test == 223:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem3t200.txt',
+		crop=(1000, 100000),
+		num_windows=5,
+		window_length=15000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem3t200.txt',
+		crop=(1000, 100000),
+		num_windows=5,
+		window_length=15000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 13)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G5_AUC_L10.txt', AUCs)
 	
 	
