@@ -2733,8 +2733,6 @@ if test == 131313:
 
 	np.savetxt('ViolClarinet_AUC_varyW_131313.txt', AUCs)
 	
-	
-<<<<<<< HEAD
 if test == 131311:
 	
 	ts2 = TimeSeries(
@@ -3116,8 +3114,7 @@ if test == 223:
 	
 	np.savetxt('I4G6_I2G5_AUC_L10.txt', AUCs)
 	
-	
-=======
+
 if test == 1024:
    traj = Trajectory('datasets/trajectories/fancy_pendulum.txt', 
 		      num_windows=4);
@@ -3142,4 +3139,87 @@ if test == 1024:
        filt.movie('output/pendulum/' + str(counter) + '_filt_movie.mp4')     # save the filtration/complexes movie
        filt.plot_pd('output/pendulum/' + str(counter) + '_pd.png')           # save the persistence diagram
        filt.plot_prf('output/pendulum/' + str(counter) + '_prf.png')         # save the persistence rank function
->>>>>>> d12ef4c386f1fe3ac647cb2b2c27a7c93e9d1e35
+  
+###### Nikki: 4/19      
+if test == 1025:
+   traj = Trajectory('datasets/trajectories/fancy_pendulum.txt', 
+		      num_windows=4);
+    
+   filts = filt_set(
+	    traj,
+	    filt_params,
+	    vp1 = ('d_use_hamiltonian', (-6, -10, -100)),
+	 	quiet=True,
+	    load=False,
+	    save=False,
+	fid=1
+   )
+
+   print(filts.shape);
+    
+   counter = 0;
+   for idx, filt in np.ndenumerate(filts):
+       print("VRD: ", counter);
+       counter += 1;
+       filt.plot_pd('output/pendulum/{}.png'.format(counter));
+       filt.movie('output/pendulum/' + str(counter) + '_filt_movie.mp4')     # save the filtration/complexes movie
+       filt.plot_pd('output/pendulum/' + str(counter) + '_pd.png')           # save the persistence diagram
+       filt.plot_prf('output/pendulum/' + str(counter) + '_prf.png')         # save the persistence rank function
+
+###########
+	
+if test == 1026:
+	traj = Trajectory('datasets/trajectories/fancy_pendulum.txt', 
+		      num_windows=4);
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -10,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		})
+
+	filts = filt_set(
+	    traj,
+	    filt_params,
+	    vp1=('d_use_hamiltonian', (-1, -1.5, -2, -2.5, -3, -3.5, -4, -4.5, -5, -5.5, -6)),
+		vp2=('worm_length', (500, 1000, 2000, 5000, 10000)),
+	 	quiet=True,
+	    load=False,
+	    save='Test_1026_Filts',
+		fid=1
+		)
+
+	print(filts.shape);
+	
+	o_norms = toward_3D_plot(traj,
+		filt_params,
+		vary_param_1=('d_use_hamiltonian', (-1, -1.5, -2, -2.5, -3, -3.5, -4, -4.5, -5, -5.5, -6)),
+		vary_param_2=('worm_length', (500, 1000, 2000, 5000, 10000)),
+		quiet = False	
+	)
+
+	GeomInf = GeometricInfo.get_tricks()
+	
+	np.savetxt('GeomInf_1026.txt', GeomInf, delimiter=',', fmt='%.4f')
+	
+	np.savetxt('Norms_1026.txt', o_norms, delimiter=',', fmt='%.4f')
+
+
+if test == 1027:
+	traj = Trajectory('datasets/trajectories/fancy_pendulum.txt', 
+		      num_windows=4);
+		      
+	filts = filt_set(traj,filt_params,load='Test_1026_Filts.npy')
+	
+	print(filts.shape);
+    
+	counter = 0;
+	for idx, filt in np.ndenumerate(filts):
+		print("VRD: ", counter);
+		counter += 1;
+		filt.plot_pd('output/pendulum1027/{}.png'.format(counter));
+		filt.movie('output/pendulum1027/' + str(counter) + '_filt_movie.mp4')     # save the filtration/complexes movie
+		filt.plot_pd('output/pendulum1027/' + str(counter) + '_pd.png')           # save the persistence diagram
+		filt.plot_prf('output/pendulum1027/' + str(counter) + '_prf.png')         # save the persistence rank function
+
+###########
