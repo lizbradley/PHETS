@@ -277,6 +277,7 @@ class Filtration:
 		silent = self.silent
 		if not silent: print "building filtration..."
 
+		print traj.data.shape
 		np.savetxt('temp/worm_data.txt.' + file_suffix, traj.data)
 		start_time = time.time()
 

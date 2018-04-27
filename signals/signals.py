@@ -267,6 +267,7 @@ class TimeSeries(BaseTrajectory):
 
 		traj.source_ts = self
 		traj.embed_params = {'tau': tau, 'm': m}
+		
 
 		return traj
 
