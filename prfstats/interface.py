@@ -764,16 +764,35 @@ def toward_3D_plot(traj,
 		see_samples=False,
 		quiet=True,
 		load_filts=False,
-		save_filts=True,
+		save_filts=True
 ):
+	
+	if load_filts:
+	    if isinstance(load_filts, basestring):
+		    saved = np.load(load_filts)
+	    else:
+		    saved = get_prfstats_filts_path();
+	    filts = saved
 
-	filts = filt_set(
-		traj,
-		filt_params,
-		vary_param_1,
-		vary_param_2,
-		quiet=quiet,
-	)
+	else:
+
+	    filts = filt_set(
+		    traj,
+		    filt_params,
+		    vary_param_1,
+		    vary_param_2,
+		    quiet=quiet,
+	    )
+
+	
+	if save_filts:
+	    for idx, filt in np.ndenumerate(filts):
+	        filt.intervals(); 
+	    if isinstance(save_filts, basestring):
+		    np.save(save_filts, filts)
+	    else:
+		    path = get_prfstats_filts_path();
+		    np.save(path, filts)
 
 	prfs = prf_set(filts, weight_func, vary_param_1, vary_param_2)
 	
