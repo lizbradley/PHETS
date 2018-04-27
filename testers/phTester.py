@@ -809,6 +809,34 @@ if test == 508:
 	filt.plot_prf(out_fname('_PRF.png'))
 
 
+if test == 2:
+
+	ts = TimeSeries(
+		'datasets/BTC-USD.txt',
+		num_windows=2,
+
+		window_length=150,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj = ts.embed(tau=3, m=2)
+
+	filt_params.update(
+		{
+			'ds_rate': 5,
+			'worm_length': 120,
+			'max_filtration_param': -8,
+			'num_divisions': 10
+		})
+
+	filt = Filtration(traj, filt_params)
+	filt = load_filtration()
+
+	filt.movie(out_fname('.mp4'))
+	filt.plot_pd(out_fname('_PD.png'))
+	filt.plot_prf(out_fname('_PRF.png'))
+
+
 
 print("time elapsed: %d seconds" % (time.time() - start_time))
 
