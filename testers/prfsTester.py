@@ -2573,15 +2573,14 @@ if test == 7995:
 # From 3/19 Still to Run - - - 4/9, running...
 	
 if test == 1995:
-	
-	traj1 = Trajectory(
-		'datasets/Lorenz/StandardLorenz63_IC123.txt',
-		crop=(5000, 1000000),
-		num_windows=5,
-		window_length=90000,
-		vol_norm=(1, 1, 1)
-	)
-	
+
+	#traj1 = Trajectory(
+	#	'datasets/Lorenz/StandardLorenz63_IC123.txt',
+	#	crop=(5000, 1000000),
+	#	num_windows=5,
+	#	window_length=90000,
+	#	vol_norm=(1, 1, 1)
+	#)	
 	
 	filt_params.update({
 		'num_divisions': 10,
@@ -2590,12 +2589,12 @@ if test == 1995:
 
 
 
-	o_norms = toward_3D_plot(traj1,
+	o_norms = toward_3D_plot(None,
 		filt_params,
-		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
-		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200))),
-		load_filts=True,
-		weight_func=lambda i, j: 5.17*np.exp(2*(j-i-np.sqrt(2))),
+		vary_param_1=('worm_length', (501, 1000)), #2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25))),#('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200))),
+		load_filts='Test2995Take2.npy',
+		weight_func=lambda i, j: 1, #5.17*np.exp(2*(j-i-np.sqrt(2))),
 		quiet = True	
 	)
 
@@ -2627,9 +2626,10 @@ if test == 2995:
 
 	o_norms = toward_3D_plot(traj1,
 		filt_params,
-		vary_param_1=('worm_length', (501, 1000, 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
-		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25), ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200))),
+		vary_param_1=('worm_length', (501, 1000)), # 2000, 5000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000)),
+		vary_param_2=('ds_rate',(('worm_length', lambda x: x / 16),('worm_length', lambda x: x / 25))), # ('worm_length', lambda x: x / 50), ('worm_length', lambda x: x / 100), ('worm_length', lambda x: x / 150), ('worm_length', lambda x: x / 200))),
 		weight_func=lambda i, j: 2.12*np.exp(2*(j-np.sqrt(2))),
+		save_filts = 'Test2995Take2.npy',
 		quiet = True	
 	)
 
@@ -2952,168 +2952,7 @@ if test == 151312:
 	
 	
 ##### Nikki: 4/19 to set up bifurcation heuristic and ROC for Neuron Data - - - PHETS_NeuronVoltageDATA > I4G6_Exc_Avg_3thru7_dcem3t200, I2G5, I1G4p5, I2G3
-
-if test == 220:
-
-
-	traj2 = Trajectory(
-		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem3t200.txt',
-		crop=(1000, 100000),
-		num_windows=5,
-		window_length=15000,
-		vol_norm=(1, 1, 1)
-		)
-
-
-	traj1 = Trajectory(
-		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem3t200.txt',
-		crop=(1000, 100000),
-		num_windows=5,
-		window_length=15000,
-		vol_norm=(1, 1, 1)
-		)
-		
-	filt_params.update({
-		'num_divisions': 10,
-		'max_filtration_param': -12,
-		'ds_rate': ('worm_length', lambda x: x / 50)
-		
-	})
- 
- 	AUCs = get_aucs(
-		traj1, traj2,
-		out_fname(),
-		filt_params,
-		k = [0,5,.01],
-		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000)),
-		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
-		weight_func=lambda i, j: 1,
-		#samples = {'interval': 5}
-	)
-	
-
-	np.savetxt('I4G6_I2G5_AUC_L50.txt', AUCs)
-	
-if test == 221:
-
-
-	traj2 = Trajectory(
-		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem3t200.txt',
-		crop=(1000, 100000),
-		num_windows=5,
-		window_length=15000,
-		vol_norm=(1, 1, 1)
-		)
-
-
-	traj1 = Trajectory(
-		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem3t200.txt',
-		crop=(1000, 100000),
-		num_windows=5,
-		window_length=15000,
-		vol_norm=(1, 1, 1)
-		)
-		
-	filt_params.update({
-		'num_divisions': 10,
-		'max_filtration_param': -12,
-		'ds_rate': ('worm_length', lambda x: x / 100)
-		
-	})
- 
- 	AUCs = get_aucs(
-		traj1, traj2,
-		out_fname(),
-		filt_params,
-		k = [0,5,.01],
-		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000)),
-		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
-		weight_func=lambda i, j: 1,
-		#samples = {'interval': 5}
-	)
-	
-	np.savetxt('I4G6_I2G5_AUC_L100.txt', AUCs)
-	
-if test == 222:
-
-
-	traj2 = Trajectory(
-		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem3t200.txt',
-		crop=(1000, 100000),
-		num_windows=5,
-		window_length=15000,
-		vol_norm=(1, 1, 1)
-		)
-
-
-	traj1 = Trajectory(
-		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem3t200.txt',
-		crop=(1000, 100000),
-		num_windows=5,
-		window_length=15000,
-		vol_norm=(1, 1, 1)
-		)
-		
-	filt_params.update({
-		'num_divisions': 10,
-		'max_filtration_param': -12,
-		'ds_rate': ('worm_length', lambda x: x / 500)
-		
-	})
- 
- 	AUCs = get_aucs(
-		traj1, traj2,
-		out_fname(),
-		filt_params,
-		k = [0,5,.01],
-		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000)),
-		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
-		weight_func=lambda i, j: 1,
-		#samples = {'interval': 5}
-	)
-	
-	np.savetxt('I4G6_I2G5_AUC_L500.txt', AUCs)
-	
-if test == 223:
-
-
-	traj2 = Trajectory(
-		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem3t200.txt',
-		crop=(1000, 100000),
-		num_windows=5,
-		window_length=15000,
-		vol_norm=(1, 1, 1)
-		)
-
-
-	traj1 = Trajectory(
-		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem3t200.txt',
-		crop=(1000, 100000),
-		num_windows=5,
-		window_length=15000,
-		vol_norm=(1, 1, 1)
-		)
-		
-	filt_params.update({
-		'num_divisions': 10,
-		'max_filtration_param': -12,
-		'ds_rate': ('worm_length', lambda x: x / 13)
-		
-	})
- 
- 	AUCs = get_aucs(
-		traj1, traj2,
-		out_fname(),
-		filt_params,
-		k = [0,5,.01],
-		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000)),
-		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
-		weight_func=lambda i, j: 1,
-		#samples = {'interval': 5}
-	)
-	
-	np.savetxt('I4G6_I2G5_AUC_L10.txt', AUCs)
-	
+## ^ ^ Moved down to 5/21 to run 
 
 if test == 1024:
    traj = Trajectory('datasets/trajectories/fancy_pendulum.txt', 
@@ -3223,3 +3062,1283 @@ if test == 1027:
 		filt.plot_prf('output/pendulum1027/' + str(counter) + '_prf.png')         # save the persistence rank function
 
 ###########
+
+# 4/28: Nikki to run AUC on L63 / Rossler dcr
+
+if test == 42428:
+
+
+	ts1 = TimeSeries(
+		'datasets/LOR.txt',
+		crop=(1000, 990000),
+		num_windows=5,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj1 = ts1.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+
+
+	ts2 = TimeSeries(
+		'datasets/ROS.txt',
+		crop=(1000, 990000),
+		num_windows=5,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+		'ds_rate': ('worm_length', lambda x: x / 16)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.1],
+		vary_param=('worm_length', (500, 1000, 2000, 5000)), #, 8000, 10000, 15000, 20000, 25000, 30000, 35000, 40000)),
+		save_filts= True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('LORvROS_NL16.txt', AUCs)
+	
+### 4/30 
+
+if test == 42429:
+
+
+	ts1 = TimeSeries(
+		'datasets/LOR.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj1 = ts1.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+
+
+	ts2 = TimeSeries(
+		'datasets/ROS.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+		'ds_rate': ('worm_length', lambda x: x / 25)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.1],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 8000, 10000, 15000, 20000, 25000, 30000, 35000, 40000)),
+		save_filts= True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('LORvROS_NL25.txt', AUCs)
+
+### ^ took about 1 1/2 hrs 
+
+if test == 42430:
+
+
+	ts1 = TimeSeries(
+		'datasets/LOR.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj1 = ts1.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+
+
+	ts2 = TimeSeries(
+		'datasets/ROS.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.1],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 8000, 10000, 15000, 20000, 25000, 30000, 35000, 40000)),
+		save_filts= True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('LORvROS_NL50.txt', AUCs)
+
+if test == 42431:
+
+
+	ts1 = TimeSeries(
+		'datasets/LOR.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj1 = ts1.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+
+
+	ts2 = TimeSeries(
+		'datasets/ROS.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.1],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000, 40000)),
+		save_filts= True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('LORvROS_NL100.txt', AUCs)
+	
+if test == 42432:
+
+
+	ts1 = TimeSeries(
+		'datasets/LOR.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj1 = ts1.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+
+
+	ts2 = TimeSeries(
+		'datasets/ROS.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+		'ds_rate': ('worm_length', lambda x: x / 200)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.1],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000, 40000)),
+		save_filts= True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('LORvROS_NL200.txt', AUCs)
+	
+if test == 42433:
+
+
+	ts1 = TimeSeries(
+		'datasets/LOR.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj1 = ts1.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+
+
+	ts2 = TimeSeries(
+		'datasets/ROS.txt',
+		crop=(1000, 990000),
+		num_windows=20,
+		window_length=50000,
+		vol_norm=(1, 1, 1)
+	)
+
+	traj2 = ts2.embed(tau=18, m=2) # WHAT IS TAU CONVERSION? 1/ F*PI - here f = 261.2 b/c middle c instead of 440 = a,  ; F = 1/P3R ? ; F = 2^k-12? ; 
+	
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -15,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.1],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000, 40000)),
+		save_filts= True,
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('LORvROS_NL500.txt', AUCs)
+	
+
+## 5/21 : Nikki copied down Neuron AUC tests written back in end of April; run and put in paper 1
+
+	
+##### Nikki: 4/19 to set up bifurcation heuristic and ROC for Neuron Data - - - PHETS_NeuronVoltageDATA > I4G6_Exc_Avg_3thru7_dcem3t200, I2G5, I1G4p5, I2G3
+
+# varying worm length from 500, 1000, 2000, 5000, 10000, 20000 and number of landmarks from 13 (kmax + 1), 50, 100, 500
+
+# I4G6 vs I2G5: synchronus vs ?? 
+
+# Abstract from orignial Brunel paper 1999 - dynamics of networks of sparsely connected excitatory and inhibitory integrate-and-fire neurons analytically ...
+# > synchronous states in which neurons fire regularly; (SR)
+# > asynchronous states with stationary global activity and very irregular individual cell activity; (AI) - - (AR) is also mentioned
+# and states in which the global activity oscillates but individual cells fire irregularly, typically at rates lower than the global oscillation frequency. 
+## > fast oscillatory state, the network frequency is almost fully controlled by the synaptic time scale. (SI-fast)
+## > slow oscillatory state, the network frequency depends mostly on the membrane time constant. (SI-slow)
+# model has 5 - 12 parameters (model A versus model B, distinguishes parameters for exhibitory vs inhibitory)
+# >> in particular, the transmission delay(s) are important
+# asynchronous = constant global firing rate 
+# probability of a neuron being in depolarization or refractory
+# I2G3 - almost fully synchronized, regularly firing neurons at high rates
+# I2G5 - stationary global activity, irregularly firing neurons
+# I4G6 - fast oscillations of global activity, neurons firing irregularly at rate lower than global frequency
+# I1G4p5 - slow osscilations of global activity, neurons firing irregularly at very low rages
+
+## FIRST: I4G6 vs I2G5 - fast oscillating global activity and irregular lower rate firing neuron *vs* stationary global activity and irregular firing neurons
+# 5/22: opps, used 3D reconstruction w/ delay 200 for test 220 @ first on 5/21; repeat with 2D and fix other tests; repeat for 3D later? 
+
+
+if test == 220:
+
+
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('I4G6_I2G5_AUC_L50.txt', AUCs)
+	
+if test == 221:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G5_AUC_L100.txt', AUCs)
+	
+if test == 222:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G5_AUC_L500.txt', AUCs)
+	
+if test == 223:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 13)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G5_AUC_L13.txt', AUCs)
+	
+## SECOND: I4G6 vs I2G3 - fast oscillating global activity and irregular lower rate firing neuron *vs* almost fully synchronized global activity and regular fast rate firing neurons
+
+if test == 320:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('I4G6_I2G3_AUC_L50.txt', AUCs)
+	
+if test == 321:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G3_AUC_L100.txt', AUCs)
+	
+if test == 322:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G3_AUC_L500.txt', AUCs)
+	
+if test == 323:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 13)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I2G3_AUC_L13.txt', AUCs)
+	
+## THIRD: I4G6 vs I1G4p5 - fast oscillating global activity and irregular lower rate firing neuron *vs* slow oscillating global activity and irregular really slow firing neurons
+
+if test == 420:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('I4G6_I1G4p5_AUC_L50.txt', AUCs)
+	
+if test == 421:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I1G4p5_AUC_L100.txt', AUCs)
+	
+if test == 422:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I1G4p5_AUC_L500.txt', AUCs)
+	
+if test == 423:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I4G6_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 13)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I4G6_I1G4p5_AUC_L13.txt', AUCs)
+	
+## FOURTH: I2G3 vs I1G4p5 - almost fully synchronized, regularly firing neurons at high rates *vs* slow oscillating global activity and irregular really slow firing neurons
+
+if test == 520:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('I2G3_I1G4p5_AUC_L50.txt', AUCs)
+	
+if test == 521:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G3_I1G4p5_AUC_L100.txt', AUCs)
+	
+if test == 522:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G3_I1G4p5_AUC_L500.txt', AUCs)
+	
+if test == 523:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 13)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G3_I1G4p5_AUC_L13.txt', AUCs)
+	
+## FIFTH: I2G5 vs I1G4p5 - stationary global activity, irregularly firing neurons *vs* slow oscillating global activity and irregular really slow firing neurons
+
+if test == 620:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('I2G5_I1G4p5_AUC_L50.txt', AUCs)
+	
+if test == 621:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G5_I1G4p5_AUC_L100.txt', AUCs)
+	
+if test == 622:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G5_I1G4p5_AUC_L500.txt', AUCs)
+	
+if test == 623:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I1G4p5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 13)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G5_I1G4p5_AUC_L13.txt', AUCs)
+	
+## SIXTH: I2G5 vs I2G3 - stationary global activity, irregularly firing neurons *vs* almost fully synchronized, regularly firing neurons at high rates
+
+if test == 720:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 50)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+
+	np.savetxt('I2G5_I2G3_AUC_L50.txt', AUCs)
+	
+if test == 721:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 100)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G5_I2G3_AUC_L100.txt', AUCs)
+	
+if test == 722:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 500)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G5_I2G3_AUC_L500.txt', AUCs)
+	
+if test == 723:
+
+
+	traj2 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G5_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+
+
+	traj1 = Trajectory(
+		'datasets/PHETS_NeuronVoltageDATA/I2G3_Exc_Avg_3thru7_dcem2t200.txt',
+		crop=(1000, 100000),
+		num_windows=10,
+		window_length=25000,
+		vol_norm=(1, 1, 1)
+		)
+		
+	filt_params.update({
+		'num_divisions': 10,
+		'max_filtration_param': -12,
+		'ds_rate': ('worm_length', lambda x: x / 13)
+		
+	})
+ 
+ 	AUCs = get_aucs(
+		traj1, traj2,
+		out_fname(),
+		filt_params,
+		k = [0,5,.01],
+		vary_param=('worm_length', (500, 1000, 2000, 5000, 10000, 20000)),
+		#save_filts= 'ViolClarinet_L50_varyW500_1000_4000_5000',
+		weight_func=lambda i, j: 1,
+		#samples = {'interval': 5}
+	)
+	
+	np.savetxt('I2G5_I2G3_AUC_L13.txt', AUCs)
+	
+if test == 77788:
+	count_simplicies_from_filts('prfstats/data/TEST_NEW_2/filts1.npy')
