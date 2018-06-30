@@ -4342,3 +4342,30 @@ if test == 723:
 	
 if test == 77788:
 	count_simplicies_from_filts('prfstats/data/TEST_NEW_2/filts1.npy')
+
+
+if test == 1031:
+
+        traj_args = {"crop":(100, 9100),
+                "num_windows" : 5,
+                "vol_norm" : (1, 1, 1)}
+        
+	filt_params.update({
+		"worm_length": 2000,
+		"max_filtration_param": 9,
+                'ds_rate': 100
+        })
+       
+        plot_dists_to_ref(
+                'datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
+                out_fname(),
+                filt_params,
+                i_ref=15,
+                i_arr=np.arange(2, 30, 2),
+                quiet=False,
+                save_filts='testing.npy',
+	        #load_filts='testing.npy',
+                samples={'interval': 5, 'filt_step': 5},
+                traj_args=traj_args
+        )
+

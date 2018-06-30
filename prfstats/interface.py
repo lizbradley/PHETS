@@ -23,12 +23,12 @@ def plot_dists_to_ref(
 		filt_params,
 		i_ref,
 		i_arr,
+                traj_args,
 		weight_func=None,
 		load_filts=False,
 		save_filts=True,
 		samples=False,
 		quiet=True,
-
 ):
 	"""
 	Take a set of trajectories as text files with one specified as the
@@ -80,7 +80,7 @@ def plot_dists_to_ref(
 		distances to reference prf
 
 	"""
-
+        
 	out_dir, out_filename = get_prfstats_path(out_filename);
 
 	if load_filts:
@@ -95,11 +95,11 @@ def plot_dists_to_ref(
 		for i in i_arr:
 			fname = path.format(i)
 			print_title(fname)
-			traj = Trajectory(fname)
+			traj = Trajectory(fname, **traj_args)
 			filts.append(
 				Filtration(traj, filt_params, silent=quiet, save=False)
 			)
-		ref_traj = Trajectory(path.format(i_ref))
+		ref_traj = Trajectory(path.format(i_ref), **traj_args)
 		ref_filt = Filtration(ref_traj, filt_params, silent=quiet, save=False)
 		if save_filts:
 			if isinstance(save_filts, basestring):
