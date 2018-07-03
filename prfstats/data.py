@@ -29,7 +29,7 @@ class NormalPRF:
 	lim = np.sqrt(dom_area * 2)
 
 	def __init__(self, prf):
-		if isinstance(prf, PRF):
+		if isinstance(prf, PRF) or isinstance(prf, NormalPRF):
 			self.data = prf.data
 		elif isinstance(prf, np.ndarray):
 			self.data = prf
@@ -222,20 +222,20 @@ def distance(a, b):
 
 def dists_to_ref(funcs, ref_func):
 			
-	#dists = [NormalPRF(f - ref_func).norm for f in funcs]
-	dists = []
-	for i in xrange(len(funcs)):
-		for j in xrange(len(funcs[-1])):
-			#print funcs[i][j].data
-			e = funcs[i][j].data - ref_func.data
-			#print e
-			f = NormalPRF(e)
-			g = f.norm
-			print g
-			dists.append(g)
-	dists2 = np.reshape(dists,(len(funcs),len(funcs[-1])))
-	print np.shape(dists2)
-	return dists2
+	dists = [NormalPRF(f - ref_func).norm for f in funcs]
+	#dists = []
+	#for i in xrange(len(funcs)):
+	#	for j in xrange(len(funcs[-1])):
+	#		#print funcs[i][j].data
+	#		e = funcs[i][j].data - ref_func.data
+	#		#print e
+	#		f = NormalPRF(e)
+	#		g = f.norm
+	#		print g
+	#		dists.append(g)
+	#dists2 = np.reshape(dists,(len(funcs),len(funcs[-1])))
+	#print np.shape(dists2)
+	return dists
 
 
 def mean_dists_compare(prfs1, prfs2):

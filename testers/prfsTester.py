@@ -4352,7 +4352,7 @@ if test == 1031:
         
 	filt_params.update({
 		"worm_length": 2000,
-		"max_filtration_param": 9,
+		"max_filtration_param": -9,
                 'ds_rate': 100
         })
        
@@ -4361,7 +4361,7 @@ if test == 1031:
                 out_fname(),
                 filt_params,
                 i_ref=15,
-                i_arr=np.arange(2, 30, 2),
+                i_arr=np.arange(2, 30, 1),
                 quiet=False,
                 save_filts='testing.npy',
 	        #load_filts='testing.npy',
