@@ -4369,3 +4369,84 @@ if test == 1031:
                 traj_args=traj_args
         )
 
+if test == 1032:
+
+        traj_args = {"crop":(100, 9100),
+                "num_windows" : 5,
+                "vol_norm" : (1, 1, 1)}
+        
+	filt_params.update({
+		"worm_length": 2000,
+		"max_filtration_param": -9,
+                'ds_rate': 20,
+		'd_use_hamiltonian' : -1.01
+        })
+       
+        plot_dists_to_ref(
+                #'datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
+                'datasets/trajectories/lorenz/lorenz_{}.txt',
+                out_fname(),
+                filt_params,
+                i_ref=18,
+                i_arr=np.arange(2, 100, 1),
+                quiet=False,
+                save_filts='testing.npy',
+	        #load_filts='testing.npy',
+                samples={'interval': 3},
+                traj_args=traj_args
+        )
+
+if test == 1033:
+
+        traj_args = {"crop":(100, 9100),
+                "num_windows" : 5,
+                "vol_norm" : (1, 1, 1)}
+        
+	filt_params.update({
+		"worm_length": 2000,
+		"max_filtration_param": -9,
+                'ds_rate': 10,
+		'd_use_hamiltonian' : -1.01
+        })
+       
+        plot_dists_to_ref(
+                'datasets/trajectories/pendulum/pendulum_{}.txt',
+                out_fname(),
+                filt_params,
+                i_ref=25,
+                i_arr=np.arange(2, 100, 1),
+                quiet=False,
+                save_filts='testing.npy',
+	        #load_filts='testing.npy',
+                samples={'interval': 5},
+                traj_args=traj_args
+        )
+
+if test == 1034:
+
+        traj_args = {"crop":(100, 9100),
+                "num_windows" : 5,
+                "vol_norm" : (1, 1, 1)}
+        
+	filt_params.update({
+		"worm_length": 2000,
+		"max_filtration_param": -9,
+                'ds_rate': 20,
+		'd_use_hamiltonian' : -1.01
+        })
+       
+        plot_dists_to_ref(
+                #'datasets/trajectories/L63_x_m2/L63_x_m2_tau{}.txt',
+                'datasets/trajectories/rossler/rossler_{}.txt',
+                out_fname(),
+                filt_params,
+                i_ref=20,
+                i_arr=np.arange(2, 100, 1),
+                quiet=False,
+                save_filts='testing.npy',
+	        #load_filts='testing.npy',
+                samples={'interval': 3},
+                traj_args=traj_args
+        )
+
+
