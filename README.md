@@ -9,7 +9,7 @@ technique. Also included is a dataset of time-series (mostly musical
 instrument recordings) and higher dimensional trajectories as .txt files.
 
 PHETS uses [Perseus](http://people.maths.ox.ac.uk/nanda/perseus/) to
-compute persitent homology.
+compute persistent homology.
 
 PHETS was originally developed for the research detailed 
 [here](https://arxiv.org/pdf/1708.09359.pdf). If you find PHETS useful 
