@@ -13,7 +13,7 @@ compute persistent homology.
 
 PHETS was originally developed for the research detailed 
 [here](https://arxiv.org/pdf/1708.09359.pdf). If you find PHETS useful 
-in your research work, please cite this paper.
+in your research work, please cite [N. Sanderson, E. Shugerman, S. Molnar, J. Meiss, and E. Bradley, "Computational Topology Techniques for Characterizing Time-Series Data", IDA-17 (Proceedings of the 13th International Symposium on Intelligent Data Analysis), London, October 2017](http://arxiv.org/abs/1708.09359): 
 
 Please direct inquires to lizb@colorado.edu.
 
