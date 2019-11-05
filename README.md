@@ -1,6 +1,6 @@
 ## Synopsis
 
-**P**ersistent **H**omology on **E**mbedded **T**ime-**S**eries
+**P**ersistent **H**omology on **E**mbedded **T**ime-**S**eries  [DOI: 10.5281/zenodo.3528239]
 
 This package offers high-level tools for exploration and visualization
 of delay coordinate embedding and persistent homology. It is used to
